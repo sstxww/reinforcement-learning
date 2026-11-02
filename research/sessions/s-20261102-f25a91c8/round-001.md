@@ -38,3 +38,10 @@
 - No Champion. No model promotion.
 - Do not scale PPO before verifying candidate baseline diagnostics, trustworthy recovery, and causal fix.
 - If dedicated CI has not completed, keep new PR Draft and do not claim the canary receipt. Check workflow output for actual run ID and commit SHA before review.
+
+## Verified post-authoring Actions result
+- **SUCCESS**: dedicated [run 41450173178](https://github.com/sstxww/reinforcement-learning/actions/runs/41450173178) completed full unit tests, pinned TavernGym compatibility check, and **one genuine eight-seat game**, generated and committed exact receipt `experiments/s-20261102-f25a91c8/001-118573.json`.
+- Own independent game result: seed 118573, Baseline seat-0 rank 7, placements [7,6,2,8,3,5,1,4], 50 decisions, 14 turns, no truncation, no turn-limit end. This does **not** test PPO candidate strength.
+- Model training performed in this session: 0 steps, no new checkpoint; candidate model games this session: 0. Historical model/guarded results remain attributed to their source sessions.
+- Branch PR [#131](https://github.com/sstxww/reinforcement-learning/pull/131) remains Draft pending exact latest-head CI, review, and nonconflicting safe merge ownership.
+- Additional verified source-backed P2 docs: `reports/s-20261102-f25a91c8/002-verified-action-semantics.md` (1 Refresh, 2 Freeze) and `003-buy-override-falsification.md` (forced BUY still rank 8, guard reliance worse in PR #107).
