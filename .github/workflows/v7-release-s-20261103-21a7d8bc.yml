@@ -1,0 +1,128 @@
+name: V7 durable rejected 1536-step model Release s-20261103-21a7d8bc
+
+# One shot; publishes immutable, clearly unpromoted negative model evidence.
+# The training runner had read-only permissions; no third-party code runs here.
+on:
+  push:
+    branches: [agent/s-20261103-21a7d8bc/optimization-002]
+    paths:
+      - .github/workflows/v7-release-s-20261103-21a7d8bc.yml
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: v7-release-s-20261103-21a7d8bc-41512015082
+  cancel-in-progress: false
+
+jobs:
+  publish-negative-model:
+    if: github.ref == 'refs/heads/agent/s-20261103-21a7d8bc/optimization-002'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      GH_TOKEN: ${{ github.token }}
+      SOURCE_DIR: /tmp/v7-model-source-s-20261103-21a7d8bc
+      STAGED_DIR: /tmp/v7-model-release-s-20261103-21a7d8bc
+      TAG: 'v7-s-20261103-21a7d8bc-1536-41512015082'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify immutable provenance and reject existing Release tag
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REPOSITORY" = 'sstxww/reinforcement-learning'
+          test "$GITHUB_REF" = 'refs/heads/agent/s-20261103-21a7d8bc/optimization-002'
+          test "$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/41512015082" --jq '.head_sha')" = 'edaff917648e7bce536ae3ba99185d18743123d6'
+          test "$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/41512015082" --jq '.conclusion')" = 'success'
+          test "$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/41512015082/artifacts" --jq '.artifacts[] | select(.id == 13174595714) | .digest')" = 'sha256:5bbe0d3e6e5bab2e44e4816a9cb67e290dbb6bda5bc8c04338c7477f2d973080'
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "Refusing existing Release tag; never replace or overwrite an existing model" >&2
+            exit 1
+          fi
+      - name: Download single exact trusted Action artifact
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$SOURCE_DIR" "$STAGED_DIR"
+          gh run download 41512015082 --repo "$GITHUB_REPOSITORY" --name "v7-buy-s-20261103-21a7d8bc-41512015082" --dir "$SOURCE_DIR"
+      - name: Verify all exact bytes and candidate game, stage only immutable evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import hashlib, json, os
+          from pathlib import Path
+          root=Path(os.environ["SOURCE_DIR"]).resolve()
+          dest=Path(os.environ["STAGED_DIR"])
+          sid="s-20261103-21a7d8bc"
+          checks={
+            "checkpoints/candidate.zip":("model.zip","cf34d9728dc50d97707c2c65c6095f330c84c07d0763963db675484f2d797d7c"),
+            "checkpoints/candidate.metadata.json":("model.metadata.json","af629000e088d64b3a9198a60cfac7ad4bdffbacb873dc6f04fb1f5a3b3a623d"),
+            "experiments/"+sid+"/001-baseline-97421.json":("baseline-97421.json","31b7b9566052374347bfced31bcffc69bc3e55f2432e4736b36ba0211ebc05eb"),
+            "experiments/"+sid+"/002-raw-1408-97421.json":("source-97421.json","e08f8276e4e7b4b8f6abde5ad51c8f2faee3574f892bf272dc62e6d10c729e26"),
+            "experiments/"+sid+"/003-candidate-97422.json":("candidate-97422.json","0d901580ea6e79ea16bfc9e8162da0e791406e77240ba89e5b2ea079d3fc035a"),
+            "reports/"+sid+"/001-matched-buy-97421.json":("matched-buy-97421.json","b7228c094bb0640c37963c78bfed47f215f233dcd297004d98fa29fb15133760"),
+          }
+          content={}
+          for src,(dst,sha) in checks.items():
+            p=root/src
+            if not p.is_file() or p.is_symlink() or not p.resolve().is_relative_to(root):
+              raise ValueError("Missing/unsafe original asset: "+src)
+            if p.stat().st_size>25_000_000:
+              raise ValueError("Unbounded asset")
+            data=p.read_bytes()
+            if hashlib.sha256(data).hexdigest()!=sha:
+              raise ValueError("Original file SHA mismatch: "+src)
+            (dest/dst).write_bytes(data)
+            if dst.endswith(".json"):
+              content[dst]=json.loads(data)
+          m=content["model.metadata.json"]
+          c=content["candidate-97422.json"]
+          b=content["baseline-97421.json"]
+          s=content["source-97421.json"]
+          if (m["algorithm"]!="MaskablePPO" or m["total_timesteps"]!=1536
+              or m["checkpoint_sha256"]!="cf34d9728dc50d97707c2c65c6095f330c84c07d0763963db675484f2d797d7c"
+              or m["parent_checkpoint_sha256"]!="a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632"):
+            raise ValueError("Candidate lineage mismatch")
+          for r,seed,rank,expected_sha in (
+            (b,97421,7,None),
+            (s,97421,8,"a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632"),
+            (c,97422,8,"cf34d9728dc50d97707c2c65c6095f330c84c07d0763963db675484f2d797d7c"),
+          ):
+            if (r.get("agent_id")!=sid or r.get("seed")!=seed or r.get("model_sha256")!=expected_sha or
+                r.get("completed") is not True or r.get("placements",[])[0]!=rank or
+                sorted(r["placements"])!=list(range(1,9)) or
+                r.get("environment")!="TavernGym" or r.get("engine_version")!="1.1.0" or
+                r.get("engine_source_hash")!="6d8712c93022ba11" or
+                r.get("truncated_combats")!=0 or r.get("turn_limit_end") is not False or
+                r.get("model_guard_forced_end",0)!=0):
+              raise ValueError("Untrusted/assisted match evidence")
+          print("All six immutable original assets and full-match/lineage evidence verified")
+          PY
+          (cd "$STAGED_DIR" && sha256sum model.zip model.metadata.json baseline-97421.json source-97421.json candidate-97422.json matched-buy-97421.json > sha256sums.txt)
+      - name: Create unique prerelease, never Best or Champion, never update main
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > "$STAGED_DIR/RELEASE-NOTES.md" <<'EOF'
+          AutoTavern-AI V7 R001 — **unpromoted, rejected-for-strength 1536-step MaskablePPO candidate**.
+
+          This experimental model has a completed full eight-seat TavernGym game on seed 97422 placing **8th**; it is **NOT** Best, Champion, an improvement, or an Arena-ranked model. The original source 1408-step raw PPO on seed 97421 also placed 8th versus baseline 7th. One matched seed and one distinct candidate smoke are not statistical evidence of strength.
+
+          Training lineage: registered 1408-step Release `v5-s-20261102-68099929-1408-41428692617`, parent SHA256 a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632, 128 actual added PPO steps, total 1536, candidate weights SHA256 cf34d9728dc50d97707c2c65c6095f330c84c07d0763963db675484f2d797d7c. TavernGym 1.1.0 source 6d8712c93022ba11. No assertion that an additional optimizer restart from the candidate has been run.
+
+          True historical proof: https://github.com/sstxww/reinforcement-learning/actions/runs/41512015082 and committed originals in https://github.com/sstxww/reinforcement-learning/pull/232. All Release assets were obtained from one SHA-verified original artifact and are accompanied by sha256sums.txt. The tag is immutable by workflow design; no overwrites or main/registry mutations.
+          EOF
+          gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --target 0475af195989a491b9f00ef2bd8404b9fc678088 --prerelease --title "V7 R001 rejected 1536-step candidate (rank 8, unpromoted)" --notes-file "$STAGED_DIR/RELEASE-NOTES.md" "$STAGED_DIR/model.zip" "$STAGED_DIR/model.metadata.json" "$STAGED_DIR/baseline-97421.json" "$STAGED_DIR/source-97421.json" "$STAGED_DIR/candidate-97422.json" "$STAGED_DIR/matched-buy-97421.json" "$STAGED_DIR/sha256sums.txt"
+      - name: Independently re-download published model and verify SHA256
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json isPrerelease --jq '.isPrerelease')" = true
+          mkdir -p /tmp/v7-check-released-s-20261103-21a7d8bc
+          gh release download "$TAG" --repo "$GITHUB_REPOSITORY" --pattern model.zip --pattern model.metadata.json --dir /tmp/v7-check-released-s-20261103-21a7d8bc
+          echo "cf34d9728dc50d97707c2c65c6095f330c84c07d0763963db675484f2d797d7c  /tmp/v7-check-released-s-20261103-21a7d8bc/model.zip" | sha256sum -c -
+          echo "af629000e088d64b3a9198a60cfac7ad4bdffbacb873dc6f04fb1f5a3b3a623d  /tmp/v7-check-released-s-20261103-21a7d8bc/model.metadata.json" | sha256sum -c -
+          gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json url,tagName,isPrerelease --jq '{url,tagName,isPrerelease}'
