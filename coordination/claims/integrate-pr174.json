@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "task_key": "integrate/pr-174",
+  "session_id": "s-20261103-469d13fa",
+  "role": "REVIEWER",
+  "state": "claimed",
+  "base_main_sha": "c1b828734527bae6141805581693d890cc3bff94",
+  "work_branch": "agent/s-20261103-469d13fa/optimization-001",
+  "claim_ref": "claims/integrate-pr174",
+  "target_pr": "https://github.com/sstxww/reinforcement-learning/pull/174",
+  "review_id": 5742370559,
+  "main_merge_lease_held": false,
+  "expires_or_handoff": "Release claim on completion; this is task ownership, not the main integration lock.",
+  "scope_files": [
+    "research/sessions/s-20261103-469d13fa/*",
+    "research/knowledge/proposals/s-20261103-469d13fa-001.md",
+    ".github/workflows/v7-pr174-review-469d13fa.yml"
+  ],
+  "non_overlap_note": "Do not modify PR #174 owner's branch; independent review plus own baseline."
+}
