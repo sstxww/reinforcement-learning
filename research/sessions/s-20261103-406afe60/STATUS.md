@@ -1,17 +1,36 @@
-# V7 session status: s-20261103-406afe60
+# V7 session status — s-20261103-406afe60
 
-- **TASK_KEY:** policy/raw-ppo-sampling-vs-argmax-99831
-- **ROUND:** R001; **ROLE:** EVALUATOR/REPAIRER; **state:** running (not integrated).
-- **BASE_MAIN_SHA:** `3a745c6f6a48c65528bcbeb81b8627b8db93f046`; main moved from `c5edec2e3261dacdf3908796ebfe0457fb76c02e` when another integrator merged PR #176.
-- **OWN_BRANCH:** `agent/s-20261103-406afe60/optimization-001`. Initial tested source commit: `b7260914ab2d7264cc44f1abc41f63bdf7f598f3`; later handoff documentation adds commits. Only own namespace files.
-- **P0 inherited:** PR #166 merged `c5edec2e`, main CI run 41510861696 later SUCCESS. PR #176 merged by **another** session `3a745c6f`; its main CI run 41511419671 was running during first inspection. PR #15 has base `agent/learning/v1` and depends on Draft #9. No PR was merged by this session.
-- **P0 gate:** We have **no verified exclusive integrator lease**. Do not merge main or claim lock. Shared train/eval/registry files deliberately untouched.
-- **P2 hypothesis:** Existing unpromoted 1408-step raw PPO rarely buys despite masked-legal BUY. Test whether its deterministic argmax is a bottleneck by comparing the exact same weights with direct stochastic masked `MaskablePPO.predict(..., deterministic=False)`. It is a policy-selection ablation, **not new training or evidence of strength**.
-- **Source:** canonical registry `v5-s-20261102-68099929-1408-41428692617`, Release https://github.com/sstxww/reinforcement-learning/releases/tag/v5-s-20261102-68099929-1408-41428692617 ; SHA256 `a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632`; TavernGym 1.1.0, source hash `6d8712c93022ba11`, 4017 floats / 447 cards / 245 actions. The workflow executes the actual independent Release preflight.
-- **Actual new PPO steps:** 0. No new checkpoint, optimizer state, Release, or promotion. No best/champion. Do not rerun ineffective training just to increase steps.
-- **Own Actions:** https://github.com/sstxww/reinforcement-learning/actions/runs/41511916662 , initially in_progress at source commit `b7260914`. Workflow is branch-only, read-only token, 75 minute max, one seed and one-shot push trigger; no automatic retry.
-- **Real eight-seat games planned, not yet claimed:** seed 99831, seat 0, seven official bots; baseline; raw argmax; raw sampled; authoritative receipts only once matching run artifact is read and verified. Any unfinished raw game is a failure **without ranking**, not rank eight.
-- **Evidence comparisons:** historical raw model rank eight / zero BUY on legal BUY exposures; current R001 baseline vs model outcome **unknown** while Actions runs. `n=1` exploratory even if successful; no causal or quality conclusion.
-- **Failure status:** none yet verified; unexpected gate/loop must be recorded separately, with job log and run ID, and no fabricated completed receipt.
-- **PR and merge:** PR not yet opened until original match receipt is available; no head SHA/PR CI/merge SHA/main postmerge CI is claimed. Do not promote any model.
-- **Next exact action:** Inspect Actions run #41511916662 for completion, fetch its original JSON Artifact, independently check `completed=true`, 1..8 permutation, seed, model SHA, engine and zero fallback. Commit actual receipt(s) under `experiments/s-20261103-406afe60/`, update this STATUS and R001, create non-Draft PR targeting latest main, inspect exact-head CI; hand to actual integrator if no valid lease.
+**1. Claim / stage.** TASK_KEY `policy/raw-ppo-sampling-vs-argmax-99831`; ROUND R001; role EVALUATOR/REPAIRER; **engineering experiment verified, integration pending**. No global atomic task claim or exclusive main-integration lease was obtained; isolation by unique branch and files only, NOT a concurrency lock.
+
+**2. Git identity.** BASE_MAIN_SHA `3a745c6f6a48c65528bcbeb81b8627b8db93f046`. Last main read `c1b828734527bae6141805581693d890cc3bff94` (other integrators merging; refresh before any integration). Own branch `agent/s-20261103-406afe60/optimization-001`; exact successful source experiment source/head SHA `b7260914ab2d7264cc44f1abc41f63bdf7f598f3`; later receipt archive + documentation commits advance own branch; inspect PR's exact current SHA.
+
+**3. Inherited / P0 review.** Read entire 32,014-byte V7 TXT and source `AGENTS.md`, session/closed-loop docs, main registry/trainer/evaluator, open PRs, source issue #158. Other sessions merged PR #166 (main `c5edec2e...`, postmerge Actions SUCCESS #41510861696), PR #176 (main `3a745c6f...`, postmerge Actions SUCCESS #41511419671), and later PR #165. PR #15 still stacked onto Draft #9, not independently mergeable. PR #175 is an ongoing distinct restore-install proposal; never modify its branch. **This session merged zero PRs.**
+
+**4. Own PR and integration gate.** This branch changes only unique code/tests/receipt/workflow/session proposal paths, not canonical train/eval/registry, model weights, main or others' work. Open non-Draft PR to main after this handoff is committed. No merge attempted without real exclusive entry, review and exact-head CI; README/Best/Champion remain untouched. PR URL/head/CI must be verified live, not invented.
+
+**5. Checkpoint provenance.** Official registered *unpromoted* 1,408-step source `v5-s-20261102-68099929-1408-41428692617`; Release https://github.com/sstxww/reinforcement-learning/releases/tag/v5-s-20261102-68099929-1408-41428692617 ; verified checkpoint SHA256 `a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632`. Source run independently restored Release via canonical SHA/metadata/archive/CPU preflight (not a new optimizer-resume certification). TavernGym 1.1.0 source `6d8712c93022ba11`, observe2 4017 float + 447 card slots, 245 masked actions.
+
+**6. Real training/durability.** **0 newly trained PPO steps**; no new model ZIP or optimizer checkpoint and no new model Release. Historical #176 did a bounded 1408→1536 continuation, retained negative rank-eight evidence. This single-variable inference-selection experiment reuses exactly the same read-only 1408 source weights, does not pretend to fix training, and does not promote Best/Champion.
+
+**7. Original genuine games.** Source Action https://github.com/sstxww/reinforcement-learning/actions/runs/41511916662 **completed SUCCESS** on `b7260914...`; artifact #13174485348 (14-day *temporary*), engine preflight + tests SUCCESS. Original files retrieved, byte-SHA-checked and committed unchanged by one-shot own-branch archive Action https://github.com/sstxww/reinforcement-learning/actions/runs/41512673429 **SUCCESS**. Importer's ephemeral `contents:write` workflow was removed at commit `4b8d76bfb088ef4c2c94f091c0c813d1adca6394` once successful. All seed 99831, seat 0, seven official bots, **completed** `Game.is_over()`, eight-seat rank permutation, no combat truncation, no turn-limit end, zero fallback and forced ends.
+ 
+| Authentic unchanged receipt | Mode | Rank | Turns | Decisions | BUY | Mask-legal BUY decision states | FREEZE | REFRESH |
+|---|---|---:|---:|---:|---:|---:|---:|---:|
+| `experiments/s-20261103-406afe60/001-baseline-99831.json` | baseline | 8 | 15 | 37 | 13 | 20 | 0 | 0 |
+| `experiments/s-20261103-406afe60/002-argmax-99831.json` | raw deterministic PPO | 8 | 14 | 125 | 0 | 47 | 70 | 39 |
+| `experiments/s-20261103-406afe60/003-sampled-99831.json` | raw stochastic PPO (same SHA) | 8 | 15 | 45 | 4 | 17 | 8 | 10 |
+
+Original source-file SHA256:
+- baseline: `4149499bd7fed09b45de93b5801d1b9db4cf9dd10c58df9f3045a7944876a97b`
+- argmax: `aba5a0b30e205119c0ce52e06fbc446febf8338cb24c11626410bf5f2abb61dc`
+- sampled: `6355ab8757a1d6343480a2438b34f81784fb78adac7635b69efc1703592d3751`
+
+**8. Matched evaluation / uncertainty.** One exploratory same-seed pair and baseline, **n=1 per arm**, rank mean 8 each, top-4 rate 0 and win rate 0 each. BUY/legally exposed decision ratio: baseline 13/20=65%, argmax 0/47=0%, sampled 4/17≈23.5%; correlated sequential mask exposures are *not* independent opportunities. Sampled model still ends 3 times while BUY legal. Model changes its own future state trajectory; no statistical generalization or proven gameplay benefit.
+
+**9. Confirmed vs hypothesis.** Confirmed in these authentic games: direct masked sampling emitted four BUY actions from unchanged weights, while argmax emitted zero and made many FREEZE/REFRESH calls; **all three placed eighth**. Hypothesis only: spreading probability mass across multiple legal BUY IDs may partly explain argmax non-purchasing; neither reward deficiency nor optimality nor rank improvement is established. Separate other action family ID mapping issues may still exist.
+
+**10. Failures / budget.** No own Actions workflow failures in completed original or importer runs. Source checkpoint passed restore and actual game, not a strength gate. No retries, no additional training costs. No credentials, hidden opponent state, ranked Arena, or uploads of model weights into Git.
+
+**11. Integration / main CI.** Our new code/data are **branch-only until a verified PR merge**. Other-session successful main checks above do **not** substitute our latest-head PR CI. No own merge SHA, no postmerge main CI, no promotion.
+
+**12. Exact next action for successor/integrator.** Confirm own PR #/latest head SHA; run/inspect its `CI - full-match gate` on the exact final PR HEAD; inspect artifact #13174485348 and import run 41512673429; ensure no overlap with latest main; only an actual exclusive integrator with review/security/main compatibility may merge via PR expected_head_sha. Recheck new main SHA and postmerge CI. Then predeclare at least 3 new held-out seeds/rotated seats for **raw sampled vs raw deterministic** if budget allows, and do not promote while ranks remain eighth. Do not repeat same 128-step continuation without a distinct falsifiable training hypothesis.
