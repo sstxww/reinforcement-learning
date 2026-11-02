@@ -1,0 +1,12 @@
+{
+  "buy_chosen": 14,
+  "decisions": 40,
+  "legal_buy_decisions": 22,
+  "model_sha256": null,
+  "note": "Internal-consistency audit only; source authenticity and competitive strength require independent evidence.",
+  "policy": "baseline",
+  "public_trace_prefix_length": 32,
+  "raw_unassisted": true,
+  "seat_zero_placement": 8,
+  "seed": 97821
+}
