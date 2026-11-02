@@ -1,0 +1,50 @@
+{
+  "schema": "v61-raw-economic-liveness-1-summary",
+  "session_id": "s-20261103-9dc0a960",
+  "seed": 43837,
+  "controlled_seat": 0,
+  "policy_mode": "unassisted_raw_maskable_ppo",
+  "engine": {
+    "version": "1.1.0",
+    "source_hash": "6d8712c93022ba11",
+    "features": 4017,
+    "cards": 447,
+    "actions": 245,
+    "n_cards": 3984
+  },
+  "checkpoint_sha256": "a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632",
+  "completed": false,
+  "stop_reason": "raw_model_turn_liveness_budget",
+  "game_turn": 7,
+  "model_placement": null,
+  "max_raw_model_decisions": 480,
+  "stats": {
+    "counts": {
+      "decisions": 223,
+      "buy_legal_decision_exposures": 88,
+      "buy_actions": 0,
+      "end_turn_with_buy_legal": 0,
+      "end_turn": 6,
+      "play_band": 61,
+      "upgrade_action_3": 1,
+      "unchanged_public_obs_between_decisions": 0
+    },
+    "raw_action_histogram": {
+      "0": 6,
+      "1": 31,
+      "2": 60,
+      "3": 1,
+      "7": 60,
+      "31": 1,
+      "32": 3,
+      "46": 61
+    },
+    "buy_given_legal_exposure": 0,
+    "denominator": "One exposure is one own-seat decision with at least one mask-legal BUY ID (8..15); repeated exposures are correlated. Gold and affordability are NOT inferred independently from mask legality."
+  },
+  "raw_full_report_sha256": "69327fc4b3d939b1137da301c4cef2f37a9820afcbf7988f40bbdcd8c29ef939",
+  "raw_full_report_archive": "https://github.com/sstxww/reinforcement-learning/actions/runs/41510804758/artifacts/13172359996",
+  "raw_archive_sha256": "5028ef418ddb4ed9a333dcc82f26eb23c2ea7395ea808309c1da140a65a2ce89",
+  "workflow_run": "https://github.com/sstxww/reinforcement-learning/actions/runs/41510804758",
+  "note": "Summary faithfully transcribed from actual Actions artifact. Full first-64-decision SHA hashes retained in the Artifact, not reconstructed here. No completed model-game receipt or placement is asserted."
+}
