@@ -1,0 +1,68 @@
+name: Mechanism audit R001 s-20261102-30b45c4d
+
+on:
+  push:
+    branches:
+      - 'agent/s-20261102-30b45c4d/optimization-001'
+    paths:
+      - 'tavern_ai/mechanics_audit_s_30b45c4d.py'
+      - 'tests/test_mechanics_audit_s_30b45c4d.py'
+      - '.github/workflows/experiment-s-20261102-30b45c4d.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: s-20261102-30b45c4d-mechanics-001
+  cancel-in-progress: false
+
+jobs:
+  audit:
+    if: github.repository == 'sstxww/reinforcement-learning'
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install minimal audit dependencies
+        run: |
+          python -m pip install -e '.[test]'
+      - name: Run existing and mechanism regression tests
+        run: python -m pytest -q
+      - name: Install pinned real TavernGym and verify source fingerprint
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Generate catalog and genuinely complete one eight-player game
+        run: |
+          python -m tavern_ai.mechanics_audit_s_30b45c4d \
+            --source vendor/AutoTavern/crates/taverngym/data/cards.json \
+            --seed 83171 \
+            --output-dir artifacts/s-20261102-30b45c4d
+          python -m tavern_ai.validate_receipt artifacts/s-20261102-30b45c4d/receipt.json
+      - name: Archive exact ruleset index and game evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: s-20261102-30b45c4d-mechanics-r001
+          path: artifacts/s-20261102-30b45c4d/*.json
+          if-no-files-found: ignore
+          retention-days: 30
+      - name: Commit genuine compact evidence ONLY to own branch
+        run: |
+          test -f artifacts/s-20261102-30b45c4d/receipt.json
+          test -f artifacts/s-20261102-30b45c4d/summary.json
+          mkdir -p experiments/s-20261102-30b45c4d reports
+          cp artifacts/s-20261102-30b45c4d/receipt.json experiments/s-20261102-30b45c4d/001-83171.json
+          cp artifacts/s-20261102-30b45c4d/summary.json reports/s-20261102-30b45c4d-001-mechanics-summary.json
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add experiments/s-20261102-30b45c4d/001-83171.json reports/s-20261102-30b45c4d-001-mechanics-summary.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'evidence(mechanics): verified full eight-seat public audit [s-20261102-30b45c4d]'
+            git push origin HEAD:refs/heads/agent/s-20261102-30b45c4d/optimization-001
+          fi
