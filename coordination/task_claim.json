@@ -4,14 +4,20 @@
   "session_id": "s-20261103-b7c493e2",
   "round": 1,
   "role": "REPAIRER",
-  "state": "claimed",
+  "state": "released_for_handoff",
   "base_main_sha": "c1b828734527bae6141805581693d890cc3bff94",
   "owned_paths": [
     "tavern_ai/train.py",
     "tests/test_resume_prelearn_b7c493e2.py",
     ".github/workflows/v7-prelearn-b7c493e2.yml",
-    "research/sessions/s-20261103-b7c493e2/"
+    "research/sessions/s-20261103-b7c493e2/",
+    "tests/test_train_resume_s_20261102_001b7da1.py"
   ],
   "integration_lease": false,
-  "notes": "Task claim is atomic creation of its ref only; NOT global merge lock. Release claim at handoff; if any conflicting owner emerges, pause shared-file writes."
+  "notes": "Task claim is atomic creation of its ref only; NOT global merge lock. Release claim at handoff; if any conflicting owner emerges, pause shared-file writes.",
+  "release_reason": "Original baseline verified; exact PR head full CI queued, no global integration lock; safe to hand off to qualified reviewer",
+  "handoff_pr": "https://github.com/sstxww/reinforcement-learning/pull/202",
+  "handoff_expected_head_sha": "5650dd1f93ecfb51ef9a0ce3a12d7ecee1c2da1e",
+  "handoff_ci_url": "https://github.com/sstxww/reinforcement-learning/actions/runs/41514245394",
+  "authentic_game_url": "https://github.com/sstxww/reinforcement-learning/blob/agent/s-20261103-b7c493e2/optimization-001/experiments/s-20261103-b7c493e2/001-99763.json"
 }
