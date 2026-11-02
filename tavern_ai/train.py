@@ -10,6 +10,20 @@ from .contract import verify_engine
 from .env import TavernEnv
 
 
+def require_verified_resume(resume: Path, metadata: dict) -> str:
+    """Reject SHA-less legacy restarts before deserializing a PPO checkpoint.
+
+    A metadata self-digest detects corruption, but callers still need trusted
+    Release/registry provenance; this is not a Champion or strength gate.
+    """
+    if not verify_resume_digest(resume, metadata):
+        raise ValueError(
+            "Refusing SHA-less legacy PPO resume: verify a pinned Release "
+            "and migrate to SHA-bound checkpoint metadata first"
+        )
+    return sha256_file(resume)
+
+
 def run(steps: int, seed: int, model_out: Path, resume: Path | None = None):
     from sb3_contrib import MaskablePPO
     from .model import TavernExtractor
@@ -29,8 +43,7 @@ def run(steps: int, seed: int, model_out: Path, resume: Path | None = None):
             prev = json.loads(meta_path.read_text(encoding="utf-8"))
             if not isinstance(prev, dict) or prev.get("engine") != engine:
                 raise ValueError("Checkpoint engine or card vocabulary mismatch")
-            verify_resume_digest(resume, prev)
-            parent_sha256 = sha256_file(resume)
+            parent_sha256 = require_verified_resume(resume, prev)
             model = MaskablePPO.load(str(resume), env=env, device="cpu")
             if type(prev.get("total_timesteps")) is not int or (
                 int(model.num_timesteps) != prev["total_timesteps"]

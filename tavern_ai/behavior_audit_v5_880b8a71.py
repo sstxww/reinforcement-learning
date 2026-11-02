@@ -17,6 +17,7 @@ import numpy as np
 
 from .canary import run as baseline_game
 from .contract import ACTIONS, CARDS, FEATURES, verify_engine
+from .mechanics_audit_f3af3b4d import action_family
 from .validate_receipt import validate
 
 SESSION = "s-20261102-880b8a71"
@@ -25,19 +26,12 @@ RAW_PROBE_BUDGET = 600
 
 
 def category(action: int) -> str:
-    if action == 0:
-        return "end_turn"
-    if action == 3:
-        return "upgrade"
-    if 8 <= action <= 15:
-        return "buy"
-    if 16 <= action <= 29:
-        return "shop_or_sell"
-    if 30 <= action <= 45:
-        return "choose"
-    if 46 <= action <= 125:
-        return "play"
-    return "other"
+    """Use the engine-verified 245-action taxonomy, not a lossy "other" bin.
+
+    Preserve the existing "end_turn" label for older report consumers.
+    """
+    family = action_family(action)
+    return "end_turn" if family == "end" else family
 
 
 def decide(mask: np.ndarray, proposed: int, used: int,
@@ -56,8 +50,10 @@ def one_game(seed: int, model, model_sha: str, engine: dict,
     import taverngym
     game = taverngym.Game(seed=seed)
     histogram = Counter()
+    raw_histogram = Counter()
     legal_opportunities = Counter()
     selected_when_buy_legal = Counter()
+    raw_when_buy_legal = Counter()
     changes = Counter()
     turns = Counter()
     last_turn = None
@@ -104,9 +100,11 @@ def one_game(seed: int, model, model_sha: str, engine: dict,
             if bool(mask[8:16].any()):
                 legal_opportunities["decisions_with_legal_buy"] += 1
                 selected_when_buy_legal[category(action)] += 1
+                raw_when_buy_legal[category(raw_action)] += 1
             legal_opportunities["own_decisions"] += 1
             legal_opportunities["legal_end_turn_opportunities"] += int(mask[0])
             histogram[category(action)] += 1
+            raw_histogram[category(raw_action)] += 1
             turns[str(turn)] += 1
             if len(first_actions) < 32:
                 first_actions.append({"turn": turn, "chosen": action,
@@ -133,8 +131,11 @@ def one_game(seed: int, model, model_sha: str, engine: dict,
         "raw_model_actions": raw_actions, "model_chosen_ends": model_chosen_ends,
         "guard_forced_ends": forced_ends,
         "guard_limit_per_turn": guard_limit, "action_category_counts": dict(histogram),
+        "raw_action_category_counts": dict(raw_histogram),
+        "action_category_semantics": "pinned_taverngym_1.1.0_245_actions_v2",
         "legal_action_opportunities": dict(legal_opportunities),
         "choice_when_buy_legal": dict(selected_when_buy_legal),
+        "raw_choice_when_buy_legal": dict(raw_when_buy_legal),
         "observation_progress": dict(changes), "per_turn_decisions": dict(turns),
         "first_actions": first_actions,
     }

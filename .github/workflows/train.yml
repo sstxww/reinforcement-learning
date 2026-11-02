@@ -2,6 +2,7 @@ name: Train - durable registered Release continuation (manual only)
 
 # Paused weekly bulk PPO: current unpromoted models still rank eighth.
 # Opt-in only until model behavior and promotion gates are independently audited.
+# No Champion/Best promotion occurs in this workflow; every candidate is unpromoted.
 on:
   workflow_dispatch:
     inputs:
@@ -63,6 +64,13 @@ jobs:
             --resume checkpoints/model.zip --out checkpoints/candidate.zip
           test -s checkpoints/candidate.zip
           test -s checkpoints/candidate.metadata.json
+      - name: Bind checkpoint/metadata digests before attempting Release publication
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s checkpoints/candidate.zip
+          test -s checkpoints/candidate.metadata.json
+          sha256sum checkpoints/candidate.zip checkpoints/candidate.metadata.json > checkpoints/candidate.sha256
       - name: Candidate itself plays a complete eight-seat game
         run: |
           python -m tavern_ai.canary --agent-id training-v5-main \
@@ -135,28 +143,18 @@ jobs:
           path: publish/
           if-no-files-found: error
           retention-days: 30
-      - name: Quarantine failed candidate weights for bounded diagnostics only
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: v5-failed-candidate-${{ github.run_id }}
-          path: |
-            checkpoints/candidate.zip
-            checkpoints/candidate.metadata.json
-            artifacts/trained-canary.json
-            artifacts/evaluation.json
-          if-no-files-found: ignore
-          retention-days: 30
-      - name: Supplementary diagnostics (not durable storage)
+      - name: Emergency candidate custody (expiring Artifact, not a permanent Release)
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: v5-main-unpromoted-${{ github.run_id }}
+          name: v5-main-unpromoted-${{ github.run_id }}-${{ github.run_attempt }}
           path: |
             artifacts/*.json
+            checkpoints/candidate.zip
             checkpoints/candidate.metadata.json
+            checkpoints/candidate.sha256
           if-no-files-found: ignore
-          retention-days: 30
+          retention-days: 90
 
   publish:
     needs: train
@@ -172,7 +170,7 @@ jobs:
         with:
           name: v5-main-verified-candidate-${{ github.run_id }}
           path: publish
-      - name: Reverify and publish unpromoted candidate
+      - name: Publish immutable unpromoted candidate only after all gates
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
