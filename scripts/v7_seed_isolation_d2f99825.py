@@ -108,7 +108,7 @@ def run_batch(
                   "mean_model_minus_baseline": (sum(m[s] - b[s] for s in pairs) / len(pairs)) if pairs else None}
     all_done = all(x["completed"] for x in outcomes)
     result = {"schema": 1, "session_id": session_id, "status": "complete" if all_done else "failed_with_evidence",
-              "source_model_sha256": expected_hash, "policy_provenance": "raw model, no guard or fallback",
+              "source_model_sha256": expected_hash, "policy_provenance": ("raw model, no guard or fallback" if policy == "model" else "baseline, no model used"),
               "requested_seeds": list(range(start_seed, start_seed + games)), "by_arm": by_arm,
               "paired_complete_only": paired, "outcomes": outcomes,
               "promotion_authorized": False}
