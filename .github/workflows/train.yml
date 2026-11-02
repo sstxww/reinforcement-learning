@@ -11,6 +11,10 @@ on:
         description: 'Held-out full games: 1 to 10'
         required: true
         default: '3'
+      resume_release_tag:
+        description: 'Optional registered, immutable unpromoted Release tag; fail closed if invalid'
+        required: false
+        default: ''
   schedule:
     - cron: '13 4 * * 1'
 
@@ -42,19 +46,32 @@ jobs:
         run: bash scripts/bootstrap_engine.sh
       - name: Restore last successful compatible model
         shell: bash
+        env:
+          RESUME_RELEASE_TAG: ${{ github.event.inputs.resume_release_tag || '' }}
         run: |
+          set -euo pipefail
           mkdir -p checkpoints
-          RUN_ID="$(gh api "repos/${GITHUB_REPOSITORY}/actions/workflows/train.yml/runs?branch=main&status=success&per_page=1" --jq '.workflow_runs[0].id // empty' || true)"
-          if [[ -n "$RUN_ID" ]]; then
-            if gh run download "$RUN_ID" --repo "$GITHUB_REPOSITORY" --name v1-model --dir checkpoints; then
-              test -f checkpoints/model.zip
-              test -f checkpoints/model.metadata.json
-            else
-              echo "No compatible prior artifact; initializing a fresh checkpoint"
-              rm -f checkpoints/model.zip checkpoints/model.metadata.json
-            fi
+          if [[ -n "$RESUME_RELEASE_TAG" ]]; then
+            # Check declared immutable tag before accessing the remote or loading weights.
+            python -m tavern_ai.release_resume_gate_6ed41c9a --tag "$RESUME_RELEASE_TAG"
+            gh release download "$RESUME_RELEASE_TAG" --repo "$GITHUB_REPOSITORY" \
+              --pattern model.zip --pattern model.metadata.json --dir checkpoints
+            python -m tavern_ai.release_resume_gate_6ed41c9a --tag "$RESUME_RELEASE_TAG" \
+              --model checkpoints/model.zip --metadata checkpoints/model.metadata.json
+            echo "Verified explicit durable Release checkpoint; continuing PPO."
           else
-            echo "First run; training from scratch"
+            RUN_ID="$(gh api "repos/${GITHUB_REPOSITORY}/actions/workflows/train.yml/runs?branch=main&status=success&per_page=1" --jq '.workflow_runs[0].id // empty' || true)"
+            if [[ -n "$RUN_ID" ]]; then
+              if gh run download "$RUN_ID" --repo "$GITHUB_REPOSITORY" --name v1-model --dir checkpoints; then
+                test -f checkpoints/model.zip
+                test -f checkpoints/model.metadata.json
+              else
+                echo "No compatible prior artifact; initializing a fresh checkpoint"
+                rm -f checkpoints/model.zip checkpoints/model.metadata.json
+              fi
+            else
+              echo "First run; training from scratch"
+            fi
           fi
       - name: Incremental Maskable PPO
         shell: bash
@@ -86,6 +103,15 @@ jobs:
           python -m tavern_ai.evaluate --model checkpoints/model.zip \
             --games "$EVAL_GAMES" --start-seed 24000 \
             --out artifacts/evaluation.json
+      - name: Validate checkpoint bytes and CPU inference without write permission
+        shell: bash
+        run: |
+          set -euo pipefail
+          sha256sum checkpoints/model.zip > artifacts/checkpoint.sha256
+          python -m tavern_ai.checkpoint_preflight \
+            --model checkpoints/model.zip --metadata checkpoints/model.metadata.json \
+            --expected-sha256 "$(cut -d' ' -f1 artifacts/checkpoint.sha256)" \
+            --probe-inference
       - name: Save resumable checkpoint and evidence
         uses: actions/upload-artifact@v4
         with:
@@ -95,5 +121,49 @@ jobs:
             checkpoints/model.metadata.json
             artifacts/trained-canary.json
             artifacts/evaluation.json
+            artifacts/checkpoint.sha256
           if-no-files-found: error
           retention-days: 90
+
+  publish:
+    needs: train
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    # GitHub write token is isolated from untrusted training dependencies.
+    permissions:
+      contents: write
+      actions: read
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Restore validated checkpoint and genuine results from this exact run
+        uses: actions/download-artifact@v4
+        with:
+          name: v1-model
+          path: .
+      - name: Publish durable unpromoted Release and verify downloaded bytes
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s checkpoints/model.zip
+          test -s checkpoints/model.metadata.json
+          test -s artifacts/trained-canary.json
+          test -s artifacts/evaluation.json
+          test -s artifacts/checkpoint.sha256
+          sha256sum -c artifacts/checkpoint.sha256
+          jq -e '(.completed == true) and (.policy == "model") and (.truncated_combats == 0) and (.turn_limit_end == false)' artifacts/trained-canary.json
+          jq -e '.candidate.games >= 1 and .candidate.mean_placement >= 1' artifacts/evaluation.json
+          TAG="v5-main-${GITHUB_RUN_ID}"
+          gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --prerelease \
+            --title "Unpromoted main training checkpoint $TAG" \
+            --notes "Experimental only, no Champion promotion. Source run: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}. Full model game and evaluation passed in isolated, read-only train job." \
+            checkpoints/model.zip checkpoints/model.metadata.json \
+            artifacts/trained-canary.json artifacts/evaluation.json artifacts/checkpoint.sha256
+          mkdir -p "$RUNNER_TEMP/release-roundtrip"
+          gh release download "$TAG" --repo "$GITHUB_REPOSITORY" \
+            --pattern model.zip --pattern model.metadata.json \
+            --dir "$RUNNER_TEMP/release-roundtrip"
+          cmp checkpoints/model.zip "$RUNNER_TEMP/release-roundtrip/model.zip"
+          cmp checkpoints/model.metadata.json "$RUNNER_TEMP/release-roundtrip/model.metadata.json"
+          unzip -t "$RUNNER_TEMP/release-roundtrip/model.zip" >/dev/null
