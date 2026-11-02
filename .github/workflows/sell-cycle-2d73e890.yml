@@ -1,0 +1,59 @@
+name: Sell-cycle s-20261102-2d73e890 real-game study
+on:
+  push:
+    branches:
+      - agent/s-20261102-2d73e890/optimization-001
+    paths:
+      - tavern_ai/sell_cycle_2d73e890.py
+      - tavern_ai/sell_cycle_experiment_2d73e890.py
+      - tests/test_sell_cycle_2d73e890.py
+      - .github/workflows/sell-cycle-2d73e890.yml
+permissions:
+  contents: write
+concurrency:
+  group: sell-cycle-s-20261102-2d73e890
+  cancel-in-progress: false
+jobs:
+  bounded-real-game-experiment:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Unit tests
+        run: |
+          python -m pip install -e '.[test]'
+          python -m pytest
+      - name: Bootstrap pinned TavernGym
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Full-game parameter selection and independent paired evaluation
+        run: |
+          python -m tavern_ai.sell_cycle_experiment_2d73e890
+          python -m tavern_ai.validate_receipt experiments/s-20261102-2d73e890/001-68410.json
+      - name: Commit only genuine same-session receipts
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add experiments/s-20261102-2d73e890/ reports/s-20261102-2d73e890/
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "results(s-20261102-2d73e890): real heldout receipts"
+          test "$GITHUB_REF_NAME" = "agent/s-20261102-2d73e890/optimization-001"
+          git pull --rebase origin "$GITHUB_REF_NAME"
+          git push origin HEAD:"$GITHUB_REF_NAME"
+      - name: Preserve bounded run evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sell-cycle-s-20261102-2d73e890-evidence
+          path: |
+            experiments/s-20261102-2d73e890/*.json
+            reports/s-20261102-2d73e890/*.json
+          if-no-files-found: ignore
+          retention-days: 30
