@@ -85,3 +85,38 @@ def test_duplicate_ids_are_rejected(tmp_path):
                                 "models": [entry, dict(entry)]}))
     with pytest.raises(ValueError, match="Duplicate"):
         read_registry(path)
+
+
+def test_schema2_actual_release_format(tmp_path):
+    checkpoint, metadata, entry = fixture(tmp_path)
+    payload = json.loads(metadata.read_text())
+    from tavern_ai.contract import CATALOG_SHA256, RULESET_ID, PATCH_SHA256, UPSTREAM_COMMIT
+    payload["schema"] = 2
+    payload["checkpoint_sha256"] = entry["sha256"]
+    payload["compatibility"] = {
+        "engine": payload["engine"], "catalog_sha256": CATALOG_SHA256,
+        "ruleset_id": RULESET_ID, "patch_sha256": PATCH_SHA256,
+        "upstream_commit": UPSTREAM_COMMIT,
+    }
+    metadata.write_text(json.dumps(payload))
+    assert verify_archive(entry, checkpoint, metadata)["status"] == "integrity_preflight_passed"
+    payload["compatibility"]["catalog_sha256"] = "incorrect"
+    metadata.write_text(json.dumps(payload))
+    with pytest.raises(ValueError, match="catalog"):
+        verify_archive(entry, checkpoint, metadata)
+
+
+def test_schema2_embedded_sha_must_match_release(tmp_path):
+    checkpoint, metadata, entry = fixture(tmp_path)
+    payload = json.loads(metadata.read_text())
+    from tavern_ai.contract import CATALOG_SHA256, RULESET_ID, PATCH_SHA256, UPSTREAM_COMMIT
+    payload["schema"] = 2
+    payload["checkpoint_sha256"] = "0" * 64
+    payload["compatibility"] = {
+        "engine": payload["engine"], "catalog_sha256": CATALOG_SHA256,
+        "ruleset_id": RULESET_ID, "patch_sha256": PATCH_SHA256,
+        "upstream_commit": UPSTREAM_COMMIT,
+    }
+    metadata.write_text(json.dumps(payload))
+    with pytest.raises(ValueError, match="Embedded"):
+        verify_archive(entry, checkpoint, metadata)
