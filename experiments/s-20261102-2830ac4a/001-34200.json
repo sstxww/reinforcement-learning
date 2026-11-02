@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "timestamp": "2026-11-02T08:54:33.192459+00:00",
+  "timestamp": "2026-11-02T08:58:24.918278+00:00",
   "environment": "TavernGym",
   "engine_source_hash": "6d8712c93022ba11",
   "engine_version": "1.1.0",
@@ -8,25 +8,25 @@
   "policy": "avoid_magnetize_v1",
   "seed": 34200,
   "completed": true,
-  "turns": 15,
-  "decisions": 44,
+  "turns": 18,
+  "decisions": 48,
   "placements": [
     8,
+    1,
     5,
     7,
-    1,
+    2,
     3,
-    6,
     4,
-    2
+    6
   ],
   "truncated_combats": 0,
   "turn_limit_end": false,
   "illegal_actions": 0,
-  "shadow_baseline_disagreements": 1,
-  "legal_magnetize_observations": 0,
-  "skipped_baseline_magnetizations": 0,
-  "git_sha": "fdce600b8605845e7e746deaa899f31e957cfa2d",
-  "policy_sha256": "eefea2179896c7bdf94177f5d072b5091aed98512a02446fcebaececd52dd617",
+  "shadow_baseline_disagreements": 11,
+  "legal_magnetize_observations": 13,
+  "skipped_baseline_magnetizations": 11,
+  "git_sha": "9eddd5f6dbbb1e4a79384461b03fed6705384c6e",
+  "policy_sha256": "00173f264d2e300220e2e8a64f1d6f1ab26caedbfbff35d46a10657b8652334a",
   "model_sha256": null
 }

@@ -9,8 +9,8 @@
     "actions": 245,
     "n_cards": 3984
   },
-  "policy_sha256": "eefea2179896c7bdf94177f5d072b5091aed98512a02446fcebaececd52dd617",
-  "base_git_sha": "fdce600b8605845e7e746deaa899f31e957cfa2d",
+  "policy_sha256": "00173f264d2e300220e2e8a64f1d6f1ab26caedbfbff35d46a10657b8652334a",
+  "base_git_sha": "9eddd5f6dbbb1e4a79384461b03fed6705384c6e",
   "training_timesteps": 0,
   "action_contract": {
     "sell_indices": [
@@ -26,9 +26,9 @@
     "seed": 34200,
     "completed": true,
     "rank": 8,
-    "decisions": 44,
-    "shadow_baseline_disagreements": 1,
-    "skipped_baseline_magnetizations": 0
+    "decisions": 48,
+    "shadow_baseline_disagreements": 11,
+    "skipped_baseline_magnetizations": 11
   },
   "control": {
     "games": 3,
@@ -71,7 +71,7 @@
     },
     {
       "seed": 34202,
-      "shadow_baseline_disagreements": 1,
+      "shadow_baseline_disagreements": 0,
       "legal_magnetize_observations": 0,
       "skipped_baseline_magnetizations": 0
     },
