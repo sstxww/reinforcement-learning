@@ -1,0 +1,65 @@
+{
+  "schema": 1,
+  "engine_version": "1.1.0",
+  "engine_source_hash": "6d8712c93022ba11",
+  "candidate_kind": "guarded_model",
+  "candidate_model_sha256_claim": "73bde2666426cecce39f135980a897bb2cd4a7d70783ba04c9c0d29477a6664a",
+  "checkpoint_bytes_verified_by_this_report": false,
+  "paired_seed_seat": [
+    {
+      "seed": 45111,
+      "seat": 0
+    },
+    {
+      "seed": 45112,
+      "seat": 0
+    }
+  ],
+  "candidate": {
+    "games": 2,
+    "ranks": [
+      8,
+      8
+    ],
+    "mean_rank": 8,
+    "top4_rate": 0.0,
+    "top4_wilson95": [
+      0,
+      0.6576197724933469
+    ],
+    "win_rate": 0.0,
+    "win_wilson95": [
+      0,
+      0.6576197724933469
+    ],
+    "decisions": 248,
+    "guard_interventions_reported": 0
+  },
+  "baseline": {
+    "games": 2,
+    "ranks": [
+      6,
+      7
+    ],
+    "mean_rank": 6.5,
+    "top4_rate": 0.0,
+    "top4_wilson95": [
+      0,
+      0.6576197724933469
+    ],
+    "win_rate": 0.0,
+    "win_wilson95": [
+      0,
+      0.6576197724933469
+    ],
+    "decisions": 93,
+    "guard_interventions_reported": 0
+  },
+  "paired_rank_deltas": [
+    2,
+    1
+  ],
+  "paired_mean_rank_delta": 1.5,
+  "interpretation": "Lower mean rank is better. Complete-game receipt validation is not proof of model strength or checkpoint integrity.",
+  "caveat": "Wilson intervals describe win/top4 rates; no causal or statistically significant rank gain is claimed. Samples and gameplay seeds must be independent of training."
+}
