@@ -1,0 +1,147 @@
+name: Research matrix - four isolated agent experiments
+
+on:
+  push:
+    branches: ['agent/infrastructure/v1']
+    paths: ['.github/workflows/research-matrix.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: research-matrix-v1
+  cancel-in-progress: false
+
+jobs:
+  isolated-agent:
+    name: ${{ matrix.agent }} - actual eight-seat game
+    runs-on: ubuntu-latest
+    timeout-minutes: 80
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix:
+        include:
+          - agent: strategy
+            branch: agent/strategy/v1
+            seed: 11001
+          - agent: learning
+            branch: agent/learning/v1
+            seed: 11002
+          - agent: evaluation
+            branch: agent/evaluation/v1
+            seed: 11003
+          - agent: infrastructure
+            branch: agent/infrastructure/v1
+            seed: 11004
+    steps:
+      - name: Check out the matching agent branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ matrix.branch }}
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install project tools
+        shell: bash
+        env:
+          AGENT: ${{ matrix.agent }}
+        run: |
+          set -euo pipefail
+          python -m pip install --upgrade pip
+          if [[ "$AGENT" == learning ]]; then
+            python -m pip install -e '.[train,test]'
+          else
+            python -m pip install -e '.[test]'
+          fi
+      - name: Run local unit tests
+        run: python -m pytest
+      - name: Bootstrap pinned TavernGym engine from upstream read-only
+        run: bash scripts/bootstrap_engine.sh
+      - name: Verify pinned engine and play full eight-seat match
+        shell: bash
+        env:
+          AGENT: ${{ matrix.agent }}
+          SEED: ${{ matrix.seed }}
+        run: |
+          set -euo pipefail
+          # GitHub event SHA belongs to the orchestrator; record the actual
+          # checked-out agent commit instead.
+          export GITHUB_SHA="$(git rev-parse HEAD)"
+          python -m tavern_ai.contract
+          mkdir -p "experiments/$AGENT" artifacts checkpoints
+          if [[ "$AGENT" == learning ]]; then
+            python -m tavern_ai.train --steps 128 --seed 42 --out checkpoints/model.zip
+            python -m tavern_ai.canary --agent-id "$AGENT" --seed "$SEED" \
+              --policy model --model checkpoints/model.zip \
+              --receipt "experiments/$AGENT/first-model-match.json"
+            python -m tavern_ai.evaluate --model checkpoints/model.zip \
+              --games 2 --start-seed 24000 --out artifacts/learning-evaluation.json
+          else
+            python -m tavern_ai.canary --agent-id "$AGENT" --seed "$SEED" \
+              --policy baseline --receipt "experiments/$AGENT/first-match.json"
+          fi
+          if [[ "$AGENT" == evaluation ]]; then
+            python -m tavern_ai.evaluate --games 4 --start-seed 26000 \
+              --out artifacts/evaluation-baseline.json
+          fi
+          if [[ "$AGENT" == strategy ]]; then
+            python - <<'PY'
+          import importlib.util,json,statistics,subprocess
+          from pathlib import Path
+          import tavern_ai.canary as canary
+          seeds=[25001,25002,25003,25004]
+          current=canary.BaselinePolicy
+          candidate=[canary.run(seed,"strategy")["placements"][0] for seed in seeds]
+          old_src=subprocess.check_output(["git","show","origin/main:tavern_ai/baseline.py"],text=True)
+          Path("/tmp/old_baseline.py").write_text(old_src)
+          spec=importlib.util.spec_from_file_location("old_baseline","/tmp/old_baseline.py")
+          old=importlib.util.module_from_spec(spec)
+          spec.loader.exec_module(old)
+          canary.BaselinePolicy=old.BaselinePolicy
+          baseline=[canary.run(seed,"strategy")["placements"][0] for seed in seeds]
+          canary.BaselinePolicy=current
+          report={
+            "seeds":seeds,"candidate_placements":candidate,
+            "main_baseline_placements":baseline,
+            "candidate_mean":statistics.mean(candidate),
+            "main_baseline_mean":statistics.mean(baseline),
+            "paired_mean_delta":statistics.mean(candidate)-statistics.mean(baseline),
+            "n":len(seeds),"warning":"Descriptive paired comparison; n=4 is not significance",
+            "baseline_commit":subprocess.check_output(
+              ["git","rev-parse","origin/main"],text=True).strip(),
+          }
+          Path("artifacts/strategy-paired.json").write_text(json.dumps(report,indent=2))
+          print(json.dumps(report))
+          PY
+          fi
+          python -m tavern_ai.validate_receipt "experiments/$AGENT/first-$([[ "$AGENT" == learning ]] && echo model-match || echo match).json"
+      - name: Preserve training, metrics and original game evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: research-${{ matrix.agent }}-${{ github.run_id }}
+          path: |
+            experiments/${{ matrix.agent }}/*.json
+            artifacts/*.json
+            checkpoints/model.zip
+            checkpoints/model.metadata.json
+          if-no-files-found: ignore
+          retention-days: 90
+      - name: Commit only validated match receipt to matching branch
+        shell: bash
+        env:
+          AGENT: ${{ matrix.agent }}
+          BRANCH: ${{ matrix.branch }}
+        run: |
+          set -euo pipefail
+          python -m tavern_ai.validate_receipt "experiments/$AGENT/first-$([[ "$AGENT" == learning ]] && echo model-match || echo match).json"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "experiments/$AGENT/"
+          git diff --cached --quiet && exit 0
+          git commit -m "test($AGENT): record verified complete eight-seat game"
+          git push origin "HEAD:$BRANCH"
