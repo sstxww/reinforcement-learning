@@ -24,7 +24,7 @@ def validate_integrity(receipt: dict) -> bool:
     if "agent_placement" in receipt:
         placement = receipt["agent_placement"]
         if type(placement) is not int or placement != receipt["placements"][seat]:
-            raise ValueError("Agent placement does not match controlled seat")
+            raise ValueError("Seat/rank mismatch: Agent placement does not match controlled seat")
     elif seat != 0:
         raise ValueError("Rotated-seat receipt requires agent_placement")
     if type(receipt.get("seed")) is not int or receipt["seed"] < 0:
