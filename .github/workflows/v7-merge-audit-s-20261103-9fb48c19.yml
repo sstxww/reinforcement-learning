@@ -66,7 +66,20 @@ jobs:
           git add experiments/s-20261103-9fb48c19/001-99731.json
           if ! git diff --cached --quiet; then
             git commit -m "test(v7): preserve real independent eight-seat baseline receipt seed 99731"
-            git push origin HEAD:refs/heads/agent/s-20261103-9fb48c19/optimization-001
+            BRANCH="agent/s-20261103-9fb48c19/optimization-001"
+            # Other V7 writers may append our own STATUS/proposal before this job
+            # reaches its push. Rebase only this session's receipt on the current
+            # remote head; never force-push or touch another session's ref.
+            published=0
+            for attempt in 1 2 3; do
+              git fetch origin "refs/heads/$BRANCH:refs/remotes/origin/$BRANCH"
+              git rebase "refs/remotes/origin/$BRANCH"
+              if git push origin "HEAD:refs/heads/$BRANCH"; then
+                published=1
+                break
+              fi
+            done
+            test "$published" -eq 1
           fi
       - name: Archive non-secret read-only audit and genuine receipt
         if: always()
