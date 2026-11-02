@@ -25,3 +25,5 @@ metrics: research/sessions/s-20261102-221336eb/evaluation.json; run: https://git
 Failure/uncertainty: sample of six pairs, no superiority proven; Candidate rank advantage not established; cap was exercised.
 Model status: no candidate weight, Best unchanged; artifact retention 30 days only.
 Next hypothesis: test alternative cap after independent sample expansion if interventions are material.
+PR (draft): https://github.com/sstxww/reinforcement-learning/pull/41
+Original PR CI full-match passed at evidence commit 9437d569: https://github.com/sstxww/reinforcement-learning/actions/runs/41416812564

@@ -8,5 +8,5 @@
 - Illegal moves: 0. Truncation/turn-limit: 0 (receipt validation).
 - Model/checkpoint: none; strategy-only study; Best model not changed.
 - Evidence: experiments/s-20261102-221336eb/, research/sessions/s-20261102-221336eb/evaluation.json
-- PR: to be opened after job succeeds.
+- PR: https://github.com/sstxww/reinforcement-learning/pull/41 (draft; original full-match CI https://github.com/sstxww/reinforcement-learning/actions/runs/41416812564 passed at evidence commit 9437d569).
 - Remaining: independent confirmation, owner review, no model promotion.
