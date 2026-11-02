@@ -1,0 +1,96 @@
+{
+  "session": "s-20261102-4d619f26",
+  "base_main_sha": "315b068bac5ab6d8403c3c9b18f8c101c0cded5d",
+  "engine": {
+    "version": "1.1.0",
+    "source_hash": "6d8712c93022ba11",
+    "features": 4017,
+    "cards": 447,
+    "actions": 245,
+    "n_cards": 3984
+  },
+  "algorithm": "masked behavior cloning MLP(287,96,96,245)",
+  "train_seeds": [
+    61101,
+    61102,
+    61103,
+    61104
+  ],
+  "diagnostic_seeds": [
+    61211,
+    61212
+  ],
+  "match_seeds": [
+    61421,
+    61422
+  ],
+  "epochs": 8,
+  "training_samples": 451,
+  "final_loss": 1.8990033864974976,
+  "heldout_imitation": {
+    "n": 250,
+    "exact_accuracy": 0.416,
+    "family_accuracy": 0.548,
+    "teacher_family_counts": {
+      "choose": 35,
+      "buy": 42,
+      "play": 81,
+      "end": 23,
+      "upgrade": 10,
+      "sell": 35,
+      "hero": 10,
+      "activate": 2,
+      "refresh": 12
+    },
+    "student_family_counts": {
+      "choose": 35,
+      "buy": 3,
+      "play": 53,
+      "end": 19,
+      "upgrade": 55,
+      "hero": 40,
+      "refresh": 45
+    }
+  },
+  "model_sha256": "e46ecc54019df972c45755dea294794e302d51acdb57264c1f5d77180be3d1e7",
+  "checkpoint_restored": true,
+  "checkpoint_persistent": false,
+  "game_results": {
+    "clone": {
+      "n": 2,
+      "ranks": [
+        8,
+        8
+      ],
+      "mean_rank": 8.0,
+      "top4_rate": 0.0,
+      "first_place_rate": 0.0,
+      "mean_decisions": 24.5
+    },
+    "baseline": {
+      "n": 2,
+      "ranks": [
+        8,
+        7
+      ],
+      "mean_rank": 7.5,
+      "top4_rate": 0.0,
+      "first_place_rate": 0.0,
+      "mean_decisions": 41.0
+    },
+    "official_teacher": {
+      "n": 2,
+      "ranks": [
+        7,
+        4
+      ],
+      "mean_rank": 5.5,
+      "top4_rate": 0.5,
+      "first_place_rate": 0.0,
+      "mean_decisions": 124.0
+    }
+  },
+  "paired_delta": 0.5,
+  "research_forced_end_count": 0,
+  "promotion": "RETEST"
+}
