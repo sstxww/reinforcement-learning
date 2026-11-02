@@ -62,14 +62,29 @@ def _records(rows: list[dict], *, candidate: bool) -> dict[tuple[int, int], dict
 
 
 def _guard_state(row: dict) -> tuple[str, int | None]:
-    """Unknown is NEVER silently interpreted as zero safety interventions."""
+    """No raw-policy claim without BOTH a raw variant label and zero counters.
+
+    A model receipt alone does not disclose whether its driver applied a rule.
+    Treat any unrecognized variant as unknown, and known assisted variants as
+    guarded even if their rules happened not to fire in this game.
+    """
     reported = []
     for key in GUARD_KEYS:
         if key in row:
             reported.append(_whole(row[key], key))
-    if not reported:
-        return "unknown", None
-    return ("guarded" if any(x > 0 for x in reported) else "explicit_zero", max(reported))
+    maximum = max(reported) if reported else None
+    variant = row.get("policy_variant")
+    if variant is not None and (type(variant) is not str or not variant.strip()):
+        raise ValueError("Invalid policy_variant")
+    if any(x > 0 for x in reported):
+        return "guarded", maximum
+    if isinstance(variant, str) and any(
+        marker in variant.lower() for marker in ("guard", "override", "fallback", "hybrid", "rule_assist")
+    ):
+        return "guarded", maximum
+    if variant not in {"raw_ppo_model", "raw_model", "model_without_fallback"} or not reported:
+        return "unknown", maximum
+    return "explicit_zero", maximum
 
 
 def _bootstrap(values: list[int], *, seed: int, draws: int = 4000) -> list[float]:
