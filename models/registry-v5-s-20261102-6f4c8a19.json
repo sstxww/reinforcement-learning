@@ -1,0 +1,31 @@
+{
+  "schema": 1,
+  "champion": null,
+  "latest": null,
+  "population": [],
+  "notes": "Isolated V5 audit manifest; NOT the project's authoritative registry. No verified Champion. Candidate source claims MUST be independently tested.",
+  "candidates": [
+    {
+      "id": "ppo-v2-1280-41413557445",
+      "role": "challenger",
+      "promotion_verified": false,
+      "source_commit": "ad1bf93498ab5a310e0f4557dde1df7a97bf85fb",
+      "release_tag": "v2-learning-41413557445",
+      "download_url": "https://github.com/sstxww/reinforcement-learning/releases/tag/v2-learning-41413557445",
+      "sha256": "73bde2666426cecce39f135980a897bb2cd4a7d70783ba04c9c0d29477a6664a",
+      "training_steps": 1280,
+      "parent_release_tag": "v1-learning-9eada5801f99",
+      "engine": {
+        "version": "1.1.0",
+        "source_hash": "6d8712c93022ba11",
+        "features": 4017,
+        "cards": 447,
+        "actions": 245
+      },
+      "resume_verified_in_session": false,
+      "full_match_verified_in_session": false,
+      "evaluation_verified_in_session": false,
+      "provenance": "Historical PR #15 / Release; unverified until this session's workflow completes"
+    }
+  ]
+}
