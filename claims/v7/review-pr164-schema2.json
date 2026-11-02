@@ -2,7 +2,7 @@
   "task_key": "integrate/postmerge-pr164-schema2-validation",
   "session_id": "s-20261103-7c7c11cb",
   "round": 1,
-  "state": "running",
+  "state": "completed_execution__awaiting_PR224_latest_head_CI_and_exclusive_integrator",
   "claim_ref": "refs/heads/claims/v7/review-pr164-schema2",
   "scope": [
     "PR #164 postmerge verification",
@@ -12,11 +12,20 @@
   "original_base_main_sha": "3a745c6f6a48c65528bcbeb81b8627b8db93f046",
   "postmerge_main_sha": "990acd21d598a34a554a80c50089a8f1a9423ac4",
   "own_branch": "agent/s-20261103-7c7c11cb/optimization-001",
-  "exclusivity": "atomic branch name creation for this task, not a global main merge lease",
+  "exclusivity": "Atomic branch name protects task identity, but branch is now completed/inactive; never a main lease",
   "merge_rights": false,
-  "related_pr": "https://github.com/sstxww/reinforcement-learning/pull/164",
+  "related_pr": "https://github.com/sstxww/reinforcement-learning/pull/224",
   "merged_by": "other session",
   "postmerge_ci": "https://github.com/sstxww/reinforcement-learning/actions/runs/41511814464",
   "owned_run": "https://github.com/sstxww/reinforcement-learning/actions/runs/41512463704",
-  "expiry_policy": "Task concluded on own final verification; subsequent agent may read receipt and safely choose a new task without requiring this claim branch to be deleted."
+  "expiry_policy": "Task concluded on own final verification; subsequent agent may read receipt and safely choose a new task without requiring this claim branch to be deleted.",
+  "task_claim_active": false,
+  "handoff": "No current lease and no main merge right. PR #224 opened non-draft with six unique evidence files, own train 1280->1408 and two complete games, raw model rank8, durable rejected model Release. Check exact-head CI #41514260556 (queued) before merge; integrate only with exclusive main lock. This task claim is not a main merge lease.",
+  "exact_head_sha": "fda4b104da0866c7ca29dc9754e8b0f66458132a",
+  "pending_ci": "https://github.com/sstxww/reinforcement-learning/actions/runs/41514260556",
+  "owned_run_status": "success",
+  "immutable_rejected_release": "https://github.com/sstxww/reinforcement-learning/releases/tag/v7-rejected-s-20261103-7c7c11cb-1408-1d2d8aa4",
+  "release_publisher_run": "https://github.com/sstxww/reinforcement-learning/actions/runs/41513319168",
+  "release_publisher_status": "success",
+  "recorded_conclusion": "Real raw model rank 8, no established superiority"
 }
