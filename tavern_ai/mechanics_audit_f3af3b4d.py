@@ -78,7 +78,7 @@ def normalize_catalog(raw: list[dict]) -> list[dict]:
 
 def audit_catalog(tg) -> tuple[list[dict], dict]:
     cards = normalize_catalog(json.loads(tg.catalog_json()))
-    if len(cards) != tg.N_CARDS:
+    if len(cards) + 1 != tg.N_CARDS:
         raise AssertionError("engine catalog count disagrees with embedding table")
     for card in cards:
         cid = int(card["cid"])
@@ -90,6 +90,7 @@ def audit_catalog(tg) -> tuple[list[dict], dict]:
     text = json.dumps(cards, ensure_ascii=False, separators=(",", ":"), sort_keys=True)
     coverage = {
         "all_cards": len(cards),
+        "embedding_vocab_including_padding": tg.N_CARDS,
         "in_pool": sum(bool(c["in_pool"]) for c in cards),
         "reachable": sum(bool(c["reachable"]) for c in cards),
         "scripted": sum(bool(c["scripted"]) for c in cards),
