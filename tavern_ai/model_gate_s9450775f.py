@@ -15,22 +15,24 @@ from pathlib import Path
 from .contract import ACTIONS, CARDS, FEATURES, verify_engine
 
 
+# Pinned upstream Action::decode bands (compare #70 mechanics audit).
+# Diagnostic-only classification; does not alter the model's legal actions.
+_ACTION_BANDS = (
+    ("end_turn", 0, 1), ("refresh", 1, 2), ("freeze", 2, 3),
+    ("upgrade", 3, 4), ("hero_power", 4, 6), ("dark_gift", 6, 7),
+    ("cancel", 7, 8), ("buy", 8, 16), ("sell", 16, 23),
+    ("activate", 23, 30), ("choose", 30, 46), ("play", 46, 126),
+    ("magnetize", 126, 196), ("move", 196, 245),
+)
+
+
 def action_family(action: int) -> str:
-    if action == 0:
-        return "end_turn"
-    if action == 1:
-        return "refresh"
-    if action == 3:
-        return "upgrade"
-    if 8 <= action <= 15:
-        return "buy"
-    if 16 <= action <= 22:
-        return "sell"
-    if 30 <= action <= 45:
-        return "choose"
-    if 46 <= action <= 125:
-        return "play"
-    return "other"
+    if type(action) is not int or not 0 <= action < ACTIONS:
+        raise ValueError("Illegal action ID")
+    for family, lo, hi in _ACTION_BANDS:
+        if lo <= action < hi:
+            return family
+    raise RuntimeError("Pinned action bands do not cover legal action")
 
 
 def archive_gate(model_path: Path, metadata_path: Path, expected_sha256: str) -> dict:
@@ -77,6 +79,7 @@ def audit_game(model_path: Path, seed: int, max_decisions: int) -> dict:
     counts = Counter()
     opportunities = Counter()
     by_turn = defaultdict(Counter)
+    action_ids = Counter()
     last = None
     repeats = 0
     decisions = 0
@@ -120,6 +123,11 @@ def audit_game(model_path: Path, seed: int, max_decisions: int) -> dict:
                 repeats += 1
             last = (turn, action, fingerprint)
             family = action_family(action)
+            action_ids[action] += 1
+            if family == "move":
+                opportunities["move_actions"] += 1
+                if (action - 196) // 7 == (action - 196) % 7:
+                    opportunities["same_slot_move_actions"] += 1
             counts[family] += 1
             by_turn[str(turn)][family] += 1
             game.step(0, action)
@@ -139,7 +147,9 @@ def audit_game(model_path: Path, seed: int, max_decisions: int) -> dict:
         "placements": [int(x) for x in game.placements()] if completed else None,
         "truncated_combats": int(game.truncated_combats),
         "turn_limit_end": bool(game.turn_limit_end),
-        "action_counts": dict(counts), "legal_opportunities": dict(opportunities),
+        "action_counts": dict(counts),
+        "action_id_counts": {str(k): v for k, v in sorted(action_ids.items())},
+        "legal_opportunities": dict(opportunities),
         "same_observation_action_repeat_count": repeats,
         "per_turn_action_counts": {k: dict(v) for k, v in sorted(by_turn.items(), key=lambda e: int(e[0]))},
         "forced_end_turns": 0, "baseline_fallback_actions": 0,
