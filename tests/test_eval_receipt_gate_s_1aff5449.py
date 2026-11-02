@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
+import hashlib
 
 import pytest
 
@@ -25,10 +26,11 @@ def test_validates_paired_seed_and_model_digest_before_reporting(tmp_path, monke
     model = tmp_path / "fake-model-only-for-mock.zip"
     model.write_bytes(b"synthetic-not-a-real-checkpoint")
     seen = []
+    model_digest = hashlib.sha256(model.read_bytes()).hexdigest()
 
     def fake_game(seed, agent_id, policy, model_path=None):
         seen.append((seed, policy))
-        return receipt(seed, policy=policy, model_hash=("a" * 64 if policy == "model" else None))
+        return receipt(seed, policy=policy, model_hash=(model_digest if policy == "model" else None))
 
     monkeypatch.setattr(evaluation, "run", fake_game)
     report = evaluation.evaluate("model", model, games=3, start_seed=91200, compare_baseline=True)

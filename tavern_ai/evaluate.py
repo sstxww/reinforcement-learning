@@ -1,9 +1,15 @@
 """Seeded full-game evaluation, with optional paired baseline comparison."""
 from __future__ import annotations
-import argparse, json, statistics
+import argparse, hashlib, json, statistics
 from pathlib import Path
 from .canary import run
 from .receipt_integrity import validate_integrity
+
+
+def _checkpoint_sha256(path: Path) -> str:
+    """Bind a batch to the actual checkpoint bytes, not merely receipt agreement."""
+    with path.open("rb") as stream:
+        return hashlib.file_digest(stream, "sha256").hexdigest()
 
 def summarize(records: list[dict]) -> dict:
     if not records:
@@ -60,12 +66,18 @@ def evaluate(policy: str | int = "baseline", model: Path | int | None = None, ga
         raise FileNotFoundError("Model checkpoint required for evaluation")
     if compare_baseline and policy != "model":
         raise ValueError("Paired baseline comparison requires a model")
+    expected_checkpoint_sha256 = _checkpoint_sha256(model) if policy == "model" else None
     candidate = [
         run(start_seed + i, "evaluation", policy, str(model) if model else None)
         for i in range(games)
     ]
     expected_seeds = list(range(start_seed, start_seed + games))
     _verify_full_game_records(candidate, policy, expected_seeds)
+    if policy == "model":
+        if _checkpoint_sha256(model) != expected_checkpoint_sha256:
+            raise ValueError("Model checkpoint changed during evaluation")
+        if any(row["model_sha256"] != expected_checkpoint_sha256 for row in candidate):
+            raise ValueError("Model receipt digest does not match evaluated checkpoint")
     report = {
         "policy": policy, "candidate": summarize(candidate),
         "seed_start": start_seed,
