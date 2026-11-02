@@ -1,0 +1,118 @@
+# P0 PR integration triage — snapshot with live GitHub PR heads
+
+**Session:** s-20261102-6e4b91ac. **Repo:** sstxww/reinforcement-learning. **Snapshot:** 2026-11-02; GitHub REST `pulls?state=open&per_page=100`, not reused historical counts. PRs dynamically change across parallel sessions. Full source list and mutable head SHAs below.
+
+**Open = 100**; **Draft = 99**; **Main-target = 100**. Conservative *triage-only* buckets: A=0, B=9, C=53, D=28, E=10. These are NOT merge approvals and do not imply tests or model performance evidence have been reviewed for each PR.
+
+- **A — immediate audited main merge:** none. All main-targeting PRs in the snapshot were Draft or lacked verified readiness/ownership; exception non-Draft #15 targets non-main experimental branch. Draft author gates must not be bypassed to reduce PR count.
+- **B — structural or explicit block:** dependency/stacking, wrong target or `action_required` CI examples: #105 stacked over #90, #107 over #103, #15 targets `agent/learning/v1`, #91 unmergeable at this session's check, #86/#84 exact-head PR checks `action_required`. For these, reviewer must recheck latest head and dependencies before any integration.
+- **C — requires deeper evidence review:** PR title alone cannot establish quality. Full actual CI, hashes, receipts, tests, main compatibility and no concurrent integrator required.
+- **D — reported non-gain / negative study:** knowledge and instrumentation may be valuable; weak policies must not be promoted. Bucket based on explicit title only, so reviewer must inspect real reports.
+- **E — potential duplication/overlap:** Release/checkpoint catalog, behavior probes or pinned-card catalogs appear in other already integrated or open PRs; not necessarily actual diff conflicts. #103 author explicitly warns overlap with already merged #90/#98. Selectively extract unique tests and evidence; do not bulk merge.
+
+**Specific latest-head observations during this session:** #103 HEAD `917b92471ef5` CI [41430511908](https://github.com/sstxww/reinforcement-learning/actions/runs/41430511908) SUCCESS, still Draft and author warns duplicates; #75 HEAD `19e5cbb46629` CI [41423533070](https://github.com/sstxww/reinforcement-learning/actions/runs/41423533070) SUCCESS, still Draft awaiting review; #86 HEAD `36ad39184f6d` CI [41430321014](https://github.com/sstxww/reinforcement-learning/actions/runs/41430321014) `action_required`; #84 HEAD `33ca186da956` CI [41430221563](https://github.com/sstxww/reinforcement-learning/actions/runs/41430221563) `action_required`. These are historical observations tied to those exact SHAs, not a blanket certification of newer heads. No PR was merged in this session.
+
+| PR | Triage | Draft status | HEAD first 12 | Base | Title |
+|---|---|---|---|---|---|
+| [#149](https://github.com/sstxww/reinforcement-learning/pull/149) | C | Draft | `f9d346111e84` | `main` | [s-20261102-6ed41c9a R001] Verified Release recovery gate and main durable checkpoint publishing |
+| [#148](https://github.com/sstxww/reinforcement-learning/pull/148) | D | Draft | `086812e2db29` | `main` | [s-20261102-2be229d5 R001] Canonical evaluator rejects assisted games and reports paired uncertainty |
+| [#147](https://github.com/sstxww/reinforcement-learning/pull/147) | C | Draft | `c4859e52ea43` | `main` | [s-20261102-2b9660fa R001] Fail-closed continuation and explicit Release restoration |
+| [#146](https://github.com/sstxww/reinforcement-learning/pull/146) | C | Draft | `5ccc93b9f8b4` | `main` | [s-20261102-8e64a0da R001] V5 P0 integration audit and bounded published-release PPO resume |
+| [#145](https://github.com/sstxww/reinforcement-learning/pull/145) | C | Draft | `74d0ed9ad321` | `main` | [s-20261102-a280d7eb R001] Strict raw/guarded paired rank evidence gate + real TavernGym receipt |
+| [#144](https://github.com/sstxww/reinforcement-learning/pull/144) | C | Draft | `b79432125c9c` | `main` | [s-20261102-6fc22e71 R001] Paired real-game evidence gate: separate raw PPO from guard interventions |
+| [#143](https://github.com/sstxww/reinforcement-learning/pull/143) | D | Draft | `1e803d745be8` | `main` | [s-20261102-71136659 R001] V5 verified paired-evidence gate, 1536-step negative smoke and Release403 handoff |
+| [#142](https://github.com/sstxww/reinforcement-learning/pull/142) | C | Draft | `af4867b6b1ba` | `main` | [s-20261102-70d8074c R001] Fail-closed canonical Release→PPO resume with real full-game and durable-model gate |
+| [#141](https://github.com/sstxww/reinforcement-learning/pull/141) | C | Draft | `23a049b70fd4` | `main` | [s-20261102-dfa88e31 R001] Reuse strict complete-game integrity validation in PR evidence gate |
+| [#139](https://github.com/sstxww/reinforcement-learning/pull/139) | C | Draft | `94834d0253c8` | `main` | [s-20261102-e8355ba3 R001] Reconcile incomplete raw PPO loops vs guarded rank-8 match evidence |
+| [#138](https://github.com/sstxww/reinforcement-learning/pull/138) | C | Draft | `f109243a94e4` | `main` | [s-20261102-0935f036 R001] Fail-closed Champion evidence gate with verified baseline canary |
+| [#137](https://github.com/sstxww/reinforcement-learning/pull/137) | C | Draft | `f1832deb1368` | `main` | [s-20261102-5ce8a1d4 R001] Strict seed-seat paired evidence and raw/guarded attribution |
+| [#136](https://github.com/sstxww/reinforcement-learning/pull/136) | C | Draft | `638c0d4a1f3d` | `main` | [s-20261102-d5349678 R001] P0 integrate #93 Release verifier against live canonical registry |
+| [#135](https://github.com/sstxww/reinforcement-learning/pull/135) | C | Draft | `13cc288cff89` | `main` | [s-20261102-f17ed915 R001] Strict paired receipt evidence gate for V5 rank-8 comparisons |
+| [#134](https://github.com/sstxww/reinforcement-learning/pull/134) | C | Draft | `830760087d43` | `main` | [s-20261102-fda20934 R001] V5 stop silent PPO reset when checkpoint artifact expires |
+| [#133](https://github.com/sstxww/reinforcement-learning/pull/133) | C | Draft | `cae534ccd29a` | `main` | [s-20261102-fb6a2c91 R001] V5 fail-closed durable Release resume smoke + rank8 safety gates |
+| [#132](https://github.com/sstxww/reinforcement-learning/pull/132) | C | Draft | `2e614954a520` | `main` | [s-20261102-1e55e01e R001] Gate main PPO continuation on durable Release; fail closed and archive unpromoted candidate |
+| [#131](https://github.com/sstxww/reinforcement-learning/pull/131) | C | Draft | `709729d45f30` | `main` | [s-20261102-f25a91c8 R001] V5 fail-closed paired raw-model evaluation and live PR dependency audit |
+| [#130](https://github.com/sstxww/reinforcement-learning/pull/130) | C | Draft | `1786e792fcdf` | `main` | [s-20261102-5e3b719a R001] Integrate fail-closed ZIP/algorithm checks into canonical Release verifier |
+| [#129](https://github.com/sstxww/reinforcement-learning/pull/129) | C | Draft | `82a060951ad7` | `main` | [s-20261102-82d0fbbb R001] P1 strict canonical evaluation receipt gate + genuine eight-seat evidence |
+| [#128](https://github.com/sstxww/reinforcement-learning/pull/128) | C | Draft | `62d99f9f885d` | `main` | [s-20261102-5ac817e2 R001] V5 fail-closed main PPO restore guard (no silent reset) |
+| [#127](https://github.com/sstxww/reinforcement-learning/pull/127) | C | Draft | `0083fddb54f7` | `main` | [s-20261102-99372431 R001] V5: fail-closed Release resume with schema-2 provenance and true-game gate |
+| [#126](https://github.com/sstxww/reinforcement-learning/pull/126) | C | Draft | `f8dd8be9ccbc` | `main` | [s-20261102-c647a479 R001] V5 strict paired real-game evaluation and rank-eight integration evidence |
+| [#125](https://github.com/sstxww/reinforcement-learning/pull/125) | D | Draft | `684a2a8b8109` | `main` | [V5 P0/P1][s-20261102-001b7da1] Stage resumable PPO checkpoints and reject checksum/step mismatch |
+| [#124](https://github.com/sstxww/reinforcement-learning/pull/124) | C | Draft | `4a854d4900d5` | `main` | [s-20261102-6e4b91ac R001] Verify PPO resume bytes/steps and run real Release smoke |
+| [#123](https://github.com/sstxww/reinforcement-learning/pull/123) | C | Draft | `2ef3206bbeb5` | `main` | [s-20261102-c07a7192 R001] V5 fail-closed registered Release resume for main trainer |
+| [#121](https://github.com/sstxww/reinforcement-learning/pull/121) | C | Draft | `ea8113c65ddf` | `main` | [s-20261102-aaee3a59 R001] V5 fail-closed Release/Artifact resume and real-game smoke |
+| [#120](https://github.com/sstxww/reinforcement-learning/pull/120) | C | Draft | `4ebddcedd4d1` | `main` | [s-20261102-77ba1f52 R001] Reconcile canonical Release digests and prevent stale 4-model integration |
+| [#119](https://github.com/sstxww/reinforcement-learning/pull/119) | C | Draft | `8f04117ec2f4` | `main` | [s-20261102-e7783c13 R001] Fail-closed paired raw-PPO evaluation evidence and P0 integration audit |
+| [#118](https://github.com/sstxww/reinforcement-learning/pull/118) | C | Draft | `63096017b59b` | `main` | [s-20261102-5d71c0ab R001] Harden Champion evidence gate; verify Release and rank-8 buying behavior |
+| [#117](https://github.com/sstxww/reinforcement-learning/pull/117) | C | Draft | `cd80df575e06` | `main` | [s-20261102-fe461d0d R001] V5 fail-closed registered Release resume for main training |
+| [#116](https://github.com/sstxww/reinforcement-learning/pull/116) | C | Draft | `c283814f67e4` | `main` | [s-20261102-847b6d4e R001] Integrate Release digests with strict PPO ZIP/optimizer preflight |
+| [#115](https://github.com/sstxww/reinforcement-learning/pull/115) | C | Draft | `eac42fffcef2` | `main` | [s-20261102-2acfa761 R001] Integrate fail-closed paired receipt statistics (no model promotion) |
+| [#114](https://github.com/sstxww/reinforcement-learning/pull/114) | C | Ready | `362724d9b141` | `main` | [s-20261102-f26b28e0 R001] V5 fail-closed paired receipt evaluation and rank-8 integration evidence |
+| [#113](https://github.com/sstxww/reinforcement-learning/pull/113) | C | Draft | `c2f85bc032ce` | `main` | [s-20261102-7d32b871 R001] Cross-catalog Release resume gate, real game and rank-eight handoff |
+| [#112](https://github.com/sstxww/reinforcement-learning/pull/112) | C | Draft | `dc94cab5e9f4` | `main` | [s-20261102-30fe4978 R001] Gate paired real-match receipts against fallback, seed and model drift |
+| [#110](https://github.com/sstxww/reinforcement-learning/pull/110) | C | Draft | `15677b6a6cc8` | `main` | [s-20261102-860ff0fd R001] V5: fail-closed main Release resume + real smoke gate |
+| [#109](https://github.com/sstxww/reinforcement-learning/pull/109) | C | Draft | `e1672ffb46da` | `main` | [s-20261102-3e715bca R001] Gate actual PPO resume with existing archive/optimizer preflight |
+| [#107](https://github.com/sstxww/reinforcement-learning/pull/107) | B | Draft | `a41feda9cde3` | `main` | [s-20261102-90e24c7b R002] Nine real games: 46 forced Buys still rank eighth (negative ablation) |
+| [#105](https://github.com/sstxww/reinforcement-learning/pull/105) | B | Draft | `d52d90259f5d` | `main` | [s-20261102-83d91476 R002] Diagnose Refresh/Freeze loop via 4-seed legal-BUY override |
+| [#103](https://github.com/sstxww/reinforcement-learning/pull/103) | E | Draft | `917b92471ef5` | `main` | [s-20261102-90e24c7b R001] Verified V2 no-buy opportunities across six real eight-seat games |
+| [#95](https://github.com/sstxww/reinforcement-learning/pull/95) | E | Draft | `ab22af23e0a7` | `main` | [s-20261102-decfc670 R001] Verify durable V2 model SHA/CPU inference and diagnose rank-8 buy opportunities |
+| [#94](https://github.com/sstxww/reinforcement-learning/pull/94) | E | Draft | `90b5eb0ca048` | `main` | [s-20261102-6b4eaf12 R001] Integrate Release checkpoint preflight + real PPO buy-opportunity diagnosis |
+| [#93](https://github.com/sstxww/reinforcement-learning/pull/93) | E | Draft | `650f62853a1f` | `main` | [s-20261102-91b6e4a7 R001] V5 Release two-asset verification integrated with canonical registry |
+| [#92](https://github.com/sstxww/reinforcement-learning/pull/92) | E | Draft | `1c82073dcd04` | `main` | [s-20261102-309d57fc R001] V5 checkpoint SHA gates, model registry and bounded Release resume audit |
+| [#91](https://github.com/sstxww/reinforcement-learning/pull/91) | B | Draft | `1e57113cbc40` | `main` | [s-20261102-704cec7b R001] V5: verified V2 release resume and rank-8 legal-buy diagnostics |
+| [#86](https://github.com/sstxww/reinforcement-learning/pull/86) | B | Draft | `36ad39184f6d` | `main` | [s-20261102-9732a21e R001] V5 gated Release-resume 128-step smoke and persistent checkpoint roundtrip |
+| [#84](https://github.com/sstxww/reinforcement-learning/pull/84) | B | Draft | `33ca186da956` | `main` | [V5 P1][s-20261102-902968f5] Verify durable Release hashes and bounded PPO optimizer resume |
+| [#83](https://github.com/sstxww/reinforcement-learning/pull/83) | E | Draft | `d3f72a002870` | `main` | [s-20261102-b45c837d R001] V5 fail-closed checkpoint registry and real-match CI gate |
+| [#82](https://github.com/sstxww/reinforcement-learning/pull/82) | E | Draft | `026bfd9197b2` | `main` | [s-20261102-6f4c8a19 R001] Verify V2 Release SHA/optimizer, bounded PPO resume and true-game gate |
+| [#77](https://github.com/sstxww/reinforcement-learning/pull/77) | D | Draft | `d3c7ed72dd01` | `main` | [s-20261102-cee57e6a R001] Public-board replacement: 15 authentic games, selected candidate no-op, REJECT |
+| [#76](https://github.com/sstxww/reinforcement-learning/pull/76) | B | Draft | `6d129de78c26` | `main` | [s-20261102-1692601b R002] Twenty new seat-rotated pairs refute robust sell-swap rank gain |
+| [#74](https://github.com/sstxww/reinforcement-learning/pull/74) | D | Draft | `0913f2ffae7c` | `main` | [s-20261102-aca5a929 R001] Public-card shop ranker: 16 real games, no competitive gain |
+| [#73](https://github.com/sstxww/reinforcement-learning/pull/73) | C | Draft | `1a7feb942f90` | `main` | [s-20261102-13020d89 R001] Public-board upgrade gating: 13 real games, n=4 rank signal only |
+| [#72](https://github.com/sstxww/reinforcement-learning/pull/72) | D | Draft | `534a31697046` | `main` | [s-20261102-1692601b R001] Real sell-swap calibration: 18 games, weak inconclusive rank signal |
+| [#71](https://github.com/sstxww/reinforcement-learning/pull/71) | D | Draft | `b2bb7b1cee23` | `main` | [s-20261102-2d73e890 R001] Bounded blind-sell ablation: 28 real games, heldout rank worse |
+| [#68](https://github.com/sstxww/reinforcement-learning/pull/68) | E | Draft | `a3ca89fa50b0` | `main` | [s-20261102-ada5c379 R001] Pinned native card-mechanism catalog (3983 cards; real-game gate passed) |
+| [#67](https://github.com/sstxww/reinforcement-learning/pull/67) | E | Draft | `b34cb9505eb9` | `main` | [s-20261102-a881710a R001] Pinned-engine static card catalog + real 8-seat public-action probe (no strength claim) |
+| [#66](https://github.com/sstxww/reinforcement-learning/pull/66) | E | Draft | `9617c6f93e45` | `main` | [s-20261102-0ecd90f7 R001] Real-game public mechanics probe: 240 updates, 5 matches; no rank claim |
+| [#65](https://github.com/sstxww/reinforcement-learning/pull/65) | B | Draft | `fc772acf08e6` | `main` | [s-20261102-661adf61 R002] Official bot BC: 43 real games show transfer failure (REJECT) |
+| [#64](https://github.com/sstxww/reinforcement-learning/pull/64) | C | Draft | `c643fbf41eed` | `main` | [s-20261102-73729553 R001] Public-observation masked BC: 95.7% family imitation, 7 real receipts, no rank claim |
+| [#63](https://github.com/sstxww/reinforcement-learning/pull/63) | C | Draft | `4aeb97e05462` | `main` | [s-20261102-4d619f26 R001] Teacher cloning pilot: six real games, no verified gain |
+| [#62](https://github.com/sstxww/reinforcement-learning/pull/62) | C | Draft | `3f452370f502` | `main` | [s-20261102-661adf61 R001] Masked teacher BC: 80 updates, 8 real games, no established rank gain |
+| [#61](https://github.com/sstxww/reinforcement-learning/pull/61) | D | Draft | `e683fb6cfe88` | `main` | [s-20261102-1f73f4a5 R001] Masked BC on real games: legal imitation, no strength gain (negative pilot) |
+| [#60](https://github.com/sstxww/reinforcement-learning/pull/60) | B | Draft | `23beccafb0cf` | `main` | [s-20261102-24728f13 R002] Real PPO telemetry: low-LR candidate never buys on heldout seeds |
+| [#59](https://github.com/sstxww/reinforcement-learning/pull/59) | B | Draft | `f36cd92436f7` | `main` | [s-20261102-c0039389 R002] Full eight-seat TavernGym sweep (33 complete matches; no stable seat4 gain) |
+| [#58](https://github.com/sstxww/reinforcement-learning/pull/58) | D | Draft | `ff40ca8120e2` | `main` | [s-20261102-717d0e50 R002] Public-shop Freeze value gating: 30 true games, no observed gain |
+| [#57](https://github.com/sstxww/reinforcement-learning/pull/57) | D | Draft | `372d5cc6cc86` | `main` | [s-20261102-64405d5e R002] 20 held-out real paired seeds confirm only a small unproven buy-first signal |
+| [#56](https://github.com/sstxww/reinforcement-learning/pull/56) | C | Draft | `22e1f39be1a8` | `main` | [s-20261102-8cfa0c44 R002] Persistent-vs-fresh pool: 385 real games, serial still faster |
+| [#55](https://github.com/sstxww/reinforcement-learning/pull/55) | C | Draft | `d3f1c8b97e33` | `main` | [s-20261102-e9dad467 R002] Held-out 12-game real seat-rotation replication (no policy gain) |
+| [#54](https://github.com/sstxww/reinforcement-learning/pull/54) | D | Draft | `d0042408ea58` | `main` | [s-20261102-e599fa38 R002] Six-seed paired PPO guard-budget ablation (no strength gain) |
+| [#53](https://github.com/sstxww/reinforcement-learning/pull/53) | C | Draft | `fd99bd939f74` | `main` | [s-20261102-221336eb R002] Cap-3 real-game study: 40% fewer decisions but all rank 8 |
+| [#52](https://github.com/sstxww/reinforcement-learning/pull/52) | D | Draft | `f88542212941` | `main` | [s-20261102-3a93dae9 R001] Hero-power reserve ablation: 28 real matches, no confirmed gain |
+| [#51](https://github.com/sstxww/reinforcement-learning/pull/51) | D | Draft | `a60fbfbc7133` | `main` | [s-20261102-24728f13 R001] PPO learning-rate sensitivity: six real matches, no rank gain |
+| [#50](https://github.com/sstxww/reinforcement-learning/pull/50) | D | Draft | `8ee9b99e1dcb` | `main` | [s-20261102-d1116e51 R001] Generic Choose-option index ablation: 7 games, negative pilot |
+| [#49](https://github.com/sstxww/reinforcement-learning/pull/49) | D | Draft | `3dcc424dbc94` | `main` | [s-20261102-8cfa0c44 R001] Real TavernGym multiprocessing throughput ablation: 13 games, slower |
+| [#48](https://github.com/sstxww/reinforcement-learning/pull/48) | D | Draft | `5a69719c28de` | `main` | [s-20261102-9c034841 R002] Instrumented one-vs-three buy override ablation (negative efficiency result) |
+| [#46](https://github.com/sstxww/reinforcement-learning/pull/46) | D | Draft | `0a7d71404a18` | `main` | [s-20261102-64405d5e R001] Purchase-before-play priority: 13 real games, gain unproven |
+| [#45](https://github.com/sstxww/reinforcement-learning/pull/45) | C | Draft | `6333c6831718` | `main` | [s-20261102-b34940b0 R002] Hero-selection confound in generic Choose bias (24 real games) |
+| [#44](https://github.com/sstxww/reinforcement-learning/pull/44) | C | Draft | `31adcfe4589d` | `main` | [s-20261102-c0039389 R001] Verify seat-sensitive TavernGym full-game evaluation (7 real games) |
+| [#42](https://github.com/sstxww/reinforcement-learning/pull/42) | D | Draft | `36bdd4cbc438` | `main` | [s-20261102-6cc5d763 R003] Frozen prebuy policy: 16 unseen paired seeds, no confirmed gain |
+| [#41](https://github.com/sstxww/reinforcement-learning/pull/41) | C | Draft | `244424b5a8fc` | `main` | [s-20261102-221336eb R001] Budget-6 real-game ablation: 12 matches, no decision reduction |
+| [#40](https://github.com/sstxww/reinforcement-learning/pull/40) | D | Draft | `f04831ff1057` | `main` | [s-20261102-717d0e50 R001] Freeze-at-exit strategy pilot: 20 real games, no observed gain |
+| [#38](https://github.com/sstxww/reinforcement-learning/pull/38) | D | Draft | `c76e0d5a6e3d` | `main` | [s-20261102-8555759e R001] Choice-index tie-break ablation: 12 real matches, negative result |
+| [#36](https://github.com/sstxww/reinforcement-learning/pull/36) | D | Draft | `2c191b5587c2` | `main` | [s-20261102-7fd2e223 R001] Idle hero-power paired ablation: pilot gain not reproduced on heldout seeds |
+| [#35](https://github.com/sstxww/reinforcement-learning/pull/35) | C | Draft | `afeaa5787a74` | `main` | [s-20261102-509af6d2 R001] Opening upgrade delay: 40 real games, small uncertain gain |
+| [#34](https://github.com/sstxww/reinforcement-learning/pull/34) | C | Draft | `238ce68e0343` | `main` | [s-20261102-9c463177 R001] Real-game mandatory choice tie-break ablation (unverified gain) |
+| [#33](https://github.com/sstxww/reinforcement-learning/pull/33) | C | Draft | `4d762dc2eec2` | `main` | [s-20261102-6cc5d763 R002] Prebuy refresh: 9 real matches, 32 interventions, exploratory mean rank 6.25 |
+| [#32](https://github.com/sstxww/reinforcement-learning/pull/32) | D | Draft | `7f30928a2089` | `main` | [s-20261102-b34940b0 R001] Generic forced-choice slot ablation: negative real eight-seat evidence |
+| [#31](https://github.com/sstxww/reinforcement-learning/pull/31) | D | Draft | `9887e95afc57` | `main` | [s-20261102-e599fa38 R001] Guarded PPO termination experiment on real TavernGym (no strength gain) |
+| [#30](https://github.com/sstxww/reinforcement-learning/pull/30) | D | Draft | `147b02e725eb` | `main` | [s-20261102-9c034841 R001] Planned-turn buy-before-upgrade A/B (n=4, gain unproven) |
+| [#29](https://github.com/sstxww/reinforcement-learning/pull/29) | D | Draft | `bae4cd16aee1` | `main` | [s-20261102-9a484c57 R001] Tavern upgrade-before-play priority: six real games, no gain |
+| [#28](https://github.com/sstxww/reinforcement-learning/pull/28) | C | Draft | `08304baad4dc` | `main` | [s-20261102-2830ac4a R001] Corrected Magnetize action audit: 7 full games, no verified gain |
+| [#27](https://github.com/sstxww/reinforcement-learning/pull/27) | C | Draft | `e6b2fcab65f3` | `main` | [s-20261102-6cc5d763 R001] Genuine refresh ablation: 7 completed games, zero intervention |
+| [#24](https://github.com/sstxww/reinforcement-learning/pull/24) | C | Draft | `b7da2b3b6652` | `main` | [s-20261102-e046f72e R001] Compact PPO extractor + bounded complete-match evaluation |
+| [#23](https://github.com/sstxww/reinforcement-learning/pull/23) | C | Draft | `9c9969b40100` | `main` | [s-20261102-bf8e1710 R001] Test public-observation potential shaping vs sparse PPO reward |
+| [#22](https://github.com/sstxww/reinforcement-learning/pull/22) | C | Draft | `aa019a2a183a` | `main` | [s-20261102-cbc3c4927c R001] Factorized card encoder: 48% card-param savings, complete PPO safety-cap match |
+| [#21](https://github.com/sstxww/reinforcement-learning/pull/21) | D | Draft | `3783131213a7` | `main` | [s-20261102-2b0d8089 R001] Signed-log reward pilot: negative result, real match receipts |
+| [#20](https://github.com/sstxww/reinforcement-learning/pull/20) | D | Draft | `8559d3af0249` | `main` | [s-20261102-6d2f9a71 R001] Guard PPO free-action loops; paired entropy study (inconclusive) |
+| [#19](https://github.com/sstxww/reinforcement-learning/pull/19) | D | Draft | `337bdeeb8e74` | `main` | [s-20261102-14ce98f3 R001] Test PPO reward scale: 512 real steps, guarded full-game evidence, no gain |
+
+**Next integration handoff:** lock a single eligible change, re-read exact current main and PR SHA, validate mergeability/latest exact-head CI + full-game receipts + own-session isolated evidence, check code overlap and dependency; merge through normal GitHub PR only, verify resulting main CI success before declaring completed. Do not close others' work or cancel their Actions.
