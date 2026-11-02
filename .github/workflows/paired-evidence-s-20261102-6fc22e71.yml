@@ -1,0 +1,54 @@
+name: V5 paired-evidence smoke s-20261102-6fc22e71
+
+on:
+  push:
+    branches:
+      - agent/s-20261102-6fc22e71/optimization-001
+    paths:
+      - .github/workflows/paired-evidence-s-20261102-6fc22e71.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: v5-paired-evidence-s-20261102-6fc22e71
+  cancel-in-progress: false
+
+jobs:
+  test-and-own-full-game:
+    runs-on: ubuntu-latest
+    timeout-minutes: 70
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install bounded test requirements
+        run: python -m pip install -e '.[test]'
+      - name: Test exact input and paired-evaluation evidence gate
+        run: python -m pytest tests/test_paired_evidence_s_6fc22e71.py
+      - name: Install pinned TavernGym simulator
+        run: bash scripts/bootstrap_engine.sh
+      - name: Complete one genuine eight-seat baseline match, not PPO
+        run: |
+          python -m tavern_ai.contract
+          python -m tavern_ai.canary --policy baseline --agent-id s-20261102-6fc22e71 --seed 93461 --receipt experiments/s-20261102-6fc22e71/001-93461.json
+          python -m tavern_ai.validate_receipt experiments/s-20261102-6fc22e71/001-93461.json
+      - name: Preserve only own authentic evidence to isolated branch
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = "agent/s-20261102-6fc22e71/optimization-001"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add experiments/s-20261102-6fc22e71/001-93461.json
+          git diff --cached --quiet && { echo 'No new genuine receipt generated'; exit 1; }
+          git commit -m "test(v5): preserve own real eight-seat paired-evidence smoke receipt"
+          git push origin HEAD:refs/heads/agent/s-20261102-6fc22e71/optimization-001
+      - name: Archive actual own match evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v5-own-match-s-20261102-6fc22e71
+          path: experiments/s-20261102-6fc22e71/001-93461.json
+          if-no-files-found: ignore
+          retention-days: 30
