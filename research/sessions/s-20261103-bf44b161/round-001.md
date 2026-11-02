@@ -26,3 +26,10 @@ Silent random PPO initialization when an expiring main-only Actions Artifact can
 - This is a small extraction, not an endorsement of all code in #121/#147/#149.
 - Next work: use trusted `models/registry.json` + `models/release_asset_digests.json` and existing preflight to verify **bytes+schema+optimizer+load**, explicitly handle invalid/missing Release, keep model and evaluation seeds independent, then prove genuine 128-step optimizer continuation on a registered durable Release, raw (unguarded) full-game success and paired seed/seat benchmark. A checkpoint must be re-downloaded and checked before marking durable. Do not confuse a 90-day Artifact with a permanent Release.
 - If proof action is blocked by permission/action_required, record the exact workflow/job state; never manufacture a receipt.
+
+
+## Final evidence and disposition — 2026-11-03 (+08:00)
+- [Own isolated Action #41508263674](https://github.com/sstxww/reinforcement-learning/actions/runs/41508263674) **SUCCESS**. New restore-gate regressions **7 passed**; complete repository suite **308 passed, 1 skipped**; pinned TavernGym engine installed.
+- [Own authentic baseline receipt](https://github.com/sstxww/reinforcement-learning/blob/agent/s-20261103-bf44b161/optimization-001/experiments/s-20261103-bf44b161/001-98631.json): TavernGym source `6d8712c93022ba11`, seed 98631, 14 turns, 62 decisions, player-0 rank **2**, full placements `[2,6,5,3,7,1,4,8]`, `completed=true`, no truncation, no turn-limit end. Baseline match is not PPO ability evidence.
+- [PR #160](https://github.com/sstxww/reinforcement-learning/pull/160) initially submitted for an unsafe pre-merge main. **While validating, another integrator merged PR #117**, replacing the main trainer with fail-closed registered Release restore/manual-only workflow; #125 concurrently hardened SHA-bound staging. Our original train.yml patch is now redundant/conflicts with newer main and should not be merged.
+- Supersession action: close PR #160 without merge, preserve own branch/proof and pivot to round-002 **minimal Release-publish failure checkpoint custody** against current main. The old branch does not update production.
