@@ -1,0 +1,54 @@
+{
+  "hypothesis": "The fixed seat-zero evaluation convention may mask seat-dependent outcomes",
+  "experiment": "Same untouched BaselinePolicy controls seat 0 or 4 against seven official TavernGym scripted bots",
+  "canary": {
+    "seed": 45600,
+    "controlled_seat": 4,
+    "controlled_rank": 4,
+    "decisions": 67
+  },
+  "seat_0": {
+    "games": 3,
+    "ranks": [
+      8,
+      8,
+      8
+    ],
+    "seeds": [
+      45601,
+      45602,
+      45603
+    ],
+    "mean_placement": 8,
+    "top4_rate": 0.0,
+    "first_place_rate": 0.0
+  },
+  "seat_4": {
+    "games": 3,
+    "ranks": [
+      7,
+      7,
+      4
+    ],
+    "seeds": [
+      45601,
+      45602,
+      45603
+    ],
+    "mean_placement": 6,
+    "top4_rate": 0.3333333333333333,
+    "first_place_rate": 0.0
+  },
+  "paired_seat4_minus_seat0_ranks": [
+    -1,
+    -1,
+    -4
+  ],
+  "paired_mean_delta": -2,
+  "environment": "1.1.0",
+  "engine_source_hash": "6d8712c93022ba11",
+  "policy_sha256": "e4722a44660f8a880c9eeb949c80e81ebb652926f43d71acd64f958762bd6bac",
+  "ppo_gradient_steps": 0,
+  "model_checkpoint": null,
+  "caveat": "Seat changes also alter assigned heroes/opponents and action order; this is an evaluation sensitivity audit, NOT an improved policy or causal seat advantage."
+}

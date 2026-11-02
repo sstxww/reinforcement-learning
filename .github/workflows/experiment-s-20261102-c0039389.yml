@@ -1,0 +1,86 @@
+name: "Controlled-seat evaluation audit s-20261102-c0039389"
+
+on:
+  push:
+    branches:
+      - agent/s-20261102-c0039389/optimization-001
+    paths:
+      - tavern_ai/seat_position_experiment.py
+      - tests/test_seat_position_experiment.py
+      - .github/workflows/experiment-s-20261102-c0039389.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: experiment-s-20261102-c0039389
+  cancel-in-progress: false
+
+jobs:
+  full-seat-sensitivity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 80
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install test dependencies
+        run: python -m pip install -e '.[test]'
+      - name: Run regression and standard unit tests
+        run: python -m pytest
+      - name: Install real pinned TavernGym and verify observe2 contract
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Run one mandatory controlled-seat canary and three genuine paired seed games
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m tavern_ai.seat_position_experiment \
+            --agent-id s-20261102-c0039389 \
+            --seed 45600 --pair-seeds 45601 45602 45603 \
+            --out-dir experiments/s-20261102-c0039389 \
+            --report reports/s-20261102-c0039389/seat-comparison.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from tavern_ai.seat_position_experiment import verify_controlled_receipt
+          files=sorted(Path("experiments/s-20261102-c0039389").glob("*.json"))
+          assert len(files)==7, f"Expected seven genuine full games, got {len(files)}"
+          for file in files:
+              record=json.loads(file.read_text(encoding="utf-8"))
+              assert verify_controlled_receipt(record)
+              assert record["completed"] is True
+              assert record["truncated_combats"]==0 and not record["turn_limit_end"]
+              print(file, "seat", record["controlled_seat"], "rank", record["controlled_rank"], "decisions", record["decisions"])
+          PY
+      - name: Upload exact independent evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: seat-audit-s-20261102-c0039389-${{ github.run_id }}
+          path: |
+            experiments/s-20261102-c0039389/*.json
+            reports/s-20261102-c0039389/*.json
+          if-no-files-found: ignore
+          retention-days: 30
+      - name: Commit only own verified receipts and comparison report
+        if: success()
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = 'agent/s-20261102-c0039389/optimization-001'
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add experiments/s-20261102-c0039389/ reports/s-20261102-c0039389/
+          if git diff --cached --quiet; then
+            echo "No new evidence to commit"
+            exit 0
+          fi
+          git commit -m "results(s-20261102-c0039389): record seven real seat-aware TavernGym matches"
+          git pull --rebase origin "$GITHUB_REF_NAME"
+          git push origin HEAD:"$GITHUB_REF_NAME"
