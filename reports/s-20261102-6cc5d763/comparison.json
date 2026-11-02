@@ -1,0 +1,62 @@
+{
+  "session_id": "s-20261102-6cc5d763",
+  "hypothesis": "A single legal refresh when no buy is possible improves game placement",
+  "main_base_sha": "315b068bac5ab6d8403c3c9b18f8c101c0cded5d",
+  "engine_version": "1.1.0",
+  "engine_hash": "6d8712c93022ba11",
+  "policy_version": "refresh-once-v1",
+  "policy_sha256": "e2f8d2f8d23b56489eef9de8f86b815fc468dd914f256ac84ab02a9809f64c36",
+  "ppo_training_steps": 0,
+  "candidate_canary": {
+    "seed": 36501,
+    "rank": 8,
+    "decisions": 45,
+    "refreshes": 0,
+    "receipt": "experiments/s-20261102-6cc5d763/001-36501.json"
+  },
+  "baseline": {
+    "games": 3,
+    "seeds": [
+      36502,
+      36503,
+      36504
+    ],
+    "placements": [
+      8,
+      8,
+      8
+    ],
+    "mean_placement": 8.0,
+    "first_place_rate": 0.0,
+    "top4_rate": 0.0
+  },
+  "candidate": {
+    "games": 3,
+    "seeds": [
+      36502,
+      36503,
+      36504
+    ],
+    "placements": [
+      8,
+      8,
+      8
+    ],
+    "mean_placement": 8.0,
+    "first_place_rate": 0.0,
+    "top4_rate": 0.0
+  },
+  "paired_rank_deltas": [
+    0,
+    0,
+    0
+  ],
+  "mean_rank_delta_candidate_minus_baseline": 0.0,
+  "refresh_counts": [
+    0,
+    0,
+    0
+  ],
+  "conclusion": "Descriptive pilot only; small sample cannot establish improvement",
+  "model_checkpoint": null
+}
