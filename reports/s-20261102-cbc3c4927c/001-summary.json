@@ -1,0 +1,70 @@
+{
+  "session_id": "s-20261102-cbc3c4927c",
+  "base_commit": "6ac59235b8238196a0e6462de77b72413c829372",
+  "engine": {
+    "version": "1.1.0",
+    "source_hash": "6d8712c93022ba11",
+    "features": 4017,
+    "cards": 447,
+    "actions": 245,
+    "n_cards": 3984
+  },
+  "seed_train": 22021,
+  "seed_match": 22022,
+  "ppo_training_steps": 128,
+  "train_wall_seconds": 4,
+  "model_checkpoint_sha256": "2f06972140a40bf04cca6321c5a70198b69d7e60775980e4801f6578df871508",
+  "checkpoint_status": "GitHub Actions artifact; retention 90 days, NOT permanent",
+  "candidate_rank": 8,
+  "candidate_placements": [
+    8,
+    4,
+    5,
+    6,
+    7,
+    3,
+    2,
+    1
+  ],
+  "candidate_decisions": 311,
+  "baseline_rank": 6,
+  "baseline_placements": [
+    6,
+    7,
+    5,
+    3,
+    2,
+    8,
+    1,
+    4
+  ],
+  "baseline_decisions": 59,
+  "candidate_truncated_combats": 0,
+  "candidate_turn_limit_end": false,
+  "illegal_actions": "none observed (illegal actions raise in canary)",
+  "benchmark": {
+    "schema": 1,
+    "base_commit": "6ac59235b8238196a0e6462de77b72413c829372",
+    "seed": 22020,
+    "batch_size": 16,
+    "warmups": 8,
+    "timed_batches": 40,
+    "torch_threads": 1,
+    "old": {
+      "parameters_total": 1328448,
+      "parameters_card_net": 458112,
+      "ms_per_batch_median": 0.6871009999969147,
+      "ms_per_batch_p90": 0.6992739999986952
+    },
+    "candidate": {
+      "parameters_total": 1107712,
+      "parameters_card_net": 237376,
+      "ms_per_batch_median": 0.6080440000033605,
+      "ms_per_batch_p90": 0.6134969999891382
+    },
+    "total_parameter_reduction_fraction": 0.16616081321963672,
+    "card_parameter_reduction_fraction": 0.48183850237496506,
+    "note": "CPU microbenchmark; not a measure of relative playing strength"
+  },
+  "statistical_conclusion": "One paired seed; no demonstration of playing strength improvement"
+}
