@@ -40,3 +40,21 @@
 
 ## Important distinction
 This session's fresh training steps and complete-match evidence are **pending workflow verification at document creation**; the cited older runs are other sessions' genuine studies, not falsely attributed to this session.
+
+
+## Verified execution addendum — source-backed results (2026-11-02)
+
+1. Own V2 Release-recovery run [41427360022](https://github.com/sstxww/reinforcement-learning/actions/runs/41427360022) **SUCCESS**, exact SHA256 `73bde2666426cecce39f135980a897bb2cd4a7d70783ba04c9c0d29477a6664a`, loaded 1280-step MaskablePPO, performed 128 genuine PPO continuation steps to 1408, output probe model saved on runner only and **not preserved as durable weight**. Verified original V2 Release remains durable. Separate baseline game seed 88101: complete, rank 7, 46 decisions / 15 turns, authentic committed receipt.
+2. Source-registry conflict resolved by adopting main's richer registry merged via #87, instead of overwriting it. Added fail-closed registry validator and tests; registry now annotates this exact successful V2 Release re-download/resume run. Independent ported-registry run [41428514155](https://github.com/sstxww/reinforcement-learning/actions/runs/41428514155) **SUCCESS**.
+3. Own genuine V2 [diagnostic run 41428133644](https://github.com/sstxww/reinforcement-learning/actions/runs/41428133644) **SUCCESS**. Exact released 1280-step PPO model in two full eight-seat games:
+
+   | Seed | PPO rank | Decisions | BUY legal decision-states | Actual buys | Action 1+2 selections | Forced end-turns |
+   | --- | ---: | ---: | ---: | ---: | ---: | ---: |
+   | 88201 | 8 | 163 | 66 | 0 | 75 | 2 |
+   | 88202 | 8 | 143 | 49 | 0 | 132 | 0 |
+
+   Both completed with zero truncated combats and valid placements. Their full per-action public-mask events and full-game receipts are committed in `experiments/s-20261102-704cec7b/002-8820{1,2}.json`. This confirms missed legal-buy opportunities; it **does not** prove every buy would be high value. Public observation hashes changed on raw repeated actions, so do not claim all repeats are no-ops.
+4. P3 isolated one-factor candidate: when the raw V2 model proposes action 1 or 2, the public board is empty, and BUY is legal, override to first legal BUY. The intervention is explicitly labeled as an override; model's own raw buying remains distinct. Initial real-game workflow [41428860814](https://github.com/sstxww/reinforcement-learning/actions/runs/41428860814) **FAILED**, after an 88301 reference model full game ranked 8, because the new candidate hit the 40-action soft budget in a mandatory-action state where END_TURN was **illegal**. No completed candidate match or strength claim resulted from that failed run.
+5. Repair: `safe_budget_action` now first accepts forced mandatory choice/plays legally instead of inventing END_TURN, preserves explicit guard-vs-model event attribution, and hard-fails at 120 decisions for repeated unresolvable actions. Unit regression tests added. New actual paired workflow has been submitted and **must be independently checked for outcome**. Do not promote on unit tests alone.
+
+P3 result is still conditional until its latest-head workflow proves two matched pairs complete; P4 large-scale training remains blocked without a validated improvement. Champion = null, no scored Arena games, no newly advertised strong PPO model.
