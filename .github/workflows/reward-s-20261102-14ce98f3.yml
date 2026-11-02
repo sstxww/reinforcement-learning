@@ -1,0 +1,76 @@
+name: Session s-20261102-14ce98f3 - isolated reward study
+
+on:
+  push:
+    branches:
+      - agent/s-20261102-14ce98f3/optimization-001
+
+permissions:
+  contents: write
+
+concurrency:
+  group: reward-study-s-20261102-14ce98f3
+  cancel-in-progress: false
+
+jobs:
+  real-experiment:
+    runs-on: ubuntu-latest
+    timeout-minutes: 85
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[train,test]'
+      - name: Unit tests, including reward/mask contract
+        run: python -m pytest
+      - name: Bootstrap exact upstream TavernGym 1.1.0 engine
+        run: bash scripts/bootstrap_engine.sh
+      - name: Verify engine observe2 features/card/legal-mask contract
+        run: python -m tavern_ai.contract
+      - name: Real independent complete eight-seat baseline game
+        run: |
+          python -m tavern_ai.canary --agent-id s-20261102-14ce98f3 --seed 26011 --policy baseline --receipt experiments/s-20261102-14ce98f3/001-26011.json
+          python -m tavern_ai.validate_receipt experiments/s-20261102-14ce98f3/001-26011.json
+      - name: Train original-reward control (256 true PPO steps)
+        run: |
+          python -m tavern_ai.reward_study --seed 74231 --steps 256 --scale 1.0 --out checkpoints/s-20261102-14ce98f3/raw.zip --metrics experiments/s-20261102-14ce98f3/metrics/raw.json
+      - name: Train 0.25-reward treatment (256 true PPO steps)
+        run: |
+          python -m tavern_ai.reward_study --seed 74231 --steps 256 --scale 0.25 --out checkpoints/s-20261102-14ce98f3/scaled.zip --metrics experiments/s-20261102-14ce98f3/metrics/scaled.json
+      - name: Real complete eight-seat evaluation of treatment model
+        run: |
+          python -m tavern_ai.canary --agent-id s-20261102-14ce98f3 --seed 26012 --policy model --model checkpoints/s-20261102-14ce98f3/scaled.zip --receipt experiments/s-20261102-14ce98f3/002-26012.json
+          python -m tavern_ai.validate_receipt experiments/s-20261102-14ce98f3/002-26012.json
+      - name: Real complete eight-seat evaluation of control model
+        run: |
+          python -m tavern_ai.canary --agent-id s-20261102-14ce98f3 --seed 26012 --policy model --model checkpoints/s-20261102-14ce98f3/raw.zip --receipt experiments/s-20261102-14ce98f3/003-26012.json
+          python -m tavern_ai.validate_receipt experiments/s-20261102-14ce98f3/003-26012.json
+      - name: Publish genuine receipts and small training metrics to own branch
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add experiments/s-20261102-14ce98f3
+          if ! git diff --cached --quiet; then
+            git commit -m "experiment(s-20261102-14ce98f3): record actual game receipts and PPO metrics"
+            git push origin HEAD:refs/heads/agent/s-20261102-14ce98f3/optimization-001
+          fi
+      - name: Preserve isolated model checkpoints and recovery metadata
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: reward-models-s-20261102-14ce98f3
+          path: |
+            checkpoints/s-20261102-14ce98f3/*.zip
+            experiments/s-20261102-14ce98f3/**/*.json
+            experiments/s-20261102-14ce98f3/*.json
+          if-no-files-found: ignore
+          retention-days: 30
