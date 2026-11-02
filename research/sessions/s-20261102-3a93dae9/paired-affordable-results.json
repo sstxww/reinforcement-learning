@@ -1,0 +1,58 @@
+{
+  "session_id": "s-20261102-3a93dae9",
+  "hypothesis": "Once per turn at turn >=3, use legal hero power costing <=3 while reserving 3 gold",
+  "seeds": [
+    18101,
+    18102,
+    18103,
+    18104,
+    18105,
+    18106
+  ],
+  "candidate": {
+    "n": 6,
+    "placements": [
+      8,
+      7,
+      7,
+      6,
+      1,
+      7
+    ],
+    "mean_placement": 6.0,
+    "top4_rate": 0.16666666666666666,
+    "first_place_rate": 0.16666666666666666
+  },
+  "baseline": {
+    "n": 6,
+    "placements": [
+      8,
+      8,
+      7,
+      7,
+      8,
+      8
+    ],
+    "mean_placement": 7.666666666666667,
+    "top4_rate": 0.0,
+    "first_place_rate": 0.0
+  },
+  "hero_power_actions_per_game": [
+    4,
+    8,
+    0,
+    5,
+    12,
+    8
+  ],
+  "available_hero_power_turns_per_game": [
+    6,
+    9,
+    0,
+    7,
+    14,
+    10
+  ],
+  "paired_mean_placement_delta": -1.666666666666667,
+  "interpretation": "Active intervention only if hero_power_actions > 0; small sample never proves improvement"
+}
