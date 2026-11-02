@@ -58,3 +58,33 @@ def test_modified_model_release_url_fails(registry):
     next(x for x in bad["candidates"] if x["id"] == ident)["release_url"] = "https://example.com/model"
     with pytest.raises(ValueError):
         select_source(bad)
+
+def test_metadata_digest_is_provided_from_index(registry):
+    index = json.loads(Path("models/release_asset_digests.json").read_text(encoding="utf-8"))
+    selected = select_source(registry, asset_index=index)
+    row = next(x for x in index["assets"] if x["id"] == selected["model_id"])
+    assert selected["metadata_sha256"] == row["metadata"]["sha256"]
+
+
+def test_missing_indexed_metadata_digest_fails_closed(registry):
+    index = json.loads(Path("models/release_asset_digests.json").read_text(encoding="utf-8"))
+    row = next(x for x in index["assets"] if x["id"] == registry["latest"]["id"])
+    row["metadata"]["sha256"] = None
+    with pytest.raises(ValueError, match="metadata digest"):
+        select_source(registry, asset_index=index)
+
+
+def test_indexed_weight_digest_must_match_canonical_registry(registry):
+    index = json.loads(Path("models/release_asset_digests.json").read_text(encoding="utf-8"))
+    row = next(x for x in index["assets"] if x["id"] == registry["latest"]["id"])
+    row["weights"]["sha256"] = "0" * 64
+    with pytest.raises(ValueError, match="weight digest"):
+        select_source(registry, asset_index=index)
+
+
+def test_indexed_metadata_url_cannot_point_to_other_model(registry):
+    index = json.loads(Path("models/release_asset_digests.json").read_text(encoding="utf-8"))
+    row = next(x for x in index["assets"] if x["id"] == registry["latest"]["id"])
+    row["metadata"]["url"] = "https://example.org/metadata.json"
+    with pytest.raises(ValueError, match="asset URLs"):
+        select_source(registry, asset_index=index)
