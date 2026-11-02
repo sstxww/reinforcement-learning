@@ -121,7 +121,7 @@ def verify_release(entry: dict, model_file: Path, metadata_file: Path, *, cpu_sm
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--registry", type=Path, default=Path("models/registry.json"))
+    parser.add_argument("--registry", type=Path, default=Path("models/sessions/s-20261102-decfc670/registry.json"))
     parser.add_argument("--model-id")
     parser.add_argument("--model", type=Path)
     parser.add_argument("--metadata", type=Path)
