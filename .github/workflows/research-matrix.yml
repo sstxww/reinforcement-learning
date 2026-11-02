@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: research-matrix-v1
@@ -41,7 +41,7 @@ jobs:
         with:
           ref: ${{ matrix.branch }}
           fetch-depth: 0
-          persist-credentials: true
+          persist-credentials: false
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -131,17 +131,3 @@ jobs:
             checkpoints/model.metadata.json
           if-no-files-found: ignore
           retention-days: 90
-      - name: Commit only validated match receipt to matching branch
-        shell: bash
-        env:
-          AGENT: ${{ matrix.agent }}
-          BRANCH: ${{ matrix.branch }}
-        run: |
-          set -euo pipefail
-          python -m tavern_ai.validate_receipt "experiments/$AGENT/first-$([[ "$AGENT" == learning ]] && echo model-match || echo match).json"
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add "experiments/$AGENT/"
-          git diff --cached --quiet && exit 0
-          git commit -m "test($AGENT): record verified complete eight-seat game"
-          git push origin "HEAD:$BRANCH"
