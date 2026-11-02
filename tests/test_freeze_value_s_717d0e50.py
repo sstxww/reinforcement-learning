@@ -59,7 +59,10 @@ def test_guard_masks_and_pending_choices():
 
 def test_dual_observation_contract_and_shop_offsets():
     """Patched TavernGym reports both 3227/124 V1 and 4017/447 V2 observations."""
-    layout = dict(LAYOUT, OBS_FLOATS=3227, OBS_CARDS=124,
+    # Keep earlier synthetic cases independent, but use the *real* V1 layout
+    # constants here for an accurate shop-offset regression.
+    layout = dict(LAYOUT, GLOBAL_F=53, MINION_F=31, ITEM_F=40,
+                  OBS_FLOATS=3227, OBS_CARDS=124,
                   OBS2_FLOATS=4017, OBS2_CARDS=447, N_ACTIONS=245)
     # The documented legacy observation has 3227 float features;
     # the public shop starts after global, quests, pending, board and hand.

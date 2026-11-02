@@ -10,4 +10,6 @@
 - Reproduction: run original source with pinned TavernGym 1.1.0, source hash `6d8712c93022ba11`, then `python -m tavern_ai.freeze_value_s_717d0e50`.
 - Root-cause fix: verify both contracts, continue verifying observe2 4017/447 on each candidate decision, read the **same player's public legacy Game.observe(0)** only to decode shop slots via the documented legacy offsets. No hidden opponent data. Validate its 3227-length and finite values before deciding.
 - New regression: test both legacy and V2 dimension constants; assert shop offset 685 and reject either mismatch.
-- Rerun: pending after submitting this fix. No existing CI run or non-existent match receipt is represented as a success.
+- First repair run https://github.com/sstxww/reinforcement-learning/actions/runs/41417550965 failed in the newly added `test_dual_observation_contract_and_shop_offsets` before engine bootstrap: expected real shop start 685, received 488 because the old unit-test fixture intentionally used fake GLOBAL_F=60/MINION_F=19/ITEM_F=28. This was a **fixture error**, not simulator behavior, and still produced zero match receipts.
+- Second root-cause fix: override only the dual-version contract test fixture with the real values GLOBAL_F=53, MINION_F=31, ITEM_F=40; keep the older synthetic behavior tests unchanged.
+- Retest: pending on the new source SHA; no success is claimed until the engine-backed workflow finishes. Two meaningful fixes were applied to different identified failure signatures.
