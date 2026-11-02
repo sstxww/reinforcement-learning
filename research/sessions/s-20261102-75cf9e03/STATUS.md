@@ -1,14 +1,11 @@
-# s-20261102-75cf9e03 — Status
+# s-20261102-75cf9e03 — Verified R001; bounded R002 submitted
 
-- **State:** awaiting GitHub Actions real-game verification; **not eligible for merge yet**.
-- **Priority:** V5 P0 integration audit followed by P1 integrity of model recovery/storage.
-- **Own branch:** `agent/s-20261102-75cf9e03/optimization-001`
-- **Base main:** `42f4cf3e5fd6dad68c0779345f9e76f42ca80c9c`
-- **Files:** new `tavern_ai/checkpoint_preflight.py`, unit tests, unique bounded workflow; no change to shared `train.yml`, main model, registry or Arena.
-- **Honesty:** Synthetic ZIP tests are not trained models; check-run game uses the existing baseline and is not model-performance evidence.
-- **Training steps performed here:** 0.
-- **Model weights saved here:** none.
-- **New Champion:** none; no promotion.
-- **Expected real game:** session-owned baseline seat-0 seed 65810; receipt appears only after actual Actions run.
-- **Existing blockers:** PR #8 is Draft/conflicted and contains competing training/storage changes; PR #9 is Draft with unstable checks and depends on further integration; PR #15 depends on #9. Do not merge blindly.
-- **Next:** inspect new Actions logs and evidence, retest on latest HEAD, consider using this preflight against separately downloaded Release model assets, then wire into formal resume only after integration review.
+- **R001 independent workflow success:** https://github.com/sstxww/reinforcement-learning/actions/runs/41427453982
+- **Unit tests:** 87 passed on first R001 HEAD; independent preflight tests included. First PR CI failed solely because session-owned receipt had not yet been committed.
+- **Genuine R001 eight-seat baseline receipt:** `experiments/s-20261102-75cf9e03/001-65810.json`, seed 65810, **rank 8**, 33 decisions, 16 turns, placement [8,7,1,6,5,4,2,3], complete=true, 0 combat truncations, 0 turn-limit ends. This is baseline, **not PPO**.
+- **R001 tests:** static synthetic archive guard, SHA/metadata/ZIP checks, optional inference probe; no checkpoint claim.
+- **R002 new workflow:** `.github/workflows/resume-smoke-s-20261102-75cf9e03.yml` triggered by unique-file branch push; downloads V2 experimental Release, verifies published SHA256, probes model inference, attempts exactly 128 PPO incremental steps, checks 1280→1408, then requires genuine model complete eight-seat game before any unpromoted diagnostic Release is published.
+- **R002 outcome:** pending actual Actions logs. Do **not** claim resumed, archived, match complete or model improved unless supported by a successful run.
+- **Champion:** None verified. Existing V2 release is unpromoted. No Arena ranked.
+- **Source baseline commit for R001:** `42f4cf3e5fd6dad68c0779345f9e76f42ca80c9c`; first code commit `56e0452ed9618284a1cf73d886d77bcf7dd77912`.
+- **Research PR:** https://github.com/sstxww/reinforcement-learning/pull/79 remains Draft until fresh latest-head CI passes and integration review. 
