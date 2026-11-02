@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "session_id": "s-20261103-8d23519f",
+  "task_key": "audit/opportunity-telemetry-receipts",
+  "round": 1,
+  "status": "running",
+  "owner": "sstxww independent ChatGPT session",
+  "base_main_sha": "3a745c6f6a48c65528bcbeb81b8627b8db93f046",
+  "branch": "agent/s-20261103-8d23519f/optimization-001",
+  "scope": [
+    "tavern_ai/opportunity_receipt_gate_s8d23519f.py",
+    "tests/test_opportunity_receipt_gate_s8d23519f.py",
+    ".github/workflows/v7-telemetry-s-20261103-8d23519f.yml",
+    "research/sessions/s-20261103-8d23519f",
+    "research/knowledge/proposals/s-20261103-8d23519f-001.md",
+    "experiments/s-20261103-8d23519f"
+  ],
+  "no_merge_lease": true,
+  "created_at": "2026-11-02T19:40:46.449Z",
+  "handoff": "Atomic task claim only; not a main-merge lease; do not overwrite other sessions."
+}
