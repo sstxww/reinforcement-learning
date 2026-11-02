@@ -1,0 +1,128 @@
+{
+  "schema": 1,
+  "repository": "sstxww/reinforcement-learning",
+  "engine": {
+    "name": "TavernGym",
+    "version": "1.1.0",
+    "observation": "observe2",
+    "features": 4017,
+    "cards": 447,
+    "actions": 245,
+    "source_hash": "6d8712c93022ba11"
+  },
+  "champion": null,
+  "latest": "v2-learning-41413557445",
+  "provenance": "Curated from PR #8 / #9 / #15 reports and existing GitHub Release inventory. SHA-256 values were reported by those experiments; verify the actual downloaded bytes independently before resume or promotion.",
+  "models": [
+    {
+      "id": "v1-learning-9eada5801f99",
+      "status": "challenger",
+      "release_tag": "v1-learning-9eada5801f99",
+      "asset": "model.zip",
+      "sha256": "dc5195658995358e70c0d565a979b9cf05ccc5e47ae7adaa0a2f078f01cad917",
+      "steps": 256,
+      "parent": null,
+      "source_pr": 9,
+      "full_match": {
+        "completed": true,
+        "seed": 1302,
+        "rank": 8
+      },
+      "heldout": {
+        "seeds": [
+          24000,
+          24001,
+          24002
+        ],
+        "ranks": [
+          8,
+          8,
+          8
+        ]
+      },
+      "release_resume_verified": true
+    },
+    {
+      "id": "v1-learning-165a76a18afb",
+      "status": "challenger",
+      "release_tag": "v1-learning-165a76a18afb",
+      "asset": "model.zip",
+      "sha256": "5e6ea8dcce8d0a66b524692a3d90a8553a0f4115494212cc70e9257e617d1683",
+      "steps": 256,
+      "parent": null,
+      "source_pr": 8,
+      "full_match": null,
+      "heldout": {
+        "seeds": [
+          24000,
+          24001,
+          24002
+        ],
+        "ranks": [
+          8,
+          8,
+          8
+        ]
+      },
+      "release_resume_verified": false
+    },
+    {
+      "id": "v1-learning-resume-41413508653",
+      "status": "challenger",
+      "release_tag": "v1-learning-resume-41413508653",
+      "asset": "model.zip",
+      "sha256": "79f90ee56e1bf49eac86e39cb76e0df70e2316a5baf5067515bced15649829e7",
+      "steps": 384,
+      "parent": "v1-learning-9eada5801f99",
+      "source_pr": 8,
+      "full_match": {
+        "completed": true,
+        "seed": 23001,
+        "rank": 8
+      },
+      "heldout": {
+        "seeds": [
+          26500,
+          26501,
+          26502
+        ],
+        "ranks": [
+          8,
+          8,
+          8
+        ]
+      },
+      "release_resume_verified": false
+    },
+    {
+      "id": "v2-learning-41413557445",
+      "status": "challenger",
+      "release_tag": "v2-learning-41413557445",
+      "asset": "model.zip",
+      "sha256": "73bde2666426cecce39f135980a897bb2cd4a7d70783ba04c9c0d29477a6664a",
+      "steps": 1280,
+      "parent": "v1-learning-9eada5801f99",
+      "source_pr": 15,
+      "full_match": {
+        "completed": true,
+        "seed": 23002,
+        "rank": 8
+      },
+      "heldout": {
+        "seeds": [
+          24000,
+          24001,
+          24002,
+          24003
+        ],
+        "ranks": [
+          8,
+          8,
+          8,
+          8
+        ]
+      },
+      "release_resume_verified": false
+    }
+  ]
+}
