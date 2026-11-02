@@ -1,0 +1,74 @@
+{
+  "engine": {
+    "actions": 245,
+    "cards": 447,
+    "features": 4017,
+    "n_cards": 3984,
+    "source_hash": "6d8712c93022ba11",
+    "version": "1.1.0"
+  },
+  "experiment_type": "engineering_action_telemetry_no_training",
+  "heldout_seeds": [
+    42174,
+    42175,
+    42176
+  ],
+  "interpretation": "Exploratory real-match action telemetry, not new training or a strength claim.",
+  "paired_delta_rank_candidate_minus_reference": [
+    0,
+    0,
+    1
+  ],
+  "paired_mean_delta": 0.3333333333333333,
+  "round": 2,
+  "session_id": "s-20261102-24728f13",
+  "source_checkpoint_workflow_run": 41416467100,
+  "source_model_sha256": {
+    "candidate": "802c65e7da2ba42e26e2f2efb55859b91428f1b792428031947484ce95f42f18",
+    "reference": "8450905bdd1d78e6be68175f9943b16ac840fc9ce2882da4e32791ddb078ad0c"
+  },
+  "summary": {
+    "candidate": {
+      "action_categories": {
+        "end_turn": 21,
+        "hand_play_range": 3,
+        "mandatory_choice_range": 12
+      },
+      "first_rate": 0.0,
+      "games": 3,
+      "guard_forced_ends": 0,
+      "max_same_action_streak": 2,
+      "mean_rank": 8,
+      "model_chosen_ends": 21,
+      "ranks": [
+        8,
+        8,
+        8
+      ],
+      "top4_rate": 0.0,
+      "total_actions": 36
+    },
+    "reference": {
+      "action_categories": {
+        "buy_slot": 20,
+        "end_turn": 24,
+        "hand_play_range": 25,
+        "mandatory_choice_range": 18,
+        "other_action": 788
+      },
+      "first_rate": 0.0,
+      "games": 3,
+      "guard_forced_ends": 21,
+      "max_same_action_streak": 40,
+      "mean_rank": 7.666666666666667,
+      "model_chosen_ends": 3,
+      "ranks": [
+        8,
+        8,
+        7
+      ],
+      "top4_rate": 0.0,
+      "total_actions": 875
+    }
+  }
+}

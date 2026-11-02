@@ -1,0 +1,72 @@
+{
+  "action_categories": {
+    "end_turn": 7,
+    "hand_play_range": 3,
+    "mandatory_choice_range": 6
+  },
+  "action_histogram": {
+    "0": 7,
+    "30": 4,
+    "32": 2,
+    "46": 3
+  },
+  "agent_id": "s-20261102-24728f13",
+  "arm": "candidate",
+  "completed": true,
+  "decisions": 16,
+  "engine_source_hash": "6d8712c93022ba11",
+  "engine_version": "1.1.0",
+  "environment": "TavernGym",
+  "first_actions": [
+    30,
+    46,
+    30,
+    0,
+    46,
+    30,
+    0,
+    46,
+    30,
+    0,
+    0,
+    0,
+    32,
+    32,
+    0,
+    0
+  ],
+  "git_sha": "9dded69f34ce3813c68a15099d5fb4e8d5a8c0f0",
+  "guard_forced_ends": 0,
+  "illegal_actions": 0,
+  "max_same_action_streak": 2,
+  "model_chosen_end_turns": 7,
+  "model_sha256": "802c65e7da2ba42e26e2f2efb55859b91428f1b792428031947484ce95f42f18",
+  "per_turn_decisions": {
+    "0": 1,
+    "1": 3,
+    "2": 3,
+    "3": 3,
+    "4": 1,
+    "5": 1,
+    "6": 3,
+    "7": 1
+  },
+  "placements": [
+    8,
+    4,
+    7,
+    3,
+    6,
+    5,
+    1,
+    2
+  ],
+  "policy": "guarded_model_action_trace",
+  "schema": 1,
+  "seed": 42174,
+  "timestamp": "2026-11-02T09:13:21.465895+00:00",
+  "truncated_combats": 0,
+  "turn_budget": 40,
+  "turn_limit_end": false,
+  "turns": 19
+}

@@ -1,0 +1,120 @@
+{
+  "base_main_sha": "315b068bac5ab6d8403c3c9b18f8c101c0cded5d",
+  "engine": {
+    "actions": 245,
+    "cards": 447,
+    "features": 4017,
+    "n_cards": 3984,
+    "source_hash": "6d8712c93022ba11",
+    "version": "1.1.0"
+  },
+  "independent_eval_seeds": [
+    42171,
+    42172,
+    42173
+  ],
+  "interpretation": "Exploratory pilot; three heldout matches per arm are insufficient to establish strength.",
+  "model_state": "CANDIDATE only; no Best promotion; temporary Actions Artifact (30 days).",
+  "paired_candidate_minus_reference_rank": [
+    0,
+    0,
+    0
+  ],
+  "paired_mean_rank_delta": 0,
+  "receipts": {
+    "candidate": [
+      "experiments/s-20261102-24728f13/001-42171.json",
+      "experiments/s-20261102-24728f13/001-42172.json",
+      "experiments/s-20261102-24728f13/001-42173.json"
+    ],
+    "reference": [
+      "experiments/s-20261102-24728f13/001-reference-42171.json",
+      "experiments/s-20261102-24728f13/001-reference-42172.json",
+      "experiments/s-20261102-24728f13/001-reference-42173.json"
+    ]
+  },
+  "research_hypothesis": "Smaller PPO learning rate might improve short-run placement and guard stability",
+  "round": 1,
+  "run_sha": "ff2f28b76d6a484e248437bb27c868f3550827d1",
+  "session_id": "s-20261102-24728f13",
+  "summary": {
+    "candidate": {
+      "first_rate": 0.0,
+      "games": 3,
+      "guard_forced_ends": 0,
+      "mean_rank": 8,
+      "ranks": [
+        8,
+        8,
+        8
+      ],
+      "top4_rate": 0.0,
+      "total_decisions": 66
+    },
+    "reference": {
+      "first_rate": 0.0,
+      "games": 3,
+      "guard_forced_ends": 18,
+      "mean_rank": 8,
+      "ranks": [
+        8,
+        8,
+        8
+      ],
+      "top4_rate": 0.0,
+      "total_decisions": 759
+    }
+  },
+  "training": {
+    "candidate": {
+      "algorithm": "MaskablePPO",
+      "batch_size": 64,
+      "checkpoint_path": "outputs/s-20261102-24728f13/candidate.zip",
+      "engine": {
+        "actions": 245,
+        "cards": 447,
+        "features": 4017,
+        "n_cards": 3984,
+        "source_hash": "6d8712c93022ba11",
+        "version": "1.1.0"
+      },
+      "ent_coef": 0.01,
+      "gae_lambda": 0.95,
+      "gamma": 0.99,
+      "label": "candidate",
+      "learning_rate": 0.0001,
+      "model_sha256": "802c65e7da2ba42e26e2f2efb55859b91428f1b792428031947484ce95f42f18",
+      "n_epochs": 4,
+      "n_steps": 128,
+      "policy": "MultiInputPolicy",
+      "seed": 24728,
+      "steps_executed": 256,
+      "turn_budget": 40
+    },
+    "reference": {
+      "algorithm": "MaskablePPO",
+      "batch_size": 64,
+      "checkpoint_path": "outputs/s-20261102-24728f13/reference.zip",
+      "engine": {
+        "actions": 245,
+        "cards": 447,
+        "features": 4017,
+        "n_cards": 3984,
+        "source_hash": "6d8712c93022ba11",
+        "version": "1.1.0"
+      },
+      "ent_coef": 0.01,
+      "gae_lambda": 0.95,
+      "gamma": 0.99,
+      "label": "reference",
+      "learning_rate": 0.0003,
+      "model_sha256": "8450905bdd1d78e6be68175f9943b16ac840fc9ce2882da4e32791ddb078ad0c",
+      "n_epochs": 4,
+      "n_steps": 128,
+      "policy": "MultiInputPolicy",
+      "seed": 24728,
+      "steps_executed": 256,
+      "turn_budget": 40
+    }
+  }
+}
