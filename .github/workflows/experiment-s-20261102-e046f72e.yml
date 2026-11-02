@@ -1,0 +1,74 @@
+name: Compact extractor - s-20261102-e046f72e bounded real experiment
+
+on:
+  push:
+    branches:
+      - 'agent/s-20261102-e046f72e/optimization-001'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: experiment-s-20261102-e046f72e
+  cancel-in-progress: false
+
+jobs:
+  paired-ablation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 65
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install research and test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[train,test]'
+          python -m pytest
+      - name: Install verified TavernGym observe2 engine
+        run: bash scripts/bootstrap_engine.sh
+      - name: Validate engine contract before experimentation
+        run: python -m tavern_ai.contract
+      - name: Train original and compact PPO from scratch on independent seed
+        run: |
+          timeout 25m python -m tavern_ai.compact_experiment \
+            --steps 128 --seed 261102 --out outputs/s-20261102-e046f72e
+      - name: Run original extractor model in complete 8-seat game
+        run: |
+          timeout 15m python -m tavern_ai.canary \
+            --agent-id s-20261102-e046f72e --policy model \
+            --model outputs/s-20261102-e046f72e/control.zip --seed 26110201 \
+            --receipt experiments/s-20261102-e046f72e/control-26110201.json
+          python -m tavern_ai.validate_receipt experiments/s-20261102-e046f72e/control-26110201.json
+      - name: Run candidate in complete 8-seat game (required session receipt)
+        run: |
+          timeout 15m python -m tavern_ai.canary \
+            --agent-id s-20261102-e046f72e --policy model \
+            --model outputs/s-20261102-e046f72e/candidate.zip --seed 26110201 \
+            --receipt experiments/s-20261102-e046f72e/001-26110201.json
+          python -m tavern_ai.validate_receipt experiments/s-20261102-e046f72e/001-26110201.json
+      - name: Commit only this session's real evidence to its branch
+        run: |
+          cp outputs/s-20261102-e046f72e/training-metrics.json \
+            experiments/s-20261102-e046f72e/training-metrics.json
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add experiments/s-20261102-e046f72e/001-26110201.json \
+            experiments/s-20261102-e046f72e/control-26110201.json \
+            experiments/s-20261102-e046f72e/training-metrics.json
+          if ! git diff --cached --quiet; then
+            git commit -m "experiment(s-20261102-e046f72e): record real training and two full matches"
+            git push origin "HEAD:$GITHUB_REF_NAME"
+          fi
+      - name: Retain isolated model checkpoints and provenance
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: compact-s-20261102-e046f72e
+          path: |
+            outputs/s-20261102-e046f72e/*.zip
+            outputs/s-20261102-e046f72e/*.json
+            experiments/s-20261102-e046f72e/*.json
+          if-no-files-found: warn
+          retention-days: 60
