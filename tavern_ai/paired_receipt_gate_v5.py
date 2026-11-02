@@ -28,10 +28,16 @@ def _guard_count(row: dict) -> int:
         raise ValueError("Malformed action counts")
     fields = (
         row.get("guard_forced_end", 0),
+        row.get("guard_forced_ends", 0),  # emitted by real PPO telemetry
+        row.get("model_guard_forced_end", 0),
         row.get("forced_end_count", 0),
         row.get("fallback_count", 0),
+        row.get("fallback_actions", 0),  # checked by canonical evaluator
         row.get("safety_fallback_count", 0),
+        row.get("safety_fallbacks", 0),
         counts.get("guard_forced_end", 0),
+        counts.get("guard_forced_ends", 0),
+        counts.get("fallback_actions", 0),
     )
     if any(type(v) is not int or v < 0 for v in fields):
         raise ValueError("Invalid guard/fallback counter")
@@ -53,6 +59,8 @@ def _checked(row: dict, arm: str) -> tuple[tuple[int, int], int, bool]:
             raise ValueError("Candidate must identify model policy")
         if not guarded and n_guard:
             raise ValueError("Undisclosed guard/fallback in raw model receipt")
+        if not guarded and row.get("raw_model_only", True) is not True:
+            raise ValueError("Undisclosed assisted execution in raw model receipt")
         if not guarded:
             validate_integrity(row)
         else:
