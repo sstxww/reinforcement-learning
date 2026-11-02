@@ -1,0 +1,124 @@
+name: V5 public transition diagnosis s-20261102-3c1ad8f4
+
+on:
+  push:
+    branches:
+      - 'agent/s-20261102-3c1ad8f4/optimization-001'
+    paths:
+      - '.github/workflows/transition-audit-s-20261102-3c1ad8f4.yml'
+      - 'tavern_ai/transition_audit_3c1ad8f4.py'
+      - 'tests/test_transition_audit_3c1ad8f4.py'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: v5-transition-audit-s-20261102-3c1ad8f4
+  cancel-in-progress: false
+
+jobs:
+  run-one-real-paired-diagnosis:
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned project/test dependencies
+        run: |
+          python -m pip install -e '.[train,test]'
+      - name: Verify pure telemetry regressions
+        run: python -m pytest -q tests/test_transition_audit_3c1ad8f4.py
+      - name: Bootstrap pinned real TavernGym
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Restore a real unpromoted V2 checkpoint with fail-closed SHA256
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p checkpoints
+          gh release download v2-learning-41413557445 \
+            --repo "$GITHUB_REPOSITORY" \
+            --pattern model.zip --pattern model.metadata.json --dir checkpoints
+          python - <<'PY'
+          import hashlib, json
+          from pathlib import Path
+          zip_path = Path("checkpoints/model.zip")
+          expected = "73bde2666426cecce39f135980a897bb2cd4a7d70783ba04c9c0d29477a6664a"
+          actual = hashlib.sha256(zip_path.read_bytes()).hexdigest()
+          if actual != expected:
+              raise SystemExit("Refusing checkpoint: SHA256 mismatch")
+          meta = json.loads(Path("checkpoints/model.metadata.json").read_text())
+          if meta.get("checkpoint_sha256") != expected or meta.get("total_timesteps") != 1280:
+              raise SystemExit("Refusing checkpoint: metadata or train-step mismatch")
+          print("Restored authentic, unpromoted V2 checkpoint:", actual)
+          PY
+      - name: Genuine full game, seat 0 baseline, held comparison seed 87311
+        run: |
+          python -m tavern_ai.transition_audit_3c1ad8f4 \
+            --seed 87311 --policy baseline \
+            --receipt experiments/s-20261102-3c1ad8f4/001-baseline-87311.json \
+            --report reports/s-20261102-3c1ad8f4/001-baseline-transition.json
+          python -m tavern_ai.validate_receipt experiments/s-20261102-3c1ad8f4/001-baseline-87311.json
+      - name: Genuine full game, seat 0 V2 checkpoint, same seed
+        run: |
+          python -m tavern_ai.transition_audit_3c1ad8f4 \
+            --seed 87311 --policy model --model checkpoints/model.zip \
+            --expected-sha256 73bde2666426cecce39f135980a897bb2cd4a7d70783ba04c9c0d29477a6664a \
+            --receipt experiments/s-20261102-3c1ad8f4/001-model-87311.json \
+            --report reports/s-20261102-3c1ad8f4/001-model-transition.json
+          python -m tavern_ai.validate_receipt experiments/s-20261102-3c1ad8f4/001-model-87311.json
+      - name: Preserve concise paired evidence without competitive-strength claim
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          home = Path("reports/s-20261102-3c1ad8f4")
+          base = json.loads((home / "001-baseline-transition.json").read_text())
+          model = json.loads((home / "001-model-transition.json").read_text())
+          def selected(s):
+              return {kind: s["telemetry"]["action_families"].get(kind, {})
+                      for kind in ("refresh", "freeze", "move", "buy", "end")}
+          result = {
+              "schema": 1, "analysis": "public-observation-only transition audit",
+              "seed": 87311, "games": 2, "training_steps_this_run": 0,
+              "source_release": "v2-learning-41413557445",
+              "source_model_sha256": model["model_sha256"],
+              "baseline_rank": base["model_rank"], "candidate_rank": model["model_rank"],
+              "baseline": selected(base), "candidate": selected(model),
+              "model_guard_forced_ends": model["telemetry"]["guard_forced_ends"],
+              "promotion_allowed": False,
+              "interpretation": "One paired seed is a diagnosis only. Public observe2 equality is not internal state equality; guarded results are not raw policy results.",
+          }
+          (home / "001-paired-summary.json").write_text(json.dumps(result, indent=2) + "\n")
+          print(json.dumps(result))
+          PY
+      - name: Persist our own genuine receipts and diagnostic summary on our isolated branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add experiments/s-20261102-3c1ad8f4/001-*.json reports/s-20261102-3c1ad8f4/001-*.json
+          if ! git diff --cached --quiet; then
+            test "$GITHUB_REF_NAME" = "agent/s-20261102-3c1ad8f4/optimization-001"
+            git commit -m "results(v5): preserve real paired public-transition diagnosis (no gain claim)"
+            git pull --rebase origin "$GITHUB_REF_NAME"
+            git push origin HEAD:"$GITHUB_REF_NAME"
+          fi
+      - name: Preserve evidence even if the result commit is blocked
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: transition-audit-s-20261102-3c1ad8f4
+          path: |
+            experiments/s-20261102-3c1ad8f4/*.json
+            reports/s-20261102-3c1ad8f4/*.json
+          if-no-files-found: ignore
+          retention-days: 30

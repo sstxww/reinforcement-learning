@@ -1,0 +1,370 @@
+{
+  "schema": 1,
+  "seed": 87311,
+  "policy": "model_guarded",
+  "release_source": "v2-learning-41413557445",
+  "model_sha256": "73bde2666426cecce39f135980a897bb2cd4a7d70783ba04c9c0d29477a6664a",
+  "model_rank": 8,
+  "engine": {
+    "version": "1.1.0",
+    "source_hash": "6d8712c93022ba11",
+    "features": 4017,
+    "cards": 447,
+    "actions": 245,
+    "n_cards": 3984
+  },
+  "telemetry": {
+    "decisions": 193,
+    "guard_forced_ends": 1,
+    "action_families": {
+      "buy": {
+        "cards_changed_total": 6,
+        "decisions": 1,
+        "features_changed_total": 41,
+        "public_observation_changed": 1,
+        "same_turn_comparisons": 1
+      },
+      "end": {
+        "decisions": 7,
+        "guard_forced": 1,
+        "not_comparable_after_action": 7
+      },
+      "freeze": {
+        "cards_changed_total": 0,
+        "decisions": 70,
+        "features_changed_total": 430,
+        "public_observation_changed": 70,
+        "same_turn_comparisons": 70
+      },
+      "other": {
+        "cards_changed_total": 189,
+        "decisions": 41,
+        "features_changed_total": 1214,
+        "not_comparable_after_action": 1,
+        "public_observation_changed": 40,
+        "same_turn_comparisons": 40
+      },
+      "play": {
+        "cards_changed_total": 163,
+        "decisions": 33,
+        "features_changed_total": 1143,
+        "public_observation_changed": 33,
+        "same_turn_comparisons": 33
+      },
+      "refresh": {
+        "cards_changed_total": 157,
+        "decisions": 40,
+        "features_changed_total": 834,
+        "public_observation_changed": 40,
+        "same_turn_comparisons": 40
+      },
+      "upgrade": {
+        "cards_changed_total": 0,
+        "decisions": 1,
+        "features_changed_total": 4,
+        "public_observation_changed": 1,
+        "same_turn_comparisons": 1
+      }
+    },
+    "turns": {
+      "0": {
+        "buy_legal_exposures": 0,
+        "decisions": 1
+      },
+      "1": {
+        "buy_legal_exposures": 2,
+        "decisions": 15
+      },
+      "2": {
+        "buy_legal_exposures": 4,
+        "decisions": 16
+      },
+      "3": {
+        "buy_legal_exposures": 3,
+        "decisions": 17
+      },
+      "4": {
+        "buy_legal_exposures": 5,
+        "decisions": 18
+      },
+      "5": {
+        "buy_legal_exposures": 6,
+        "decisions": 19
+      },
+      "6": {
+        "buy_legal_exposures": 6,
+        "decisions": 20
+      },
+      "7": {
+        "buy_legal_exposures": 20,
+        "buys": 1,
+        "decisions": 87
+      }
+    },
+    "examples": [
+      {
+        "turn": 1,
+        "action_id": 1,
+        "kind": "refresh",
+        "features_changed": 20,
+        "cards_changed": 4,
+        "buy_legal": true
+      },
+      {
+        "turn": 1,
+        "action_id": 1,
+        "kind": "refresh",
+        "features_changed": 17,
+        "cards_changed": 3,
+        "buy_legal": true
+      },
+      {
+        "turn": 1,
+        "action_id": 1,
+        "kind": "refresh",
+        "features_changed": 22,
+        "cards_changed": 4,
+        "buy_legal": false
+      },
+      {
+        "turn": 1,
+        "action_id": 2,
+        "kind": "freeze",
+        "features_changed": 6,
+        "cards_changed": 0,
+        "buy_legal": false
+      },
+      {
+        "turn": 1,
+        "action_id": 2,
+        "kind": "freeze",
+        "features_changed": 6,
+        "cards_changed": 0,
+        "buy_legal": false
+      },
+      {
+        "turn": 1,
+        "action_id": 2,
+        "kind": "freeze",
+        "features_changed": 6,
+        "cards_changed": 0,
+        "buy_legal": false
+      },
+      {
+        "turn": 1,
+        "action_id": 2,
+        "kind": "freeze",
+        "features_changed": 6,
+        "cards_changed": 0,
+        "buy_legal": false
+      },
+      {
+        "turn": 1,
+        "action_id": 2,
+        "kind": "freeze",
+        "features_changed": 6,
+        "cards_changed": 0,
+        "buy_legal": false
+      },
+      {
+        "turn": 1,
+        "action_id": 2,
+        "kind": "freeze",
+        "features_changed": 6,
+        "cards_changed": 0,
+        "buy_legal": false
+      },
+      {
+        "turn": 1,
+        "action_id": 2,
+        "kind": "freeze",
+        "features_changed": 6,
+        "cards_changed": 0,
+        "buy_legal": false
+      },
+      {
+        "turn": 1,
+        "action_id": 2,
+        "kind": "freeze",
+        "features_changed": 6,
+        "cards_changed": 0,
+        "buy_legal": false
+      },
+      {
+        "turn": 1,
+        "action_id": 2,
+        "kind": "freeze",
+        "features_changed": 6,
+        "cards_changed": 0,
+        "buy_legal": false
+      },
+      {
+        "turn": 1,
+        "action_id": 2,
+        "kind": "freeze",
+        "features_changed": 6,
+        "cards_changed": 0,
+        "buy_legal": false
+      },
+      {
+        "turn": 2,
+        "action_id": 1,
+        "kind": "refresh",
+        "features_changed": 27,
+        "cards_changed": 4,
+        "buy_legal": true
+      },
+      {
+        "turn": 2,
+        "action_id": 1,
+        "kind": "refresh",
+        "features_changed": 22,
+        "cards_changed": 3,
+        "buy_legal": true
+      },
+      {
+        "turn": 2,
+        "action_id": 1,
+        "kind": "refresh",
+        "features_changed": 18,
+        "cards_changed": 4,
+        "buy_legal": true
+      },
+      {
+        "turn": 2,
+        "action_id": 1,
+        "kind": "refresh",
+        "features_changed": 13,
+        "cards_changed": 3,
+        "buy_legal": true
+      },
+      {
+        "turn": 2,
+        "action_id": 2,
+        "kind": "freeze",
+        "features_changed": 6,
+        "cards_changed": 0,
+        "buy_legal": false
+      },
+      {
+        "turn": 2,
+        "action_id": 2,
+        "kind": "freeze",
+        "features_changed": 6,
+        "cards_changed": 0,
+        "buy_legal": false
+      },
+      {
+        "turn": 2,
+        "action_id": 2,
+        "kind": "freeze",
+        "features_changed": 6,
+        "cards_changed": 0,
+        "buy_legal": false
+      },
+      {
+        "turn": 2,
+        "action_id": 2,
+        "kind": "freeze",
+        "features_changed": 6,
+        "cards_changed": 0,
+        "buy_legal": false
+      },
+      {
+        "turn": 2,
+        "action_id": 2,
+        "kind": "freeze",
+        "features_changed": 6,
+        "cards_changed": 0,
+        "buy_legal": false
+      },
+      {
+        "turn": 2,
+        "action_id": 2,
+        "kind": "freeze",
+        "features_changed": 6,
+        "cards_changed": 0,
+        "buy_legal": false
+      },
+      {
+        "turn": 2,
+        "action_id": 2,
+        "kind": "freeze",
+        "features_changed": 6,
+        "cards_changed": 0,
+        "buy_legal": false
+      },
+      {
+        "turn": 2,
+        "action_id": 2,
+        "kind": "freeze",
+        "features_changed": 6,
+        "cards_changed": 0,
+        "buy_legal": false
+      },
+      {
+        "turn": 2,
+        "action_id": 2,
+        "kind": "freeze",
+        "features_changed": 6,
+        "cards_changed": 0,
+        "buy_legal": false
+      },
+      {
+        "turn": 2,
+        "action_id": 2,
+        "kind": "freeze",
+        "features_changed": 6,
+        "cards_changed": 0,
+        "buy_legal": false
+      },
+      {
+        "turn": 3,
+        "action_id": 1,
+        "kind": "refresh",
+        "features_changed": 20,
+        "cards_changed": 4,
+        "buy_legal": true
+      },
+      {
+        "turn": 3,
+        "action_id": 1,
+        "kind": "refresh",
+        "features_changed": 20,
+        "cards_changed": 4,
+        "buy_legal": true
+      },
+      {
+        "turn": 3,
+        "action_id": 1,
+        "kind": "refresh",
+        "features_changed": 23,
+        "cards_changed": 4,
+        "buy_legal": true
+      },
+      {
+        "turn": 3,
+        "action_id": 1,
+        "kind": "refresh",
+        "features_changed": 22,
+        "cards_changed": 3,
+        "buy_legal": false
+      },
+      {
+        "turn": 3,
+        "action_id": 1,
+        "kind": "refresh",
+        "features_changed": 19,
+        "cards_changed": 4,
+        "buy_legal": false
+      }
+    ],
+    "limitations": [
+      "A same-turn identical observe2 projection DOES NOT prove that internal game state was unchanged.",
+      "BUY mask-legal exposures can repeat within a turn and are not independent offers or proof of a good purchase.",
+      "Model games with any forced END_TURN are guarded, not raw policy results."
+    ]
+  },
+  "training_steps_this_run": 0,
+  "competitive_gain_claim": false
+}
