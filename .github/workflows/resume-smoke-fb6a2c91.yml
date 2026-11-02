@@ -1,0 +1,131 @@
+name: V5 Release resume and full-game smoke fb6a2c91
+
+on:
+  push:
+    branches:
+      - agent/s-20261102-fb6a2c91/optimization-001
+    paths:
+      - .github/workflows/resume-smoke-fb6a2c91.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: v5-isolated-resume-fb6a2c91
+  cancel-in-progress: false
+
+jobs:
+  verified-resume:
+    if: github.ref == 'refs/heads/agent/s-20261102-fb6a2c91/optimization-001'
+    runs-on: ubuntu-latest
+    timeout-minutes: 110
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install CPU training and test requirements
+        run: |
+          python -m pip install -e '.[train,test]'
+      - name: Run offline resume lineage regression tests
+        run: |
+          python -m pytest tests/test_resume_smoke_fb6a2c91.py
+          python -m tavern_ai.registry_integrity
+          python -m tavern_ai.release_asset_verifier
+      - name: Build and verify original pinned TavernGym
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Generate own original complete eight-seat baseline receipt
+        run: |
+          python -m tavern_ai.canary --agent-id s-20261102-fb6a2c91 --seed 92360 --policy baseline --receipt experiments/s-20261102-fb6a2c91/001-92360.json
+          python -m tavern_ai.validate_receipt experiments/s-20261102-fb6a2c91/001-92360.json
+      - name: Commit only genuine own-game evidence to isolated branch
+        run: |
+          test "$GITHUB_REF_NAME" = "agent/s-20261102-fb6a2c91/optimization-001"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add experiments/s-20261102-fb6a2c91/001-92360.json
+          git commit -m "test(v5): preserve authentic 92360 full eight-seat own-session receipt [skip ci]"
+          git push origin HEAD:refs/heads/agent/s-20261102-fb6a2c91/optimization-001
+      - name: Download immutable 1408-step V5 Release source
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p checkpoints/source
+          gh release download v5-s-20261102-68099929-1408-41428692617 \
+            --repo "$GITHUB_REPOSITORY" \
+            --pattern model.zip --pattern model.metadata.json --dir checkpoints/source
+          test -s checkpoints/source/model.zip
+          test -s checkpoints/source/model.metadata.json
+      - name: Verify both source assets, CPU load, and truly resume 128 PPO steps
+        run: |
+          python -m tavern_ai.resume_smoke_fb6a2c91 \
+            --source checkpoints/source/model.zip \
+            --out checkpoints/resumed/model.zip --lineage outputs/001-lineage.json \
+            --steps 128 --seed 92361
+      - name: Probe unassisted trained model in true eight-seat game
+        shell: bash
+        run: |
+          mkdir -p outputs
+          set +e
+          timeout 720s python -m tavern_ai.canary \
+            --agent-id s-20261102-fb6a2c91 --policy model \
+            --model checkpoints/resumed/model.zip --seed 92362 \
+            --receipt outputs/001-model-full-game.json > outputs/001-model-game-log.txt 2>&1
+          rc=$?
+          set -e
+          if (( rc == 0 )); then
+            python -m tavern_ai.validate_receipt outputs/001-model-full-game.json
+            printf '{"model_only_game_completed":true,"guard_used":false,"exit_code":0}\n' > outputs/001-model-game-gate.json
+          else
+            printf '{"model_only_game_completed":false,"guard_used":false,"exit_code":%s,"reason":"see bounded game log; no valid rank"}\n' "$rc" > outputs/001-model-game-gate.json
+          fi
+          cat outputs/001-model-game-gate.json
+      - name: Small same-seed paired full-game evaluation if pure model game completed
+        shell: bash
+        run: |
+          if grep -q '"model_only_game_completed":true' outputs/001-model-game-gate.json; then
+            set +e
+            timeout 900s python -m tavern_ai.evaluate \
+              --model checkpoints/resumed/model.zip \
+              --games 2 --start-seed 92370 --compare-baseline \
+              --out outputs/001-paired.json > outputs/001-paired-log.txt 2>&1
+            rc=$?
+            set -e
+            echo "$rc" > outputs/001-paired-exit-code.txt
+          else
+            echo "not_run_raw_game_incomplete" > outputs/001-paired-exit-code.txt
+          fi
+      - name: Permanently archive checkpoint as experimental unpromoted Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cat > outputs/001-release-notes.txt <<'EOF'
+          V5 isolated 128-step genuine PPO resumption from existing 1408-step unpromoted Release.
+          EXPLICITLY NOT A CHAMPION. No competitive improvement is asserted.
+          Always inspect model-only game gate and independent paired report before using weights.
+          Git main registry and shared training workflow were not modified.
+          EOF
+          sha256sum checkpoints/resumed/model.zip > outputs/001-model.sha256
+          gh release create v5-experimental-s-20261102-fb6a2c91-resume128-001 \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$GITHUB_SHA" \
+            --title "V5 isolated 1536-step unpromoted resume fb6a2c91" \
+            --notes-file outputs/001-release-notes.txt --prerelease \
+            checkpoints/resumed/model.zip \
+            checkpoints/resumed/model.metadata.json \
+            outputs/001-lineage.json outputs/001-model.sha256 outputs/001-model-game-gate.json
+      - name: Preserve bounded model and real-game evidence even if archive fails
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v5-resume-fb6a2c91-${{ github.run_id }}
+          path: |
+            experiments/s-20261102-fb6a2c91/*.json
+            checkpoints/resumed/model.zip
+            checkpoints/resumed/model.metadata.json
+            outputs/*.json
+            outputs/*.txt
+          if-no-files-found: ignore
+          retention-days: 30
