@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import importlib.util
+import hashlib
 import json
 import sys
 from pathlib import Path
@@ -80,6 +81,7 @@ def test_refuse_wrong_step_count_after_load(monkeypatch, tmp_path):
     source.write_bytes(b"any")
     source.with_suffix(".metadata.json").write_text(json.dumps({
         "engine": ENGINE, "total_timesteps": 128,
+        "checkpoint_sha256": hashlib.sha256(source.read_bytes()).hexdigest(),
     }), encoding="utf-8")
     with pytest.raises(ValueError, match="step counters differ"):
         train.run(128, 10, tmp_path / "new.zip", resume=source)
