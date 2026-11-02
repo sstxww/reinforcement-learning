@@ -6,7 +6,7 @@
 - Starting main: `315b068bac5ab6d8403c3c9b18f8c101c0cded5d`
 - Evaluated code commit: `fea0eb39e6880b732bc2896ca1a47d126fe79de7`
 - Genuine execution: https://github.com/sstxww/reinforcement-learning/actions/runs/41415146112 (**success**)
-- Original evidence commit: `760aa6cf51ec58e8b80bcfbea3187f72766baf3b`; PR awaits review and independent CI.
+- Original evidence commit: `760aa6cf51ec58e8b80bcfbea3187f72766baf3b`; draft PR: https://github.com/sstxww/reinforcement-learning/pull/30, independent CI required.
 - Hypothesis: on planned tier turns 2,5,7,9,11, purchasing a legal shop minion *instead of an otherwise chosen tier upgrade* during the first three decisions could improve early board survival versus the unchanged baseline. Preserve all higher-priority discover/hand-play decisions.
 - Isolation: new dedicated `tavern_ai/upgrade_priority_s_20261102_9c034841.py`, unit tests and one bounded private workflow. Shared `baseline.py`, train.yml, other PRs, models and upstream untouched.
 

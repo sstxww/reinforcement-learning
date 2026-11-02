@@ -3,7 +3,7 @@
 - State: **research candidate evaluated and preserved; performance benefit unproven**. PR/independent CI review required, no model promotion.
 - Base main: `315b068bac5ab6d8403c3c9b18f8c101c0cded5d`.
 - Branch: `agent/s-20261102-9c034841/optimization-001`; evaluated policy commit: `fea0eb39e6880b732bc2896ca1a47d126fe79de7`; evidence commit: `760aa6cf51ec58e8b80bcfbea3187f72766baf3b`.
-- PR: to be created after this evidence commit; no automatic merge.
+- PR: https://github.com/sstxww/reinforcement-learning/pull/30 (**draft**, CI on latest head required, no automatic merge).
 - Successful real-engine experiment: https://github.com/sstxww/reinforcement-learning/actions/runs/41415146112 (24 tests, 9 complete games).
 - Mandatory candidate game: `experiments/s-20261102-9c034841/001-49101.json`, seed 49101, rank **7**, **45** decisions, 17 turns, no truncated combat or turn protection.
 - Held-out evaluation: four seeds [49111,49112,49113,49114], baseline 7.75 mean, candidate 7.25 mean. Top4=0%, first=0% for both. **No proven strength increase.**
