@@ -1,0 +1,54 @@
+name: V5 isolated receipt-integrity canary s-20261102-dfa88e31
+
+on:
+  push:
+    branches:
+      - 'agent/s-20261102-dfa88e31/optimization-001'
+    paths:
+      - '.github/workflows/receipt-integrity-s-20261102-dfa88e31.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: v5-receipt-integrity-s-20261102-dfa88e31
+  cancel-in-progress: false
+
+jobs:
+  genuine-eight-seat-receipt:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install offline test dependencies
+        run: |
+          python -m pip install -e '.[test]'
+          python -m pytest tests/test_receipt_integrity.py -q || test ! -f tests/test_receipt_integrity.py
+      - name: Install pinned real TavernGym
+        run: bash scripts/bootstrap_engine.sh
+      - name: Pin engine contract
+        run: python -m tavern_ai.contract
+      - name: Real independent complete eight-player canary
+        run: |
+          mkdir -p outputs
+          python -m tavern_ai.canary --agent-id 's-20261102-dfa88e31' --seed 801231 --policy baseline --receipt outputs/001-801231.json
+          python -m tavern_ai.validate_receipt outputs/001-801231.json
+          python - <<'PY'
+          import json
+          from tavern_ai.receipt_integrity import validate_integrity
+          from pathlib import Path
+          receipt = json.loads(Path("outputs/001-801231.json").read_text(encoding="utf-8"))
+          assert validate_integrity(receipt)
+          print(json.dumps({"seed": receipt["seed"], "placement": receipt["placements"][0], "decisions": receipt["decisions"], "completed": receipt["completed"]}))
+          PY
+      - name: Preserve actual simulator receipt (not a fake test fixture)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: receipt-s-20261102-dfa88e31-${{ github.run_id }}
+          path: outputs/001-801231.json
+          if-no-files-found: warn
+          retention-days: 30
