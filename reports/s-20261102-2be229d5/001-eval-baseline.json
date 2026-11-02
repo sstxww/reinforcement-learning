@@ -1,0 +1,23 @@
+{
+  "policy": "baseline",
+  "model_sha256": null,
+  "engine_version": "1.1.0",
+  "engine_source_hash": "6d8712c93022ba11",
+  "controlled_seat": 0,
+  "fallback_allowed": false,
+  "candidate": {
+    "games": 1,
+    "mean_placement": 8,
+    "top4_rate": 0.0,
+    "first_place_rate": 0.0,
+    "placements": [
+      8
+    ],
+    "seeds": [
+      98022
+    ]
+  },
+  "seed_start": 98022,
+  "comparison": "seven scripted TavernGym bots, not Arena Elo",
+  "inference": "Descriptive results only; small samples do not establish improvement"
+}
