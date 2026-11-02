@@ -11,6 +11,11 @@ on:
         description: 'Held-out full games: 1 to 10'
         required: true
         default: '3'
+      fresh_start:
+        description: 'Explicitly discard model lineage and train from scratch (never scheduled)'
+        type: boolean
+        required: true
+        default: false
   schedule:
     - cron: '13 4 * * 1'
 
@@ -40,22 +45,52 @@ jobs:
           python -m pip install -e '.[train,test]'
       - name: Install pinned TavernGym 1.1 engine
         run: bash scripts/bootstrap_engine.sh
-      - name: Restore last successful compatible model
+      - name: Restore verified Artifact or immutable Release (fail closed)
         shell: bash
+        env:
+          FRESH_START: ${{ github.event.inputs.fresh_start || 'false' }}
         run: |
-          mkdir -p checkpoints
-          RUN_ID="$(gh api "repos/${GITHUB_REPOSITORY}/actions/workflows/train.yml/runs?branch=main&status=success&per_page=1" --jq '.workflow_runs[0].id // empty' || true)"
-          if [[ -n "$RUN_ID" ]]; then
-            if gh run download "$RUN_ID" --repo "$GITHUB_REPOSITORY" --name v1-model --dir checkpoints; then
-              test -f checkpoints/model.zip
-              test -f checkpoints/model.metadata.json
-            else
-              echo "No compatible prior artifact; initializing a fresh checkpoint"
-              rm -f checkpoints/model.zip checkpoints/model.metadata.json
+          set -euo pipefail
+          mkdir -p checkpoints/resume checkpoints/previous-artifact checkpoints/from-release
+          echo "RESUME_AVAILABLE=false" >> "$GITHUB_ENV"
+          if [[ "$FRESH_START" == "true" ]]; then
+            if [[ "$GITHUB_EVENT_NAME" != "workflow_dispatch" ]]; then
+              echo "Scheduled runs may not start from random weights" >&2
+              exit 2
             fi
-          else
-            echo "First run; training from scratch"
+            echo "Explicit manual fresh start; not a continuation"
+            exit 0
           fi
+          RUN_ID="$(gh api "repos/${GITHUB_REPOSITORY}/actions/workflows/train.yml/runs?branch=main&status=success&per_page=1" --jq '.workflow_runs[0].id // empty' || true)"
+          if [[ -n "$RUN_ID" ]] && gh run download "$RUN_ID" --repo "$GITHUB_REPOSITORY" --name v1-model --dir checkpoints/previous-artifact; then
+            if python -m tavern_ai.resume_source_gate \
+              --origin artifact \
+              --weights checkpoints/previous-artifact/model.zip \
+              --metadata checkpoints/previous-artifact/model.metadata.json \
+              --probe-inference; then
+              cp checkpoints/previous-artifact/model.zip checkpoints/resume/model.zip
+              cp checkpoints/previous-artifact/model.metadata.json checkpoints/resume/model.metadata.json
+              echo "RESUME_AVAILABLE=true" >> "$GITHUB_ENV"
+              echo "RESUME_ORIGIN=artifact:${RUN_ID}" >> "$GITHUB_ENV"
+              echo "Resuming hash-validated previous successful Actions checkpoint"
+              exit 0
+            fi
+            echo "Prior Artifact failed integrity preflight; checking durable Release" >&2
+          fi
+          TAG="$(python -m tavern_ai.resume_source_gate --print-release-tag)"
+          gh release download "$TAG" --repo "$GITHUB_REPOSITORY" \
+            --pattern model.zip --pattern model.metadata.json \
+            --dir checkpoints/from-release
+          python -m tavern_ai.resume_source_gate \
+            --origin release \
+            --weights checkpoints/from-release/model.zip \
+            --metadata checkpoints/from-release/model.metadata.json \
+            --probe-inference
+          cp checkpoints/from-release/model.zip checkpoints/resume/model.zip
+          cp checkpoints/from-release/model.metadata.json checkpoints/resume/model.metadata.json
+          echo "RESUME_AVAILABLE=true" >> "$GITHUB_ENV"
+          echo "RESUME_ORIGIN=release:${TAG}" >> "$GITHUB_ENV"
+          echo "Resuming byte-verified, unpromoted Release checkpoint"
       - name: Incremental Maskable PPO
         shell: bash
         env:
@@ -65,8 +100,8 @@ jobs:
             echo 'steps must be 128..20000'; exit 2
           fi
           args=(--steps "$STEPS" --seed 42 --out checkpoints/model.zip)
-          if [[ -f checkpoints/model.zip ]]; then
-            args+=(--resume checkpoints/model.zip)
+          if [[ "${RESUME_AVAILABLE:-false}" == "true" ]]; then
+            args+=(--resume checkpoints/resume/model.zip)
           fi
           python -m tavern_ai.train "${args[@]}"
       - name: Model plays full eight-seat game
@@ -83,8 +118,10 @@ jobs:
           if [[ ! "$EVAL_GAMES" =~ ^[0-9]+$ ]] || (( EVAL_GAMES < 1 || EVAL_GAMES > 10 )); then
             echo 'eval_games must be 1..10'; exit 2
           fi
+          # Fresh held-out seeds per run avoid repeated adaptive selection on 24000.
+          START_SEED=$((500000 + (GITHUB_RUN_ID % 100000) * 20))
           python -m tavern_ai.evaluate --model checkpoints/model.zip \
-            --games "$EVAL_GAMES" --start-seed 24000 \
+            --games "$EVAL_GAMES" --start-seed "$START_SEED" \
             --out artifacts/evaluation.json
       - name: Save resumable checkpoint and evidence
         uses: actions/upload-artifact@v4
