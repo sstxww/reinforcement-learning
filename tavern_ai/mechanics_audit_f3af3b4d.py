@@ -214,6 +214,8 @@ def run(out_dir: Path, agent_id: str, seed: int) -> dict:
     cards, card_coverage = audit_catalog(tg)
     probes = [probe_economy(tg, seed), probe_economy(tg, seed + 1)]
     out_dir.mkdir(parents=True, exist_ok=True)
+    metadata_dir = out_dir / "metadata"
+    metadata_dir.mkdir(parents=True, exist_ok=True)
     compact = {
         "schema": 1, "source": "runtime taverngym.catalog_json",
         "upstream_commit": UPSTREAM_COMMIT, "patch_sha256": PATCH_SHA256,
@@ -223,7 +225,7 @@ def run(out_dir: Path, agent_id: str, seed: int) -> dict:
         "status": "static metadata only; printed text does not prove trigger logic",
         "cards": cards,
     }
-    (out_dir / "001-engine-card-catalog.json").write_text(
+    (metadata_dir / "001-engine-card-catalog.json").write_text(
         json.dumps(compact, ensure_ascii=False, separators=(",", ":")), encoding="utf-8"
     )
     receipt = full_match(seed + 2, agent_id=agent_id, policy="baseline")
@@ -245,7 +247,7 @@ def run(out_dir: Path, agent_id: str, seed: int) -> dict:
             "One baseline full-match is an engineering gate, not evidence of improvement.",
         ],
     }
-    (out_dir / "001-mechanics-results.json").write_text(
+    (metadata_dir / "001-mechanics-results.json").write_text(
         json.dumps(summary, indent=2, ensure_ascii=False), encoding="utf-8"
     )
     return summary
