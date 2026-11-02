@@ -1,0 +1,48 @@
+name: V5 strict evaluation and authentic game s-20261102-82d0fbbb
+
+on:
+  push:
+    branches:
+      - agent/s-20261102-82d0fbbb/optimization-001
+    paths:
+      - .github/workflows/eval-strict-s-20261102-82d0fbbb.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: strict-eval-s-20261102-82d0fbbb
+  cancel-in-progress: false
+
+jobs:
+  real-match-and-regressions:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install test-only dependencies
+        run: |
+          python -m pip install -e '.[test]'
+          python -m pytest tests/test_evaluation_v1.py tests/test_evaluation_strict_s_82d0fbbb.py
+      - name: Install verified pinned TavernGym
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Genuine eight-seat baseline match and canonical evaluation
+        run: |
+          mkdir -p outputs/s-20261102-82d0fbbb
+          python -m tavern_ai.canary --agent-id s-20261102-82d0fbbb --seed 99218 --policy baseline --receipt outputs/s-20261102-82d0fbbb/001-99218.json
+          python -m tavern_ai.validate_receipt outputs/s-20261102-82d0fbbb/001-99218.json
+          python -m tavern_ai.evaluate --policy baseline --games 1 --start-seed 99219 --out outputs/s-20261102-82d0fbbb/001-strict-eval.json
+      - name: Preserve machine-generated own match evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: strict-eval-s-20261102-82d0fbbb
+          path: outputs/s-20261102-82d0fbbb/*.json
+          if-no-files-found: ignore
+          retention-days: 30

@@ -1,8 +1,10 @@
 """Seeded full-game evaluation, with optional paired baseline comparison."""
 from __future__ import annotations
-import argparse, json, statistics
+import argparse, hashlib, json, statistics
 from pathlib import Path
 from .canary import run
+from .contract import ENGINE_HASH
+from .receipt_integrity import validate_integrity
 
 def summarize(records: list[dict]) -> dict:
     placements = [r["placements"][0] for r in records]
@@ -13,6 +15,18 @@ def summarize(records: list[dict]) -> dict:
         "first_place_rate": sum(x == 1 for x in placements) / len(records),
         "placements": placements, "seeds": [r["seed"] for r in records],
     }
+
+def _check_game(receipt: dict, expected_policy: str, seed: int, model_digest: str | None) -> None:
+    """Only strict, unassisted full games enter comparable evaluation scores."""
+    validate_integrity(receipt)
+    if receipt["policy"] != expected_policy:
+        raise ValueError("Evaluation policy/receipt mismatch (possible fallback)")
+    if receipt["seed"] != seed:
+        raise ValueError("Evaluation receipt seed mismatch")
+    if receipt.get("guard_forced_ends", 0) != 0 or receipt.get("raw_model_only", True) is False:
+        raise ValueError("Guarded/assisted model result cannot be scored as raw PPO")
+    if expected_policy == "model" and receipt["model_sha256"] != model_digest:
+        raise ValueError("Evaluation model checkpoint SHA256 mismatch")
 
 def evaluate(policy: str | int = "baseline", model: Path | int | None = None, games: int | None = None, start_seed: int = 24000,
              compare_baseline: bool = False) -> dict:
@@ -29,19 +43,36 @@ def evaluate(policy: str | int = "baseline", model: Path | int | None = None, ga
         raise FileNotFoundError("Model checkpoint required for evaluation")
     if compare_baseline and policy != "model":
         raise ValueError("Paired baseline comparison requires a model")
-    candidate = [
-        run(start_seed + i, "evaluation", policy, str(model) if model else None)
-        for i in range(games)
-    ]
+    # Verify receipts before computing any performance aggregates. These are
+    # raw-policy games: externally guarded/fallback runs need a separate label.
+    model_digest = hashlib.sha256(model.read_bytes()).hexdigest() if policy == "model" else None
+    candidate = []
+    for i in range(games):
+        seed = start_seed + i
+        receipt = run(seed, "evaluation", policy, str(model) if model else None)
+        _check_game(receipt, policy, seed, model_digest)
+        candidate.append(receipt)
     report = {
         "policy": policy, "candidate": summarize(candidate),
         "seed_start": start_seed,
         "comparison": "seven scripted TavernGym bots, not Arena Elo",
         "inference": "Descriptive results only; small samples do not establish improvement",
+        "receipt_gate": "strict_unassisted_full_match",
+        "control_seat": 0,
+        "engine_source_hash": ENGINE_HASH,
+        "candidate_model_sha256": model_digest,
     }
     if compare_baseline:
-        baseline = [run(start_seed + i, "evaluation", "baseline") for i in range(games)]
+        baseline = []
+        for i in range(games):
+            seed = start_seed + i
+            receipt = run(seed, "evaluation", "baseline")
+            _check_game(receipt, "baseline", seed, None)
+            baseline.append(receipt)
         report["baseline"] = summarize(baseline)
+        report["paired_rank_deltas"] = [a["placements"][0] - b["placements"][0]
+                                        for a, b in zip(candidate, baseline)]
+        report["paired_seed_count"] = len(report["paired_rank_deltas"])
         report["paired_mean_placement_delta"] = (
             report["candidate"]["mean_placement"] - report["baseline"]["mean_placement"]
         )
