@@ -19,3 +19,17 @@ Planned 9 actual full eight-seat games. Workflow must download Release V2, verif
 - reports/s-20261102-90e24c7b/002-buy-ablation.json
 
 All statements about actual results remain **PENDING** until the workflow reports success and GitHub branch contains evidence. No PPO gradient steps or model weight update is planned in this ablation, and no Champion can be promoted. If Buy selection increases but rank/board remains weak, separate next-step experiments should study PLAY execution and economic teacher warm-start before costly PPO training.
+
+
+## Verified results (completed 2026-11-02)
+
+Successful dedicated GitHub Actions run #41429432385 on source SHA 18b28c82292f3288507d008646965138fab50f3e; full test suite, pinned-engine install, immutable V2 Release model checksum, all 9 authentic eight-seat games and strict receipt checks passed. Action-generated evidence commit a0a5830f54d916cc581d3a895bf92ab67bb5cb6c; no simulator truncation or turn-limit fallback. Per-game complete data and action histograms saved in 9 own R002 receipts. Models and policy parameters unchanged, zero PPO updates this round.
+
+**Same new heldout seeds 89111–89113, all seat 0:**
+- Rules Baseline: ranks [8,8,8], selected Buy 40, Buy legal on 66 decisions, 131 total decisions, guard forced ends 0.
+- Unchanged V2 1280-step PPO + legal-end guard: [8,8,8], Buy **0** of 99 legal-buy decisions, 415 decisions, guard forced ends 1.
+- V2 + mask-only first-Buy override + same end guard: [8,8,8], selected Buy **46** of 46 legal-buy decisions, 46 explicit overrides (per game 14,18,14), 1425 decisions, guard forced ends **18**.
+- Hybrid minus original rank differences [0,0,0]; no strength gain, no top-four in any arm. Sample is n=3 per arm.
+- Per-game hybrid actions: seed 89111 Play 257 / Cancel 252, board after later turns roughly 3 with hand up to 7; seed 89112 Play 184 / Cancel 175, board often 2–3 with hand up to 7; seed 89113 Play 217 / Cancel 214, board often 1 with hand up to 9. This is evidence of a **second bottleneck** in resolving/using cards after purchase, not simply absence of purchasable minions.
+
+**Interpretation:** This single-variable intervention causally produces legal Buy actions, but does not improve rank in any tested game and increases forced-guard dependence. This does NOT prove neural learning improved: weights were frozen. Do not promote. Next falsifiable hypothesis must target Play↔Cancel/target-choice resolution (using public legal mask and positive state transition, not hidden game state), ideally with strict intervention count and identical seeds; only after stable action behavior consider modest PPO/BC training.
