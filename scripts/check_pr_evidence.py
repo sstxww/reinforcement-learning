@@ -1,8 +1,12 @@
-"""Require every Agent PR to include a real completed game receipt."""
+"""Require every Agent PR to include a valid full eight-seat TavernGym receipt.
+
+Structural validation is not cryptographic proof of an independent game; the
+branch's real full-game workflow and the receipt's provenance remain required.
+"""
 from __future__ import annotations
 import json,os
 from pathlib import Path
-from tavern_ai.validate_receipt import validate
+from tavern_ai.receipt_integrity import validate_integrity
 
 def main():
     head=os.environ.get("GITHUB_HEAD_REF","").strip()
@@ -18,8 +22,8 @@ def main():
     matched=0
     for path in candidates:
         payload=json.loads(path.read_text(encoding="utf-8"))
-        validate(payload)
+        validate_integrity(payload)
         if payload["agent_id"]==agent_id:matched+=1
     if not matched:raise SystemExit("Agent receipt identity mismatch")
-    print(f"Validated {matched} completed game receipts for {agent_id}")
+    print(f"Validated {matched} integrity-checked completed game receipts for {agent_id}")
 if __name__=="__main__":main()
