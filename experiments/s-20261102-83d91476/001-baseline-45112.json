@@ -1,0 +1,51 @@
+{
+  "schema": 1,
+  "timestamp": "2026-11-02T10:24:04.691280+00:00",
+  "environment": "TavernGym",
+  "engine_version": "1.1.0",
+  "engine_source_hash": "6d8712c93022ba11",
+  "agent_id": "s-20261102-83d91476",
+  "policy": "baseline",
+  "seed": 45112,
+  "completed": true,
+  "turns": 14,
+  "decisions": 39,
+  "placements": [
+    7,
+    5,
+    1,
+    8,
+    3,
+    4,
+    6,
+    2
+  ],
+  "truncated_combats": 0,
+  "turn_limit_end": false,
+  "git_sha": "6aecf6ba52e73b87659b4b427995226c55f184fa",
+  "model_sha256": null,
+  "guarded": false,
+  "opportunity_counts": {
+    "buy_legal_exposures": 20,
+    "buys": 13,
+    "decisions": 39,
+    "end_turn": 8,
+    "policy_chosen_end": 8,
+    "tavern_upgrade": 3,
+    "hand_play_band": 9,
+    "policy_end_with_buy_legal": 0,
+    "guard_forced_end": 0
+  },
+  "action_histogram": {
+    "0": 8,
+    "3": 3,
+    "8": 11,
+    "10": 1,
+    "11": 1,
+    "30": 6,
+    "46": 9
+  },
+  "evidence_run": "https://github.com/sstxww/reinforcement-learning/actions/runs/41428098018",
+  "evidence_artifact": "https://github.com/sstxww/reinforcement-learning/actions/runs/41428098018/artifacts/13132408776",
+  "note": "Compact faithful transcription of the corresponding completed game in the original Actions JSON artifact; raw per-turn details remain in that artifact."
+}

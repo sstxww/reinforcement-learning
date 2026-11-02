@@ -1,0 +1,59 @@
+{
+  "schema": 1,
+  "session_id": "s-20261102-83d91476",
+  "round": 1,
+  "source_workflow_run_id": 41428098018,
+  "source_run": "https://github.com/sstxww/reinforcement-learning/actions/runs/41428098018",
+  "source_artifact_id": 13132408776,
+  "source_artifact": "https://github.com/sstxww/reinforcement-learning/actions/runs/41428098018/artifacts/13132408776",
+  "source_commit": "6aecf6ba52e73b87659b4b427995226c55f184fa",
+  "game_engine": {
+    "version": "1.1.0",
+    "source_hash": "6d8712c93022ba11",
+    "observations_float": 4017,
+    "card_ids": 447,
+    "action_count": 245
+  },
+  "source_model": {
+    "status": "Unpromoted V2 Release",
+    "tag": "v2-learning-41413557445",
+    "sha256": "73bde2666426cecce39f135980a897bb2cd4a7d70783ba04c9c0d29477a6664a",
+    "new_training_steps": 0
+  },
+  "seeds": [
+    45111,
+    45112
+  ],
+  "model": {
+    "rank": [
+      8,
+      8
+    ],
+    "mean_rank": 8,
+    "model_games_completed": 2,
+    "buy_legal_exposures": 74,
+    "buys": 0,
+    "raw_actions": 248,
+    "actions_1_plus_2": 222,
+    "forced_end_turns": 0,
+    "policy_end_while_buy_legal": 0
+  },
+  "baseline": {
+    "rank": [
+      6,
+      7
+    ],
+    "mean_rank": 6.5,
+    "games_completed": 2,
+    "buy_legal_exposures": 48,
+    "buys": 33,
+    "raw_actions": 93,
+    "forced_end_turns": 0
+  },
+  "interpretation": {
+    "confirmed": "The candidate had 74 seat-0 decisions where at least one BUY action was legal and chose BUY zero times. This is not absence of legal buying opportunity.",
+    "confirmed_other": "222/248 model actions used raw IDs 1 or 2; no safety guard intervention. Both games completed, both rank eight; baseline ranks 6 and 7.",
+    "not_confirmed": "The semantics and state impact of raw IDs 1 and 2 require code-level verification; repeated IDs do not prove identical unchanged state. Two seeds do not establish causal effect or rank significance.",
+    "next_test": "Log state deltas, gold, action mask, per-category logits during repeated IDs 1/2, then test one isolated correction before PPO scaling."
+  }
+}
