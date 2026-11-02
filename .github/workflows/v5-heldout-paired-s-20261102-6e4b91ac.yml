@@ -1,0 +1,87 @@
+name: V5 heldout paired real games s-20261102-6e4b91ac
+
+on:
+  push:
+    branches:
+      - 'agent/s-20261102-6e4b91ac/optimization-001'
+    paths:
+      - '.github/workflows/v5-heldout-paired-s-20261102-6e4b91ac.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: v5-heldout-s-20261102-6e4b91ac
+  cancel-in-progress: false
+
+jobs:
+  heldout-four-seeds:
+    runs-on: ubuntu-latest
+    timeout-minutes: 38
+    env:
+      GH_TOKEN: ${{ github.token }}
+      SOURCE_TAG: v5-s-20261102-6e4b91ac-resume128
+      SOURCE_SHA: 3e576d92459186a91a52940a59be0c782e8afa95fdd3323de015ab708c21db7a
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned engine and exact training dependencies
+        run: |
+          python -m pip install -e '.[train,test]'
+          bash scripts/bootstrap_engine.sh
+      - name: Independently download and SHA-verify immutable candidate
+        run: |
+          mkdir -p checkpoints
+          gh release download "$SOURCE_TAG" --repo "$GITHUB_REPOSITORY" \
+            --pattern 'resumed.*' --dir checkpoints
+          python -m tavern_ai.checkpoint_preflight \
+            --model checkpoints/resumed.zip \
+            --metadata checkpoints/resumed.metadata.json \
+            --expected-sha256 "$SOURCE_SHA" --probe-inference
+      - name: Four independent heldout paired unguarded complete eight-seat games
+        run: |
+          mkdir -p reports/s-20261102-6e4b91ac
+          python -m tavern_ai.evaluate --policy model \
+            --model checkpoints/resumed.zip --compare-baseline \
+            --games 4 --start-seed 86410 --out reports/s-20261102-6e4b91ac/002-paired-raw.json
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib,json
+          p=Path('reports/s-20261102-6e4b91ac/002-paired-raw.json')
+          obj=json.loads(p.read_text())
+          cand=obj['candidate']; base=obj['baseline']
+          assert cand['games']==base['games']==4
+          assert cand['seeds']==base['seeds']==[86410,86411,86412,86413]
+          assert all(1<=int(x)<=8 for x in cand['placements']+base['placements'])
+          digest=hashlib.sha256(Path('checkpoints/resumed.zip').read_bytes()).hexdigest()
+          assert digest=='3e576d92459186a91a52940a59be0c782e8afa95fdd3323de015ab708c21db7a'
+          obj.update({'schema':1,'session_id':'s-20261102-6e4b91ac','source_model_sha256':digest,
+                      'source_release':'v5-s-20261102-6e4b91ac-resume128',
+                      'source_training_steps':1536,'engine_source_hash':'6d8712c93022ba11',
+                      'seat':0,'ungarded_model':True,'safety_fallback_count':0,
+                      'games_are_full_TavernGym_eight_seat':True,
+                      'effect_is_exploratory':True,'champion_promoted':False,
+                      'limitations':'n=4, fixed control seat, correlated fixed opponent lineup; no statistically reliable rank improvement inferred'})
+          p.rename(p.with_name('002-paired.json'))
+          p.with_name('002-paired.json').write_text(json.dumps(obj,indent=2,ensure_ascii=False)+'\n')
+          print(json.dumps({'candidate_ranks':cand['placements'],'baseline_ranks':base['placements'],
+                            'candidate_mean':cand['mean_placement'],'baseline_mean':base['mean_placement']}))
+          PY
+      - name: Save only real evidence to own branch
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add reports/s-20261102-6e4b91ac/002-paired.json
+          git commit -m 'evidence: four heldout raw-PPO versus baseline full games [skip ci]'
+          git push origin HEAD:agent/s-20261102-6e4b91ac/optimization-001
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: four-heldout-evaluation-s-20261102-6e4b91ac
+          path: reports/s-20261102-6e4b91ac/*.json
+          if-no-files-found: ignore
+          retention-days: 14
