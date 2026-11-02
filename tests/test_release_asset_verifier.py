@@ -2,7 +2,9 @@
 from pathlib import Path
 import copy
 import hashlib
+import io
 import json
+import zipfile
 
 import pytest
 from tavern_ai.release_asset_verifier import validate_asset_index, verify_local
@@ -17,9 +19,13 @@ def canonical():
 def fixture(tmp_path):
     model_id = "v2-learning-41413557445"
     weights = tmp_path/"model.zip"
-    weights.write_bytes(b"synthetic CHECKSUM TEST ONLY")
+    # A deliberately synthetic archive: ZIP-integrity tests, not PPO inference.
+    output = io.BytesIO()
+    with zipfile.ZipFile(output, "w", compression=zipfile.ZIP_STORED) as zf:
+        zf.writestr("fixture", "synthetic-checkpoint-fixture")
+    weights.write_bytes(output.getvalue())
     meta = tmp_path/"model.metadata.json"
-    meta.write_text(json.dumps({"total_timesteps":1280,"engine":{
+    meta.write_text(json.dumps({"algorithm":"MaskablePPO","total_timesteps":1280,"engine":{
         "version":"1.1.0","source_hash":ENGINE_HASH,"features":FEATURES,
         "cards":CARDS,"actions":ACTIONS}}))
     index = real_index()
@@ -79,3 +85,35 @@ def test_mutations_rejected(mutation,expected):
         next(a for a in index["assets"] if a["id"]=="v2-learning-41413557445")["optimizer_resume_verified"]=True
     with pytest.raises(ValueError,match=expected):
         validate_asset_index(index,canon)
+
+def test_matching_sha_does_not_bypass_zip_structure_check(tmp_path):
+    index, canon, ident, w, m = fixture(tmp_path)
+    w.write_bytes(b"not a valid PPO ZIP; SHA intentionally updated")
+    fresh_sha = hashlib.sha256(w.read_bytes()).hexdigest()
+    next(a for a in index["assets"] if a["id"] == ident)["weights"]["sha256"] = fresh_sha
+    next(c for c in canon["candidates"] if c["id"] == ident)["checkpoint_sha256"] = fresh_sha
+    with pytest.raises(ValueError, match="ZIP"):
+        verify_local(index, canon, ident, w, m)
+
+
+def test_matching_sha_does_not_bypass_member_crc_check(tmp_path):
+    index, canon, ident, w, m = fixture(tmp_path)
+    data = w.read_bytes()
+    needle = b"synthetic-checkpoint-fixture"
+    assert data.count(needle) == 1
+    w.write_bytes(data.replace(needle, b"!" + needle[1:], 1))
+    fresh_sha = hashlib.sha256(w.read_bytes()).hexdigest()
+    next(a for a in index["assets"] if a["id"] == ident)["weights"]["sha256"] = fresh_sha
+    next(c for c in canon["candidates"] if c["id"] == ident)["checkpoint_sha256"] = fresh_sha
+    with pytest.raises(ValueError, match="CRC"):
+        verify_local(index, canon, ident, w, m)
+
+
+def test_hash_matching_unsupported_algorithm_rejected(tmp_path):
+    index, canon, ident, w, m = fixture(tmp_path)
+    payload = json.loads(m.read_text())
+    payload["algorithm"] = "UnknownPPO"
+    m.write_text(json.dumps(payload))
+    next(a for a in index["assets"] if a["id"] == ident)["metadata"]["sha256"] = hashlib.sha256(m.read_bytes()).hexdigest()
+    with pytest.raises(ValueError, match="algorithm"):
+        verify_local(index, canon, ident, w, m)
