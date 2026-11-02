@@ -1,0 +1,29 @@
+{
+  "agent_id": "s-20261102-9c034841",
+  "comparison_arm": "upgrade-first",
+  "completed": true,
+  "decisions": 39,
+  "engine_source_hash": "6d8712c93022ba11",
+  "engine_version": "1.1.0",
+  "environment": "TavernGym",
+  "git_sha": "fea0eb39e6880b732bc2896ca1a47d126fe79de7",
+  "model_sha256": null,
+  "placements": [
+    6,
+    8,
+    5,
+    2,
+    1,
+    7,
+    3,
+    4
+  ],
+  "policy": "planned-turn-buy-before-upgrade-v1",
+  "policy_source": "tavern_ai/upgrade_priority_s_20261102_9c034841.py",
+  "schema": 1,
+  "seed": 49114,
+  "timestamp": "2026-11-02T08:45:34.817574+00:00",
+  "truncated_combats": 0,
+  "turn_limit_end": false,
+  "turns": 16
+}

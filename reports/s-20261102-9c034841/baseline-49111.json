@@ -1,0 +1,29 @@
+{
+  "agent_id": "s-20261102-9c034841",
+  "comparison_arm": "original-baseline",
+  "completed": true,
+  "decisions": 44,
+  "engine_source_hash": "6d8712c93022ba11",
+  "engine_version": "1.1.0",
+  "environment": "TavernGym",
+  "git_sha": "fea0eb39e6880b732bc2896ca1a47d126fe79de7",
+  "model_sha256": null,
+  "placements": [
+    7,
+    2,
+    3,
+    1,
+    4,
+    8,
+    5,
+    6
+  ],
+  "policy": "baseline",
+  "policy_source": "tavern_ai/upgrade_priority_s_20261102_9c034841.py",
+  "schema": 1,
+  "seed": 49111,
+  "timestamp": "2026-11-02T08:45:34.777781+00:00",
+  "truncated_combats": 0,
+  "turn_limit_end": false,
+  "turns": 15
+}
