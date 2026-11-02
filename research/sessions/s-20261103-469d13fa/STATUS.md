@@ -1,0 +1,29 @@
+# V7 session s-20261103-469d13fa — live P0 integration review
+
+| Field | Verified state |
+| --- | --- |
+| TASK_KEY / role / round | `integrate/pr-174` / REVIEWER / 001 |
+| State | `running` (independent eight-seat baseline Action pending); PR #174 reviewed, not merged |
+| Base main | `c1b828734527bae6141805581693d890cc3bff94` |
+| Work branch | `agent/s-20261103-469d13fa/optimization-001` |
+| Atomic task claim | `claims/integrate-pr174` created successfully; owner record commit `dfa4024ce065ff353e600f7546327680a5879594` |
+| Shared main merge lock | **Not held**; coordination ref's released lease reports concurrent merge despite prior lease |
+| Target PR | https://github.com/sstxww/reinforcement-learning/pull/174 |
+| Expected PR head | `874bbba4377c229c2218b565779dd4dc7d3b0104` |
+| PR state | Ready/non-Draft; `mergeable_state=clean`, old base SHA `70c411b6`; re-validate immediately before merge |
+| Exact PR-head CI | https://github.com/sstxww/reinforcement-learning/actions/runs/41511087345 — SUCCESS, all checked job steps |
+| Current-main CI at audit | https://github.com/sstxww/reinforcement-learning/actions/runs/41512315964 — SUCCESS on `c1b82873` |
+| Independent review | GitHub review `5742370559` on PR #174 |
+| Own baseline Actions | https://github.com/sstxww/reinforcement-learning/actions/runs/41512972780; at initial handoff **IN PROGRESS**, no own placement claimed |
+| Official registered checkpoint | `v5-s-20261102-68099929-1408-41428692617`; SHA256 `a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632` |
+| Engine contract | pinned TavernGym 1.1.0; source `6d8712c93022ba11`, observe2 4017 floats + 447 cards, 245 masked actions (historical main contract) |
+| Checkpoint actual restore | Not attempted in this session; prior source provenance only |
+| New training | 0 PPO steps; no new trained checkpoint; no new Release |
+| Own raw model game | None. Baseline seed 99517 is independently scheduled; never mislabel baseline as candidate |
+| Candidate paired evaluation | Not performed; n=0; placement/top4/win/BUY utilization unknown |
+| Confirmed issue | Shared coordination release record admits a main merge while another lease was held; actual exclusive merge not established |
+| Hypotheses | Merely adding a CAS ref cannot guarantee exclusion unless all main merging participants enforce it |
+| Merged PR / main postmerge CI | None by this session; not integrated |
+| Next safe operation | Verify own Action #41512972780 and original receipt; save source evidence, then give exclusive integrator refreshed exact PR head/base/main and CI; do not blindly merge |
+
+This status is an auditable handoff, not proof of additional training, model strength, or an independent model match.
