@@ -37,7 +37,7 @@ jobs:
           python -m tavern_ai.train --steps 256 --seed 42 --out checkpoints/model.zip
           python -m tavern_ai.canary --agent-id learning --seed 1302 --policy model --model checkpoints/model.zip --receipt experiments/learning/v1-model-match.json
           python -m tavern_ai.validate_receipt experiments/learning/v1-model-match.json
-          python -m tavern_ai.evaluate --policy model --model checkpoints/model.zip --games 3 --start-seed 24000 --out reports/learning/v1-heldout.json
+          python -m tavern_ai.evaluate --model checkpoints/model.zip --games 3 --start-seed 24000 --out reports/learning/v1-heldout.json
           python - <<'PY'
           import json,pathlib
           m=json.loads(pathlib.Path("checkpoints/model.metadata.json").read_text())
@@ -55,7 +55,24 @@ jobs:
           git diff --cached --quiet && exit 0
           git commit -m "results(learning): record real V1 full-match evidence"
           test "$GITHUB_REF_NAME" = "agent/learning/v1"
+          git pull --rebase origin "$GITHUB_REF_NAME"
           git push origin HEAD:"$GITHUB_REF_NAME"
+      - name: Publish durable resumable checkpoint to this repository
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          TAG="v1-learning-${GITHUB_SHA:0:12}"
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "Checkpoint release already exists: $TAG"
+          else
+            gh release create "$TAG" \
+              checkpoints/model.zip checkpoints/model.metadata.json \
+              reports/learning/v1-heldout.json \
+              --target "$GITHUB_SHA" --prerelease \
+              --title "AutoTavern PPO checkpoint $TAG" \
+              --notes "Experimental 256-step CPU checkpoint. NOT proven stronger; source branch agent/learning/v1; inspect complete-game receipt and fixed-seed metrics in the branch."
+          fi
       - name: Upload verification evidence
         if: always()
         uses: actions/upload-artifact@v4
@@ -64,5 +81,7 @@ jobs:
           path: |
             experiments/learning/*.json
             reports/learning/*.json
+            checkpoints/model.zip
+            checkpoints/model.metadata.json
           if-no-files-found: ignore
           retention-days: 30
