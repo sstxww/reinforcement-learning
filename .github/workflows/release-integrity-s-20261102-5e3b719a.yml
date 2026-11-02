@@ -1,0 +1,72 @@
+name: V5 verified Release ZIP preflight s-20261102-5e3b719a
+
+on:
+  push:
+    branches:
+      - agent/s-20261102-5e3b719a/optimization-001
+    paths:
+      - .github/workflows/release-integrity-s-20261102-5e3b719a.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: v5-release-integrity-s-20261102-5e3b719a
+  cancel-in-progress: false
+
+jobs:
+  release-preflight-and-eight-seat:
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install unit and MaskablePPO dependencies
+        run: python -m pip install -e '.[train,test]'
+      - name: Run focused Release integrity tests and canonical registry audit
+        run: |
+          python -m pytest tests/test_release_asset_verifier.py tests/test_registry_integrity.py
+          python -m tavern_ai.release_asset_verifier
+      - name: Install pinned TavernGym 1.1.0
+        run: bash scripts/bootstrap_engine.sh
+      - name: Read and verify durable V5 1408-step Release assets
+        run: |
+          mkdir -p checkpoints
+          gh release download v5-s-20261102-68099929-1408-41428692617 \
+            --repo "${GITHUB_REPOSITORY}" \
+            --pattern model.zip --pattern model.metadata.json --dir checkpoints
+          python -m tavern_ai.release_asset_verifier \
+            --model-id v5-s-20261102-68099929-1408-41428692617 \
+            --weights checkpoints/model.zip \
+            --metadata checkpoints/model.metadata.json --check-load
+      - name: Independently run and validate one complete eight-seat engine game
+        run: |
+          mkdir -p experiments/s-20261102-5e3b719a
+          python -m tavern_ai.contract
+          python -m tavern_ai.canary \
+            --agent-id s-20261102-5e3b719a --policy baseline \
+            --seed 94213 \
+            --receipt experiments/s-20261102-5e3b719a/001-94213.json
+          python -m tavern_ai.validate_receipt \
+            experiments/s-20261102-5e3b719a/001-94213.json
+      - name: Preserve only genuine own-session match receipt in branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add experiments/s-20261102-5e3b719a/001-94213.json
+          if ! git diff --cached --quiet; then
+            git commit -m "test(v5): record authentic release-preflight eight-seat canary"
+            git push origin HEAD:refs/heads/agent/s-20261102-5e3b719a/optimization-001
+          fi
+      - name: Keep diagnostic evidence, never model weights
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-integrity-s-20261102-5e3b719a
+          path: experiments/s-20261102-5e3b719a/*.json
+          if-no-files-found: ignore
+          retention-days: 30

@@ -10,6 +10,7 @@ import hashlib
 import hmac
 import json
 import re
+import zipfile
 from pathlib import Path
 
 from .contract import ACTIONS, CARDS, ENGINE_HASH, FEATURES
@@ -79,7 +80,20 @@ def verify_local(index: dict, canonical: dict, model_id: str, weights: Path,
                              (metadata, record["metadata"])):
         if not hmac.compare_digest(digest_file(path), descriptor["sha256"]):
             raise ValueError(f"SHA256 mismatch: {path.name}")
+    # A matching external digest does not guarantee a usable archive: refuse
+    # malformed ZIPs and corrupted members before attempting model deserialization.
+    try:
+        with zipfile.ZipFile(weights, "r") as archive:
+            if not archive.namelist():
+                raise ValueError("Checkpoint ZIP has no members")
+            corrupt_member = archive.testzip()
+            if corrupt_member is not None:
+                raise ValueError(f"Checkpoint ZIP CRC mismatch: {corrupt_member}")
+    except (zipfile.BadZipFile, zipfile.LargeZipFile, OSError, RuntimeError, EOFError) as exc:
+        raise ValueError("Invalid checkpoint ZIP") from exc
     doc = json.loads(metadata.read_text(encoding="utf-8"))
+    if not isinstance(doc, dict) or doc.get("algorithm") != "MaskablePPO":
+        raise ValueError("Checkpoint algorithm must be MaskablePPO")
     engine = doc.get("engine")
     expected = {"version": "1.1.0", "source_hash": ENGINE_HASH,
                 "features": FEATURES, "cards": CARDS, "actions": ACTIONS}
