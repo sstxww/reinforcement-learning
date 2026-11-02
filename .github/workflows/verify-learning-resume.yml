@@ -1,0 +1,93 @@
+name: Verify learning candidate Release - resume PPO
+
+on:
+  push:
+    branches: ['agent/infrastructure/v1']
+    paths: ['.github/workflows/verify-learning-resume.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: verify-learning-release-v1
+  cancel-in-progress: false
+
+jobs:
+  independently-restore-and-resume:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Checkout exact learning training implementation
+        uses: actions/checkout@v4
+        with:
+          ref: 9eada5801f99c4f725d6503a6d603a9cb2a269e3
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install candidate's exact software and simulator
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[train,test]'
+          bash scripts/bootstrap_engine.sh
+      - name: Download and verify durable candidate assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p checkpoints outputs
+          gh release download v1-learning-9eada5801f99 \
+            --repo sstxww/reinforcement-learning \
+            --pattern 'model.zip' \
+            --pattern 'model.metadata.json' \
+            --dir checkpoints
+          printf '%s  %s\n' \
+            dc5195658995358e70c0d565a979b9cf05ccc5e47ae7adaa0a2f078f01cad917 \
+            checkpoints/model.zip | sha256sum -c -
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p = json.loads(Path("checkpoints/model.metadata.json").read_text())
+          assert p["schema"] == 2, p
+          assert p["checkpoint_sha256"] == "dc5195658995358e70c0d565a979b9cf05ccc5e47ae7adaa0a2f078f01cad917", p
+          assert p["total_timesteps"] == 256, p
+          print("Verified source schema, SHA256 and 256 training steps")
+          PY
+      - name: Independently restore optimizer and resume 128 PPO steps
+        run: |
+          python -m tavern_ai.train --steps 128 --seed 42 \
+            --resume checkpoints/model.zip --out checkpoints/resumed.zip
+      - name: Preserve independent resume verification summary
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json
+          metadata = json.loads(Path("checkpoints/resumed.metadata.json").read_text())
+          assert metadata["total_timesteps"] == 384, metadata
+          assert metadata["increment_timesteps"] == 128, metadata
+          data = {
+              "schema": 1,
+              "result": "passed",
+              "candidate_release": "v1-learning-9eada5801f99",
+              "original_sha256": "dc5195658995358e70c0d565a979b9cf05ccc5e47ae7adaa0a2f078f01cad917",
+              "source_commit": "9eada5801f99c4f725d6503a6d603a9cb2a269e3",
+              "resume_seed": 42,
+              "original_training_steps": 256,
+              "resumed_total_timesteps": metadata["total_timesteps"],
+              "resumed_increment_steps": metadata["increment_timesteps"],
+              "resumed_sha256": metadata["checkpoint_sha256"],
+              "engine": metadata["engine"],
+              "note": "Independent GitHub runner Release download, load, and 128-step continuation; not a skill improvement."
+          }
+          Path("outputs/learning-resume-verification.json").write_text(json.dumps(data, indent=2)+"\n")
+          print(json.dumps(data))
+          PY
+      - name: Save compact verification receipt, never publish resumed weight by default
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: learning-release-resume-${{ github.run_id }}
+          path: outputs/learning-resume-verification.json
+          if-no-files-found: ignore
+          retention-days: 30

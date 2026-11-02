@@ -1,0 +1,66 @@
+name: Agent infrastructure - real V1 experiment
+on:
+  push:
+    branches: ['agent/infrastructure/v1']
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: v1-infrastructure-experiment
+  cancel-in-progress: false
+jobs:
+  full-game-experiment:
+    runs-on: ubuntu-latest
+    timeout-minutes: 80
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[test]'
+      - name: Unit tests
+        run: python -m pytest
+      - name: Install pinned TavernGym and validate observe2
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Execute real experiment to Game.is_over
+        shell: bash
+        run: |
+          mkdir -p experiments/infrastructure reports/infrastructure
+          python -m tavern_ai.canary --agent-id infrastructure --seed 1304 --policy baseline --receipt experiments/infrastructure/v1-full-match.json
+          python -m tavern_ai.validate_receipt experiments/infrastructure/v1-full-match.json
+          python - <<'PY'
+          import json,pathlib
+          r=json.loads(pathlib.Path("experiments/infrastructure/v1-full-match.json").read_text())
+          report={"verified_receipt_schema":r["schema"],"verified_engine":r["engine_version"],"verified_hash":r["engine_source_hash"],"game_completed":r["completed"],"placement":r["placements"][0],"decisions":r["decisions"],"seed":r["seed"]}
+          pathlib.Path("reports/infrastructure/v1.json").write_text(json.dumps(report,indent=2)+"\n")
+          print(report)
+          PY
+      - name: Commit only actual match receipts and compact metrics
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add experiments/infrastructure/ reports/infrastructure/
+          git diff --cached --quiet && exit 0
+          git commit -m "results(infrastructure): record real V1 full-match evidence"
+          test "$GITHUB_REF_NAME" = "agent/infrastructure/v1"
+          git pull --rebase origin "$GITHUB_REF_NAME"
+          git push origin HEAD:"$GITHUB_REF_NAME"
+      - name: Upload verification evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: agent-infrastructure-v1-evidence
+          path: |
+            experiments/infrastructure/*.json
+            reports/infrastructure/*.json
+          if-no-files-found: ignore
+          retention-days: 30

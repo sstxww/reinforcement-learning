@@ -1,0 +1,27 @@
+{
+  "schema": 1,
+  "timestamp": "2026-11-02T08:28:51.488792+00:00",
+  "environment": "TavernGym",
+  "engine_source_hash": "6d8712c93022ba11",
+  "engine_version": "1.1.0",
+  "agent_id": "infrastructure",
+  "policy": "baseline",
+  "seed": 1304,
+  "completed": true,
+  "turns": 14,
+  "decisions": 59,
+  "placements": [
+    7,
+    5,
+    4,
+    6,
+    8,
+    1,
+    3,
+    2
+  ],
+  "truncated_combats": 0,
+  "turn_limit_end": false,
+  "git_sha": "c41506ce031da6466e098650ff17f88d9fd5c7d9",
+  "model_sha256": null
+}
