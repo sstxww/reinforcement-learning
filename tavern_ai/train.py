@@ -1,6 +1,6 @@
 """Incremental mask-aware PPO training and compatible checkpoint resume."""
 from __future__ import annotations
-import argparse,json
+import argparse,hashlib,json
 from pathlib import Path
 from .contract import verify_engine
 from .env import TavernEnv
@@ -17,6 +17,12 @@ def run(steps:int,seed:int,model_out:Path,resume:Path|None=None):
         if not meta_path.is_file():raise ValueError("Missing checkpoint compatibility metadata")
         prev=json.loads(meta_path.read_text(encoding="utf-8"))
         if prev["engine"]!=engine:raise ValueError("Checkpoint engine or card vocabulary mismatch")
+        expected_digest=prev.get("checkpoint_sha256")
+        if expected_digest is not None:
+            if not isinstance(expected_digest,str) or len(expected_digest)!=64:
+                raise ValueError("Invalid recorded checkpoint digest")
+            if hashlib.sha256(resume.read_bytes()).hexdigest()!=expected_digest:
+                raise ValueError("Resume checkpoint SHA256 mismatch")
         model=MaskablePPO.load(str(resume),env=env,device="cpu")
     else:
         model=MaskablePPO("MultiInputPolicy",env,device="cpu",verbose=1,seed=seed,
@@ -29,8 +35,12 @@ def run(steps:int,seed:int,model_out:Path,resume:Path|None=None):
         model.learn(total_timesteps=steps,reset_num_timesteps=False)
         model_out.parent.mkdir(parents=True,exist_ok=True)
         model.save(str(model_out))
+        checkpoint_digest=hashlib.sha256(model_out.read_bytes()).hexdigest()
+        parent_digest=hashlib.sha256(resume.read_bytes()).hexdigest() if resume else None
         meta={"schema":1,"engine":engine,"total_timesteps":int(model.num_timesteps),
               "training_seed":seed,"algorithm":"MaskablePPO",
+              "checkpoint_sha256":checkpoint_digest,
+              "parent_checkpoint_sha256":parent_digest,
               "notes":"V1 CPU single-seat vs seven scripted bots"}
         model_out.with_suffix(".metadata.json").write_text(json.dumps(meta,indent=2),encoding="utf-8")
         return meta
