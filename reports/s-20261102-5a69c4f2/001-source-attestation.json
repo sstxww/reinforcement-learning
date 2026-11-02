@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "repository": "sstxww/reinforcement-learning",
+  "role": "latest",
+  "checkpoint_id": "v5-s-20261102-68099929-1408-41428692617",
+  "release_tag": "v5-s-20261102-68099929-1408-41428692617",
+  "sha256": "a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632",
+  "total_timesteps": 1408,
+  "metadata_schema": 1,
+  "archive_integrity": "passed",
+  "engine_compatibility": "passed",
+  "model_inference": "passed_one_action",
+  "optimizer_continuation_from_this_copy": "not_tested",
+  "new_training_steps": 0,
+  "competitive_improvement": "not_established",
+  "promoted_to_champion": false
+}

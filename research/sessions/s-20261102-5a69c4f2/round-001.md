@@ -1,0 +1,12 @@
+# V5 P0/P1/P2 handoff — s-20261102-5a69c4f2 R001
+
+- Base main when claimed: `1afd8297e3c661bee3117ac5301b1ca08d64869b`.
+- Scope: read-only registered GitHub Release source audit, fail-closed integrity preflight, own cloud execution/receipt and research handoff.
+- P0: 75 open PRs at discovery, 74 Draft. Only #15 non-Draft, but it targets unmerged Draft #9 branch, **not main**. No safe PR eligible for immediate main merge. No concurrent PR branches changed.
+- P1: `.github/workflows/train.yml` still downloads an expiring `v1-model` Actions Artifact and silently random-initializes if absent. This is not a reliable durable-resume gate. A canonical `models/registry.json` and `tavern_ai/checkpoint_preflight.py` now exist on main, but are not wired to official `train.yml`. This R001 supplies a separate, fail-closed Release preflight, not an unreviewed change to shared main-only training.
+- P1 registered latest (at review): `v5-s-20261102-68099929-1408-41428692617`, 1408 actual cumulative PPO steps, model SHA256 `a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632`, GitHub Release, `best=null` and `champion=null`. A Release audit/source inference is NOT proof of optimizer restoration from this specific copy. Do not silently train fresh; do not auto-promote.
+- P2: main registry's independent heldout placements are [8,8,8] vs paired baseline [6,8,8]; n=3 is insufficient for strong causal claims. Existing raw behavior telemetry reports repeated no-buy/oscillation patterns; causal impact of buy availability, masks and phase-specific decisions remains to be tested independently. No new model-strength claim.
+- Tests: new isolated unit regressions for malformed/forged source metadata, missing champion, missing source, overwrite, digest mismatch and step discrepancy. Fresh cloud test results and own real 8-seat receipt are pending until the branch workflow runs.
+- Source compatibility: TavernGym 1.1.0, observe2, 4017 float features, 447 cards, 245 actions, source hash `6d8712c93022ba11`. Actual pinned source/patch compatibility is asserted by the repository's schema-2 preflight, not reimplemented.
+- New PPO steps in this round: 0. No new candidate or Champion. No official ranked Arena.
+- Next integration gate: confirm branch job completed and bot committed authentic receipt; check current PR-head CI; review with concurrent latest main, then selectively wire durable fail-closed preflight into main-only train with an explicit fresh-start policy. Do not merge an unverified training behavior change.
