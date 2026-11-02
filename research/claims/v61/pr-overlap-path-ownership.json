@@ -1,0 +1,18 @@
+{
+  "schema": 1,
+  "session_id": "s-20261103-70349465",
+  "role": "WORKER",
+  "task_key": "P0/pr-overlap-path-ownership",
+  "base_main_sha": "3602f64b798bb51dcf69ef5964fe0b4c4cd39495",
+  "owner": "sstxww",
+  "started_at_utc": "2026-11-02T19:28:37Z",
+  "responsible_paths": [
+    "scripts/v61_pr_path_overlap_70349465.py",
+    "tests/test_v61_pr_path_overlap_70349465.py",
+    ".github/workflows/v61-pr-overlap-s-20261103-70349465.yml",
+    "research/sessions/s-20261103-70349465/",
+    "reports/s-20261103-70349465/"
+  ],
+  "latest_evidence": "https://github.com/sstxww/reinforcement-learning/tree/agent/s-20261103-70349465/optimization-001",
+  "handoff": "Claim ends when own PR is merged/closed or integrator explicitly releases ownership. No lease expiry asserted."
+}
