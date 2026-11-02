@@ -86,15 +86,21 @@ jobs:
           timeout 900 python -m tavern_ai.canary \
             --agent-id s-20261102-aaee3a59 \
             --policy model --model checkpoints/candidate/model.zip \
-            --seed 94433 --receipt experiments/s-20261102-aaee3a59/002-94433.json
-          python -m tavern_ai.validate_receipt experiments/s-20261102-aaee3a59/002-94433.json
-      - name: Save genuine model game if completed
+            --seed 94433 --receipt artifacts/1536-candidate-model-game.json
+          python -m tavern_ai.validate_receipt artifacts/1536-candidate-model-game.json
+      - name: Validate candidate evidence and preserve as short-lived artifact
         run: |
-          git add experiments/s-20261102-aaee3a59/002-94433.json
-          git diff --cached --quiet || git commit -m 'evidence: model-controlled eight-seat continuation canary'
-          git fetch origin agent/s-20261102-aaee3a59/optimization-001
-          git rebase origin/agent/s-20261102-aaee3a59/optimization-001
-          git push origin HEAD:agent/s-20261102-aaee3a59/optimization-001
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          meta = json.loads(Path("checkpoints/candidate/model.metadata.json").read_text(encoding="utf-8"))
+          game = json.loads(Path("artifacts/1536-candidate-model-game.json").read_text(encoding="utf-8"))
+          assert game["model_sha256"] == meta["checkpoint_sha256"]
+          assert game["policy"] == "model" and game["completed"]
+          assert game["truncated_combats"] == 0 and not game["turn_limit_end"]
+          assert meta["total_timesteps"] == 1536
+          print("One true unguarded model-controlled game, no Champion promotion")
+          PY
       - name: Short-lived diagnostic outputs (NOT permanent model storage)
         if: always()
         uses: actions/upload-artifact@v4
