@@ -53,6 +53,8 @@ jobs:
           git add "experiments/$SESSION_ID/001-baseline-73021.json"
           if ! git diff --cached --quiet; then
             git commit -m "test(v5): archive authentic original eight-seat resume gate receipt"
+            git fetch origin "+refs/heads/$GITHUB_REF_NAME:refs/remotes/origin/$GITHUB_REF_NAME"
+            git rebase "refs/remotes/origin/$GITHUB_REF_NAME"
             git push origin "HEAD:refs/heads/agent/$SESSION_ID/optimization-001"
           fi
       - name: Download original versioned durable checkpoint and metadata
