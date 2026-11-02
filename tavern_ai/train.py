@@ -3,7 +3,7 @@ from __future__ import annotations
 import argparse
 import json
 from pathlib import Path
-from .checkpoint_integrity import save_checkpoint, verify_checkpoint
+from .checkpoint_integrity import pinned_compatibility, save_checkpoint, verify_checkpoint
 from .contract import verify_engine
 from .env import TavernEnv
 
@@ -38,7 +38,8 @@ def run(steps: int, seed: int, model_out: Path, resume: Path | None = None):
         if previous is not None and int(model.num_timesteps) <= previous["total_timesteps"]:
             raise RuntimeError("Resume did not advance total training steps")
         meta = {
-            "schema": 1, "engine": engine, "total_timesteps": int(model.num_timesteps),
+            "schema": 2, "engine": engine, "compatibility": pinned_compatibility(engine),
+            "total_timesteps": int(model.num_timesteps),
             "training_seed": seed, "algorithm": "MaskablePPO",
             "notes": "V1 CPU single-seat vs seven scripted bots",
         }
