@@ -1,0 +1,48 @@
+name: V7 schema2 pre-learn gate b7c493e2 (bounded)
+on:
+  push:
+    branches:
+      - 'agent/s-20261103-b7c493e2/optimization-001'
+    paths:
+      - 'tavern_ai/train.py'
+      - 'tests/test_resume_prelearn_b7c493e2.py'
+      - '.github/workflows/v7-prelearn-b7c493e2.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: v7-prelearn-s-20261103-b7c493e2
+  cancel-in-progress: false
+
+jobs:
+  prelearn-tests-and-authentic-baseline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install minimal regression dependencies
+        run: |
+          python -m pip install -e '.[test]'
+      - name: Test genuine pre-learn rejection without downloading weights
+        run: |
+          python -m pytest -q tests/test_resume_prelearn_b7c493e2.py tests/test_train_schema2_resume_db1986b8.py
+      - name: Install pinned public TavernGym
+        run: bash scripts/bootstrap_engine.sh
+      - name: Run independent real eight-seat baseline game
+        run: |
+          python -m tavern_ai.contract
+          python -m tavern_ai.canary --agent-id s-20261103-b7c493e2 --policy baseline --seed 99763 --receipt outputs/v7-b7c493e2-baseline-99763.json
+          python -m tavern_ai.validate_receipt outputs/v7-b7c493e2-baseline-99763.json
+      - name: Preserve original completed-game evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v7-b7c493e2-baseline-${{ github.run_id }}
+          path: outputs/*.json
+          if-no-files-found: ignore
+          retention-days: 30
