@@ -1,0 +1,101 @@
+name: V5 matched heldout TavernGym games s-20261102-7be8a4d3
+on:
+  push:
+    branches: [agent/s-20261102-7be8a4d3/optimization-001]
+    paths:
+      - '.github/workflows/v5-heldout-s-20261102-7be8a4d3.yml'
+permissions:
+  contents: write
+concurrency:
+  group: v5-heldout-s-20261102-7be8a4d3
+  cancel-in-progress: false
+jobs:
+  paired-heldout:
+    runs-on: ubuntu-latest
+    timeout-minutes: 80
+    env:
+      GH_TOKEN: ${{ github.token }}
+      SESSION: s-20261102-7be8a4d3
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install exact pinned engine and inference dependencies
+        run: |
+          python -m pip install -e '.[train,test]'
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Download, verify source and target Releases
+        run: |
+          mkdir -p checkpoints/original checkpoints/resumed
+          gh release download v2-learning-41413557445 --repo "$GITHUB_REPOSITORY" --pattern model.zip --dir checkpoints/original
+          gh release download v5-recovery-s-20261102-7be8a4d3-41428181901 --repo "$GITHUB_REPOSITORY" --pattern model.zip --dir checkpoints/resumed
+          printf '73bde2666426cecce39f135980a897bb2cd4a7d70783ba04c9c0d29477a6664a  checkpoints/original/model.zip\n' | sha256sum -c -
+          printf '250be6159508fdd1ef91abb6c7277efe32fa49c726ea347923f18f6a4765e0f0  checkpoints/resumed/model.zip\n' | sha256sum -c -
+      - name: Run 12 genuine full eight-seat matches on fresh paired seeds
+        run: |
+          python - <<'PY'
+          import json,pathlib,statistics
+          from tavern_ai.canary import run
+          from tavern_ai.validate_receipt import validate
+          sid="s-20261102-7be8a4d3"
+          out=pathlib.Path("experiments")/sid
+          out.mkdir(parents=True,exist_ok=True)
+          seeds=list(range(98340,98344))
+          paths={"baseline":None,"original":"checkpoints/original/model.zip","resumed":"checkpoints/resumed/model.zip"}
+          rows={}
+          for policy,model in paths.items():
+              receipts=[]
+              for seed in seeds:
+                  receipt=run(seed,sid,"baseline" if model is None else "model",model)
+                  validate(receipt)
+                  assert receipt["completed"] is True and not receipt["truncated_combats"] and not receipt["turn_limit_end"]
+                  path=out/f"002-{policy}-{seed}.json"
+                  path.write_text(json.dumps(receipt,indent=2)+"\n")
+                  receipts.append(receipt)
+                  print(f"REAL GAME {policy} seed={seed} rank={receipt['placements'][0]} decisions={receipt['decisions']}",flush=True)
+              placements=[r["placements"][0] for r in receipts]
+              rows[policy]={"rank":placements,"mean_rank":statistics.mean(placements),
+                  "top4_rate":sum(v<=4 for v in placements)/len(placements),
+                  "first_rate":sum(v==1 for v in placements)/len(placements),
+                  "decisions":[r["decisions"] for r in receipts],
+                  "full_games_completed":len(receipts),"fallback":False}
+          report={"schema":1,"type":"genuine eight-seat 4-seed heldout paired evaluation",
+              "session_id":sid,"engine_version":"1.1.0","source_hash":"6d8712c93022ba11",
+              "seeds":seeds,"games":12,"source_total_steps":1280,"resumed_total_steps":1408,
+              "source_sha256":"73bde2666426cecce39f135980a897bb2cd4a7d70783ba04c9c0d29477a6664a",
+              "resumed_sha256":"250be6159508fdd1ef91abb6c7277efe32fa49c726ea347923f18f6a4765e0f0",
+              "policies":rows,
+              "new_minus_old_mean_rank":rows["resumed"]["mean_rank"]-rows["original"]["mean_rank"],
+              "new_minus_baseline_mean_rank":rows["resumed"]["mean_rank"]-rows["baseline"]["mean_rank"],
+              "champion_promotion_allowed":False,
+              "interpretation":"Four fresh seat-zero seeds, only descriptive: uncertainty high, no Arena Elo or strength promotion"}
+          target=pathlib.Path("reports")/sid
+          target.mkdir(parents=True,exist_ok=True)
+          (target/"002-paired-heldout.json").write_text(json.dumps(report,indent=2)+"\n")
+          print(json.dumps(report),flush=True)
+          PY
+      - name: Commit only real session-owned receipts and truthful metrics
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "experiments/$SESSION" "reports/$SESSION/002-paired-heldout.json" 2>/dev/null || true
+          if git diff --cached --quiet; then echo "No genuine evidence available"; exit 0; fi
+          git commit -m "results($SESSION): 12 authentic paired heldout TavernGym games"
+          git pull --rebase origin "$GITHUB_REF_NAME"
+          git push origin "HEAD:$GITHUB_REF_NAME"
+      - name: Preserve fresh evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v5-heldout-s-20261102-7be8a4d3-${{ github.run_id }}
+          path: |
+            experiments/s-20261102-7be8a4d3/002-*.json
+            reports/s-20261102-7be8a4d3/002-paired-heldout.json
+          if-no-files-found: ignore
+          retention-days: 30
