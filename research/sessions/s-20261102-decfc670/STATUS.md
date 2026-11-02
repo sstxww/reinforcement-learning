@@ -1,12 +1,12 @@
-# s-20261102-decfc670 STATUS
+# s-20261102-decfc670 — current reproducible status
 
-- State: isolated model-registry verification and independent full-game gate **pending GitHub Action execution**.
-- Branch: `agent/s-20261102-decfc670/optimization-001`.
-- Base main: `42f4cf3e5fd6dad68c0779345f9e76f42ca80c9c`.
-- Main advanced concurrently; verified PR #43 and PR #25 were integrated by other sessions; this session did not duplicate merges.
-- Implementation: immutable Release catalog, hash/metadata/CPU legal-action verifier, fail-closed Champion/latest pointer validation, targeted tests.
-- Stored weights: existing GitHub Release only, not committed to Git. SHA256 in registry is a GitHub Release API-reported digest, awaiting this session's independent download verification.
-- Champion: none verified. Latest-resumable: none verified. Actual new PPO steps: 0.
-- Real own game: pending Actions, do not invent receipt. Official Arena: none.
-- Await head-specific GitHub PR CI before integration. No direct push to main.
-- Next: inspect actual workflow result; fix on failure (maximum two substantive attempts); verify own receipt and main-branch compatibility; then consider isolated action/economy diagnosis for rank-8 PPO.
+- Session `s-20261102-decfc670`, branch `agent/s-20261102-decfc670/optimization-001`, initial main `42f4cf3e5fd6dad68c0779345f9e76f42ca80c9c`.
+- Draft PR: https://github.com/sstxww/reinforcement-learning/pull/95. Do not merge before final head CI and explicit integration review.
+- **R001 complete and green:** [Actions 41427457452](https://github.com/sstxww/reinforcement-learning/actions/runs/41427457452), full pytest, immutable pinned engine, authentic complete baseline seed 86241 rank8 / 48 decisions / 16 turns, model Release SHA256 `73bde2666426cecce39f135980a897bb2cd4a7d70783ba04c9c0d29477a6664a`, CPU load and legal inference. Receipts and report committed in `experiments/s-20261102-decfc670/001-86241.json` and `reports/s-20261102-decfc670/001-release-verification.json`.
+- **R002 complete and green:** [Actions 41428096980](https://github.com/sstxww/reinforcement-learning/actions/runs/41428096980), two V2 checkpoint-controlled real TavernGym eight-seat games, seeds 86251/86252, ranks [8,8], 286 decisions, 0 buys, 77 decision states with legal Buy, 0 voluntarily model-selected END when Buy legal, 12 other model-selected END, 2 guard-forced END, no combat truncations. Logs `research/sessions/s-20261102-decfc670/round-002.md`; reports and receipts committed. No full unguarded model-game claim.
+- **R003 launched, result pending:** [Actions 41428821470](https://github.com/sstxww/reinforcement-learning/actions/runs/41428821470), controlled **128 additional actual MaskablePPO steps** from exact prechecked V2 Release, optimizer-state counter check, a new uniquely tagged research-only GitHub Release upon successful training, fresh paired guarded model full-game tests, no Champion promotion. Do not claim success until job completion and report read.
+- Historic PR #43 and #25 integrated by other active sessions after this session verified tests. Avoided duplicate merge; no direct main writes.
+- Registry `models/registry.json`: existing V2 Release is a verified SHA/load/inference **challenger**; formal Champion = null, Latest resumable = null. Model strength not established.
+- No official Arena games. No upstream writes. No secrets or weight files committed to Git.
+- Source engine pinned: upstream `fb61201a557ddd36a411cf44aac51ce4d9b606ce`, patch SHA256 `1e48a071cad63c284debbf917cb012595a405a4ef5ab66180eb2918e205aaac0`, TavernGym 1.1.0 fingerprint `6d8712c93022ba11`, observe2 4017/447/245.
+- Next branch action: inspect exact R003 run; if the newly resumed model improves in independent paired full-games with adequate n, submit future model promotion *separately*. Negative or inconclusive => save as challenger/rejected, never Champion.
