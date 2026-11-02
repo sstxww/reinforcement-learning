@@ -1,0 +1,28 @@
+{
+  "schema": 1,
+  "environment": "TavernGym",
+  "engine_source_hash": "6d8712c93022ba11",
+  "engine_version": "1.1.0",
+  "agent_id": "s-20261102-1f73f4a5",
+  "policy": "student_bc_guarded",
+  "seed": 56104,
+  "completed": true,
+  "turns": 15,
+  "decisions": 154,
+  "placements": [
+    8,
+    1,
+    7,
+    4,
+    5,
+    6,
+    3,
+    2
+  ],
+  "truncated_combats": 0,
+  "turn_limit_end": false,
+  "git_sha": "eccf2112018bd2ad75692caab8c4faf03d3105f1",
+  "model_sha256": "7be2f5b2a7b2778ce5f3a2a7c0ca4d5c8f79fa0d15e16d83a5ee0e4c71eec669",
+  "safety_forced_ends": 1,
+  "guard_enabled": true
+}
