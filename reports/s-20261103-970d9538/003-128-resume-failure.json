@@ -1,0 +1,36 @@
+{
+  "schema": 1,
+  "session": "s-20261103-970d9538",
+  "round": 3,
+  "source_run": "https://github.com/sstxww/reinforcement-learning/actions/runs/41508855386",
+  "checkpoint_artifact": "https://github.com/sstxww/reinforcement-learning/actions/runs/41508855386/artifacts/13171229041",
+  "source_release": "v5-s-20261102-68099929-1408-41428692617",
+  "source_sha256": "a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632",
+  "candidate_sha256": "56ac39b408b2579afefdf1b8479c17c5199a44eaeb8e6f02f30d08d67eab2912",
+  "parent_timesteps": 1408,
+  "new_training_steps": 128,
+  "candidate_timesteps": 1536,
+  "engine": "TavernGym 1.1.0",
+  "engine_source_hash": "6d8712c93022ba11",
+  "baseline_game": {
+    "seed": 97311,
+    "completed": true,
+    "placement": 7,
+    "turns": 17,
+    "decisions": 57
+  },
+  "raw_candidate_game": {
+    "seed": 97312,
+    "completed": false,
+    "receipt_written": false,
+    "failure_signature": "Full-game safety limit exceeded",
+    "policy": "raw_model",
+    "fallback_or_guard": false
+  },
+  "publication": {
+    "durable_release_created": false,
+    "publish_job": "skipped",
+    "artifact_retention_days": 30
+  },
+  "interpretation": "Proven optimizer continuation and SHA-bound checkpoint save; raw model did not complete; not evidence of strength or Champion candidacy."
+}
