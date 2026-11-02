@@ -10,6 +10,8 @@
 - Engine: TavernGym 1.1.0, source hash 6d8712c93022ba11, observe2=4017/447, legal actions=245.
 - New PPO steps: 0. New model/Release: none. Best/Champion: unchanged. Arena: none.
 - Independent seed: 1256380, controlled seat 0; seven scripted bots; raw model vs baseline with exactly the same seed.
+- Verified GitHub Actions execution request: https://github.com/sstxww/reinforcement-learning/actions/runs/41513735245 ; push commit 59d821ece38ddf1312ffa5473ba7c24bfda692a5; initial observed status queued, not completed.
+- Release independently observed at https://github.com/sstxww/reinforcement-learning/releases/tag/v5-s-20261102-68099929-1408-41428692617 with model.zip 17,525,156 bytes and published asset SHA256 a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632; registered metadata digest 51a651c3a1921447e7bc06c301a52e85331411e75d61b35b5330c43a55aeba9c. Source index does not claim optimizer resume independently tested for this Release.
 - Real results: pending; no completed receipt, ranking, or n asserted.
 - Safety: no main merge, no changes to shared trainer or registry; workflow with finite 45-minute and model 15-minute caps.
 - Next: check own push Actions, retrieve original Artifact, validate/commit real receipts if complete; otherwise preserve failure log, then open reviewable PR only after required evidence.
