@@ -1,0 +1,29 @@
+{
+  "schema": 1,
+  "source_release": "v1-learning-9eada5801f99",
+  "source_model_sha256": "dc5195658995358e70c0d565a979b9cf05ccc5e47ae7adaa0a2f078f01cad917",
+  "source_steps": 256,
+  "source_release_download_verified": true,
+  "resumed_steps": 384,
+  "increment_steps": 128,
+  "resumed_model_sha256": "79f90ee56e1bf49eac86e39cb76e0df70e2316a5baf5067515bced15649829e7",
+  "model_full_game_completed": true,
+  "model_match_seed": 23001,
+  "model_placement": 8,
+  "model_decisions": 263,
+  "evaluation": {
+    "games": 3,
+    "mean_placement": 8,
+    "top4_rate": 0.0,
+    "first_place_rate": 0.0,
+    "placements": [
+      8,
+      8,
+      8
+    ],
+    "seed_start": 26500,
+    "comparison": "seven scripted TavernGym bots, not arena players"
+  },
+  "model_role": "candidate_unpromoted",
+  "claim": "Release download, real PPO resume, and model full-match checked; no model strength claim"
+}

@@ -1,0 +1,13 @@
+{
+  "games": 3,
+  "mean_placement": 8,
+  "top4_rate": 0.0,
+  "first_place_rate": 0.0,
+  "placements": [
+    8,
+    8,
+    8
+  ],
+  "seed_start": 26500,
+  "comparison": "seven scripted TavernGym bots, not arena players"
+}
