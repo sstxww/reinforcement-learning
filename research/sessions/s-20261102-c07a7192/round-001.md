@@ -22,3 +22,20 @@ At the time this report was first committed, this session had performed **0 PPO 
 
 ## Next check
 Confirm branch workflow, own genuine receipt, exact-head PR CI and reviewer approval. If V5 strict model-controlled smoke fails, report real error and do not publish or promote a model. Do not touch the shared main training workflow without safe integration ownership.
+
+## Verified final Actions result (updated after source workflow finished)
+
+- Own unique workflow [41450150026](https://github.com/sstxww/reinforcement-learning/actions/runs/41450150026) completed **success** on source HEAD `2f83885866139d297f4b8ff36489f563d061c894`.
+- Offline focused regressions passed; original PR CI 41450222567 ran **241 passed, 1 skipped** but failed the separate evidence gate because it executed before this own match receipt was committed. This is a sequencing failure, not a test failure. Re-run current PR CI after evidence commits; do not merge until success.
+- Actual baseline match seed **76012**: place **8**, 15 turns, 30 decisions, completed and validation succeeded, 0 truncations. Genuine receipt `experiments/s-20261102-c07a7192/001-76012.json` was committed by isolated workflow.
+- Downloaded actual versioned parent V5 1408-step Release `v5-s-20261102-68099929-1408-41428692617`; parent SHA256 `a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632`, actual both asset digest/optimizer ZIP/CPU inference checks succeeded.
+- **128 genuine PPO steps completed**, cumulative **1408→1536**, metadata verified in Actions. Resulting resumed model SHA256 `c1851820a7cbd353b8d8c91b4a446c512c4f6ba3f7048259da3f61ad932be0d1`.
+- **Model-controlled** authentic eight-seat match seed **76013**: place **8**, 16 turns, 122 decisions, completed, zero combat truncations. Its model receipt was read verbatim from verified workflow logs and committed as `experiments/s-20261102-c07a7192/002-76013-model.json`. Machine-readable replay audit is in `reports/s-20261102-c07a7192/001-release-resume.json`.
+- Newly resumed weights are in 30-day GitHub Actions diagnostic Artifact **only**, not an immutable Release; **not durable**, never Champion. Source 1408-step checkpoint remains safely preserved in Release. There is no paired heldout gain or learning signal established from this one new model match. Further PPO expansion is blocked pending behavioral diagnosis and durable new checkpoint publishing.
+
+## Focused cross-session P2 evidence (no invented new games)
+
+- Main canonical source `reports/s-20261102-68099929/003-buy-opportunity.json`: V5 1408-step game seed99128 has 35 mask-legal BUY decisions, 0 buys, rank8; same seed baseline 14 buys out of 21 legal BUY decision states, rank8. Small n=1 pair.
+- Main `reports/s-20261102-83d91476/001-buy-opportunity-report.json`: two V2 PPO games rank [8,8], 74 mask-legal BUY decision states, 0 purchases, 222/248 actions raw 1 or 2; baseline ranks [6,7], 33 buys. These are real matched games, not a mechanism causal test.
+- Draft dependent PR #107 (not merged) reports 46 forced legal buys in 3 games still ranked [8,8,8], with Play/Cancel loop symptoms; a negative **small-sample ablation**, not evidence that forced buying teaches a good policy.
+- Main guard experiment `reports/s-20261102-ba09e2d4/005-guarded-evaluation-summary.json`: guarded V2 still two rank8 and no buys. Prioritize state progression, action-family logits/entropy, observed gold, Play/Cancel loops and reward consistency over blind training scale-up.
