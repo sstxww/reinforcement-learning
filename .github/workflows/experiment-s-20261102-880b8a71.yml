@@ -6,6 +6,8 @@ on:
     paths:
       - 'scripts/verify_release_resume_v5_880b8a71.py'
       - 'tests/test_release_resume_v5_880b8a71.py'
+      - 'tavern_ai/behavior_audit_v5_880b8a71.py'
+      - 'tests/test_behavior_audit_v5_880b8a71.py'
       - '.github/workflows/experiment-s-20261102-880b8a71.yml'
   workflow_dispatch:
 permissions:
@@ -51,47 +53,45 @@ jobs:
         run: |
           python -m tavern_ai.train --steps 128 --seed 42 --resume checkpoints/source/model.zip --out checkpoints/next/model.zip
           python scripts/verify_release_resume_v5_880b8a71.py postflight --source-model checkpoints/source/model.zip --source-metadata checkpoints/source/model.metadata.json --resumed-model checkpoints/next/model.zip --resumed-metadata checkpoints/next/model.metadata.json --report reports/s-20261102-880b8a71/resume-attestation.json
-      - name: Candidate itself completes real eight-seat game
+      - name: Measure raw-model stall and run separately labelled guarded eight-seat matches
         run: |
-          python -m tavern_ai.canary --agent-id s-20261102-880b8a71 --policy model --model checkpoints/next/model.zip --seed 23051 --receipt experiments/s-20261102-880b8a71/001-23051.json
-          python -m tavern_ai.validate_receipt experiments/s-20261102-880b8a71/001-23051.json
-      - name: Paired held-out candidate and rule baseline games
-        run: |
-          python -m tavern_ai.evaluate --model checkpoints/next/model.zip --compare-baseline --games 3 --start-seed 27100 --out reports/s-20261102-880b8a71/paired-evaluation.json
-      - name: Confirm model receipt corresponds to the resumed weights
+          python -m tavern_ai.behavior_audit_v5_880b8a71 --model checkpoints/next/model.zip --out-dir experiments/s-20261102-880b8a71 --report reports/s-20261102-880b8a71/behavior-001.json
+          for receipt in experiments/s-20261102-880b8a71/*.json; do
+            python -m tavern_ai.validate_receipt "$receipt"
+          done
+      - name: Verify assisted evidence and keep promotion blocked
         run: |
           python - <<'PY'
           import json
           from pathlib import Path
           m=json.loads(Path('checkpoints/next/model.metadata.json').read_text())
           r=json.loads(Path('experiments/s-20261102-880b8a71/001-23051.json').read_text())
-          assert r['policy']=='model' and r['completed'] and r['agent_id']=='s-20261102-880b8a71'
-          assert r['model_sha256']==m['checkpoint_sha256']
+          report=json.loads(Path('reports/s-20261102-880b8a71/behavior-001.json').read_text())
+          assert r['policy']=='guarded_model' and r['completed'] and r['agent_id']=='s-20261102-880b8a71'
+          assert r['raw_model_only'] is False and r['model_sha256']==m['checkpoint_sha256']
           assert sorted(r['placements'])==list(range(1,9)) and not r['truncated_combats'] and not r['turn_limit_end']
           assert m['total_timesteps']==1408 and m['role']=='challenger_unpromoted'
+          assert report['all_guarded_games_completed'] and report['promotion']=='none'
+          assert len(report['baseline_paired_games'])==3
+          assert all(p['completed'] for p in report['baseline_paired_games'])
+          print('Guarded games and paired seeds verified. Raw policy is NOT validated for Champion.')
           PY
-      - name: Persist genuine own-session evidence on its isolated branch
+      - name: Commit only genuine separate guarded-game evidence on own branch
         shell: bash
         run: |
           set -euo pipefail
           test "$GITHUB_REF_NAME" = 'agent/s-20261102-880b8a71/optimization-001'
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add experiments/s-20261102-880b8a71/001-23051.json reports/s-20261102-880b8a71/*.json
+          git add experiments/s-20261102-880b8a71/*.json reports/s-20261102-880b8a71/*.json
           git diff --cached --quiet && exit 0
-          git commit -m 'evidence(v5): verified Release continuation and authentic paired games'
+          git commit -m 'evidence(v5): actual guarded games, legal buy opportunities and raw PPO stall'
           git pull --rebase origin "$GITHUB_REF_NAME"
           git push origin "HEAD:$GITHUB_REF_NAME"
-      - name: Publish ONLY unpromoted Release and independently re-download
-        shell: bash
+      - name: Deliberately avoid new Release for failed raw-model full-game gate
         run: |
-          set -euo pipefail
-          tag="v5-resume-s-20261102-880b8a71-${GITHUB_RUN_ID}"
-          gh release create "$tag" checkpoints/next/model.zip checkpoints/next/model.metadata.json reports/s-20261102-880b8a71/resume-attestation.json reports/s-20261102-880b8a71/paired-evaluation.json experiments/s-20261102-880b8a71/001-23051.json --repo "$GITHUB_REPOSITORY" --target "$(git rev-parse HEAD)" --prerelease --title "Unpromoted V5 1408-step resumed candidate $tag" --notes 'Verified source v2-learning-41413557445. Candidate only, not Champion; all rank claims require independent paired evidence.'
-          mkdir -p checkpoints/published
-          gh release download "$tag" --repo "$GITHUB_REPOSITORY" --pattern model.zip --pattern model.metadata.json --dir checkpoints/published
-          cmp checkpoints/next/model.zip checkpoints/published/model.zip
-          cmp checkpoints/next/model.metadata.json checkpoints/published/model.metadata.json
+          echo 'No Release, no Champion: raw model failed real game in run 41427593167.'
+          echo 'Resumed weight remains in temporary Artifact for diagnosis only.'
       - name: Retain model and failure diagnostics even if later gate fails
         if: always()
         uses: actions/upload-artifact@v4
