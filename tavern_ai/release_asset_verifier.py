@@ -69,6 +69,33 @@ def validate_asset_index(index: dict, canonical: dict) -> dict:
     return {"indexed_releases": len(assets), "canonical_candidates_matched":
             len(canonical["candidates"]), "does_not_claim_verification": True}
 
+def _probe_masked_inference(model: object, seed: int = 7819) -> int:
+    """Require one actual engine-backed, mask-legal deterministic action.
+
+    Successful model deserialization alone is not evidence that the saved
+    policy can consume the pinned observation or use a TavernGym action mask.
+    This checks one step, NOT a completed eight-seat match or PPO resume.
+    """
+    from .env import TavernEnv
+
+    env = TavernEnv(seed=seed)
+    try:
+        observation, _ = env.reset(seed=seed)
+        mask = env.action_masks()
+        if len(mask) != ACTIONS or not any(mask):
+            raise ValueError("Pinned action mask is empty or has incorrect length")
+        action, _ = model.predict(
+            observation, action_masks=mask, deterministic=True
+        )
+        selected = int(action)
+        if selected < 0 or selected >= ACTIONS or not bool(mask[selected]):
+            raise ValueError("Loaded model predicted a masked-illegal action")
+        env.step(selected)
+        return selected
+    finally:
+        env.close()
+
+
 def verify_local(index: dict, canonical: dict, model_id: str, weights: Path,
                  metadata: Path, check_load: bool = False) -> dict:
     """Read actual local bytes. check_load is not a resume or full-game test."""
@@ -98,7 +125,8 @@ def verify_local(index: dict, canonical: dict, model_id: str, weights: Path,
               "archive_integrity_verified": preflight["archive_integrity"] == "passed",
               "optimizer_state_present": True,
               "checkpoint_metadata_schema": preflight["checkpoint_metadata_schema"],
-              "sb3_load_checked": False, "optimizer_resume_checked": False,
+              "sb3_load_checked": False, "masked_legal_inference_checked": False,
+              "optimizer_resume_checked": False,
               "complete_game_checked": False}
     if check_load:
         from sb3_contrib import MaskablePPO
@@ -108,6 +136,8 @@ def verify_local(index: dict, canonical: dict, model_id: str, weights: Path,
         if candidate and model.num_timesteps != candidate["training_steps"]:
             raise ValueError("Loaded SB3 model steps mismatch")
         result["sb3_load_checked"] = True
+        _probe_masked_inference(model)
+        result["masked_legal_inference_checked"] = True
     return result
 
 def main() -> None:
