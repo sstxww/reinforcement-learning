@@ -16,7 +16,7 @@ from urllib.request import Request, urlopen
 
 REPO = 'sstxww/reinforcement-learning'
 API = f'https://api.github.com/repos/{REPO}'
-HEX40 = re.compile(r'[0-9a-f]{40}\\Z')
+HEX40 = re.compile(r'[0-9a-f]{40}\Z')
 
 
 def get_json(path: str) -> dict:
@@ -104,7 +104,7 @@ def main() -> None:
     args = p.parse_args()
     report = snapshot(args.pr, args.expected_main, args.expected_head)
     args.out.parent.mkdir(parents=True, exist_ok=True)
-    args.out.write_text(json.dumps(report, indent=2) + '\\n')
+    args.out.write_text(json.dumps(report, indent=2) + '\n')
     print(json.dumps(report))
     # Nonzero: a read-only report NEVER means authorized to merge.
     raise SystemExit(2 if report['blockers'] else 0)
