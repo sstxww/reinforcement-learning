@@ -1,0 +1,55 @@
+name: V5 P0-P2 evidence gate s-20261102-e8355ba3
+
+on:
+  push:
+    branches:
+      - agent/s-20261102-e8355ba3/optimization-001
+    paths:
+      - .github/workflows/v5-p0-evidence-e8355ba3.yml
+      - tavern_ai/guarded_evidence_gate_e8355ba3.py
+      - tests/test_guarded_evidence_gate_e8355ba3.py
+
+permissions:
+  contents: read
+
+concurrency:
+  group: v5-e8355ba3-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  evidence-and-authentic-game:
+    runs-on: ubuntu-latest
+    timeout-minutes: 65
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install isolated test dependencies
+        run: python -m pip install -e '.[test]'
+      - name: Reconcile real raw and guarded evidence with regression tests
+        run: |
+          python -m pytest -q tests/test_guarded_evidence_gate_e8355ba3.py
+          python -m tavern_ai.guarded_evidence_gate_e8355ba3 \
+            --raw reports/s-20261102-ba09e2d4/002-action-opportunities.json \
+            --guarded reports/s-20261102-ba09e2d4/005-guarded-evaluation-summary.json \
+            --out outputs/001-p2-evidence-reconciliation.json
+      - name: Install exact pinned TavernGym engine
+        run: bash scripts/bootstrap_engine.sh
+      - name: Run one authentic full eight-player baseline game
+        run: |
+          python -m tavern_ai.contract
+          python -m tavern_ai.canary \
+            --agent-id s-20261102-e8355ba3 \
+            --seed 93031 \
+            --policy baseline \
+            --receipt outputs/001-93031.json
+          python -m tavern_ai.validate_receipt outputs/001-93031.json
+      - name: Preserve genuine outputs independently of CI gate
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v5-e8355ba3-p0-p2-receipts-${{ github.run_id }}
+          path: outputs/*.json
+          if-no-files-found: ignore
+          retention-days: 30
