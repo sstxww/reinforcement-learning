@@ -1,0 +1,45 @@
+name: V7 exclusive-merge gate regression and genuine baseline s-20261103-01cdbd04
+
+on:
+  push:
+    branches: [agent/s-20261103-01cdbd04/optimization-001]
+    paths:
+      - scripts/v7_integration_gate_01cdbd04.py
+      - tests/test_v7_integration_gate_01cdbd04.py
+      - .github/workflows/v7-main-integrate-01cdbd04.yml
+      - .github/workflows/v7-integration-canary-01cdbd04.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: v7-01cdbd04-canary
+  cancel-in-progress: false
+
+jobs:
+  audit-and-game:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Synthetic offline tests
+        run: python -m unittest discover -s tests -p 'test_v7_integration_gate_01cdbd04.py'
+      - name: Pinned TavernGym engine
+        run: bash scripts/bootstrap_engine.sh
+      - name: Genuine eight-seat baseline canary (not PPO skill)
+        run: |
+          python -m tavern_ai.canary --agent-id s-20261103-01cdbd04 \
+            --seed 99711 --policy baseline \
+            --receipt experiments/s-20261103-01cdbd04/001-99711.json
+          python -m tavern_ai.validate_receipt experiments/s-20261103-01cdbd04/001-99711.json
+      - name: Preserve original temporary receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v7-01cdbd04-original-game-${{ github.run_id }}
+          path: experiments/s-20261103-01cdbd04/*.json
+          if-no-files-found: ignore
+          retention-days: 30

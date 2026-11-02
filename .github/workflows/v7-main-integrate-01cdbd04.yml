@@ -1,0 +1,98 @@
+name: V7 serialized main integration (manual)
+
+on:
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: Reviewed PR number
+        type: string
+        required: true
+      expected_head_sha:
+        description: Exact reviewed head commit SHA
+        type: string
+        required: true
+      reviewed_head_sha:
+        description: Integrator attests independently reviewing exact head SHA
+        type: string
+        required: true
+
+permissions:
+  contents: read
+  pull-requests: write
+  checks: read
+
+concurrency:
+  group: autotavern-main-integrate
+  cancel-in-progress: false
+
+jobs:
+  integrate:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Offline gate regression
+        run: python -m unittest discover -s tests -p 'test_v7_integration_gate_01cdbd04.py'
+      - name: Check live base, head, ancestry, CI, review before merge
+        shell: bash
+        env:
+          GH_${{ github.token }}: ${{ github.token }}
+          PR: ${{ inputs.pr_number }}
+          HEAD: ${{ inputs.expected_head_sha }}
+          REVIEWED: ${{ inputs.reviewed_head_sha }}
+        run: |
+          set -euo pipefail
+          [[ "$PR" =~ ^[1-9][0-9]*$ ]]
+          [[ "$HEAD" =~ ^[0-9a-f]{40}$ ]]
+          [[ "$REVIEWED" == "$HEAD" ]]
+          mkdir -p /tmp/v7
+          gh api "repos/$GITHUB_REPOSITORY/pulls/$PR" > /tmp/v7/pr.json
+          main="$(gh api "repos/$GITHUB_REPOSITORY/branches/main" --jq '.commit.sha')"
+          [[ "$(gh api "repos/$GITHUB_REPOSITORY/pulls/$PR" --jq '.head.sha')" == "$HEAD" ]]
+          gh api --paginate "repos/$GITHUB_REPOSITORY/commits/$HEAD/check-runs?per_page=100" \
+            --jq '.check_runs[]' > /tmp/v7/check-lines.jsonl
+          python - <<'PY'
+          import json
+          rows=[json.loads(s) for s in open("/tmp/v7/check-lines.jsonl") if s.strip()]
+          json.dump({"total_count":len(rows),"check_runs":rows}, open("/tmp/v7/checks.json","w"))
+          PY
+          git fetch --no-tags origin "$main" "$HEAD"
+          ancestor=""
+          if git merge-base --is-ancestor "$main" "$HEAD"; then ancestor="--ancestor"; fi
+          python scripts/v7_integration_gate_01cdbd04.py \
+            --pr /tmp/v7/pr.json --checks /tmp/v7/checks.json \
+            --main "$main" --head "$HEAD" --reviewed "$REVIEWED" $ancestor \
+            --out /tmp/v7/gate.json
+          [[ "$(gh api "repos/$GITHUB_REPOSITORY/branches/main" --jq '.commit.sha')" == "$main" ]]
+          [[ "$(gh api "repos/$GITHUB_REPOSITORY/pulls/$PR" --jq '.head.sha')" == "$HEAD" ]]
+      - name: Merge through GitHub protected PR API, exact expected head
+        shell: bash
+        env:
+          GH_${{ github.token }}: ${{ github.token }}
+          PR: ${{ inputs.pr_number }}
+          HEAD: ${{ inputs.expected_head_sha }}
+        run: |
+          set -euo pipefail
+          gh api --method PUT "repos/$GITHUB_REPOSITORY/pulls/$PR/merge" \
+            -f sha="$HEAD" -f merge_method=squash > /tmp/v7/merge.json
+          python - <<'PY'
+          import json
+          m=json.load(open("/tmp/v7/merge.json"))
+          assert m.get("merged") is True, m
+          print("MERGED SHA:", m.get("sha"))
+          print("Postmerge CI must be checked independently; not yet verified")
+          PY
+      - name: Save temporary integration attempt audit
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v7-integration-attempt-${{ github.run_id }}
+          path: /tmp/v7/*.json
+          if-no-files-found: ignore
+          retention-days: 30
