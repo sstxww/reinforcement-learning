@@ -1,0 +1,2 @@
+Launch one finite independent safety-test and genuine TavernGym baseline receipt run for session s-20261102-fda20934.
+Seed: 89341. No PPO training, no model promotion, no official Arena.

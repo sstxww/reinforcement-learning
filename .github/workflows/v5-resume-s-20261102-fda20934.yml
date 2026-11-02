@@ -1,0 +1,56 @@
+name: V5 resume safety verification - s-20261102-fda20934
+
+on:
+  push:
+    branches:
+      - agent/s-20261102-fda20934/optimization-001
+    paths:
+      - research/sessions/s-20261102-fda20934/trigger.txt
+
+permissions:
+  contents: write
+
+concurrency:
+  group: v5-resume-fda20934
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install offline test dependencies
+        run: |
+          python -m pip install -e '.[test]'
+      - name: Run focused resume safety tests
+        run: python -m pytest -q tests/test_resume_gate_fda20934.py
+      - name: Bootstrap pinned engine
+        run: bash scripts/bootstrap_engine.sh
+      - name: Verify real independent full eight-seat baseline game
+        run: |
+          python -m tavern_ai.contract
+          python -m tavern_ai.canary --agent-id s-20261102-fda20934 --seed 89341 --policy baseline --receipt experiments/s-20261102-fda20934/001-89341.json
+          python -m tavern_ai.validate_receipt experiments/s-20261102-fda20934/001-89341.json
+      - name: Record genuine receipt on this session branch only
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add experiments/s-20261102-fda20934/001-89341.json
+          git diff --cached --quiet && { echo 'Expected real new receipt absent'; exit 1; }
+          git commit -m 'evidence: record real eight-seat baseline for s-20261102-fda20934'
+          git push origin "HEAD:${GITHUB_REF_NAME}"
+      - name: Keep receipt artifact for inspection
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v5-resume-fda20934-receipt
+          path: experiments/s-20261102-fda20934/*.json
+          if-no-files-found: ignore
+          retention-days: 30
