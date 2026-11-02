@@ -34,9 +34,9 @@ def run(steps:int,seed:int,model_out:Path,resume:Path|None=None):
     try:
         model.learn(total_timesteps=steps,reset_num_timesteps=False)
         model_out.parent.mkdir(parents=True,exist_ok=True)
+        parent_digest=hashlib.sha256(resume.read_bytes()).hexdigest() if resume else None
         model.save(str(model_out))
         checkpoint_digest=hashlib.sha256(model_out.read_bytes()).hexdigest()
-        parent_digest=hashlib.sha256(resume.read_bytes()).hexdigest() if resume else None
         meta={"schema":1,"engine":engine,"total_timesteps":int(model.num_timesteps),
               "training_seed":seed,"algorithm":"MaskablePPO",
               "checkpoint_sha256":checkpoint_digest,
