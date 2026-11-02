@@ -1,14 +1,27 @@
-# Session s-20261102-9732a21e — validated V5 integration and training status
+# V5 Agent s-20261102-9732a21e — verified integration, model recovery and behavioral diagnosis
 
-- Session branch: `agent/s-20261102-9732a21e/optimization-001`; initial base main `3c65ffd0380d6269e6b39c7bf1ca2d84281546d8`. Only `sstxww/reinforcement-learning` was modified.
-- **P0 MERGED by this session:** PR #70, add-only pinned public mechanics audit; squash commit `3c65ffd0380d6269e6b39c7bf1ca2d84281546d8`, exact post-merge main CI [41427295858](https://github.com/sstxww/reinforcement-learning/actions/runs/41427295858) **success**.
-- **Other concurrent PR #25**: integrated separately by another session (not counted as own merge). PR #75 overlap documented in its discussion; no blind merging.
-- **P1 actual FIRST attempt:** [Actions 41427627265](https://github.com/sstxww/reinforcement-learning/actions/runs/41427627265) **failure at heldout evaluation only**. Source V2 Release `v2-learning-41413557445` SHA and engine check passed. True MaskablePPO 128 additional steps **1280 -> 1408**; checkpoint SHA256 `04799f7e23153dd1728d6e765386ea5f9c17da4075ec7672d17cf4dfb170e185`, metadata SHA256 `83d4a7d5df6d18b9fcc4816edd14988ab2f4e5768cdd41fa2f670cf2b6df7991`.
-- **Pure model authentic full-game receipt:** `experiments/s-20261102-9732a21e/001-83601.json`, original recovered from workflow Artifact [13132927436](https://github.com/sstxww/reinforcement-learning/actions/runs/41427627265/artifacts/13132927436). Seed 83601, completed, **rank 8**, 15 turns, 117 actions, placements `[8,4,3,5,2,6,1,7]`, no combat/turn-limit guard, SHA matches checkpoint.
-- **Heldout failure:** independent seed test `tavern_ai.evaluate` raised `RuntimeError: Full-game safety limit exceeded`, so **no complete paired estimate**; do not invent placements or strength gain. See `failures/001-eval-fullgame-safety-limit.md`.
-- **P2 new diagnostic:** `tavern_ai/v5_behavior_9732a21e.py` uses only public observe2/legality, records legal-buy opportunities, chosen buys, end-turns while purchase is legal, gold, repeated public observations/action categories; failed games stay in reports only and never count as completed receipts. Isolated tests `tests/test_v5_behavior_9732a21e.py`.
-- **First fix rerun:** [Actions 41428791989](https://github.com/sstxww/reinforcement-learning/actions/runs/41428791989) **in progress at this status edit**, expected to attempt finite resume, legal-buy/loop diagnostics, unpromoted archival Release + independent re-download, and commit actual evidence. No R2 results are claimed until verified.
-- **Latest R2 source CI:** [Actions 41428800205](https://github.com/sstxww/reinforcement-learning/actions/runs/41428800205) **success**, includes tests and independent full game; do not conflate it with R2 candidate's real-match diagnostic result.
-- **Storage:** first checkpoint exists in 30-day workflow Artifact; not a permanent model release at first attempt. Latest/Best/Champion **unchanged, no model promoted**. Second run release not yet verified. Do not resume from a failed candidate as formal baseline.
-- **Training after R2:** not approved to increase steps unless all game/guard/behavior and model reproducibility gates pass.
-- No TavernArena ranked games, no upstream source edits, no shared `train.yml` edits.
+## GitHub integration
+- Authored session branch: `agent/s-20261102-9732a21e/optimization-001`. Sole writable repository `sstxww/reinforcement-learning`; no TavernArena ranked.
+- **Our merged PR #70** engine card/action contract audit: commit `3c65ffd0380d6269e6b39c7bf1ca2d84281546d8`, post-merge [CI 41427295858](https://github.com/sstxww/reinforcement-learning/actions/runs/41427295858) success.
+- **PR #25** strict receipt integrity merged by a parallel session (not credited as our action). PR #75 overlapping schema received deduplication comment, no blind merge.
+- **Our active Draft PR #86:** https://github.com/sstxww/reinforcement-learning/pull/86. Local final-head CI must be checked after all changes.
+
+## R001 completed training, failed paired evaluation
+- [Actions 41427627265](https://github.com/sstxww/reinforcement-learning/actions/runs/41427627265) failed at pure-model heldout `Full-game safety limit exceeded`, **not** at Release restore, SHA validation, or actual PPO training.
+- V2 Release source 1280 PPO steps -> verified **1408** saved steps (+128), original first candidate SHA256 `04799f7e23153dd1728d6e765386ea5f9c17da4075ec7672d17cf4dfb170e185`.
+- Original unchanged artifact game receipt seed 83601 (rank 8, 15 turns, 117 decisions, valid eight placements) committed at `experiments/s-20261102-9732a21e/001-83601.json`; artifact 13132927436 archived 30 days. Original failed paired run gives **zero complete paired comparisons**. See failure report `failures/001-eval-fullgame-safety-limit.md`.
+
+## R002 successful recovery, permanent rejected checkpoint and direct root cause
+- [Actions 41428791989](https://github.com/sstxww/reinforcement-learning/actions/runs/41428791989) **completed SUCCESS**. Repeat bounded 128-step restore from original 1280-step V2 release to 1408 steps. Source Release model SHA and engine contract validated; candidate alone completed seed 83601 rank 8.
+- **Durable unpromoted model Release**: https://github.com/sstxww/reinforcement-learning/releases/tag/v5-resume-smoke-s-20261102-9732a21e-r001
+- Candidate weight SHA256 `976d9323e79cd00fa1dae73ea31886e4087171078eabdde8eeca06fac7eb0cc6`; metadata SHA256 `83d4a7d5df6d18b9fcc4816edd14988ab2f4e5768cdd41fa2f670cf2b6df7991`. Release roundtrip check and manifest roundtrip check **passed**. `reports/s-20261102-9732a21e/001-model-lineage.json` contains `checkpoint_persistence=verified_release_roundtrip`, `model_status=rejected_behavior_safety_failure`, `formal_resume_allowed=false`; do **NOT** promote Champion/Latest/Best or use this unsafe model as formal continuation base.
+- Public-observation diagnostic `reports/s-20261102-9732a21e/001-behavior-telemetry.json` confirms:
+  - Seed 83701: pure candidate **failed** to complete at turn 6, 30,000 decisions; `Play=14955`, `Cancel=14955`, 50 `Freeze`, 32 `Refresh`; **86 decision points with some legal buy**, **0 buys**. This failed game has **no rank**. Official rule baseline on same seed completed rank 8 with 13 buys.
+  - Seed 83702: pure candidate completed **rank 8**, 122 decisions, 70 Freeze / 42 Refresh / 7 EndTurn / 1 Upgrade / 2 Choose; **39 decision points with legal buy**, **0 buys**. Official baseline same seed completed rank 8 with 10 buys.
+  - **Total 125 model decisions with some legal purchase**, **zero buys**, but these counts include repeated choices in the stuck loop and are not 125 independent economic opportunities. Full-game failure explains unsafe model. **Only 1/2 paired seeds completed**; both models rank 8 on that seed. No strength uplift.
+- Root cause level: **observed action behavior failure** (buy-action omission, Play/Cancel loop, Freeze/Refresh spam); not yet causal proof of reward or learning-rate mechanism. Probe captures only public obs2 and legal mask; no hidden-information leak.
+
+## R003 isolated behavior intervention
+- One-factor legal-action hybrid (maximum 2 buying overrides per turn; only mask-legal END_TURN after 35 actions/turn), explicitly **not pure PPO**. New source `tavern_ai/v5_guarded_9732a21e.py`, tests, branch-specific workflow. It reuses the *rejected* checkpoint only as a fixed research model; zero new training steps.
+- 4-seed pilot, 8 real games planned; no results yet. [Actions 41429774484](https://github.com/sstxww/reinforcement-learning/actions/runs/41429774484) **queued at this edit**. All complete hybrid receipts are labelled `policy=guarded_model_diagnostic` and kept under reports, never claimed as native PPO victories. Incomplete games get only diagnostics.
+- No large PPO scale-up until actual behavior gate / valid paired samples show improvement.
