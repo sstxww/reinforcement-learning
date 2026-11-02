@@ -1,0 +1,50 @@
+name: V7 isolated per-seed failure provenance s-20261103-d2f99825
+
+on:
+  push:
+    branches:
+      - agent/s-20261103-d2f99825/optimization-001
+    paths:
+      - .github/workflows/v7-seed-isolation-s-20261103-d2f99825.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: v7-seed-isolation-s-20261103-d2f99825
+  cancel-in-progress: false
+
+jobs:
+  baseline-real-game:
+    runs-on: ubuntu-latest
+    timeout-minutes: 65
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install bounded regression dependencies
+        run: |
+          python -m pip install -e '.[test]'
+      - name: Local per-seed failure/provenance regression
+        run: python -m pytest -q tests/test_v7_seed_isolation_d2f99825.py
+      - name: Install verified pinned TavernGym
+        run: bash scripts/bootstrap_engine.sh
+      - name: Confirm strict pinned engine contract
+        run: python -m tavern_ai.contract
+      - name: Actual independent full eight-seat baseline game
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/v7_seed_isolation_d2f99825.py \
+            --session-id s-20261103-d2f99825 --start-seed 99437 \
+            --games 1 --policy baseline --out-dir outputs
+          python -m tavern_ai.validate_receipt outputs/receipts/baseline-99437.json
+      - name: Keep actual per-seed evidence even on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v7-seed-s-20261103-d2f99825-\${{ github.run_id }}
+          path: outputs/
+          if-no-files-found: ignore
+          retention-days: 30
