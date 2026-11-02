@@ -12,33 +12,35 @@
   },
   "best": null,
   "latest": {
-    "id": "v2-learning-41413557445",
+    "id": "v5-s-20261102-68099929-1408-41428692617",
     "role": "latest_experimental_unpromoted",
     "durable_storage": "github_release",
-    "release": "https://github.com/sstxww/reinforcement-learning/releases/tag/v2-learning-41413557445",
-    "release_tag": "v2-learning-41413557445",
+    "release_tag": "v5-s-20261102-68099929-1408-41428692617",
+    "release": "https://github.com/sstxww/reinforcement-learning/releases/tag/v5-s-20261102-68099929-1408-41428692617",
     "model_asset": "model.zip",
     "metadata_asset": "model.metadata.json",
-    "checkpoint_sha256": "73bde2666426cecce39f135980a897bb2cd4a7d70783ba04c9c0d29477a6664a",
-    "training_steps": 1280,
-    "added_steps_from_v1": 1024,
-    "source_release": "v1-learning-9eada5801f99",
-    "source_run": "https://github.com/sstxww/reinforcement-learning/actions/runs/41413557445",
-    "source_commit": "e37bd7e3a4bf95576ca1b27867df05af86ddab71",
+    "checkpoint_sha256": "a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632",
+    "training_steps": 1408,
+    "added_steps_from_parent": 128,
+    "source_release": "v2-learning-41413557445",
+    "resume_validation_run": "https://github.com/sstxww/reinforcement-learning/actions/runs/41427963534",
+    "source_run": "https://github.com/sstxww/reinforcement-learning/actions/runs/41428692617",
+    "source_commit": "a7ffcbb566ed9a3e2dc5d1edc59d8021e23d8103",
     "engine_version": "1.1.0",
     "engine_source_hash": "6d8712c93022ba11",
     "observation": "observe2",
+    "release_download_sha256_verified": true,
+    "model_load_verified": true,
+    "real_resume_128_steps_verified": true,
     "model_full_game_passed": true,
-    "model_full_game_seed": 23002,
+    "model_full_game_seed": 99124,
     "model_full_game_placement": 8,
     "heldout_eval_seeds": [
-      24000,
-      24001,
-      24002,
-      24003
+      99125,
+      99126,
+      99127
     ],
     "heldout_placements": [
-      8,
       8,
       8,
       8
@@ -46,10 +48,14 @@
     "heldout_mean_placement": 8,
     "heldout_top4_rate": 0,
     "heldout_first_place_rate": 0,
-    "paired_improvement_vs_256_step_model_verified": false,
-    "independent_release_resume_tested": false,
+    "paired_baseline_ranks": [
+      6,
+      8,
+      8
+    ],
+    "paired_improvement_verified": false,
     "promoted_to_best": false,
-    "note": "A durable latest release was published, but automatic main-workflow recovery from it remains to be validated."
+    "note": "Published and redownloaded Release; model remains rank8 in 3 independent paired games, no competitive advantage."
   },
   "candidates": [
     {
@@ -137,15 +143,54 @@
       },
       "validated_download_load_resume": true,
       "promoted_to_best": false
+    },
+    {
+      "id": "v5-s-20261102-68099929-1408-41428692617",
+      "role": "candidate_unpromoted",
+      "durable_storage": "GitHub Release",
+      "release_url": "https://github.com/sstxww/reinforcement-learning/releases/tag/v5-s-20261102-68099929-1408-41428692617",
+      "checkpoint_sha256": "a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632",
+      "training_steps": 1408,
+      "source_release": "v2-learning-41413557445",
+      "actual_additional_train_steps": 128,
+      "model_full_game": {
+        "seed": 99124,
+        "rank": 8,
+        "decisions": 119,
+        "complete": true
+      },
+      "heldout": {
+        "seeds": [
+          99125,
+          99126,
+          99127
+        ],
+        "placements": [
+          8,
+          8,
+          8
+        ],
+        "baseline_placements": [
+          6,
+          8,
+          8
+        ],
+        "mean_placement": 8,
+        "top4_rate": 0,
+        "first_place_rate": 0
+      },
+      "verified_download_load_resume": true,
+      "verified_published_release_download": true,
+      "champion_promoted": false
     }
   ],
-  "status": "Six GitHub prereleases enumerated from API; v2-1280 is latest tracked experimental candidate; Champion remains null; new binary download+resume is not yet verified.",
+  "status": "Seven real GitHub model Releases indexed including newly verified 1408-step unpromoted Challenger. Latest is the newest *verified, durable* experiment, Best remains null. Heldout n=3 candidate ranks [8,8,8] vs baseline [6,8,8]; no gain.",
   "release_tag_prefix": "v1-main-",
   "learning_release_tag_prefix": "v1-learning-",
   "promotion_policy": "Paired held-out evaluation and verified checkpoint read/inference are required; never auto-promote.",
   "training_progress": {
-    "cumulative_latest_candidate_steps": 1280,
-    "last_training_run": "https://github.com/sstxww/reinforcement-learning/actions/runs/41413557445",
+    "cumulative_latest_candidate_steps": 1408,
+    "last_training_run": "https://github.com/sstxww/reinforcement-learning/actions/runs/41427963534",
     "latest_full_model_game_passed": true,
     "baseline_four_seed_mean_placement": 7.25,
     "v1_four_seed_mean_placement": 8,
@@ -155,7 +200,12 @@
     "v2_release_resume_verified": false,
     "warning": "An initial resumed checkpoint Release upload returned 404, but a subsequent independent GitHub Release was published with the matching SHA256. Earlier full-game guard failures remain recorded.",
     "recovered_384_step_weight_durable": true,
-    "recovered_384_release": "https://github.com/sstxww/reinforcement-learning/releases/tag/v1-learning-resume-41413508653"
+    "recovered_384_release": "https://github.com/sstxww/reinforcement-learning/releases/tag/v1-learning-resume-41413508653",
+    "last_persisted_release_run": "https://github.com/sstxww/reinforcement-learning/actions/runs/41428692617",
+    "latest_model_eval_mean_rank": 8,
+    "baseline_same_three_seed_mean_rank": 7.333333333333333,
+    "latest_release_resume_verified": true,
+    "latest_release_download_verified": true
   },
   "diagnostic_checkpoints": [
     {
@@ -178,7 +228,8 @@
   "storage_warnings": [
     "Do not silently resume from temporary Actions artifacts when a versioned Release is available.",
     "Before claiming reliable resumption, download Release assets, verify SHA-256, load policy and perform an actual continued PPO training step.",
-    "Current release is an experimental candidate, not a validated Best."
+    "Current release is an experimental candidate, not a validated Best.",
+    "A published model can remain weak. This 1408-step model remains Challenger only: no promotion until independent paired evidence demonstrates strength."
   ],
   "source_integration": {
     "source_pr": 8,
@@ -187,6 +238,18 @@
     "snapshot_date": "2026-11-02"
   },
   "github_release_asset_inventory": [
+    {
+      "tag": "v5-s-20261102-68099929-1408-41428692617",
+      "release_url": "https://github.com/sstxww/reinforcement-learning/releases/tag/v5-s-20261102-68099929-1408-41428692617",
+      "prerelease": true,
+      "model_asset": {
+        "name": "model.zip",
+        "bytes": 17525156,
+        "github_api_sha256": "sha256:a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632"
+      },
+      "metadata_asset_present": true,
+      "binary_download_hash_checked_in_this_integration": true
+    },
     {
       "tag": "v2-learning-41413557445",
       "release_url": "https://github.com/sstxww/reinforcement-learning/releases/tag/v2-learning-41413557445",
