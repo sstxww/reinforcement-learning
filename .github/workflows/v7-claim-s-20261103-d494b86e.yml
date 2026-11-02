@@ -1,0 +1,49 @@
+name: V7 isolated claim & match - s-20261103-d494b86e
+
+on:
+  push:
+    branches: [agent/s-20261103-d494b86e/optimization-001]
+    paths:
+      - .github/workflows/v7-claim-s-20261103-d494b86e.yml
+      - scripts/v7_task_claim_d494b86e.py
+      - tests/test_v7_task_claim_d494b86e.py
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: v7-claim-s-20261103-d494b86e
+  cancel-in-progress: false
+
+jobs:
+  verify-and-play:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Offline atomic claim regressions
+        run: |
+          python -m pip install -e '.[test]'
+          python -m pytest tests/test_v7_task_claim_d494b86e.py
+      - name: Bootstrap exact pinned TavernGym
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Own real eight-seat baseline game (not PPO strength)
+        run: |
+          mkdir -p outputs
+          python -m tavern_ai.canary --agent-id s-20261103-d494b86e --seed 97413 --policy baseline --receipt outputs/001-97413.json
+          python -m tavern_ai.validate_receipt outputs/001-97413.json
+          sha256sum outputs/001-97413.json > outputs/001-97413.sha256
+      - name: Preserve original proof
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v7-claim-s-20261103-d494b86e-evidence
+          path: outputs/*
+          if-no-files-found: ignore
+          retention-days: 30
