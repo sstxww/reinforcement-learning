@@ -1,0 +1,55 @@
+name: Model-registry extraction canary s-20261102-ecf9aef9
+on:
+  push:
+    branches:
+      - agent/s-20261102-ecf9aef9/optimization-001
+    paths-ignore:
+      - 'experiments/s-20261102-ecf9aef9/**'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: registry-evidence-s-20261102-ecf9aef9
+  cancel-in-progress: false
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 65
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Offline registry tests
+        run: |
+          python -m pip install -e '.[test]'
+          python -m pytest tests/test_registry_integrity.py
+          python -m tavern_ai.registry_integrity
+      - name: Pinned engine
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Own authentic full eight-seat baseline match
+        run: |
+          python -m tavern_ai.canary --agent-id s-20261102-ecf9aef9 \
+            --seed 834210 --policy baseline \
+            --receipt experiments/s-20261102-ecf9aef9/001-834210.json
+          python -m tavern_ai.validate_receipt experiments/s-20261102-ecf9aef9/001-834210.json
+      - name: Persist own verified receipt to session branch only
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add experiments/s-20261102-ecf9aef9/001-834210.json
+          if ! git diff --cached --quiet; then
+            git commit -m "evidence(s-20261102-ecf9aef9): preserve real baseline canary receipt"
+            git push origin HEAD:refs/heads/agent/s-20261102-ecf9aef9/optimization-001
+          fi
+      - name: Preserve canary copy
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: registry-canary-s-20261102-ecf9aef9
+          path: experiments/s-20261102-ecf9aef9/*.json
+          retention-days: 30
+          if-no-files-found: ignore
