@@ -6,7 +6,6 @@ on:
     paths:
       - 'tavern_ai/confirm_buy_s64405d5e.py'
       - 'tests/test_confirm_buy_s64405d5e.py'
-      - '.github/workflows/experiment-s-20261102-64405d5e-r002.yml'
   workflow_dispatch:
 
 permissions:
