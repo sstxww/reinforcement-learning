@@ -11,3 +11,9 @@ Actual isolated GitHub Actions 41511856113 starts synthetic suite, installs pinn
 Canonical source only: v5-s-20261102-68099929-1408-41428692617 1408-step, hash a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632, TavernGym 1.1.0 hash 6d8712c93022ba11, observation 4017/447, actions 245. No own download+optimizer-resume proven.
 
 Next action: check workflow logs, download exact JSON if complete, commit genuine receipt; then create ready PR, wait for latest-head CI, get review, and only merge via valid exclusive integration lease. Best/Champion untouched. Failure diagnostics and attempts must be recorded if job fails.
+
+## Final verified work before PR
+- Actions run https://github.com/sstxww/reinforcement-learning/actions/runs/41511856113 COMPLETE SUCCESS (workflow-source SHA 6dc500de628af2f32fe1538c7feb11cdf8a93a28). Independent artifact 13173806506 downloaded/read; raw original match receipt SHA256 3564d13456e78971b66a669b4ee261da252ac1e09179052aff00a7225c7d95aa, semantic JSON reserialized in Git for durable small evidence.
+- True pinned TavernGym baseline game (NOT model) seed97821 seat0: placements [8,6,2,3,7,5,1,4], 14 turns, 40 decisions, complete, zero truncations, 22 masked BUY opportunities and 14 BUY, same public trace prefix first32. Own synthetic telemetry regressions green.
+- No own new training, checkpoint, Release or promotion. Baseline rank8 demonstrates that a single last-place finish is not a unique PPO-specific causality indicator; 1 seed is insufficient for ability claims.
+- The workflow Artifact is temporary; actual small JSON proof stored under experiments/ and reports/. Subsequent PR gate is a separate run on a later HEAD; verify it, never reuse earlier success as latest-head CI.
