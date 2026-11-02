@@ -5,7 +5,7 @@ import zipfile
 
 import pytest
 
-from tavern_ai.continuation_gate_2b9660fa import inspect_continuation
+from tavern_ai.continuation_gate import inspect_continuation
 from tavern_ai.contract import ACTIONS, CARDS, ENGINE_HASH, FEATURES
 
 
