@@ -1,0 +1,23 @@
+# V7 session s-20261103-822bc450 status
+- TASK_KEY: checkpoint/candidate-save-no-clobber
+- ROUND: 001
+- STATE: running; own Actions evidence and PR integration gates pending
+- ROLE: REPAIRER, no exclusive main-integrator lease
+- CLAIM: claims/p1-candidate-save-no-clobber created atomically on current main
+- BASE_MAIN_SHA: 990acd21d598a34a554a80c50089a8f1a9423ac4
+- OWN_BRANCH: agent/s-20261103-822bc450/optimization-001
+- INITIAL_CODE_SHA: 84d0f001216710e760c02ef811a8888490ac8004
+- INITIAL_TEST_SHA: 8f9554d600fab49ef59548d532d83d0707e47085
+- Reused main PRs: #117 Release restore, #125 staged checkpoint, #161 SHA preflight, #166 emergency custody, #176 FREEZE diagnosis, #164 schema-2 continuity. Did not merge these PRs.
+- Avoided active overlap: PR #175 handles *restore*; this branch handles *writer* only. No shared train workflow, registry, model artifacts or other branches touched.
+- Checkpoint source: registered V5 unpromoted 1408-step Release v5-s-20261102-68099929-1408-41428692617, SHA256 a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632; observational/historical only, not downloaded or trained by this session.
+- Contract: TavernGym 1.1.0, observe2, 4017 float features, 447 card slots, 245 actions, engine source hash 6d8712c93022ba11.
+- OWN_PPO_STEPS: 0. OWN_MODEL_RELEASE: none. BEST/CHAMPION promoted: no.
+- OWN_REAL_GAMES: pending separate pinned-engine baseline Actions; not a raw PPO ranking.
+- Paired comparison: none by this session; historical 1408 rank [8,8,8] vs baseline [6,8,8] is other-session work; no strength claim.
+- Root cause verified by source review: os.replace() in save_checkpoint may overwrite an existing output path after another writer creates it; it can leave an incomplete pair if metadata replacement fails.
+- Fix: exclusive os.link into candidate output, rollback own model link on metadata failure; no claim of crash-atomic pair or guarantee against adversarial filesystem path swaps.
+- Tests: seven new offline failure-injection regressions, plus existing checkpoint writer tests. RUN/CI pending.
+- PR: pending own validated receipt and CI.
+- MAIN_MERGE: no; no exclusive main integration lock. Main CI must be checked after any merge.
+- NEXT_ACTION: inspect own isolated GitHub Actions run, download raw game receipt, commit it, open non-Draft PR, verify exact-head CI; then review remaining integration gates.
