@@ -1,0 +1,19 @@
+{
+  "policy": "baseline",
+  "games": 1,
+  "by_seat": {
+    "1": {
+      "games": 1,
+      "seeds": [
+        992310
+      ],
+      "placements": [
+        8
+      ],
+      "mean_placement": 8,
+      "top4_rate": 0.0,
+      "first_place_rate": 0.0
+    }
+  },
+  "interpretation": "Descriptive only: seat assignments may change heroes/shop RNG and bot outcomes; small samples cannot establish seat advantage or policy improvement."
+}
