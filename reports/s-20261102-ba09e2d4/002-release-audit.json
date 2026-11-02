@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "metadata_schema": 2,
+  "source": "checkpoints/model.zip",
+  "sha256": "73bde2666426cecce39f135980a897bb2cd4a7d70783ba04c9c0d29477a6664a",
+  "size_bytes": 17525115,
+  "total_timesteps": 1280,
+  "engine": {
+    "version": "1.1.0",
+    "source_hash": "6d8712c93022ba11",
+    "features": 4017,
+    "cards": 447,
+    "actions": 245
+  },
+  "card_vocab_size": 3984,
+  "archive_and_optimizer_integrity_verified": true,
+  "torch_load_verified": false,
+  "resumable_training_verified": false,
+  "real_game_verified": false,
+  "champion_eligible": false,
+  "note": "Structural validation only; separately run actual torch load, PPO continuation and full game."
+}
