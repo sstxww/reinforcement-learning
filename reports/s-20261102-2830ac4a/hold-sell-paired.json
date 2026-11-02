@@ -1,0 +1,91 @@
+{
+  "experiment": "avoid_magnetize_v1_paired",
+  "hypothesis": "Skipping optional magnetize-before-buy decisions might improve rank",
+  "environment": {
+    "version": "1.1.0",
+    "source_hash": "6d8712c93022ba11",
+    "features": 4017,
+    "cards": 447,
+    "actions": 245,
+    "n_cards": 3984
+  },
+  "policy_sha256": "00173f264d2e300220e2e8a64f1d6f1ab26caedbfbff35d46a10657b8652334a",
+  "base_git_sha": "9eddd5f6dbbb1e4a79384461b03fed6705384c6e",
+  "training_timesteps": 0,
+  "action_contract": {
+    "sell_indices": [
+      16,
+      22
+    ],
+    "magnetize_indices": [
+      126,
+      195
+    ]
+  },
+  "own_full_game": {
+    "seed": 34200,
+    "completed": true,
+    "rank": 8,
+    "decisions": 48,
+    "shadow_baseline_disagreements": 11,
+    "skipped_baseline_magnetizations": 11
+  },
+  "control": {
+    "games": 3,
+    "mean_placement": 7.666666666666667,
+    "first_place_rate": 0.0,
+    "top4_rate": 0.0,
+    "placements": [
+      7,
+      8,
+      8
+    ],
+    "seeds": [
+      34201,
+      34202,
+      34203
+    ]
+  },
+  "candidate": {
+    "games": 3,
+    "mean_placement": 7.666666666666667,
+    "first_place_rate": 0.0,
+    "top4_rate": 0.0,
+    "placements": [
+      7,
+      8,
+      8
+    ],
+    "seeds": [
+      34201,
+      34202,
+      34203
+    ]
+  },
+  "candidate_action_audit": [
+    {
+      "seed": 34201,
+      "shadow_baseline_disagreements": 0,
+      "legal_magnetize_observations": 1,
+      "skipped_baseline_magnetizations": 0
+    },
+    {
+      "seed": 34202,
+      "shadow_baseline_disagreements": 0,
+      "legal_magnetize_observations": 0,
+      "skipped_baseline_magnetizations": 0
+    },
+    {
+      "seed": 34203,
+      "shadow_baseline_disagreements": 3,
+      "legal_magnetize_observations": 3,
+      "skipped_baseline_magnetizations": 3
+    }
+  ],
+  "paired_rank_deltas_candidate_minus_control": [
+    0,
+    0,
+    0
+  ],
+  "interpretation": "Small descriptive sample; no statistical or Arena Elo claim"
+}
