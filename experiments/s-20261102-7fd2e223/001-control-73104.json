@@ -1,0 +1,31 @@
+{
+  "schema": 1,
+  "timestamp": "2026-11-02T08:49:13.199483+00:00",
+  "environment": "TavernGym",
+  "engine_source_hash": "6d8712c93022ba11",
+  "engine_version": "1.1.0",
+  "agent_id": "s-20261102-7fd2e223",
+  "policy": "baseline",
+  "seed": 73104,
+  "completed": true,
+  "turns": 16,
+  "decisions": 50,
+  "placements": [
+    7,
+    1,
+    2,
+    4,
+    3,
+    8,
+    5,
+    6
+  ],
+  "truncated_combats": 0,
+  "turn_limit_end": false,
+  "illegal_actions": 0,
+  "hero_power_uses": 0,
+  "git_sha": "1051701249f6652605ab9a914c4f65e457961d7e",
+  "model_sha256": null,
+  "training_steps": 0,
+  "workflow_run_url": "https://github.com/sstxww/reinforcement-learning/actions/runs/41415621730"
+}
