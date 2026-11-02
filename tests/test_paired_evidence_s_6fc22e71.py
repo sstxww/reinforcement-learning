@@ -23,6 +23,8 @@ def receipt(seed: int = 19111, seat: int = 0, rank: int = 8,
         "truncated_combats": 0, "turn_limit_end": False,
         "model_sha256": HASH_A if policy == "model" else None,
     }
+    if policy == "model":
+        r["policy_variant"] = "raw_ppo_model"
     if guard is not None and policy == "model":
         r["guard_interventions"] = guard
     return r
@@ -157,7 +159,34 @@ def test_actual_main_v5_1408_four_paired_games_not_misreported_as_raw():
     assert r["candidate_ranks"] == [8, 8, 8, 8]
     assert r["baseline_ranks"] == [6, 8, 8, 8]
     assert r["candidate_minus_baseline_mean_rank"] == 0.5
-    assert r["guard_status_unknown_games"] == 3
+    assert r["guard_status_unknown_games"] == 4
     assert r["guard_evidence"] == "guard_status_unknown"
     assert r["eligible_for_raw_model_claim"] is False
     assert r["champion_promoted"] is False
+
+
+
+def test_old_receipt_with_zero_guard_but_no_variant_is_still_unknown():
+    model = receipt()
+    del model["policy_variant"]
+    r = compare([model], [receipt(policy="baseline")])
+    assert r["guard_evidence"] == "guard_status_unknown"
+    assert not r["eligible_for_raw_model_claim"]
+
+
+@pytest.mark.parametrize("variant", [
+    "model_with_explicit_buy_override", "hero_cancel_guard_v1",
+    "hybrid_model", "baseline_fallback_assisted", "rule_assisted_model",
+])
+def test_assisted_model_variant_cannot_masquerade_as_raw(variant):
+    model = receipt()
+    model["policy_variant"] = variant
+    r = compare([model], [receipt(policy="baseline")])
+    assert r["guard_evidence"] == "guarded"
+    assert not r["eligible_for_raw_model_claim"]
+
+
+def test_unrecognized_policy_variant_is_not_raw():
+    model = receipt()
+    model["policy_variant"] = "new_experimental_model"
+    assert compare([model], [receipt(policy="baseline")])["guard_evidence"] == "guard_status_unknown"
