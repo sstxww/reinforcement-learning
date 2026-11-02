@@ -1,0 +1,10 @@
+{
+  "hypothesis": "prioritize buying before optional ability loop; use 36 action cap",
+  "seed": 1301,
+  "v0_placement": 8,
+  "v1_placement": 8,
+  "v0_decisions": 47,
+  "v1_decisions": 47,
+  "claimed_improvement": false,
+  "caution": "one paired seed is insufficient to prove improvement"
+}
