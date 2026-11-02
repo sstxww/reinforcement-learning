@@ -1,0 +1,182 @@
+{
+  "session": "s-20261102-73729553",
+  "rule_version": {
+    "version": "1.1.0",
+    "source_hash": "6d8712c93022ba11",
+    "features": 4017,
+    "cards": 447,
+    "actions": 245,
+    "n_cards": 3984
+  },
+  "teacher": "V0 baseline",
+  "training_seeds": [
+    67010,
+    67011,
+    67012
+  ],
+  "heldout_seeds": [
+    67020,
+    67021
+  ],
+  "comparison_seeds": [
+    67030,
+    67031,
+    67032
+  ],
+  "training": {
+    "gradient_updates": 250,
+    "examples": 129,
+    "training_accuracy": 0.9612403100775194,
+    "labels": {
+      "choose": 14,
+      "buy": 50,
+      "play": 28,
+      "end": 28,
+      "upgrade": 9
+    }
+  },
+  "heldout_examples": 94,
+  "heldout_family_accuracy": 0.9574468085106383,
+  "model_sha256": "ef09f865cbff3fe4b8685df77636045f8886264376dfd6660ff9355591a31ee2",
+  "ppo_steps": 0,
+  "paired_results": {
+    "baseline": {
+      "n": 3,
+      "ranks": [
+        8,
+        8,
+        8
+      ],
+      "mean_rank": 8.0,
+      "top4_rate": 0.0,
+      "first_rate": 0.0
+    },
+    "bc_category": {
+      "n": 3,
+      "ranks": [
+        7,
+        8,
+        8
+      ],
+      "mean_rank": 7.666666666666667,
+      "top4_rate": 0.0,
+      "first_rate": 0.0
+    }
+  },
+  "games": [
+    {
+      "seed": 67029,
+      "policy": "bc_category",
+      "rank": 8,
+      "decisions": 64,
+      "actions": {
+        "choose": 16,
+        "play": 23,
+        "buy": 15,
+        "end": 8,
+        "upgrade": 2
+      },
+      "baseline_guard": 0,
+      "only_end_legal": 0,
+      "receipt": "experiments/s-20261102-73729553/001-bc_category-67029.json"
+    },
+    {
+      "seed": 67030,
+      "policy": "baseline",
+      "rank": 8,
+      "decisions": 34,
+      "actions": {
+        "choose": 3,
+        "buy": 12,
+        "play": 7,
+        "end": 8,
+        "upgrade": 3,
+        "magnetize": 1
+      },
+      "baseline_guard": 0,
+      "only_end_legal": 0,
+      "receipt": "experiments/s-20261102-73729553/001-baseline-67030.json"
+    },
+    {
+      "seed": 67030,
+      "policy": "bc_category",
+      "rank": 7,
+      "decisions": 39,
+      "actions": {
+        "choose": 3,
+        "buy": 16,
+        "play": 10,
+        "end": 8,
+        "upgrade": 2
+      },
+      "baseline_guard": 0,
+      "only_end_legal": 0,
+      "receipt": "experiments/s-20261102-73729553/001-bc_category-67030.json"
+    },
+    {
+      "seed": 67031,
+      "policy": "baseline",
+      "rank": 8,
+      "decisions": 29,
+      "actions": {
+        "choose": 2,
+        "buy": 9,
+        "play": 8,
+        "end": 7,
+        "upgrade": 3
+      },
+      "baseline_guard": 0,
+      "only_end_legal": 0,
+      "receipt": "experiments/s-20261102-73729553/001-baseline-67031.json"
+    },
+    {
+      "seed": 67031,
+      "policy": "bc_category",
+      "rank": 8,
+      "decisions": 35,
+      "actions": {
+        "choose": 4,
+        "buy": 13,
+        "play": 8,
+        "end": 8,
+        "upgrade": 2
+      },
+      "baseline_guard": 0,
+      "only_end_legal": 0,
+      "receipt": "experiments/s-20261102-73729553/001-bc_category-67031.json"
+    },
+    {
+      "seed": 67032,
+      "policy": "baseline",
+      "rank": 8,
+      "decisions": 35,
+      "actions": {
+        "choose": 3,
+        "buy": 12,
+        "play": 9,
+        "end": 8,
+        "upgrade": 3
+      },
+      "baseline_guard": 0,
+      "only_end_legal": 0,
+      "receipt": "experiments/s-20261102-73729553/001-baseline-67032.json"
+    },
+    {
+      "seed": 67032,
+      "policy": "bc_category",
+      "rank": 8,
+      "decisions": 39,
+      "actions": {
+        "choose": 4,
+        "buy": 15,
+        "play": 10,
+        "end": 8,
+        "upgrade": 2
+      },
+      "baseline_guard": 0,
+      "only_end_legal": 0,
+      "receipt": "experiments/s-20261102-73729553/001-bc_category-67032.json"
+    }
+  ],
+  "caveat": "Action-family imitation is not card understanding or competitive strength; baseline teacher is weak."
+}
