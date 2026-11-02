@@ -1,0 +1,31 @@
+{
+  "schema": 1,
+  "timestamp": "2026-11-02T08:38:40.189186+00:00",
+  "environment": "TavernGym",
+  "engine_source_hash": "6d8712c93022ba11",
+  "engine_version": "1.1.0",
+  "agent_id": "s-20261102-e046f72e",
+  "policy": "model",
+  "policy_version": "session-bounded-maskableppo-v1",
+  "seed": 26110201,
+  "completed": true,
+  "turns": 15,
+  "decisions": 95,
+  "placements": [
+    8,
+    5,
+    3,
+    4,
+    6,
+    2,
+    1,
+    7
+  ],
+  "truncated_combats": 0,
+  "turn_limit_end": false,
+  "illegal_actions": 0,
+  "max_actions_per_turn": 80,
+  "forced_end_turns": 0,
+  "git_sha": "727e53f3a005ba9262e6e221e794bc52dc88d96a",
+  "model_sha256": "d9a777f53f2591441b46e1884d5c8a429881d2221bac523d1162fb7c235e4616"
+}
