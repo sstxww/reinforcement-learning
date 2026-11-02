@@ -63,3 +63,31 @@ def test_forged_path_without_receipt_rejected(tmp_path, monkeypatch):
     monkeypatch.setenv("GITHUB_HEAD_REF", f"agent/{SESSION}/optimization-001")
     with pytest.raises(SystemExit, match="Missing independent"):
         main()
+
+
+def test_guarded_model_diagnostic_receipt_is_valid_but_not_plain_ppo(tmp_path, monkeypatch):
+    case = synthetic_receipt()
+    case["policy"] = "model_guarded"
+    case["model_sha256"] = "a" * 64
+    case["guarded"] = True
+    check(tmp_path, monkeypatch, case)
+
+
+def test_guarded_diagnostic_must_have_model_hash(tmp_path, monkeypatch):
+    case = synthetic_receipt()
+    case["policy"] = "model_with_explicit_buy_override"
+    with pytest.raises(ValueError, match="checkpoint SHA256"):
+        check(tmp_path, monkeypatch, case)
+
+
+def test_guarded_diagnostic_cannot_bypass_permutation_and_engine(tmp_path, monkeypatch):
+    case = synthetic_receipt()
+    case["policy"] = "model_guarded"
+    case["model_sha256"] = "b" * 64
+    case["placements"][7] = 1
+    with pytest.raises(ValueError, match="permutation"):
+        check(tmp_path, monkeypatch, case)
+    case["placements"] = list(range(1, 9))
+    case["engine_source_hash"] = "untrusted"
+    with pytest.raises(ValueError, match="engine"):
+        check(tmp_path, monkeypatch, case)
