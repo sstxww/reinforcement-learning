@@ -43,3 +43,10 @@ Recommended follow-up: collect a stronger, high-coverage teacher (many distinct 
 ## CI corrective change
 - Initial post-evidence CI https://github.com/sstxww/reinforcement-learning/actions/runs/41420778736: 21 unit tests passed, then `validate_receipt` failed on the non-game `experiments/s-20261102-1f73f4a5/summary.json` caught by `check_pr_evidence.py` glob. Fixed by relocating metrics into `experiments/s-20261102-1f73f4a5/reports/summary.json` and staging only real game receipts at the experiment root. Do not weaken common validator.
 - Dedicated bounded workflow reruns once after this source/workflow fix; final results and CI require fresh verification.
+
+## Independent replay after metrics-directory fix
+- Root cause correction commit `eccf2112018bd2ad75692caab8c4faf03d3105f1`; one bounded genuine rerun: https://github.com/sstxww/reinforcement-learning/actions/runs/41421070436 — SUCCESS, all steps, complete six games and genuinely committed only 4 top-level match receipts plus nested `reports/summary.json`.
+- Rerun receipt evidence commit `786e86280bb601c519c657a3ea1264eff988cb11`. Training features/examples/seed and result replayed identically: 113 teacher samples, exactly 5 Adam updates; heldout teacher [8,6], guarded student [8,8], guard [2,1], 63.64% heldout teacher agreement. Model SHA256 unchanged `7be2f5b2a7b2778ce5f3a2a7c0ca4d5c8f79fa0d15e16d83a5ee0e4c71eec669`.
+- This is a deterministic replay of **the same** seeds, not four independent heldout games. Unique paired heldout n remains 2. First old artifact ID 13129372107, latest artifact ID 13130276501, expires 2026-12-02T09:32:23Z.
+- Latest confirmed PR CI on source/tests commit `03f1f1e6ccaa1ddd3a78e47cc6993ba136b0d9fe`: https://github.com/sstxww/reinforcement-learning/actions/runs/41421152840 — SUCCESS, **23 passed**, genuine `Game.is_over()` CI canary, `Validated 4 completed game receipts`.
+- The final report commit may trigger another CI on its own HEAD; check it separately before making a final integration claim. No promotion.
