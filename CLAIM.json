@@ -1,0 +1,28 @@
+{
+  "schema": 1,
+  "task_key": "checkpoint/candidate-save-no-clobber",
+  "session_id": "s-20261103-822bc450",
+  "round": 1,
+  "claim_ref": "refs/heads/claims/p1-candidate-save-no-clobber",
+  "base_main_sha": "990acd21d598a34a554a80c50089a8f1a9423ac4",
+  "ownership": "candidate checkpoint writer no-clobber",
+  "owned_files": [
+    "tavern_ai/checkpoint_writer.py",
+    "tests/test_checkpoint_no_clobber_s_20261103_822bc450.py",
+    ".github/workflows/v7-checkpoint-s-20261103-822bc450.yml",
+    "research/sessions/s-20261103-822bc450",
+    "experiments/s-20261103-822bc450"
+  ],
+  "state": "handed_off_for_pr_review",
+  "pull_request": "https://github.com/sstxww/reinforcement-learning/pull/206",
+  "head_sha": "a41e6bb3782572330808acaff0cc7ecd24e8999c",
+  "focused_action": "https://github.com/sstxww/reinforcement-learning/actions/runs/41512471570",
+  "independent_ci": "https://github.com/sstxww/reinforcement-learning/actions/runs/41513388601",
+  "expiration_policy": "This claim is no longer an active editing lease after PR submission. Do not overwrite this session's branch. Follow PR #206 and current main; new tasks require independent claim refs. This ref is NOT an exclusive main merge lease.",
+  "original_failure": "https://github.com/sstxww/reinforcement-learning/actions/runs/41512234993",
+  "model_training_steps_this_round": 0,
+  "own_game_policy": "baseline",
+  "game_seed": 98413,
+  "game_completed": true,
+  "game_rank": 8
+}
