@@ -1,7 +1,7 @@
 # V7 session status — s-20261103-2dbe68c7
 
 - TASK_KEY: `p0/report/committed-receipt-reference-gate` (claimed via atomic branch `claims/v7/paired-report-committed-links`), ROLE: REPAIRER/REVIEWER, ROUND 001.
-- State: implementation committed; independent Actions genuine eight-seat canary and PR evidence **pending**. This is NOT a main integration lease.
+- State: implementation and genuine own eight-seat baseline receipt committed; PR #189 exact-head CI **pending verification**. This is NOT a main integration lease.
 - Base main SHA: `990acd21d598a34a554a80c50089a8f1a9423ac4`; work branch: `agent/s-20261103-2dbe68c7/optimization-001`; commit hashes: source `33fbfda163f9a1a568f2d854b3c07df585ededd5`, tests `39c69e4e97da61fe32b95ea50ad141fab8ba5a24`. Later commits/PR/checks to be verified live.
 - P0 inherited: merged historical main gates #117 / #125 / #152 / #161; registered experimental 1408-step V5 SHA256 `a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632` remains unpromoted. Main `best` and `champion` null at source inspection.
 - PR #168 reviewed against its exact head `a701072c862d363e6a1e8f763b1bc0208287a5b3`, authentic [raw comparison run 41510089011](https://github.com/sstxww/reinforcement-learning/actions/runs/41510089011) and exact-head [green CI 41511083123](https://github.com/sstxww/reinforcement-learning/actions/runs/41511083123). Follow-up review comment: https://github.com/sstxww/reinforcement-learning/pull/168#issuecomment-6586685498. Found `original_receipts` refer to ephemeral `reports/` while committed copies live in `experiments/`; do not misrepresent original temp paths as versioned evidence.
@@ -13,3 +13,12 @@
 - Failures: none verified yet; record run-specific failures under this session rather than inventing an outcome. Transient Actions Artifacts are NOT durable model Releases.
 - Merge gate: no V7 exclusive global main lease; never merge main under this review claim. Any PR requires exact new-head CI, original genuine receipt, independent code review, updated current-base safety verification.
 - Next action: check the new isolated Actions run, extract and verify genuine complete baseline JSON, commit only its original data, then open non-Draft PR and check exact-head CI; correct failures at most twice with substantive changes.
+
+
+## Verified round outcome — exact runner evidence
+
+- Own actual full pinned eight-seat TavernGym baseline [Actions 41512700446](https://github.com/sstxww/reinforcement-learning/actions/runs/41512700446) **completed SUCCESS**, job 125508333948, checkpoint/model **not used**; seed 99737, seat 0, turns 16, model/new PPO steps 0, decisions 46, placements `[8,5,3,4,2,6,7,1]`, baseline rank **8**, no truncated combat or turn-limit end. Source head `b8935c78a7042b277a778a26f6445cb84a544c89`; authentic receipt committed [67228123](https://github.com/sstxww/reinforcement-learning/commit/67228123eb70baabf8e8c5fb74ff9bae0cb571da) to `experiments/s-20261103-2dbe68c7/001-99737-baseline.json`. Temporary artifact [13175150195](https://github.com/sstxww/reinforcement-learning/actions/runs/41512700446/artifacts/13175150195), **not permanent model custody**.
+- Initial PR #189 CI [41512858640](https://github.com/sstxww/reinforcement-learning/actions/runs/41512858640) **failed evidence gate** after **391 passed, 1 skipped** due to missing committed receipt; not a unit-test failure. See `failures/001-initial-pr-missing-receipt.md` for root cause and correction; next exact-head PR CI must be checked independently.
+- [PR #189](https://github.com/sstxww/reinforcement-learning/pull/189) is **non-Draft**, submitted for integration review; status = **awaiting latest-head CI**, not merged or integrated. No exclusive V7 main-merge lease exists for this task claim, so never direct main merge.
+- Own new model Release/weight/optimizer: none; training 0; raw PPO games 0; baseline full-game games 1; paired new sample n=0. No model improvement claim, no Best/Champion update. No ranked TavernArena.
+- Next owner action: recheck current main SHA, PR #189 latest HEAD and CI, check added receipt integrity, ensure production code scope remains independent, then hand to a verified global serialized integrator. If latest CI fails, inspect actual job logs and fix minimally.
