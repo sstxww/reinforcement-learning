@@ -1,0 +1,97 @@
+{
+  "session_id": "s-20261102-717d0e50",
+  "hypothesis": "one Freeze (action 2) before EndTurn on turns 4..9, when Refresh and Buy are illegal",
+  "base_sha": "315b068bac5ab6d8403c3c9b18f8c101c0cded5d",
+  "experiment_sha": "665dcaddac099fbdd2788a37bb687f5fe5e4a501",
+  "workflow_url": "https://github.com/sstxww/reinforcement-learning/actions/runs/41415783527",
+  "engine": {
+    "version": "1.1.0",
+    "source_hash": "6d8712c93022ba11",
+    "features": 4017,
+    "cards": 447,
+    "actions": 245,
+    "n_cards": 3984
+  },
+  "seeds": [
+    29101,
+    29102,
+    29103,
+    29104,
+    29105,
+    29106,
+    29107,
+    29108,
+    29109,
+    29110
+  ],
+  "training_steps": 0,
+  "kind": "pure strategy ablation, no PPO training",
+  "candidate": {
+    "games": 10,
+    "mean_rank": 7.7,
+    "top4_rate": 0.0,
+    "first_place_rate": 0.0,
+    "ranks": [
+      8,
+      8,
+      8,
+      8,
+      8,
+      8,
+      7,
+      8,
+      6,
+      8
+    ],
+    "freeze_actions": 35,
+    "decisions": 477
+  },
+  "baseline": {
+    "games": 10,
+    "mean_rank": 6.9,
+    "top4_rate": 0.1,
+    "first_place_rate": 0.1,
+    "ranks": [
+      7,
+      1,
+      8,
+      7,
+      8,
+      8,
+      8,
+      7,
+      7,
+      8
+    ],
+    "freeze_actions": 0,
+    "decisions": 503
+  },
+  "paired_delta_candidate_minus_baseline": [
+    1,
+    7,
+    0,
+    1,
+    0,
+    0,
+    -1,
+    1,
+    -1,
+    0
+  ],
+  "mean_paired_delta": 0.8,
+  "paired_delta_stdev": 2.2997584414213788,
+  "conclusion": "descriptive only; not evidence of statistical significance",
+  "receipt_paths": [
+    "experiments/s-20261102-717d0e50/001-29101.json",
+    "experiments/s-20261102-717d0e50/001-29102.json",
+    "experiments/s-20261102-717d0e50/001-29103.json",
+    "experiments/s-20261102-717d0e50/001-29104.json",
+    "experiments/s-20261102-717d0e50/001-29105.json",
+    "experiments/s-20261102-717d0e50/001-29106.json",
+    "experiments/s-20261102-717d0e50/001-29107.json",
+    "experiments/s-20261102-717d0e50/001-29108.json",
+    "experiments/s-20261102-717d0e50/001-29109.json",
+    "experiments/s-20261102-717d0e50/001-29110.json"
+  ],
+  "checkpoint": null
+}
