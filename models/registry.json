@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "champion_id": null,
+  "notes": "Release-backed experimental checkpoints; presence of an asset/digest is NOT an independently proven restore. No model has passed Champion gates.",
+  "models": [
+    {
+      "model_id": "v1-learning-9eada5801f99",
+      "status": "Unverified",
+      "release_url": "https://github.com/sstxww/reinforcement-learning/releases/tag/v1-learning-9eada5801f99",
+      "checkpoint_asset": "model.zip",
+      "metadata_asset": "model.metadata.json",
+      "sha256": "dc5195658995358e70c0d565a979b9cf05ccc5e47ae7adaa0a2f078f01cad917",
+      "engine_source_hash": "6d8712c93022ba11",
+      "training_steps": 256,
+      "source_commit": "9eada5801f99c4f725d6503a6d603a9cb2a269e3",
+      "parent_model_id": null,
+      "load_verified": false,
+      "resume_verified": false,
+      "full_game_verified": false,
+      "paired_eval_verified": false,
+      "evidence": "https://github.com/sstxww/reinforcement-learning/pull/9"
+    },
+    {
+      "model_id": "v2-learning-41413557445",
+      "status": "Unverified",
+      "release_url": "https://github.com/sstxww/reinforcement-learning/releases/tag/v2-learning-41413557445",
+      "checkpoint_asset": "model.zip",
+      "metadata_asset": "model.metadata.json",
+      "sha256": "73bde2666426cecce39f135980a897bb2cd4a7d70783ba04c9c0d29477a6664a",
+      "engine_source_hash": "6d8712c93022ba11",
+      "training_steps": 1280,
+      "source_commit": "e37bd7e3a4bf95576ca1b27867df05af86ddab71",
+      "parent_model_id": "v1-learning-9eada5801f99",
+      "load_verified": false,
+      "resume_verified": false,
+      "full_game_verified": false,
+      "paired_eval_verified": false,
+      "evidence": "https://github.com/sstxww/reinforcement-learning/pull/15"
+    }
+  ]
+}
