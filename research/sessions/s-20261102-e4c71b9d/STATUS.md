@@ -5,7 +5,7 @@
 - Branch: agent/s-20261102-e4c71b9d/optimization-001
 - Execution code SHA: 3e222cb4290fe0e1d05d220f1ed5b6bd95f32e68
 - Evidence SHA: a5bc1a01e81e7b9555c4bdbecf5abc050adddfd3
-- PR: to be filled once created; do not merge without CI review
+- PR: https://github.com/sstxww/reinforcement-learning/pull/18 (draft; requires CI and integrator review)
 - GitHub run: https://github.com/sstxww/reinforcement-learning/actions/runs/41413669679 (success)
 - Tests: 14 passed
 - Actual MaskablePPO training: 128 control + 128 pooled = 256 steps
