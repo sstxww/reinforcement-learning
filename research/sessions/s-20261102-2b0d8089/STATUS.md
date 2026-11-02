@@ -10,7 +10,8 @@
 - Steps: **512 on successful comparable run** (256/arm). Another 512 actually ran on the first failed attempt; cumulative work 1024.
 - Held-out seeds: 27001 and 27002 (2 games per policy; six complete games).
 - Best **observed** of tested policies: original rule baseline mean rank 6.5/8; raw PPO mean 7.5/8; signed-log PPO mean 8.0/8. No model strength gain verified; n=2.
-- Aggregated metrics (not a game receipt): `research/sessions/s-20261102-2b0d8089/001-summary.json`, moved outside the CI receipt glob to avoid false failure; PR CI pending recheck.\n- Mandatory real own-session receipt: `experiments/s-20261102-2b0d8089/001-27001.json` (rank 8; decisions 160; 8-rank array [8,2,1,5,6,4,3,7], safety pass count 6).
+- Aggregated metrics (not a game receipt): `research/sessions/s-20261102-2b0d8089/001-summary.json`, moved outside the CI receipt glob to avoid false failure; PR CI pending recheck.
+- Mandatory real own-session receipt: `experiments/s-20261102-2b0d8089/001-27001.json` (rank 8; decisions 160; 8-rank array [8,2,1,5,6,4,3,7], safety pass count 6).
 - Engine: TavernGym 1.1.0, hash `6d8712c93022ba11`, 4017/447 observations and 245 legal actions.
 - Successful checkpoint archive: https://github.com/sstxww/reinforcement-learning/actions/runs/41414058042/artifacts/13126329809, 90-day GitHub Artifact, **expires 2027-01-31; no permanent backup**.
 - Signed-log checkpoint SHA256: `2a23241582d8d1eb1313ee47dfb562bccef6d1e2a8e8cd956437b985a3014756`.
