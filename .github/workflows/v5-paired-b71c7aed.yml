@@ -1,0 +1,84 @@
+name: V5 raw model vs baseline and bounded resume s-20261102-b71c7aed
+
+on:
+  push:
+    branches:
+      - agent/s-20261102-b71c7aed/optimization-001
+    paths:
+      - 'tavern_ai/paired_evidence_b71c7aed.py'
+      - 'tests/test_paired_evidence_b71c7aed.py'
+      - '.github/workflows/v5-paired-b71c7aed.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: v5-paired-b71c7aed
+  cancel-in-progress: false
+
+jobs:
+  real-model-evidence:
+    runs-on: ubuntu-latest
+    timeout-minutes: 95
+    env:
+      MODEL_ID: v5-s-20261102-68099929-1408-41428692617
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install controlled training and tests
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[train,test]'
+      - name: Check paired-evidence fail-closed invariants
+        run: python -m pytest -q tests/test_paired_evidence_b71c7aed.py
+      - name: Pin actual TavernGym source and patch
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Download actual two-asset durable V5 Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p checkpoints outputs
+          gh release download "$MODEL_ID" --repo "$GITHUB_REPOSITORY" \
+            --pattern 'model.zip' --pattern 'model.metadata.json' --dir checkpoints
+          test -s checkpoints/model.zip
+          test -s checkpoints/model.metadata.json
+      - name: Check registered SHA, metadata, optimizer, CPU model and run raw paired games
+        run: |
+          python -m tavern_ai.paired_evidence_b71c7aed \
+            --model checkpoints/model.zip \
+            --metadata checkpoints/model.metadata.json \
+            --model-id "$MODEL_ID" --seeds 920011,920012 --out-dir outputs/raw-pairs
+      - name: One bounded 128-step PPO resume, preserving original Release unchanged
+        run: |
+          python -m tavern_ai.train --resume checkpoints/model.zip \
+            --steps 128 --seed 920013 --out outputs/resumed.zip
+          sha256sum outputs/resumed.zip > outputs/resumed.sha256
+      - name: Candidate itself must complete genuine eight-seat TavernGym game
+        run: |
+          python -m tavern_ai.canary --agent-id s-20261102-b71c7aed \
+            --seed 920014 --policy model --model outputs/resumed.zip \
+            --receipt outputs/resumed-real-game.json
+          python -m tavern_ai.validate_receipt outputs/resumed-real-game.json
+      - name: Bounded heldout comparison without fallback
+        run: |
+          python -m tavern_ai.evaluate --policy model \
+            --model outputs/resumed.zip --compare-baseline \
+            --games 2 --start-seed 920015 --out outputs/resumed-paired.json
+      - name: Preserve real outputs, including failed-gate evidence, never promote automatically
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v5-b71c7aed-evidence-${{ github.run_id }}
+          path: |
+            outputs/**/*.json
+            outputs/*.json
+            outputs/*.sha256
+            outputs/resumed.zip
+            outputs/resumed.metadata.json
+          if-no-files-found: warn
+          retention-days: 30
