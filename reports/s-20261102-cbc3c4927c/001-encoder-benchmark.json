@@ -9,14 +9,14 @@
   "old": {
     "parameters_total": 1328448,
     "parameters_card_net": 458112,
-    "ms_per_batch_median": 0.6868495000134089,
-    "ms_per_batch_p90": 0.6995530000040162
+    "ms_per_batch_median": 0.6871009999969147,
+    "ms_per_batch_p90": 0.6992739999986952
   },
   "candidate": {
     "parameters_total": 1107712,
     "parameters_card_net": 237376,
-    "ms_per_batch_median": 0.609851000007211,
-    "ms_per_batch_p90": 0.6204869999919538
+    "ms_per_batch_median": 0.6080440000033605,
+    "ms_per_batch_p90": 0.6134969999891382
   },
   "total_parameter_reduction_fraction": 0.16616081321963672,
   "card_parameter_reduction_fraction": 0.48183850237496506,
