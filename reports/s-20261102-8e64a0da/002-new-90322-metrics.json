@@ -1,0 +1,138 @@
+{
+  "schema": 1,
+  "decisions": 118,
+  "action_families": {
+    "choose": 3,
+    "end_turn": 7,
+    "freeze": 70,
+    "play": 1,
+    "refresh": 34,
+    "sell": 1,
+    "upgrade": 2
+  },
+  "buy_legal_decisions": 34,
+  "buy_opportunity_turns": 7,
+  "actual_buys": 0,
+  "model_end_turns": 7,
+  "end_with_legal_buy": 0,
+  "max_consecutive_same_action_in_turn": 10,
+  "by_turn": [
+    {
+      "turn": 0,
+      "decisions": 1,
+      "buy_legal_decisions": 0,
+      "buys": 0,
+      "end_turns": 0,
+      "end_with_legal_buy": 0,
+      "actions_by_family": {
+        "choose": 1
+      }
+    },
+    {
+      "turn": 1,
+      "decisions": 14,
+      "buy_legal_decisions": 3,
+      "buys": 0,
+      "end_turns": 1,
+      "end_with_legal_buy": 0,
+      "actions_by_family": {
+        "refresh": 3,
+        "freeze": 10,
+        "end_turn": 1
+      }
+    },
+    {
+      "turn": 2,
+      "decisions": 15,
+      "buy_legal_decisions": 3,
+      "buys": 0,
+      "end_turns": 1,
+      "end_with_legal_buy": 0,
+      "actions_by_family": {
+        "refresh": 4,
+        "freeze": 10,
+        "end_turn": 1
+      }
+    },
+    {
+      "turn": 3,
+      "decisions": 14,
+      "buy_legal_decisions": 3,
+      "buys": 0,
+      "end_turns": 1,
+      "end_with_legal_buy": 0,
+      "actions_by_family": {
+        "refresh": 2,
+        "upgrade": 1,
+        "freeze": 10,
+        "end_turn": 1
+      }
+    },
+    {
+      "turn": 4,
+      "decisions": 17,
+      "buy_legal_decisions": 6,
+      "buys": 0,
+      "end_turns": 1,
+      "end_with_legal_buy": 0,
+      "actions_by_family": {
+        "refresh": 6,
+        "freeze": 10,
+        "end_turn": 1
+      }
+    },
+    {
+      "turn": 5,
+      "decisions": 18,
+      "buy_legal_decisions": 7,
+      "buys": 0,
+      "end_turns": 1,
+      "end_with_legal_buy": 0,
+      "actions_by_family": {
+        "refresh": 7,
+        "freeze": 10,
+        "end_turn": 1
+      }
+    },
+    {
+      "turn": 6,
+      "decisions": 21,
+      "buy_legal_decisions": 5,
+      "buys": 0,
+      "end_turns": 1,
+      "end_with_legal_buy": 0,
+      "actions_by_family": {
+        "choose": 2,
+        "refresh": 6,
+        "play": 1,
+        "freeze": 10,
+        "sell": 1,
+        "end_turn": 1
+      }
+    },
+    {
+      "turn": 7,
+      "decisions": 18,
+      "buy_legal_decisions": 7,
+      "buys": 0,
+      "end_turns": 1,
+      "end_with_legal_buy": 0,
+      "actions_by_family": {
+        "upgrade": 1,
+        "refresh": 6,
+        "freeze": 10,
+        "end_turn": 1
+      }
+    }
+  ],
+  "interpretation": "A BUY was legal at these decision points; this does not prove that buying was strategically optimal. Repeated available BUY across one turn is not multiple independent purchase opportunities. No hidden-state input.",
+  "environment": "TavernGym",
+  "seed": 90322,
+  "source_model_sha256": "c3bc7cd952bbf02fb4a15e3866a13c98bc9f1486eb3de35fd119b1651f81a73a",
+  "final_controlled_placement": 8,
+  "complete_eight_seat_game": true,
+  "safety_fallback_count": 0,
+  "guard_interventions": 0,
+  "policy_variant": "raw_ppo_model",
+  "model_controlled": true
+}

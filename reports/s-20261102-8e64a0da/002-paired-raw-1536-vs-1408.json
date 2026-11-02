@@ -1,0 +1,131 @@
+{
+  "schema": 1,
+  "session_id": "s-20261102-8e64a0da",
+  "round": 2,
+  "source_workflow_run": "https://github.com/sstxww/reinforcement-learning/actions/runs/41451705437",
+  "seeds": [
+    90321,
+    90322
+  ],
+  "source_sha256_old": "a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632",
+  "source_sha256_new": "c3bc7cd952bbf02fb4a15e3866a13c98bc9f1486eb3de35fd119b1651f81a73a",
+  "steps_old": 1408,
+  "steps_new": 1536,
+  "additional_ppo_steps_this_round": 0,
+  "model_policy_variant": "unguarded_raw_ppo",
+  "matched_complete_seed_count": 0,
+  "paired_new_minus_old_rank_delta": [],
+  "mean_new_minus_old_rank_delta": null,
+  "per_seed": [
+    {
+      "seed": 90321,
+      "arms": {
+        "baseline": {
+          "completed": true,
+          "placement": 7,
+          "decisions": 42,
+          "receipt": "experiments/s-20261102-8e64a0da/002-baseline-90321.json",
+          "actions": null,
+          "buy_legal_decisions": null,
+          "actual_buys": null,
+          "failure_reason": null
+        },
+        "old": {
+          "completed": false,
+          "placement": null,
+          "decisions": null,
+          "receipt": null,
+          "actions": {
+            "cancel": 2965,
+            "choose": 1,
+            "end_turn": 4,
+            "freeze": 40,
+            "play": 2966,
+            "refresh": 24
+          },
+          "buy_legal_decisions": 2988,
+          "actual_buys": 0,
+          "failure_reason": "model_failed_to_finish_before_bounded_iteration_limit"
+        },
+        "new": {
+          "completed": true,
+          "placement": 8,
+          "decisions": 120,
+          "receipt": "experiments/s-20261102-8e64a0da/002-new-90321.json",
+          "actions": {
+            "buy": 1,
+            "choose": 3,
+            "end_turn": 7,
+            "freeze": 70,
+            "play": 2,
+            "refresh": 34,
+            "sell": 1,
+            "upgrade": 2
+          },
+          "buy_legal_decisions": 32,
+          "actual_buys": 1,
+          "failure_reason": null
+        }
+      },
+      "all_three_complete": false,
+      "new_minus_old_placement": null
+    },
+    {
+      "seed": 90322,
+      "arms": {
+        "baseline": {
+          "completed": true,
+          "placement": 8,
+          "decisions": 37,
+          "receipt": "experiments/s-20261102-8e64a0da/002-baseline-90322.json",
+          "actions": null,
+          "buy_legal_decisions": null,
+          "actual_buys": null,
+          "failure_reason": null
+        },
+        "old": {
+          "completed": false,
+          "placement": null,
+          "decisions": null,
+          "receipt": null,
+          "actions": {
+            "cancel": 2947,
+            "choose": 5,
+            "end_turn": 6,
+            "freeze": 60,
+            "play": 2950,
+            "refresh": 30,
+            "sell": 1,
+            "upgrade": 1
+          },
+          "buy_legal_decisions": 2976,
+          "actual_buys": 0,
+          "failure_reason": "model_failed_to_finish_before_bounded_iteration_limit"
+        },
+        "new": {
+          "completed": true,
+          "placement": 8,
+          "decisions": 118,
+          "receipt": "experiments/s-20261102-8e64a0da/002-new-90322.json",
+          "actions": {
+            "choose": 3,
+            "end_turn": 7,
+            "freeze": 70,
+            "play": 1,
+            "refresh": 34,
+            "sell": 1,
+            "upgrade": 2
+          },
+          "buy_legal_decisions": 34,
+          "actual_buys": 0,
+          "failure_reason": null
+        }
+      },
+      "all_three_complete": false,
+      "new_minus_old_placement": null
+    }
+  ],
+  "champion_promoted": false,
+  "competitive_improvement_verified": false,
+  "caveat": "Only new independent seeds and true Game.is_over receipts; small n cannot establish reliable strength gains. Incomplete raw games are failures, not bottom-ranked completed games."
+}
