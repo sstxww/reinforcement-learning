@@ -72,7 +72,7 @@ jobs:
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add experiments/s-20261102-2b0d8089/
+          git add experiments/s-20261102-2b0d8089/ research/sessions/s-20261102-2b0d8089/001-summary.json
           git commit -m "experiment: record six real matches for s-20261102-2b0d8089"
           git push origin HEAD:refs/heads/agent/s-20261102-2b0d8089/optimization-001
       - name: Save isolated checkpoints and audit metadata
@@ -83,5 +83,6 @@ jobs:
           path: |
             checkpoints/s-20261102-2b0d8089/
             experiments/s-20261102-2b0d8089/
+            research/sessions/s-20261102-2b0d8089/001-summary.json
           if-no-files-found: warn
           retention-days: 90

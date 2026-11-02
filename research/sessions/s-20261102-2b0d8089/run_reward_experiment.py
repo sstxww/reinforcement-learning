@@ -225,7 +225,7 @@ def main() -> None:
         "caveats": ["Two seeds per policy cannot establish a strength gain.",
                     "Checkpoints are ephemeral Actions artifacts unless separately archived."],
     }
-    write_json(ROOT / "001-summary.json", report)
+    write_json(Path("research/sessions") / SESSION / "001-summary.json", report)
     write_json(CHECKPOINTS / "manifest.json", {
         "session_id": SESSION,
         "engine": engine,
