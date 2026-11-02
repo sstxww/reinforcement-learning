@@ -13,3 +13,6 @@ Branch: agent/s-20261102-1e55e01e/optimization-001
 - New model checkpoint: none. Champion: none.
 - Merge status: draft, awaiting exact-head CI, real receipt and risk review.
 - No formal Arena matches.
+
+
+Evidence update (2026-11-02): one real baseline full-game seed 95001 completed, controlled seat 0 rank 8, 15 turns, 47 decisions; receipt recovered from Actions Artifact 13144577744 and committed to experiments/s-20261102-1e55e01e/001-95001.json. Independent job first ended failure on stale checkout push, not game; fixed by removing automated write. Initial PR CI failed missing receipt. Latest-head PR CI and independent rerun remain pending validation. Actual PPO steps this session: 0; actual model-controlled full games: 0. No model or Champion promotion.
