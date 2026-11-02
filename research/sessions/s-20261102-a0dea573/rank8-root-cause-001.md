@@ -10,10 +10,12 @@ This is an analysis of **previously recorded authentic TavernGym games**, not ne
 
 3. **1408-step V5, pure model**, seed `99128`, source `reports/s-20261102-68099929/003-buy-opportunity.json`: completed model and baseline both rank 8; candidate 117 decisions, 35 BUY-legal exposures, **0 BUY**, 37 rerolls and 0 guard-forced ends; baseline 39 decisions, **14 BUY** across 21 BUY-legal exposures. Weight SHA256 `a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632` from `models/registry.json`.
 
+4. **1280-step V2, unassisted raw diagnostic that did NOT finish**, seed `87102`, source `reports/s-20261102-ba09e2d4/002-action-opportunities.json`: 6,000 bounded model-controlled decisions but no complete eight-seat game. At turn 3 the policy executed **2,978 HERO_POWER** and **2,977 CANCEL** actions; zero BUY across 10 BUY-legal decision exposures. Ended at turn 3 due to diagnostic iteration cap, so **NO placement, no completed-game receipt**. This is direct evidence of a severe action-family oscillation for this checkpoint/seed, while not yet proving why weights favor the oscillation.
+
 ## Findings vs hypotheses
 
 **Established observations**
-- At least V2 and 1408-step V5 checkpoints repeatedly fail to choose BUY despite legal opportunities, often rank 8.
+- At least V2 and 1408-step V5 checkpoints repeatedly fail to choose BUY despite legal opportunities, often rank 8. An additional incomplete V2 diagnostic demonstrated a HERO_POWER↔CANCEL oscillation and failure to progress on one seed.
 - The original V2 pure model strongly favors REFRESH and FREEZE in the above matched game.
 - Increasing reported PPO total steps from 1280 to 1408 has not demonstrated better held-out placements (V5 `[8,8,8]` on seeds 99125–99127, source canonical `models/registry.json`).
 - Some guarded model games rely on forced END; these cannot be combined with model-only performance.
