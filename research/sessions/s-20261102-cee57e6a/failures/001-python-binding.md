@@ -8,3 +8,5 @@
 - Root cause: confusion between the Rust Game.players internal field and its PyO3 Game interface. The documented binding exposes Game.view(seat) but not players. Baseline canary uses neither.
 - Corrective action 1: validate own board/hand and minion stats against JSON-parsed game.view(0)["me"] only; do not read opponent boards or hidden state and do not pass the view into policy.act(). Also fix strict threshold equality and golden-slot regression test.
 - Evidence verdict: initial run FAILED; do not claim its intermediate receipts as candidate games or promote a policy. Re-run on new commit, then update this document with re-test evidence.
+
+- Rerun #41422715265 (commit d7ed628106379352047ea84e630f2c729243b2c5) failed in own-player layout gate: `hand count observation mismatch`. Direct examination of pinned `obs.rs` showed my indexing error: global[32] is gem_hp, global[33] is board length, global[34] is hand length. The previous check incorrectly used [32]/[33]. This is a second substantive correction on the same layout verification failure family, no model games completed yet. Next retry will be final.

@@ -5,7 +5,7 @@ from tavern_ai.research_cee57e6a import ACTIONS, FEATURES, BOARD, HAND, MINION, 
 def scene(golden=False,hand_attack=7.,hand_health=7.):
     f=np.zeros(FEATURES,dtype=np.float32)
     m=np.zeros(ACTIONS,dtype=bool)
-    f[32],f[33]=1.,.1
+    f[33],f[34]=1.,.1
     m[0]=m[8]=True
     m[16:23]=True
     for i in range(7):
@@ -50,3 +50,11 @@ def test_not_full_or_early_turn():
     assert p.act(x,{"turn":5,"actions_used":7})==8
     x["action_mask"][22]=False
     assert p.act(x,{"turn":6,"actions_used":7})==8
+
+def test_global_index_contract_board_and_hand_counts():
+    # Pinned AutoTavern obs.rs global array indices:
+    # [31] gem attack, [32] gem health, [33] board length, [34] hand length.
+    obs=scene()
+    assert obs["features"][32]==0
+    assert obs["features"][33]==1
+    assert abs(float(obs["features"][34])-.1)<1e-6

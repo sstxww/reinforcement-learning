@@ -62,9 +62,9 @@ def check_public_layout(f,game):
     # The Python PyGame does not expose Rust game.players. Its documented
     # view(0)["me"] is the own-player UI view. Opponents are never inspected.
     own=json.loads(game.view(0))["me"]
-    if round(float(f[32])*7)!=len(own["board"]):
+    if round(float(f[33])*7)!=len(own["board"]):
         raise AssertionError("board count observation mismatch")
-    if round(float(f[33])*10)!=len(own["hand"]):
+    if round(float(f[34])*10)!=len(own["hand"]):
         raise AssertionError("hand count observation mismatch")
     for i,m in enumerate(own["board"]):
         off=BOARD+i*MINION
