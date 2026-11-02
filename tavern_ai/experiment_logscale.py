@@ -10,12 +10,12 @@ import json
 import os
 import statistics
 import time
+from datetime import datetime, timezone
 from pathlib import Path
 
 import numpy as np
 import torch as th
 
-from .canary import run as full_game
 from .contract import ACTIONS, CARDS, FEATURES, verify_engine
 from .env import TavernEnv
 from .log_extractor import LogTavernExtractor
@@ -78,6 +78,89 @@ def train_variant(kind: str, extractor, steps: int, seed: int, directory: Path, 
         env.close()
 
 
+
+def bounded_full_game(seed: int, agent_id: str, model_path: str) -> dict:
+    """Full eight-seat engine match using deterministic PPO with one uniform turn cap.
+
+    The cap is part of BOTH experimental policies, not an artificial game result.
+    Unbounded 256-step random-init PPO reached the global 30k loop guard in run
+    41412975503. For fairness, both arms end a turn at 45 decisions whenever
+    END_TURN (action 0) is legal.
+    """
+    import taverngym
+    from sb3_contrib import MaskablePPO
+
+    engine = verify_engine()
+    game = taverngym.Game(seed=seed)
+    model = MaskablePPO.load(model_path, device="cpu")
+    decisions = 0
+    forced_end_turns = 0
+    actions_this_turn = 0
+    last_turn = -1
+    for _ in range(30000):
+        if game.is_over():
+            break
+        turn = int(game.turn)
+        if turn != last_turn:
+            last_turn, actions_this_turn = turn, 0
+        progress = False
+        for seat in range(game.num_players):
+            if not game.needs_action(seat):
+                continue
+            progress = True
+            if seat != 0:
+                game.bot_play(seat)
+                continue
+            fbytes, cbytes = game.observe2(0)
+            f = np.frombuffer(fbytes, dtype="<f4").copy()
+            c = np.frombuffer(cbytes, dtype="<i4").copy()
+            mask = np.frombuffer(game.legal_mask(0), dtype=np.uint8).astype(bool)
+            if f.shape != (FEATURES,) or c.shape != (CARDS,) or mask.shape != (ACTIONS,):
+                raise ValueError("Unexpected observe2 or legal-mask contract")
+            if not np.isfinite(f).all() or not mask.any():
+                raise ValueError("Non-finite features or empty action mask")
+            if actions_this_turn >= 45 and mask[0]:
+                action = 0
+                forced_end_turns += 1
+            else:
+                action, _ = model.predict(
+                    {"features": f, "cards": c},
+                    action_masks=mask, deterministic=True
+                )
+                action = int(action)
+            if not mask[action]:
+                raise RuntimeError("Model proposed an illegal TavernGym action")
+            game.step(0, action)
+            actions_this_turn += 1
+            decisions += 1
+        if not progress and not game.is_over():
+            raise RuntimeError("Game stalled without action")
+    if not game.is_over():
+        raise RuntimeError("Full-game safety limit exceeded even with turn cap")
+    result = {
+        "schema": 1,
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "environment": "TavernGym",
+        "engine_source_hash": engine["source_hash"],
+        "engine_version": engine["version"],
+        "agent_id": agent_id,
+        "policy": "model",
+        "policy_action_cap": 45,
+        "forced_end_turns": forced_end_turns,
+        "seed": seed,
+        "completed": True,
+        "turns": int(game.turn),
+        "decisions": decisions,
+        "placements": [int(x) for x in game.placements()],
+        "truncated_combats": int(game.truncated_combats),
+        "turn_limit_end": bool(game.turn_limit_end),
+        "git_sha": os.environ.get("GITHUB_SHA", ""),
+        "model_sha256": sha256(Path(model_path)),
+    }
+    validate(result)
+    return result
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--session-id", required=True)
@@ -122,7 +205,7 @@ def main() -> None:
         for index, seed in enumerate(results["eval_seeds"]):
             receipt = (receipts / (f"001-{seed}.json" if variant == "signed_log1p" and index == 0
                                   else f"{variant}-{seed}.json"))
-            match = full_game(seed, args.session_id, "model", train_data["checkpoint"])
+            match = bounded_full_game(seed, args.session_id, train_data["checkpoint"])
             validate(match)
             receipt.write_text(json.dumps(match, indent=2) + "\n", encoding="utf-8")
             games.append({
