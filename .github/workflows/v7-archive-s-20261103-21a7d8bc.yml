@@ -1,0 +1,144 @@
+name: V7 immutable original receipt archiver s-20261103-21a7d8bc
+
+# A separate minimal-permission publisher. It never loads model weights,
+# installs third-party code or writes main. One immutable original run only.
+on:
+  push:
+    branches: [agent/s-20261103-21a7d8bc/optimization-001]
+    paths:
+      - .github/workflows/v7-archive-s-20261103-21a7d8bc.yml
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: v7-archive-s-20261103-21a7d8bc
+  cancel-in-progress: false
+
+jobs:
+  original-receipts:
+    if: github.ref == 'refs/heads/agent/s-20261103-21a7d8bc/optimization-001'
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      GH_TOKEN: ${{ github.token }}
+      EVIDENCE_DIR: /tmp/v7-original-evidence-s-20261103-21a7d8bc
+    steps:
+      - uses: actions/checkout@v4
+      - name: Require exact successful immutable source run
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REPOSITORY" = "sstxww/reinforcement-learning"
+          test "$GITHUB_REF" = "refs/heads/agent/s-20261103-21a7d8bc/optimization-001"
+          actual_sha="$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/41512015082" --jq '.head_sha')"
+          result="$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/41512015082" --jq '.conclusion')"
+          test "$actual_sha" = "edaff917648e7bce536ae3ba99185d18743123d6"
+          test "$result" = "success"
+          artifact_digest="$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/41512015082/artifacts" --jq '.artifacts[] | select(.id == 13174595714) | .digest')"
+          test "$artifact_digest" = "sha256:5bbe0d3e6e5bab2e44e4816a9cb67e290dbb6bda5bc8c04338c7477f2d973080"
+      - name: Download specific source Artifact, no untrusted execution
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$EVIDENCE_DIR"
+          gh run download 41512015082 --repo "$GITHUB_REPOSITORY" --name 'v7-buy-s-20261103-21a7d8bc-41512015082' --dir "$EVIDENCE_DIR"
+      - name: Check every original receipt byte and stage whitelisted text only
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import hashlib, json, os, shutil
+          from pathlib import Path
+          root=Path(os.environ["EVIDENCE_DIR"]).resolve()
+          sid="s-20261103-21a7d8bc"
+          files={
+           "experiments/"+sid+"/001-baseline-97421.json":"31b7b9566052374347bfced31bcffc69bc3e55f2432e4736b36ba0211ebc05eb",
+           "experiments/"+sid+"/002-raw-1408-97421.json":"e08f8276e4e7b4b8f6abde5ad51c8f2faee3574f892bf272dc62e6d10c729e26",
+           "experiments/"+sid+"/003-candidate-97422.json":"0d901580ea6e79ea16bfc9e8162da0e791406e77240ba89e5b2ea079d3fc035a",
+           "reports/"+sid+"/001-matched-buy-97421.json":"b7228c094bb0640c37963c78bfed47f215f233dcd297004d98fa29fb15133760",
+           "checkpoints/candidate.metadata.json":"af629000e088d64b3a9198a60cfac7ad4bdffbacb873dc6f04fb1f5a3b3a623d",
+          }
+          verified={}
+          for n,expected in files.items():
+              p=root/n
+              if not p.is_file() or p.is_symlink() or not p.resolve().is_relative_to(root):
+                  raise ValueError("Missing or unsafe original evidence: "+n)
+              data=p.read_bytes()
+              if len(data)>30000 or hashlib.sha256(data).hexdigest()!=expected:
+                  raise ValueError("Exact original artifact digest mismatch: "+n)
+              verified[n]=json.loads(data)
+          weights=root/"checkpoints/candidate.zip"
+          if (not weights.is_file() or weights.is_symlink()
+                  or weights.stat().st_size>25_000_000
+                  or hashlib.sha256(weights.read_bytes()).hexdigest()
+                    != "cf34d9728dc50d97707c2c65c6095f330c84c07d0763963db675484f2d797d7c"):
+              raise ValueError("Candidate archive SHA256 mismatch")
+          model_parent="a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632"
+          candidate="cf34d9728dc50d97707c2c65c6095f330c84c07d0763963db675484f2d797d7c"
+          for name,policy,seed,rank,model_sha in (
+            ("001-baseline-97421.json","baseline",97421,7,None),
+            ("002-raw-1408-97421.json","model",97421,8,model_parent),
+            ("003-candidate-97422.json","model",97422,8,candidate),
+          ):
+              r=verified["experiments/"+sid+"/"+name]
+              if (r.get("agent_id")!=sid or r.get("policy")!=policy or
+                  r.get("seed")!=seed or r.get("completed") is not True or
+                  r.get("model_sha256")!=model_sha or
+                  r.get("environment")!="TavernGym" or
+                  r.get("engine_source_hash")!="6d8712c93022ba11" or
+                  r.get("engine_version")!="1.1.0" or
+                  r.get("placements",[])[0]!=rank or
+                  sorted(r["placements"])!=list(range(1,9)) or
+                  r.get("truncated_combats")!=0 or r.get("turn_limit_end") is not False or
+                  r.get("model_guard_forced_end",0)!=0 or r.get("fallback_actions",0)!=0):
+                  raise ValueError("Original real-game identity/eligibility mismatch: "+name)
+          bs=verified["experiments/"+sid+"/001-baseline-97421.json"]["opportunity_summary"]
+          ms=verified["experiments/"+sid+"/002-raw-1408-97421.json"]["opportunity_summary"]
+          if (bs["buy_legal_decisions"],bs["buy_chosen"],ms["buy_legal_decisions"],ms["buy_chosen"])!=(23,13,43,0):
+              raise ValueError("Original BUY telemetry mismatch")
+          meta=verified["checkpoints/candidate.metadata.json"]
+          if (meta.get("total_timesteps")!=1536 or meta.get("parent_checkpoint_sha256")!=model_parent or
+              meta.get("checkpoint_sha256")!=candidate):
+              raise ValueError("Optimizer progression provenance mismatch")
+          pair=verified["reports/"+sid+"/001-matched-buy-97421.json"]
+          if (pair.get("seed")!=97421 or pair.get("model_strength_improved") is not False or
+              pair["baseline"]["placement"]!=7 or pair["raw_model"]["placement"]!=8):
+              raise ValueError("Paired interpretation mismatch")
+          for n in files:
+              dest=(Path("models/sessions")/sid/"candidate-1536.metadata.json" if
+                    n=="checkpoints/candidate.metadata.json" else Path(n))
+              dest.parent.mkdir(parents=True,exist_ok=True)
+              dest.write_bytes((root/n).read_bytes())
+          index={
+             "schema":1,"model_id":"v7-"+sid+"-1536-run41512015082",
+             "status":"rejected_for_promotion_rank8","policy":"raw MaskablePPO",
+             "source_release":"https://github.com/sstxww/reinforcement-learning/releases/tag/v5-s-20261102-68099929-1408-41428692617",
+             "source_sha256":model_parent, "candidate_sha256":candidate,
+             "steps_before":1408,"steps_added":128,"steps_after":1536,
+             "training_seed":97421,"candidate_game_seed":97422,"candidate_game_rank":8,
+             "paired_original_seed":97421,"paired_original_raw_rank":8,"paired_baseline_rank":7,
+             "storage":{"type":"temporary_actions_artifact","durable":False,
+                        "url":"https://github.com/sstxww/reinforcement-learning/actions/runs/41512015082/artifacts/13174595714",
+                        "expires_at":"2026-11-16T19:46:23Z"},
+             "model_promoted":False,"engine_source_hash":"6d8712c93022ba11",
+             "evidence_action":"https://github.com/sstxww/reinforcement-learning/actions/runs/41512015082",
+             "note":"Checkpoint ZIP is only in expiring Artifact, NOT a permanent Release; n=1 cannot establish improvement."
+          }
+          target=Path("models/sessions")/sid/"candidate-1536.status.json"
+          target.write_text(json.dumps(index,indent=2)+"\n",encoding="utf-8")
+          print("Exact authenticated original receipts and candidate provenance staged.")
+          PY
+      - name: Commit only original evidence to our own branch; never main
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git branch --show-current)" = "agent/s-20261103-21a7d8bc/optimization-001"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- "experiments/s-20261103-21a7d8bc/" "reports/s-20261103-21a7d8bc/" "models/sessions/s-20261103-21a7d8bc/"
+          git diff --cached --check
+          git diff --cached --quiet && { echo 'Nothing new to archive'; exit 1; }
+          git commit -m "evidence(v7): pin 3 real eight-seat receipts and rejected 1536-step candidate"
+          git push origin "HEAD:refs/heads/agent/s-20261103-21a7d8bc/optimization-001"
