@@ -4,15 +4,14 @@ on:
   workflow_dispatch:
     inputs:
       steps:
-        description: 'PPO steps: 128 to 20000'
+        description: 'V5 bounded verification steps: 128 to 512'
         required: true
         default: '128'
       eval_games:
         description: 'Held-out full games: 1 to 10'
         required: true
         default: '3'
-  schedule:
-    - cron: '13 4 * * 1'
+# Weekly automated PPO disabled until raw completion and lineage gates pass.
 
 permissions:
   contents: read

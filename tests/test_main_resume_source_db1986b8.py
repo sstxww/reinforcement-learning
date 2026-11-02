@@ -17,9 +17,10 @@ def registry():
 
 def test_selects_only_registered_durable_unpromoted_release():
     r = select_source(registry())
-    assert r["model_tag"] == "v5-s-20261102-68099929-1408-41428692617"
-    assert r["expected_sha256"] == "a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632"
-    assert r["source_steps"] == 1408
+    latest = registry()["latest"]
+    assert r["model_tag"] == latest["id"]
+    assert r["expected_sha256"] == latest["checkpoint_sha256"]
+    assert r["source_steps"] == latest["training_steps"]
     assert r["role"] == "unpromoted_research_source"
     assert r["verified"] == "registry_selection_only"
 
@@ -52,8 +53,8 @@ def test_cli_output_is_machine_readable(tmp_path):
         "--github-output", str(outputs),
     ], cwd=ROOT, capture_output=True, text=True, check=True)
     selected = json.loads(cp.stdout)
-    assert selected["source_steps"] == 1408
+    assert selected["source_steps"] == registry()["latest"]["training_steps"]
     lines = dict(row.split("=", 1) for row in outputs.read_text().splitlines())
     assert lines["model_tag"] == selected["model_tag"]
     assert lines["expected_sha256"] == selected["expected_sha256"]
-    assert lines["source_steps"] == "1408"
+    assert lines["source_steps"] == str(registry()["latest"]["training_steps"])
