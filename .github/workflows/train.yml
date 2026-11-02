@@ -82,6 +82,13 @@ jobs:
           python -m tavern_ai.evaluate --model checkpoints/candidate.zip \
             --games "$EVAL_GAMES" --start-seed 43110 --compare-baseline \
             --out artifacts/evaluation.json
+      - name: Bind checkpoint/metadata digests before attempting Release publication
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s checkpoints/candidate.zip
+          test -s checkpoints/candidate.metadata.json
+          sha256sum checkpoints/candidate.zip checkpoints/candidate.metadata.json > checkpoints/candidate.sha256
       - name: Publish immutable unpromoted candidate only after all gates
         shell: bash
         run: |
@@ -104,13 +111,15 @@ jobs:
             --pattern 'model.zip' --pattern 'model.metadata.json' --dir verification
           cmp publish/model.zip verification/model.zip
           cmp publish/model.metadata.json verification/model.metadata.json
-      - name: Supplementary diagnostics (not durable storage)
+      - name: Emergency candidate custody (expiring Artifact, not a permanent Release)
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: v5-main-unpromoted-${{ github.run_id }}
+          name: v5-main-unpromoted-${{ github.run_id }}-${{ github.run_attempt }}
           path: |
             artifacts/*.json
+            checkpoints/candidate.zip
             checkpoints/candidate.metadata.json
+            checkpoints/candidate.sha256
           if-no-files-found: ignore
-          retention-days: 30
+          retention-days: 90
