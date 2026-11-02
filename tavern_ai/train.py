@@ -38,7 +38,7 @@ def run(steps:int,seed:int,model_out:Path,resume:Path|None=None):
         model.learn(total_timesteps=steps,reset_num_timesteps=False)
         model_out.parent.mkdir(parents=True,exist_ok=True)
         model.save(str(model_out))
-        meta={"schema":2,"engine":engine,"total_timesteps":int(model.num_timesteps),
+        meta={"schema":2,"engine":engine,"compatibility":compatibility,"total_timesteps":int(model.num_timesteps),
               "increment_timesteps":int(model.num_timesteps)-initial,
               "checkpoint_sha256":sha256(model_out),
               "training_seed":seed,"algorithm":"MaskablePPO",
