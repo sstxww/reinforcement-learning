@@ -10,3 +10,13 @@ OWN_WRITES: research/sessions/s-20261103-ab083974/, research/knowledge/proposals
 CLAIM_KIND: unique deterministic GitHub branch creation succeeded; task exclusivity only for this exact claim ref, not global merge privilege.
 MERGE_PRIVILEGE: NONE; no integration lease acquired.
 STATUS: in_progress, to be marked completed with handoff at end; stale claim is not authorization for merging.
+
+FINAL TASK HANDOFF (V7 R001):
+- Claim owner finished independent review; no active exclusive merge lease is held.
+- Non-Draft PR: https://github.com/sstxww/reinforcement-learning/pull/188
+- PR head: 1636b98f6a0c3842788780074702c0fd8751c0b9 (recheck before integration).
+- Real own source Actions run: https://github.com/sstxww/reinforcement-learning/actions/runs/41512257198 COMPLETED SUCCESS (2 unit passes/1 conditional skip and real baseline 8-seat seed 99641 rank 8). Receipt: experiments/s-20261103-ab083974/001-99641.json on own branch; genuine Artifact 13174056126.
+- PR latest-head CI https://github.com/sstxww/reinforcement-learning/actions/runs/41512857655 IN_PROGRESS at this handoff write; recheck final before any integration.
+- Source PR #175 still blocked by check-then-unlink ownership race, independent evidence: https://github.com/sstxww/reinforcement-learning/pull/175#issuecomment-6586652843.
+- Permission boundary: no main merge/force/other branch edits. This claim has no reusable active lock; task status completed, no renewal. Anyone adopting task must check current head and claim status.
+- Own training 0, new Release 0, raw PPO games 0, no model promotions.
