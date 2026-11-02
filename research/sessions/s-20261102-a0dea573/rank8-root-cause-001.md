@@ -35,4 +35,4 @@ This is an analysis of **previously recorded authentic TavernGym games**, not ne
 5. A correction must beat the original on **held-out full games**, not merely increase BUY count; log confidence interval and model hash.
 
 ## This session execution
-Training steps: **0**. Own new true-game evidence: **pending isolated Actions #41450329264**. No changes to existing model files or global evaluation configuration. No formal ranked Arena activity.
+Training steps: **0**. Own new true-game evidence: **Actions #41450329264 success**, baseline+unassisted V5 model seed 99231 both complete at rank 8. The published 1408-step candidate chose REFRESH 42, FREEZE 70, BUY 0 across 38 mask-legal BUY decisions, forced ends 0. Artifact #13144398717 was downloaded and inspected; exact receipts and compact evidence report are now committed to this branch. Official ranked Arena was not used.
