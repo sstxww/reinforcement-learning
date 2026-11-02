@@ -6,6 +6,8 @@ on:
       - agent/s-20261103-822bc450/optimization-001
     paths:
       - .github/workflows/v7-checkpoint-s-20261103-822bc450.yml
+      - tavern_ai/checkpoint_writer.py
+      - tests/test_checkpoint_no_clobber_s_20261103_822bc450.py
   workflow_dispatch:
 
 permissions:
