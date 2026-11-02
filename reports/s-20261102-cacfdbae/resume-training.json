@@ -1,0 +1,1 @@
+{"schema": 1, "engine": {"version": "1.1.0", "source_hash": "6d8712c93022ba11", "features": 4017, "cards": 447, "actions": 245, "n_cards": 3984}, "total_timesteps": 1408, "training_seed": 61102, "algorithm": "MaskablePPO", "notes": "V1 CPU single-seat vs seven scripted bots"}
