@@ -1,0 +1,86 @@
+{
+  "schema": 1,
+  "session_id": "s-20261102-82d0fbbb",
+  "audit_kind": "existing_main_evidence_not_new_games",
+  "main_sha_at_read": "db5e23ae8c218808821327d806b05d2604cfadfb",
+  "open_prs": 75,
+  "draft_prs": 74,
+  "non_draft_stacked_pr": 15,
+  "main_ci": {
+    "run_id": 41432038040,
+    "status": "success",
+    "head_sha": "db5e23ae8c218808821327d806b05d2604cfadfb"
+  },
+  "model": {
+    "role": "unpromoted_latest",
+    "release_tag": "v5-s-20261102-68099929-1408-41428692617",
+    "source_sha256": "a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632",
+    "reported_total_ppo_steps": 1408,
+    "new_steps_in_this_session": 0,
+    "independently_redownloaded_in_this_session": false
+  },
+  "paired_rank_evidence": {
+    "source": "reports/s-20261102-68099929/002-paired-custody.json",
+    "seeds": [
+      99125,
+      99126,
+      99127
+    ],
+    "baseline_ranks": [
+      6,
+      8,
+      8
+    ],
+    "model_ranks": [
+      8,
+      8,
+      8
+    ],
+    "mean_model_minus_baseline": 0.6666666666666666,
+    "uncertainty": "n3_same_seat_no_strength_claim"
+  },
+  "purchase_behavior_evidence": {
+    "source": "reports/s-20261102-68099929/003-buy-opportunity.json",
+    "seed": 99128,
+    "baseline": {
+      "buy_legal_decisions": 21,
+      "buy_actions": 14
+    },
+    "model": {
+      "buy_legal_decisions": 35,
+      "buy_actions": 0
+    },
+    "note": "decision-level opportunities correlated; legality does not establish economic optimality"
+  },
+  "guarded_evidence": {
+    "source": "reports/s-20261102-ba09e2d4/005-guarded-evaluation-summary.json",
+    "seeds": [
+      87102,
+      87103
+    ],
+    "guarded_model_ranks": [
+      8,
+      8
+    ],
+    "baseline_ranks": [
+      5,
+      7
+    ],
+    "guarded_model_buy_actions": [
+      0,
+      0
+    ],
+    "buy_legal_turns": [
+      7,
+      6
+    ],
+    "guard_interventions": [
+      4,
+      0
+    ],
+    "not_raw_model_strength": true
+  },
+  "hypothesis": "Legal-buy opportunities without selected Buy, plus repeat nonprogress actions, contribute to weak eighth-place placement. Require direct state-action and economic trace before causal attribution.",
+  "verified_causal_root": false,
+  "champion_promoted": false
+}
