@@ -1,0 +1,187 @@
+{
+  "checkpoint_retention": "GitHub Actions artifact (temporary; not durable)",
+  "engine": {
+    "actions": 245,
+    "cards": 447,
+    "features": 4017,
+    "n_cards": 3984,
+    "source_hash": "6d8712c93022ba11",
+    "version": "1.1.0"
+  },
+  "evaluation": {
+    "control": {
+      "all_placements": [
+        [
+          8,
+          7,
+          3,
+          5,
+          6,
+          1,
+          4,
+          2
+        ],
+        [
+          8,
+          7,
+          3,
+          5,
+          2,
+          4,
+          1,
+          6
+        ],
+        [
+          8,
+          2,
+          3,
+          4,
+          7,
+          1,
+          6,
+          5
+        ]
+      ],
+      "arm": "control",
+      "decisions": [
+        126,
+        176,
+        169
+      ],
+      "first_place_rate": 0.0,
+      "games": 3,
+      "invalid_model_actions": [
+        0,
+        0,
+        0
+      ],
+      "mean_placement": 8,
+      "placements_for_seat_zero": [
+        8,
+        8,
+        8
+      ],
+      "safety_fallback_actions": [
+        1,
+        2,
+        2
+      ],
+      "seeds": [
+        31011,
+        31012,
+        31013
+      ],
+      "top4_rate": 0.0,
+      "truncated_combats": 0,
+      "turn_limit_ends": 0
+    },
+    "shaped": {
+      "all_placements": [
+        [
+          8,
+          7,
+          6,
+          4,
+          5,
+          2,
+          1,
+          3
+        ],
+        [
+          8,
+          1,
+          2,
+          3,
+          6,
+          5,
+          7,
+          4
+        ],
+        [
+          8,
+          1,
+          5,
+          3,
+          7,
+          6,
+          4,
+          2
+        ]
+      ],
+      "arm": "shaped",
+      "decisions": [
+        126,
+        224,
+        218
+      ],
+      "first_place_rate": 0.0,
+      "games": 3,
+      "invalid_model_actions": [
+        0,
+        0,
+        0
+      ],
+      "mean_placement": 8,
+      "placements_for_seat_zero": [
+        8,
+        8,
+        8
+      ],
+      "safety_fallback_actions": [
+        1,
+        3,
+        3
+      ],
+      "seeds": [
+        31011,
+        31012,
+        31013
+      ],
+      "top4_rate": 0.0,
+      "truncated_combats": 0,
+      "turn_limit_ends": 0
+    }
+  },
+  "gamma": 0.99,
+  "hypothesis": "Potential shaping improves short-horizon PPO placement",
+  "interpretation": "Exploratory N=3 paired seeded games; no significance claim.",
+  "mean_rank_difference": 0,
+  "paired_shaped_minus_control_rank": [
+    0,
+    0,
+    0
+  ],
+  "schema": 1,
+  "session_id": "s-20261102-bedfc382",
+  "shaping_alpha": 0.5,
+  "steps_per_arm": 256,
+  "train_seed": 22042,
+  "training": {
+    "control": {
+      "alpha": 0.0,
+      "checkpoint": "outputs/reward/control.zip",
+      "elapsed_seconds": 2.003,
+      "name": "control",
+      "raw_reward_sum": -2.0,
+      "rollout_decisions": 256,
+      "seed": 22042,
+      "sha256": "c6d2656fd988188f24d69a8bd521dcaeaa1634dadc99671531b63d7273a7236b",
+      "shaping_bonus_sum": 0.0,
+      "terminated_episodes": 2,
+      "timesteps": 256
+    },
+    "shaped": {
+      "alpha": 0.5,
+      "checkpoint": "outputs/reward/shaped.zip",
+      "elapsed_seconds": 0.529,
+      "name": "shaped",
+      "raw_reward_sum": -2.0,
+      "rollout_decisions": 256,
+      "seed": 22042,
+      "sha256": "2d3d29a47063cb5aad029c0282c90e775a639634f904f19f183e6a415fc40352",
+      "shaping_bonus_sum": -0.529254,
+      "terminated_episodes": 2,
+      "timesteps": 256
+    }
+  }
+}
