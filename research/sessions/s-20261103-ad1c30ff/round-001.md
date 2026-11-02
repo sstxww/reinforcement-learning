@@ -37,3 +37,10 @@
 
 ## Handoff and gates
 Only after own workflow success and committed genuine game receipt plus exact-final-head PR CI may integrators consider this discovery tool for main. The script is deliberately read-only and has no automatic merge or model promotion. Do not start large-scale training or formal Arena ranked games from this audit.
+
+## Verified execution update (2026-11-02T19:26 UTC)
+- **Successful own independent GitHub Actions #41509414911**: package/test dependencies installed, Release discovery test suite green, public Release API audited, pinned native TavernGym installed, own real eight-seat baseline game completed. Original source job `125497063105`; original receipt from uploaded Artifact `13171299050` was read from its ZIP and committed without altering JSON content at `experiments/s-20261103-ad1c30ff/001-99431.json`.
+- Seed **99431**, controlled seat 0 place **8**, 17 turns, 51 actions, placements **[8,4,5,2,3,6,7,1]**, `completed=true`, no combat truncation or turn-limit ending. Baseline smoke, **not** model evaluation.
+- Release scan actually returned **25** published tags: canonical registry lists **5** candidates; **20** other published tags have ZIP and metadata filenames; 0 canonical candidate tags missing. This is discovery, not independent byte, ZIP/optimizer, inference or training validation. Compact actual snapshot `reports/s-20261103-ad1c30ff/release-drift-summary.json`; full raw JSON from temporary workflow Artifact.
+- Further historical **rank-8 evidence report** committed `reports/s-20261103-ad1c30ff/rank8-evidence.md` with checkpoint separation, no-buy-when-legal, raw loop noncompletion and forced-BUY negative ablation.
+- This round added **0 PPO training steps, 0 model-only matches, 0 new model Releases, and 0 Champion promotions**. Do not confuse genuine baseline rank8 with model result. Next gate is final-head PR CI on a clean, non-overlapping integration branch and independent review.
