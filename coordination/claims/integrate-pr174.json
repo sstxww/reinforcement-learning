@@ -3,7 +3,7 @@
   "task_key": "integrate/pr-174",
   "session_id": "s-20261103-469d13fa",
   "role": "REVIEWER",
-  "state": "claimed",
+  "state": "released_to_integrator",
   "base_main_sha": "c1b828734527bae6141805581693d890cc3bff94",
   "work_branch": "agent/s-20261103-469d13fa/optimization-001",
   "claim_ref": "claims/integrate-pr174",
@@ -16,5 +16,12 @@
     "research/knowledge/proposals/s-20261103-469d13fa-001.md",
     ".github/workflows/v7-pr174-review-469d13fa.yml"
   ],
-  "non_overlap_note": "Do not modify PR #174 owner's branch; independent review plus own baseline."
+  "non_overlap_note": "Do not modify PR #174 owner's branch; independent review plus own baseline.",
+  "handoff_reason": "Review completed, original own eight-seat baseline archived, PR #210 created; no globally enforceable exclusive main-merge lane established.",
+  "review_url": "https://github.com/sstxww/reinforcement-learning/pull/174",
+  "evidence_pr": "https://github.com/sstxww/reinforcement-learning/pull/210",
+  "own_action": "https://github.com/sstxww/reinforcement-learning/actions/runs/41512972780",
+  "latest_work_commit_at_release": "6502e8a1b52ad39c6590b7623a4dae23cdccac73",
+  "claim_is_main_merge_lease": false,
+  "next_owner_instruction": "Recheck PR174 HEAD 874bbba4377c229c2218b565779dd4dc7d3b0104, live main/CI and serial integration rights; do not treat this released task claim as a merger lease."
 }
