@@ -1,0 +1,92 @@
+name: V5 R002 Buy-action causal ablation s-20261102-90e24c7b
+
+on:
+  push:
+    branches:
+      - agent/s-20261102-90e24c7b/optimization-002
+    paths:
+      - .github/workflows/buy-ablation-s-20261102-90e24c7b.yml
+      - tavern_ai/buy_priority_s_90e24c7b.py
+      - tests/test_buy_priority_s_90e24c7b.py
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: buy-ablation-s-20261102-90e24c7b-r002
+  cancel-in-progress: false
+
+jobs:
+  nine-real-games:
+    if: github.repository == 'sstxww/reinforcement-learning' && github.ref == 'refs/heads/agent/s-20261102-90e24c7b/optimization-002'
+    runs-on: ubuntu-latest
+    timeout-minutes: 115
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies and test code
+        run: |
+          python -m pip install -e '.[train,test]'
+          python -m pytest -q
+      - name: Install exact pinned TavernGym engine
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Recover immutable unpromoted V2 Release
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p checkpoints
+          gh release download v2-learning-41413557445 --repo sstxww/reinforcement-learning \
+            --pattern model.zip --pattern model.metadata.json --dir checkpoints
+          echo '73bde2666426cecce39f135980a897bb2cd4a7d70783ba04c9c0d29477a6664a  checkpoints/model.zip' | sha256sum -c -
+      - name: Fresh paired real full eight-seat games, three arms
+        run: |
+          python -m tavern_ai.buy_priority_s_90e24c7b \
+            --model checkpoints/model.zip --start-seed 89111 \
+            --out-dir experiments/s-20261102-90e24c7b \
+            --report reports/s-20261102-90e24c7b/002-buy-ablation.json
+          python - <<'PY'
+          import json,glob
+          from tavern_ai.receipt_integrity import validate_integrity
+          paths=glob.glob("experiments/s-20261102-90e24c7b/002-*.json")
+          assert len(paths)==9, paths
+          for name in paths:
+              receipt=json.load(open(name,encoding="utf-8"))
+              assert validate_integrity(receipt)
+              assert receipt["completed"] and not receipt["truncated_combats"] and not receipt["turn_limit_end"]
+          report=json.load(open("reports/s-20261102-90e24c7b/002-buy-ablation.json",encoding="utf-8"))
+          for k in ("baseline","model_control_guarded","hybrid_buy_override_guarded"):
+              assert report[k]["games"]==3
+          assert report["model_weights_updated"] is False and report["champion_promoted"] is False
+          PY
+      - name: Commit this session's actual R002 evidence only
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = 'agent/s-20261102-90e24c7b/optimization-002'
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add experiments/s-20261102-90e24c7b/002-*.json reports/s-20261102-90e24c7b/002-buy-ablation.json
+          if ! git diff --cached --quiet; then
+            git commit -m "evidence(v5): nine paired real Buy-priority ablation games [skip ci]"
+            git pull --rebase origin "$GITHUB_REF_NAME"
+            git push origin HEAD:"$GITHUB_REF_NAME"
+          fi
+      - name: Retain bounded evidence backup
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: buy-ablation-s-20261102-90e24c7b-r002
+          path: |
+            experiments/s-20261102-90e24c7b/002-*.json
+            reports/s-20261102-90e24c7b/002-buy-ablation.json
+          if-no-files-found: ignore
+          retention-days: 30
