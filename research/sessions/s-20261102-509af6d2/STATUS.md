@@ -1,8 +1,8 @@
 # Session s-20261102-509af6d2 — STATUS (2026-11-02)
 
-- **State:** `awaiting_pr_and_final_ci`; first experimental round concluded and independently confirmed, **not promoted to Best**.
+- **State:** `awaiting_final_head_pr_ci`; first experimental round concluded and independently confirmed, **not promoted to Best**.
 - **Owner:** this unique ChatGPT research session only; no shared branches/workflows used.
-- **Branch:** `agent/s-20261102-509af6d2/optimization-001` from `main@315b068bac5ab6d8403c3c9b18f8c101c0cded5d`; PR: to be opened against main after research handoff.
+- **Branch:** `agent/s-20261102-509af6d2/optimization-001` from `main@315b068bac5ab6d8403c3c9b18f8c101c0cded5d`; PR: https://github.com/sstxww/reinforcement-learning/pull/35 (draft, pending latest-head CI).
 - **Experiment:** turn-2 Tavern upgrade deferred to turn 3, otherwise original `BaselinePolicy`; source `tavern_ai/s_20261102_509af6d2.py`; regression tests `tests/test_s_20261102_509af6d2.py`.
 - **Actual training:** PPO timesteps **0** (pure rule-policy tuning). Checkpoint/optimizer/weights: **none**, thus no checkpoint to restore; `Best` model unchanged and unverified by this research.
 - **Engine:** TavernGym 1.1.0, source fingerprint `6d8712c93022ba11`, observe2 4017/447/245; pinned upstream `fb61201a557ddd36a411cf44aac51ce4d9b606ce`.

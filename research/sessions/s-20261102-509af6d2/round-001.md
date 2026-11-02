@@ -2,6 +2,7 @@
 
 ## Identity and hypothesis
 - Session: `s-20261102-509af6d2`; isolated branch `agent/s-20261102-509af6d2/optimization-001`.
+- Pull request: https://github.com/sstxww/reinforcement-learning/pull/35 (draft; no merge performed).
 - Immutable main base: `315b068bac5ab6d8403c3c9b18f8c101c0cded5d` (2026-11-02).
 - Hypothesis: delaying the **turn-2** Tavern upgrade to **turn 3** might trade Tavern tempo for early minion purchases, improving placement versus `BaselinePolicy`.
 - Source: `tavern_ai/s_20261102_509af6d2.py`; test: `tests/test_s_20261102_509af6d2.py`.
