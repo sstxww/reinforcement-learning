@@ -1,0 +1,63 @@
+{
+  "session_id": "s-20261102-b34940b0",
+  "hypothesis": "Selecting the last legal compulsory discovery choice may improve rank",
+  "baseline_commit": "315b068bac5ab6d8403c3c9b18f8c101c0cded5d",
+  "environment": "real pinned TavernGym / 7 official bots",
+  "game_engine_source_hash": "6d8712c93022ba11",
+  "game_engine_version": "1.1.0",
+  "github_run_id": "41415645714",
+  "github_sha": "adf99fc8c229f366c8790a904f970643229d7381",
+  "learning_steps": 0,
+  "training_type": "rule-policy ablation (no neural training)",
+  "control": {
+    "games": 4,
+    "seeds": [
+      65201,
+      65202,
+      65203,
+      65204
+    ],
+    "placements": [
+      4,
+      8,
+      6,
+      5
+    ],
+    "mean_placement": 5.75,
+    "first_place_rate": 0.0,
+    "top4_rate": 0.25,
+    "completed": true,
+    "illegal_actions": 0,
+    "truncated_combats": 0
+  },
+  "candidate": {
+    "games": 4,
+    "seeds": [
+      65201,
+      65202,
+      65203,
+      65204
+    ],
+    "placements": [
+      8,
+      8,
+      8,
+      8
+    ],
+    "mean_placement": 8,
+    "first_place_rate": 0.0,
+    "top4_rate": 0.0,
+    "completed": true,
+    "illegal_actions": 0,
+    "truncated_combats": 0
+  },
+  "paired_candidate_minus_control": [
+    4,
+    0,
+    2,
+    3
+  ],
+  "mean_rank_delta": 2.25,
+  "multi_option_discover_choices": 21,
+  "conclusion": "Exploratory only; no statistical strength claim"
+}
