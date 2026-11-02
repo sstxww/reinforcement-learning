@@ -1,13 +1,14 @@
-# Session s-20261102-9732a21e status
+# Session s-20261102-9732a21e — validated V5 integration and training status
 
-- Scope: P0 verified PR integration and P1 bounded model-release restore/continuation verification; P2 eighth-place root-cause evidence triage.
-- Branch: `agent/s-20261102-9732a21e/optimization-001`.
-- Initial source main: `3c65ffd0380d6269e6b39c7bf1ca2d84281546d8`.
-- Completed own merge: [PR #70](https://github.com/sstxww/reinforcement-learning/pull/70), merge `3c65ffd0380d6269e6b39c7bf1ca2d84281546d8`.
-- Other concurrent merge: [PR #25](https://github.com/sstxww/reinforcement-learning/pull/25); not executed by this session.
-- Branch-only bounded smoke: `.github/workflows/v5-resume-s-20261102-9732a21e.yml`, 128 requested additional PPO steps from V2 1280-step unpromoted checkpoint, gated by hash, engine, pure candidate full game and paired seeds.
-- Workflow status at authoring: **not yet verified**, actual steps/results/release must be checked in Actions.
-- Model registry: Champion **not established**; V2 Release is an unpromoted **source candidate**.
-- Baseline eighth-place / non-buy evidence: PR #60 (n=3; actionable legal-mask denominator missing).
-- No formal Arena ranked games. No shared model overwrite. No main train.yml edits.
-- Next: check exact run status; on success verify complete 8-seat receipt and Release re-download, on failure save logs and do at most two evidence-driven fixes.
+- Session branch: `agent/s-20261102-9732a21e/optimization-001`; initial base main `3c65ffd0380d6269e6b39c7bf1ca2d84281546d8`. Only `sstxww/reinforcement-learning` was modified.
+- **P0 MERGED by this session:** PR #70, add-only pinned public mechanics audit; squash commit `3c65ffd0380d6269e6b39c7bf1ca2d84281546d8`, exact post-merge main CI [41427295858](https://github.com/sstxww/reinforcement-learning/actions/runs/41427295858) **success**.
+- **Other concurrent PR #25**: integrated separately by another session (not counted as own merge). PR #75 overlap documented in its discussion; no blind merging.
+- **P1 actual FIRST attempt:** [Actions 41427627265](https://github.com/sstxww/reinforcement-learning/actions/runs/41427627265) **failure at heldout evaluation only**. Source V2 Release `v2-learning-41413557445` SHA and engine check passed. True MaskablePPO 128 additional steps **1280 -> 1408**; checkpoint SHA256 `04799f7e23153dd1728d6e765386ea5f9c17da4075ec7672d17cf4dfb170e185`, metadata SHA256 `83d4a7d5df6d18b9fcc4816edd14988ab2f4e5768cdd41fa2f670cf2b6df7991`.
+- **Pure model authentic full-game receipt:** `experiments/s-20261102-9732a21e/001-83601.json`, original recovered from workflow Artifact [13132927436](https://github.com/sstxww/reinforcement-learning/actions/runs/41427627265/artifacts/13132927436). Seed 83601, completed, **rank 8**, 15 turns, 117 actions, placements `[8,4,3,5,2,6,1,7]`, no combat/turn-limit guard, SHA matches checkpoint.
+- **Heldout failure:** independent seed test `tavern_ai.evaluate` raised `RuntimeError: Full-game safety limit exceeded`, so **no complete paired estimate**; do not invent placements or strength gain. See `failures/001-eval-fullgame-safety-limit.md`.
+- **P2 new diagnostic:** `tavern_ai/v5_behavior_9732a21e.py` uses only public observe2/legality, records legal-buy opportunities, chosen buys, end-turns while purchase is legal, gold, repeated public observations/action categories; failed games stay in reports only and never count as completed receipts. Isolated tests `tests/test_v5_behavior_9732a21e.py`.
+- **First fix rerun:** [Actions 41428791989](https://github.com/sstxww/reinforcement-learning/actions/runs/41428791989) **in progress at this status edit**, expected to attempt finite resume, legal-buy/loop diagnostics, unpromoted archival Release + independent re-download, and commit actual evidence. No R2 results are claimed until verified.
+- **Latest R2 source CI:** [Actions 41428800205](https://github.com/sstxww/reinforcement-learning/actions/runs/41428800205) **success**, includes tests and independent full game; do not conflate it with R2 candidate's real-match diagnostic result.
+- **Storage:** first checkpoint exists in 30-day workflow Artifact; not a permanent model release at first attempt. Latest/Best/Champion **unchanged, no model promoted**. Second run release not yet verified. Do not resume from a failed candidate as formal baseline.
+- **Training after R2:** not approved to increase steps unless all game/guard/behavior and model reproducibility gates pass.
+- No TavernArena ranked games, no upstream source edits, no shared `train.yml` edits.
