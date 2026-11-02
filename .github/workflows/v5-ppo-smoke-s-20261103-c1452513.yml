@@ -1,0 +1,170 @@
+name: V5 1408-to-1536 unpromoted Release PPO smoke s-20261103-c1452513
+
+on:
+  push:
+    branches:
+      - agent/s-20261103-c1452513/optimization-001
+    paths:
+      - .github/workflows/v5-ppo-smoke-s-20261103-c1452513.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: v5-ppo-s-20261103-c1452513
+  cancel-in-progress: false
+
+jobs:
+  isolated-train-and-paired-games:
+    runs-on: ubuntu-latest
+    timeout-minutes: 85
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install tests and MaskablePPO; run existing recovery regressions
+        run: |
+          python -m pip install -e '.[train,test]'
+          python -m pytest -q tests/test_train_publish_privilege_s_20261103_c1452513.py tests/test_release_asset_verifier.py
+      - name: Bootstrap pinned TavernGym
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Read and validate immutable 1408-step source Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          python -m tavern_ai.release_restore_entry \
+            --model-id v5-s-20261102-68099929-1408-41428692617 --out-dir checkpoints
+          python -m tavern_ai.checkpoint_preflight \
+            --model checkpoints/model.zip --metadata checkpoints/model.metadata.json \
+            --expected-sha256 a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632 \
+            --probe-inference
+      - name: Evaluate raw parent on independent fixed seeds
+        run: |
+          mkdir -p publish
+          timeout 900 python -m tavern_ai.evaluate \
+            --model checkpoints/model.zip --games 2 --start-seed 932040 \
+            --compare-baseline --out publish/parent-paired.json
+      - name: Resume actual PPO optimizer for bounded 128 steps
+        run: |
+          set -euo pipefail
+          python -m tavern_ai.train --steps 128 --seed 42 \
+            --resume checkpoints/model.zip --out checkpoints/candidate.zip
+          test -s checkpoints/candidate.zip
+          test -s checkpoints/candidate.metadata.json
+          python -m tavern_ai.checkpoint_preflight \
+            --model checkpoints/candidate.zip --metadata checkpoints/candidate.metadata.json \
+            --expected-sha256 "$(sha256sum checkpoints/candidate.zip | cut -d' ' -f1)" \
+            --probe-inference
+      - name: Raw candidate itself completes a genuine eight-seat TavernGym game
+        run: |
+          timeout 900 python -m tavern_ai.canary \
+            --agent-id s-20261103-c1452513 --policy model \
+            --model checkpoints/candidate.zip --seed 932031 \
+            --receipt publish/002-model-932031.json
+          python -m tavern_ai.validate_receipt publish/002-model-932031.json
+          cat publish/002-model-932031.json
+      - name: Evaluate raw candidate on exact paired independent seeds
+        run: |
+          timeout 900 python -m tavern_ai.evaluate \
+            --model checkpoints/candidate.zip --games 2 --start-seed 932040 \
+            --compare-baseline --out publish/candidate-paired.json
+      - name: Verify true continuity, preserve negative outcome and stage candidate
+        run: |
+          set -euo pipefail
+          cp checkpoints/candidate.zip publish/model.zip
+          cp checkpoints/candidate.metadata.json publish/model.metadata.json
+          python - <<'PY'
+          import hashlib, json
+          from pathlib import Path
+          read=lambda p: json.loads(Path(p).read_text())
+          source=read("checkpoints/model.metadata.json")
+          new=read("publish/model.metadata.json")
+          old_eval=read("publish/parent-paired.json")
+          new_eval=read("publish/candidate-paired.json")
+          game=read("publish/002-model-932031.json")
+          digest=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
+          if source["total_timesteps"]!=1408 or new["total_timesteps"]!=1536:
+              raise ValueError("PPO source/candidate step counter is not 1408->1536")
+          if new["engine"]!=source["engine"]:
+              raise ValueError("Engine metadata changed while resuming PPO")
+          if game.get("policy")!="model" or game.get("model_sha256")!=digest("publish/model.zip") or not game.get("completed"):
+              raise ValueError("Real model-only full game or hash attestation missing")
+          if game.get("truncated_combats") or game.get("turn_limit_end") or game.get("fallback_actions",0):
+              raise ValueError("Rescued/forced match is not raw model evidence")
+          if old_eval["candidate"]["seeds"]!=new_eval["candidate"]["seeds"] or old_eval["candidate"]["games"]!=2:
+              raise ValueError("Parent and child evidence not seed-paired")
+          if old_eval["policy"]!="model" or new_eval["policy"]!="model":
+              raise ValueError("Only raw-model evaluation can count")
+          report={"schema":1,"source_tag":"v5-s-20261102-68099929-1408-41428692617",
+                  "source_sha256":digest("checkpoints/model.zip"),
+                  "candidate_sha256":digest("publish/model.zip"),
+                  "source_steps":1408,"candidate_steps":1536,
+                  "seeds":[932040,932041],
+                  "old_placements":old_eval["candidate"]["placements"],
+                  "new_placements":new_eval["candidate"]["placements"],
+                  "baseline_placements":new_eval["baseline"]["placements"],
+                  "paired_delta_new_minus_old":new_eval["candidate"]["mean_placement"]-old_eval["candidate"]["mean_placement"],
+                  "raw_model_full_game_seed":932031,"raw_model_rank":game["placements"][0],
+                  "champion_promoted":False,"improvement_claimed":False}
+          Path("publish/report.json").write_text(json.dumps(report,indent=2)+"\n")
+          print(json.dumps(report,sort_keys=True))
+          PY
+          (cd publish && sha256sum model.zip model.metadata.json 002-model-932031.json parent-paired.json candidate-paired.json report.json > checksums.sha256)
+      - name: Save true checkpoint and all evidence from this run
+        uses: actions/upload-artifact@v4
+        with:
+          name: v5-ppo-s-20261103-c1452513-${{ github.run_id }}
+          path: publish/
+          if-no-files-found: error
+          retention-days: 30
+      - name: Preserve failed experiment evidence separately (never mark successful)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v5-ppo-failed-s-20261103-c1452513-${{ github.run_id }}
+          path: |
+            publish/*.json
+            checkpoints/candidate.metadata.json
+          if-no-files-found: ignore
+          retention-days: 30
+
+  save-unpromoted:
+    needs: isolated-train-and-paired-games
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - name: Restore validated experiment artifact from same run
+        uses: actions/download-artifact@v4
+        with:
+          name: v5-ppo-s-20261103-c1452513-${{ github.run_id }}
+          path: publish
+      - name: Verify exact bytes and game, publish readbackable Release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          (cd publish && sha256sum -c checksums.sha256)
+          jq -e '(.source_steps == 1408) and (.candidate_steps == 1536) and (.champion_promoted == false) and (.improvement_claimed == false)' publish/report.json
+          jq -e '(.policy == "model") and (.completed == true) and (.turn_limit_end == false) and (.truncated_combats == 0)' publish/002-model-932031.json
+          tag="v5-smoke-s-20261103-c1452513-1536-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
+          gh release create "$tag" --repo "$GITHUB_REPOSITORY" \
+            --target "$GITHUB_SHA" --prerelease \
+            --title "Experimental unpromoted 1536-step PPO checkpoint $tag" \
+            --notes "Verified 1408->1536 bounded optimizer continuation and raw model game; paired n=2 descriptive only. NEVER Champion. Run $GITHUB_RUN_ID." \
+            publish/model.zip publish/model.metadata.json publish/report.json \
+            publish/002-model-932031.json publish/parent-paired.json publish/candidate-paired.json publish/checksums.sha256
+          mkdir -p verification
+          gh release download "$tag" --repo "$GITHUB_REPOSITORY" \
+            --pattern model.zip --pattern model.metadata.json --pattern report.json \
+            --dir verification
+          cmp publish/model.zip verification/model.zip
+          cmp publish/model.metadata.json verification/model.metadata.json
+          cmp publish/report.json verification/report.json
