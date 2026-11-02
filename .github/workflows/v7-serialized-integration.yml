@@ -1,0 +1,74 @@
+name: V7 serialized manual PR integration (fail closed)
+
+# No automatic merging on PR or model pushes.
+on:
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: 'Open, non-draft PR number after independent review'
+        type: number
+        required: true
+      expected_head_sha:
+        description: 'Exact reviewed PR head SHA'
+        type: string
+        required: true
+      expected_main_sha:
+        description: 'Exact main SHA for which full-match CI passed'
+        type: string
+        required: true
+      confirm_merge:
+        description: 'Opt in to actual merge (false = preflight only)'
+        type: boolean
+        default: false
+        required: true
+
+# Only callers using this workflow are serialized. This is not branch protection.
+concurrency:
+  group: autotavern-main-integrate
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  actions: read
+  pull-requests: read
+
+jobs:
+  preflight:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Verify live refs, reviewed PR and exact-base full-game CI evidence
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ inputs.pr_number }}
+          HEAD_SHA: ${{ inputs.expected_head_sha }}
+          MAIN_SHA: ${{ inputs.expected_main_sha }}
+        run: |
+          python scripts/v7_integrate.py --pr "$PR_NUMBER" --head "$HEAD_SHA" --main "$MAIN_SHA"
+
+  integrate:
+    needs: preflight
+    if: inputs.confirm_merge
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+      actions: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Revalidate and merge via exact-PR-head conditional GitHub API
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ inputs.pr_number }}
+          HEAD_SHA: ${{ inputs.expected_head_sha }}
+          MAIN_SHA: ${{ inputs.expected_main_sha }}
+        run: |
+          python scripts/v7_integrate.py --pr "$PR_NUMBER" --head "$HEAD_SHA" --main "$MAIN_SHA" --merge
+          echo 'Merge accepted; wait for new main full-match CI before marking integrated.' >> "$GITHUB_STEP_SUMMARY"
