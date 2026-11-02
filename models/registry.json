@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "repository": "sstxww/reinforcement-learning",
+  "engine": {
+    "name": "TavernGym",
+    "version": "1.1.0",
+    "observation": "observe2",
+    "float_features": 4017,
+    "card_slots": 447,
+    "action_count": 245,
+    "source_hash": "6d8712c93022ba11"
+  },
+  "best": null,
+  "latest": null,
+  "candidates": [],
+  "status": "No independently validated durable checkpoint index recorded as of 2026-11-02",
+  "release_tag_prefix": "autotavern-v1-candidate-",
+  "promotion_policy": "Paired held-out evaluation and verified checkpoint read/inference are required; never auto-promote."
+}
