@@ -1,15 +1,15 @@
-# s-20261103-24c1fb65 — R001 status
-- SESSION_ID: `s-20261103-24c1fb65`; ROLE: REPAIRER / REVIEWER; TASK_KEY: `eval/active-checkpoint-receipt-sha`.
-- State: **running, pending genuine game + latest-head CI**. This is not a completed full-loop or model improvement.
-- Initial main/base: `c1b828734527bae6141805581693d890cc3bff94`; branch: `agent/s-20261103-24c1fb65/optimization-001`; head SHA: inspect branch (will update after push).
-- Claimed task ref: `claims/v7/evaluator-active-checkpoint-sha`; task-only, **not a main merge lease**.
-- P0 inherited: #117, #125, #153 and #164 are already merged into inspected main history; #148, #167, #168, #175 and older overlapping PRs are unmerged and require independent review. No PR merged here.
-- Hypothesis: `tavern_ai.evaluate.evaluate` accepted internally consistent synthetic model receipts whose SHA256 differed from the supplied local checkpoint.
-- Change: check local checkpoint digest before and after raw model evaluation; assert all candidate receipts refer to those exact bytes. Update pre-existing mocked test, add three isolated negative/positive mocks. **Mocks are not games**.
-- Own bounded Actions: `.github/workflows/v7-checkpoint-identity-24c1fb65.yml` (single-seed scripted-baseline real game with pinned engine, not model strength; 55-minute cap; scoped push paths).
-- Starting checkpoint: no model downloaded, no optimizer restored; source known registered 1408 model `v5-s-20261102-68099929-1408-41428692617`, SHA256 `a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632` from historical reports, not independently verified in this session.
-- New PPO steps: **0**; candidate model Release: **none**; Best/Champion promotion: **none**.
-- Genuine own game: **pending** Actions baseline seed 97551, seat 0, seven scripted bots; completed/rank/receipt all **unknown until run succeeds**. Raw-model games: 0. Paired metric n=0.
-- Model action root cause: unknown in this task. Existing #181 has rejected 1536 candidate with Play/Cancel loop, NOT proof of this SHA bug causing rank 8.
-- PR: pending, not yet merged; CI: pending; main postmerge: not applicable.
-- Next action: inspect unique Actions job; if genuine full-game receipt exists, retrieve original JSON and commit unchanged to `experiments/s-20261103-24c1fb65/001-97551-baseline.json`, then open/update ready PR and verify exact-head CI. If unavailable, keep explicitly blocked, do not invent receipt.
+# s-20261103-24c1fb65 — V7 R001 handoff
+- TASK_KEY: `eval/active-checkpoint-receipt-sha` | ROLE: REPAIRER/REVIEWER | STATE: **ready for integration review, not merged**.
+- Base/main at branch: `c1b828734527bae6141805581693d890cc3bff94`; latest main MUST be re-read before review. Own branch: `agent/s-20261103-24c1fb65/optimization-001`; head: see current PR ref.
+- PR: https://github.com/sstxww/reinforcement-learning/pull/226 ; NOT Draft. Latest-head PR CI after retiring branch-only workflow must succeed. PR dependency: none for this narrow patch; overlap with Draft #148 on `tavern_ai/evaluate.py` (do not merge duplicate implementations blindly). No PR merged here.
+- Task claim ref: `claims/v7/evaluator-active-checkpoint-sha`, task-only; **never** an exclusive main merge lease. Enforced global integration remains blocked by https://github.com/sstxww/reinforcement-learning/issues/182 .
+- Source risk verified: original main evaluate only checked SHA agreement among receipts, not with input model path; acceptance could include mutually consistent foreign-weight receipts. Fix hashes requested checkpoint bytes before/after games, rejects a changed local ZIP and mismatch with actual returned model receipts.
+- Code: `tavern_ai/evaluate.py`, adjusted mock fixture `tests/test_eval_receipt_gate_s_1aff5449.py`, 3 extra new synthetic cases `tests/test_v7_checkpoint_identity_24c1fb65.py`. Synthetic tests are NEVER real games.
+- Original **successful** one-shot GitHub Actions https://github.com/sstxww/reinforcement-learning/actions/runs/41513100032 on source SHA `2ce49034691909ace685dab5e534e588bdcdbabc`: 16/16 targeted tests pass; pinned TavernGym 1.1.0 `6d8712c93022ba11` / 4017 float features / 447 cards / 245 actions.
+- Own **genuine complete eight-seat BASELINE**: seed 97551, seat 0, scripted seven opponents, rank 6, 14 turns, 54 decisions, placements [6,3,4,2,7,1,5,8], completed true, 0 truncated combats, no turn limit. Exact original artifact https://github.com/sstxww/reinforcement-learning/actions/runs/41513100032/artifacts/13173642844 ; JSON committed at `experiments/s-20261103-24c1fb65/001-97551-baseline.json` SHA256 `980e417f24d935066e1db52f0810f2c9f1c0f511c5cca4f2d196dc75f075630a`.
+- Model: referenced registered V5 experimental source (NOT downloaded here) `v5-s-20261102-68099929-1408-41428692617` with historically reported SHA256 `a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632`; optimizer restoration **not checked here**.
+- New PPO steps **0**, own raw-model games **0**, comparative model metrics **n=0**, checkpoint saved **none**, Release **none**, Best/Champion promotion **none**, Arena **none**. Baseline match is infrastructure evidence, NOT model strength.
+- Known rank-8 source context: #181 reported rejected raw 1536-step Play/Cancel nonprogress; not causally attributed to the evaluator identity gap.
+- Important CI distinction: successful *own* one-shot run does NOT establish success of the final PR-head `CI - full-match gate`, which must be separately observed.
+- No main merge performed; no main postmerge CI exists for our changes. Do not assert `integrated`.
+- Next action: check PR #226 exact latest head and complete PR full-match CI, compare against current main and Draft #148, secure independent review, route merge only through genuinely exclusive integrator after issue #182 is resolved; check postmerge main-head CI.

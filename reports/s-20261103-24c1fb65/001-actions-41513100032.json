@@ -1,0 +1,48 @@
+{
+  "session_id": "s-20261103-24c1fb65",
+  "round": 1,
+  "task_key": "eval/active-checkpoint-receipt-sha",
+  "source_commit": "2ce49034691909ace685dab5e534e588bdcdbabc",
+  "workflow_run_url": "https://github.com/sstxww/reinforcement-learning/actions/runs/41513100032",
+  "workflow_run_id": 41513100032,
+  "workflow_status": "completed",
+  "workflow_conclusion": "success",
+  "regression_tests_passed": 16,
+  "regression_tests_status": "success",
+  "engine": {
+    "version": "1.1.0",
+    "source_hash": "6d8712c93022ba11",
+    "features": 4017,
+    "cards": 447,
+    "actions": 245
+  },
+  "game": {
+    "receipt_path": "experiments/s-20261103-24c1fb65/001-97551-baseline.json",
+    "artifact_url": "https://github.com/sstxww/reinforcement-learning/actions/runs/41513100032/artifacts/13173642844",
+    "original_json_sha256": "980e417f24d935066e1db52f0810f2c9f1c0f511c5cca4f2d196dc75f075630a",
+    "seed": 97551,
+    "seat": 0,
+    "policy": "baseline",
+    "completed": true,
+    "turns": 14,
+    "decisions": 54,
+    "placements": [
+      6,
+      3,
+      4,
+      2,
+      7,
+      1,
+      5,
+      8
+    ],
+    "truncated_combats": 0,
+    "turn_limit_end": false
+  },
+  "new_ppo_steps": 0,
+  "own_raw_model_games": 0,
+  "new_release": null,
+  "model_promotion": null,
+  "integrated": false,
+  "notes": "Workflow source was one-shot and is retired; this is baseline infrastructure evidence, not new model strength. Exact-head PR CI and review are separate."
+}
