@@ -1,0 +1,27 @@
+{
+  "schema": 1,
+  "timestamp": "2026-11-02T09:24:02.962535+00:00",
+  "environment": "TavernGym",
+  "engine_version": "1.1.0",
+  "engine_source_hash": "6d8712c93022ba11",
+  "agent_id": "s-20261102-661adf61",
+  "policy": "teacher",
+  "seed": 65102,
+  "completed": true,
+  "turns": 18,
+  "decisions": 42,
+  "placements": [
+    8,
+    6,
+    5,
+    2,
+    4,
+    1,
+    3,
+    7
+  ],
+  "truncated_combats": 0,
+  "turn_limit_end": false,
+  "forced_end_turns": 0,
+  "git_sha": "3e093f073f8f461725ce2cff20edb98e600f9179"
+}

@@ -1,0 +1,65 @@
+name: "BC teacher pilot s-20261102-661adf61"
+
+on:
+  push:
+    branches:
+      - agent/s-20261102-661adf61/optimization-001
+    paths:
+      - .github/workflows/experiment-s-20261102-661adf61.yml
+      - tavern_ai/bc_session_661adf61.py
+      - tests/test_bc_session_661adf61.py
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: bc-s-20261102-661adf61
+  cancel-in-progress: false
+
+jobs:
+  teacher-distillation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned small research dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[test]'
+          python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
+      - name: Test legal-mask and metric isolation
+        run: python -m pytest tests/test_bc_session_661adf61.py
+      - name: Bootstrap pinned real TavernGym engine
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Collect three real teacher games, train BC and run heldout eight-seat matches
+        run: |
+          python -m tavern_ai.bc_session_661adf61 --updates 80 --outdir experiments/s-20261102-661adf61
+      - name: Validate all completed eight-seat receipts
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from tavern_ai.validate_receipt import validate
+          p=json.loads(Path('experiments/s-20261102-661adf61/report.json').read_text())
+          for r in p['teacher_train_receipts']:
+              validate(r)
+          for policy, records in p['matches'].items():
+              for r in records:
+                  if r.get('completed'):
+                      validate(r)
+          print('Completed-game receipt validation succeeded; uncompleted raw policy is NOT a receipt')
+          PY
+      - name: Preserve model and real-game evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bc-session-s-20261102-661adf61
+          path: experiments/s-20261102-661adf61/
+          if-no-files-found: warn
+          retention-days: 30
