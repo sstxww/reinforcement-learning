@@ -1,4 +1,4 @@
-name: Train - incremental V1
+name: Train - bounded verified V5 continuation (UNPROMOTED)
 
 on:
   workflow_dispatch:
@@ -6,7 +6,7 @@ on:
       steps:
         description: 'PPO steps: 128 to 20000'
         required: true
-        default: '2048'
+        default: '128'
       eval_games:
         description: 'Held-out full games: 1 to 10'
         required: true
@@ -40,60 +40,144 @@ jobs:
           python -m pip install -e '.[train,test]'
       - name: Install pinned TavernGym 1.1 engine
         run: bash scripts/bootstrap_engine.sh
-      - name: Restore last successful compatible model
+      - name: Select exact canonical registered Release source
+        id: source
         shell: bash
         run: |
-          mkdir -p checkpoints
-          RUN_ID="$(gh api "repos/${GITHUB_REPOSITORY}/actions/workflows/train.yml/runs?branch=main&status=success&per_page=1" --jq '.workflow_runs[0].id // empty' || true)"
-          if [[ -n "$RUN_ID" ]]; then
-            if gh run download "$RUN_ID" --repo "$GITHUB_REPOSITORY" --name v1-model --dir checkpoints; then
-              test -f checkpoints/model.zip
-              test -f checkpoints/model.metadata.json
-            else
-              echo "No compatible prior artifact; initializing a fresh checkpoint"
-              rm -f checkpoints/model.zip checkpoints/model.metadata.json
-            fi
-          else
-            echo "First run; training from scratch"
-          fi
-      - name: Incremental Maskable PPO
+          set -euo pipefail
+          mkdir -p checkpoints artifacts
+          python -m tavern_ai.main_resume_source_db1986b8 \
+            --registry models/registry.json --github-output "$GITHUB_OUTPUT" \
+            | tee artifacts/source-selection.json
+      - name: Download and byte-verify immutable source before any PPO step
         shell: bash
         env:
-          STEPS: ${{ github.event.inputs.steps || '2048' }}
+          SOURCE_TAG: ${{ steps.source.outputs.model_tag }}
+          SOURCE_SHA: ${{ steps.source.outputs.expected_sha256 }}
         run: |
-          if [[ ! "$STEPS" =~ ^[0-9]+$ ]] || (( STEPS < 128 || STEPS > 20000 )); then
-            echo 'steps must be 128..20000'; exit 2
+          set -euo pipefail
+          gh release download "$SOURCE_TAG" --repo "$GITHUB_REPOSITORY" \
+            --pattern 'model.zip' --pattern 'model.metadata.json' --dir checkpoints
+          test -s checkpoints/model.zip
+          test -s checkpoints/model.metadata.json
+          python -m tavern_ai.checkpoint_preflight \
+            --model checkpoints/model.zip \
+            --metadata checkpoints/model.metadata.json \
+            --expected-sha256 "$SOURCE_SHA" --probe-inference \
+            | tee artifacts/source-preflight.json
+      - name: Bounded PPO continuation to a separate unpromoted child archive
+        shell: bash
+        env:
+          STEPS: ${{ github.event.inputs.steps || '128' }}
+        run: |
+          set -euo pipefail
+          if [[ ! "$STEPS" =~ ^[0-9]+$ ]] || (( STEPS < 128 || STEPS > 512 )); then
+            echo 'V5 verification steps must be 128..512'; exit 2
           fi
-          args=(--steps "$STEPS" --seed 42 --out checkpoints/model.zip)
-          if [[ -f checkpoints/model.zip ]]; then
-            args+=(--resume checkpoints/model.zip)
-          fi
-          python -m tavern_ai.train "${args[@]}"
+          python -m tavern_ai.train --steps "$STEPS" --seed 42 \
+            --resume checkpoints/model.zip --out checkpoints/candidate.zip \
+            | tee artifacts/ppo-continuation.log
+          STEPS="$STEPS" python - <<'PY'
+          import json, os
+          source = json.load(open("checkpoints/model.metadata.json"))
+          child = json.load(open("checkpoints/candidate.metadata.json"))
+          selection = json.load(open("artifacts/source-selection.json"))
+          assert source["total_timesteps"] == selection["source_steps"]
+          assert child["engine"] == source["engine"]
+          assert child["total_timesteps"] >= source["total_timesteps"] + int(os.environ["STEPS"])
+          print("Continuity verified:", source["total_timesteps"], child["total_timesteps"])
+          PY
       - name: Model plays full eight-seat game
         run: |
           python -m tavern_ai.canary --agent-id training-v1 \
-            --policy model --model checkpoints/model.zip --seed 9001 \
+            --policy model --model checkpoints/candidate.zip --seed 9001 \
             --receipt artifacts/trained-canary.json
           python -m tavern_ai.validate_receipt artifacts/trained-canary.json
-      - name: Evaluate model on held-out seeds
+      - name: Paired raw source-versus-child and baseline held-out evaluation
         shell: bash
         env:
           EVAL_GAMES: ${{ github.event.inputs.eval_games || '3' }}
         run: |
+          set -euo pipefail
           if [[ ! "$EVAL_GAMES" =~ ^[0-9]+$ ]] || (( EVAL_GAMES < 1 || EVAL_GAMES > 10 )); then
             echo 'eval_games must be 1..10'; exit 2
           fi
           python -m tavern_ai.evaluate --model checkpoints/model.zip \
             --games "$EVAL_GAMES" --start-seed 24000 \
+            --out artifacts/source-evaluation.json
+          python -m tavern_ai.evaluate --model checkpoints/candidate.zip \
+            --compare-baseline --games "$EVAL_GAMES" --start-seed 24000 \
             --out artifacts/evaluation.json
-      - name: Save resumable checkpoint and evidence
+          python - <<'PY'
+          import json
+          old = json.load(open("artifacts/source-evaluation.json"))["candidate"]
+          new = json.load(open("artifacts/evaluation.json"))["candidate"]
+          assert old["seeds"] == new["seeds"]
+          print("Descriptive paired delta (child minus source; positive worse):",
+                new["mean_placement"] - old["mean_placement"])
+          print("NO automatic promotion: sample is not a strength guarantee")
+          PY
+          sha256sum checkpoints/candidate.zip checkpoints/candidate.metadata.json \
+            > artifacts/checkpoint.sha256
+      - name: Preserve bounded evidence (temporary Artifact, NOT durable)
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: v1-model
+          name: v5-main-candidate-${{ github.run_id }}
           path: |
-            checkpoints/model.zip
-            checkpoints/model.metadata.json
+            checkpoints/candidate.zip
+            checkpoints/candidate.metadata.json
+            artifacts/source-selection.json
+            artifacts/source-preflight.json
+            artifacts/ppo-continuation.log
+            artifacts/source-evaluation.json
             artifacts/trained-canary.json
             artifacts/evaluation.json
-          if-no-files-found: error
+            artifacts/checkpoint.sha256
+          if-no-files-found: warn
           retention-days: 90
+
+  publish:
+    needs: train
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write
+      actions: read
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Download only this verified training run's candidate Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: v5-main-candidate-${{ github.run_id }}
+          path: .
+      - name: Publish immutable UNPROMOTED candidate to durable Release
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s checkpoints/candidate.zip
+          test -s checkpoints/candidate.metadata.json
+          test -s artifacts/trained-canary.json
+          test -s artifacts/source-evaluation.json
+          test -s artifacts/evaluation.json
+          sha256sum -c artifacts/checkpoint.sha256
+          jq -e '.completed == true and .policy == "model" and .truncated_combats == 0 and .turn_limit_end == false' artifacts/trained-canary.json
+          TAG="v5-main-unpromoted-${GITHUB_RUN_ID}"
+          gh release create "$TAG" --repo "$GITHUB_REPOSITORY" \
+            --target "$GITHUB_SHA" --prerelease \
+            --title "UNPROMOTED V5 bounded PPO candidate $TAG" \
+            --notes "Source: verified canonical registered Release; full raw candidate game and matched heldout evaluation passed. This is NOT Champion promotion or proof of strength." \
+            checkpoints/candidate.zip#model.zip \
+            checkpoints/candidate.metadata.json#model.metadata.json \
+            artifacts/source-selection.json artifacts/source-preflight.json \
+            artifacts/source-evaluation.json artifacts/trained-canary.json \
+            artifacts/evaluation.json artifacts/checkpoint.sha256
+          mkdir -p "$RUNNER_TEMP/model-roundtrip"
+          gh release download "$TAG" --repo "$GITHUB_REPOSITORY" \
+            --pattern model.zip --pattern model.metadata.json \
+            --dir "$RUNNER_TEMP/model-roundtrip"
+          cmp checkpoints/candidate.zip "$RUNNER_TEMP/model-roundtrip/model.zip"
+          cmp checkpoints/candidate.metadata.json "$RUNNER_TEMP/model-roundtrip/model.metadata.json"
+          echo "Durable Release roundtrip verified. Registry remains unchanged pending review."
