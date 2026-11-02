@@ -1,0 +1,74 @@
+name: V5 paired raw evidence gate and genuine baseline canary f25a91c8
+on:
+  push:
+    branches:
+      - agent/s-20261102-f25a91c8/optimization-001
+    paths:
+      - 'tavern_ai/paired_evidence_gate_f25a91c8.py'
+      - 'tests/test_paired_evidence_gate_f25a91c8.py'
+      - '.github/workflows/paired-evidence-f25a91c8.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: v5-paired-evidence-f25a91c8
+  cancel-in-progress: false
+
+jobs:
+  test-and-real-canary:
+    if: github.repository == 'sstxww/reinforcement-learning' && github.ref == 'refs/heads/agent/s-20261102-f25a91c8/optimization-001'
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install test requirements and run all tests
+        run: |
+          python -m pip install -e '.[test]'
+          python -m pytest
+      - name: Install pinned TavernGym and verify ABI
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Complete one real eight-seat baseline game, no Arena
+        run: |
+          python -m tavern_ai.canary --agent-id s-20261102-f25a91c8 --seed 118573 --policy baseline --receipt experiments/s-20261102-f25a91c8/001-118573.json
+          python -m tavern_ai.validate_receipt experiments/s-20261102-f25a91c8/001-118573.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from tavern_ai.receipt_integrity import validate_integrity
+          p = Path('experiments/s-20261102-f25a91c8/001-118573.json')
+          row = json.loads(p.read_text())
+          assert validate_integrity(row)
+          assert row['agent_id'] == 's-20261102-f25a91c8'
+          assert row['policy'] == 'baseline' and row['completed']
+          assert sorted(row['placements']) == list(range(1,9))
+          print('Real complete baseline game audited:', row['seed'], row['placements'][0])
+          PY
+      - name: Commit only our authentic game receipt to our own branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = "agent/s-20261102-f25a91c8/optimization-001"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add experiments/s-20261102-f25a91c8/001-118573.json
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "evidence(v5): genuine eight-seat baseline receipt seed 118573"
+          git pull --rebase origin "$GITHUB_REF_NAME"
+          git push origin "HEAD:$GITHUB_REF_NAME"
+      - name: Keep audited receipt artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v5-f25a91c8-real-canary
+          path: experiments/s-20261102-f25a91c8/*.json
+          if-no-files-found: ignore
+          retention-days: 30
