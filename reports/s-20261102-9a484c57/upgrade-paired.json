@@ -1,0 +1,50 @@
+{
+  "session_id": "s-20261102-9a484c57",
+  "hypothesis": "Upgrading before playing held cards on scheduled turns can improve placement",
+  "environment": "TavernGym 1.1.0",
+  "engine_source_hash": "6d8712c93022ba11",
+  "git_sha": "8f98639e13234ce65ecd69a3dfb2c427160e16d3",
+  "strategy_sha256": "2937953ab7d69330dc6fe810a4d60088fc88b5d74d61885c4c7d451e42d275be",
+  "seeds": [
+    42021,
+    42022,
+    42023
+  ],
+  "action_budget_each_turn": 55,
+  "ppo_training_steps": 0,
+  "baseline": {
+    "games": 3,
+    "placements": [
+      7,
+      8,
+      8
+    ],
+    "mean_placement": 7.666666666666667,
+    "top4_rate": 0.0,
+    "first_place_rate": 0.0,
+    "mean_decisions": 53.0,
+    "total_forced_ends": 0,
+    "total_priority_upgrades": 0
+  },
+  "candidate": {
+    "games": 3,
+    "placements": [
+      7,
+      8,
+      8
+    ],
+    "mean_placement": 7.666666666666667,
+    "top4_rate": 0.0,
+    "first_place_rate": 0.0,
+    "mean_decisions": 53.0,
+    "total_forced_ends": 0,
+    "total_priority_upgrades": 10
+  },
+  "paired_placement_delta_candidate_minus_baseline": [
+    0,
+    0,
+    0
+  ],
+  "inference": "Descriptive three-pair pilot only. Do not infer a strength gain.",
+  "model_checkpoint": null
+}
