@@ -1,18 +1,37 @@
-# Round 001 — bounded shop refresh experiment
+# Round 001 — shop refresh when no buy is legal (negative feasibility pilot)
 
-- Session: `s-20261102-6cc5d763`
-- Own branch: `agent/s-20261102-6cc5d763/optimization-001`
-- Base main SHA: `315b068bac5ab6d8403c3c9b18f8c101c0cded5d`
-- Hypothesis: when the original baseline would end the turn with no legal Buy actions, one legal Refresh (action 1) can improve rank without introducing pathological loops.
-- Verified upstream action layout: TavernGym `actions.rs` maps EndTurn=0, Refresh=1, Buy=8..16.
-- Avoids overlapping ongoing PRs on reward, entropy, card embedding, buy-slot bias, and play positioning. The only policy source modified is the new `tavern_ai/refresh_ablation.py`.
-- Engine contract: TavernGym 1.1.0, source hash `6d8712c93022ba11`, observe2 (4017 float, 447 card slots), 245 masked actions.
-- Strategy tuning, **PPO steps 0**; no newly trained checkpoint.
-- Experiment plan: candidate must complete seed 36501, then baseline and candidate each run seeds 36502–36504; total 7 real complete eight-seat matches if all finish. Every action checked against native legal mask.
-- Candidate restriction: max one refresh per turn, no refresh before turn 3, no refresh when a Buy action is legal, no refresh when action budget >=80, original baseline decisions otherwise.
-- Expected data: `experiments/s-20261102-6cc5d763/001-36501.json`, paired receipts, and `reports/s-20261102-6cc5d763/comparison.json`.
-- Action workflow: `.github/workflows/experiment-s-20261102-6cc5d763.yml` only on own branch, one finite job (75 min timeout), no recursive writes.
-- Actual run, seeds, full-game status, illegal actions, ranks and statistics: **NOT YET VERIFIED** at initial commit. Populate only from real execution.
-- Existing evidence: PR #15 reports 1280-step PPO continuation without improvement in four games; PR #18 card pooling, #17 input scaling and #16 entropy reported no improvement at tiny budgets.
-- Best model: no new model; no promotion. Candidate conclusions remain provisional unless independently evaluated.
-- Next: read actual Actions logs, fix any failure, write observed metrics and PR link, then decide whether to vary refresh threshold.
+## Identity and hypothesis
+- Session ID: `s-20261102-6cc5d763`.
+- Branch: `agent/s-20261102-6cc5d763/optimization-001`.
+- Main baseline SHA: `315b068bac5ab6d8403c3c9b18f8c101c0cded5d`.
+- Hypothesis: one legal Refresh action when Baseline would EndTurn and no Buy is legal will improve placement.
+- Source of idea: original baseline never selects action 1 Refresh; pinned upstream `actions.rs` confirms 0=EndTurn, 1=Refresh and 8..16=Buy. Previous failure notes warn about PPO action loops.
+- Scope: brand-new `tavern_ai/refresh_ablation.py`, one test module, one isolated workflow, own receipts/notes only. No shared baseline or PPO changes.
+
+## Actual execution and configuration
+- Successful run: https://github.com/sstxww/reinforcement-learning/actions/runs/41415018609 (job 125176644550), code SHA `d1eed5699186a265d8c704bb7eaea917dec29535`.
+- Real TavernGym 1.1.0, source hash `6d8712c93022ba11`, observe2 4017 floating features / 447 card indices / 245 legal-masked actions.
+- Rule tuning only: PPO training steps **0**, no model/checkpoint, no candidate model weight hash.
+- Candidate policy hash SHA256 `e2f8d2f8d23b56489eef9de8f86b815fc468dd914f256ac84ab02a9809f64c36`.
+- The mask gates every action; maximum one refresh per turn, no refresh before turn 3, no refresh if Buy is legal, and no refresh after >=80 actions in a turn.
+- Test/dependency, pinned engine installation, seven complete games, receipt validation, evidence commit and Artifact upload: all workflow steps passed.
+- Mandatory independent candidate game: seed 36501, `Game.is_over()==True`, seat 0 rank **8**, 45 decisions, 15 turns, all placements `[8,6,2,4,7,3,1,5]`, no truncated combat or protective turn limit; receipt `experiments/s-20261102-6cc5d763/001-36501.json`.
+- Other seven seats were native TavernGym scripted bots. No official TavernArena matches.
+
+## Independent paired evaluation
+- Held-out seeds: 36502, 36503, 36504.
+- Baseline ranks `[8,8,8]` (3 games), candidate ranks `[8,8,8]` (3 games).
+- Both mean placement 8.0, first place 0%, top-four 0%. Paired rank deltas candidate-minus-control `[0,0,0]`.
+- Crucial: **Refresh activation count 0 for the mandatory game and 0 for all three held-out candidate games**. This pilot is a feasibility failure: the extra branch was not taken. The zero rank delta is not evidence that using Refresh is strategically ineffective.
+- Actual compact report `reports/s-20261102-6cc5d763/comparison.json`, per-game committed receipts `experiments/s-20261102-6cc5d763/`, generated solely by the real engine.
+- All four candidate games completed; no illegal action; failed hypothesis due to non-activation rather than simulator failure. With n=3, no strength assertion is appropriate.
+
+## Artifacts, reproducibility, prior learning
+- Artifact ID 13127905152, `refresh-s-20261102-6cc5d763-41415018609`; expires 2026-12-02 08:44:26 UTC. Results and receipts are committed, no checkpoint exists for this strategy-only experiment.
+- Rerun only as a deliberate new hypothesis using `python -m tavern_ai.refresh_ablation --seed 36501 --start-seed 36502 --games 3` after installing pinned engine. Do not blindly rerun identical seed and code.
+- Historical PR #15 shows 1280 PPO steps without rank gain; PR #11's first four placement games appeared stronger but 16 new seeds invalidated the apparent improvement. This motivated independent seeds and conservative claims.
+- No temporary raw rollouts or model weights saved. No known permission incident in this run.
+- Next distinct hypothesis: try at most one refresh **before an otherwise legal purchase** on later turns when Refresh and Buy are simultaneously legal, then compare on fresh seeds and count actual interventions. Do not promote a strategy without activation and statistical evaluation.
+
+## Final gate
+- This session's Actions experiment succeeded. Dedicated PR CI on final head must be checked separately after PR creation.
