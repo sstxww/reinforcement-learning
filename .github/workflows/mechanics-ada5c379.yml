@@ -1,0 +1,71 @@
+name: "Mechanics native catalog s-20261102-ada5c379"
+on:
+  push:
+    branches: ['agent/s-20261102-ada5c379/optimization-001']
+    paths:
+      - 'tavern_ai/mechanics_ada5c379.py'
+      - 'tests/test_mechanics_ada5c379.py'
+      - '.github/workflows/mechanics-ada5c379.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: "mechanics-ada5c379"
+  cancel-in-progress: false
+
+jobs:
+  native-catalog-and-real-match:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install Python dependencies and run offline schema checks
+        run: |
+          python -m pip install -e '.[test]'
+          python -m pytest tests/test_mechanics_ada5c379.py
+      - name: Install exact TavernGym and patched observe2
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Verify actual engine card features and collect bounded game evidence
+        run: |
+          python -m pytest
+          python -m tavern_ai.mechanics_ada5c379 \
+            --catalog outputs/s-20261102-ada5c379-catalog.json \
+            --summary reports/s-20261102-ada5c379/001-card-summary.json
+          python -m tavern_ai.canary \
+            --agent-id s-20261102-ada5c379 --seed 110221 \
+            --policy baseline \
+            --receipt experiments/s-20261102-ada5c379/001-110221.json
+          python -m tavern_ai.validate_receipt experiments/s-20261102-ada5c379/001-110221.json
+      - name: Commit only this session's real evidence to its own branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add experiments/s-20261102-ada5c379/001-110221.json \
+                  reports/s-20261102-ada5c379/001-card-summary.json
+          if ! git diff --cached --quiet; then
+            git commit -m "evidence(s-20261102-ada5c379): verified card ABI and real 8-seat match"
+            test "$GITHUB_REF_NAME" = "agent/s-20261102-ada5c379/optimization-001"
+            git pull --rebase origin "$GITHUB_REF_NAME"
+            git push origin HEAD:"$GITHUB_REF_NAME"
+          fi
+      - name: Retain generated full card table and receipt (non-permanent)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mechanics-ada5c379-catalog
+          path: |
+            outputs/s-20261102-ada5c379-catalog.json
+            reports/s-20261102-ada5c379/*.json
+            experiments/s-20261102-ada5c379/*.json
+          retention-days: 30
+          if-no-files-found: ignore

@@ -1,0 +1,49 @@
+{
+  "session_id": "s-20261102-ada5c379",
+  "engine_hash": "6d8712c93022ba11",
+  "ruleset_id": "tg36-bc45cfc55a0e5cd6c14c",
+  "cards": 3983,
+  "runtime_card_table_sha256": "dd20591d5af542187d25bbca0824daae2adfd496423c2a03a78743187b532ab3",
+  "kind_counts": {
+    "dark_gift": 47,
+    "hero": 143,
+    "hero_power": 176,
+    "minion": 2596,
+    "quest": 23,
+    "quest_reward": 73,
+    "spell": 297,
+    "tavern_spell": 208,
+    "trinket_greater": 219,
+    "trinket_lesser": 201
+  },
+  "keyword_counts": {
+    "DIVINE_SHIELD": 127,
+    "MAGNETIC": 55,
+    "POISONOUS": 8,
+    "REBORN": 58,
+    "STEALTH": 21,
+    "TAUNT": 193,
+    "VENOMOUS": 29,
+    "WINDFURY": 33
+  },
+  "mechanic_counts": {
+    "ACTIVATE": 50,
+    "AURA": 170,
+    "AVENGE": 122,
+    "BATTLECRY": 359,
+    "CHOOSE_ONE": 36,
+    "DEATHRATTLE": 428,
+    "DISCOVER": 31,
+    "END_OF_TURN": 234,
+    "MAGNETIC": 55,
+    "RALLY": 146,
+    "START_OF_COMBAT": 183
+  },
+  "known_engine_test_cases": {
+    "source": "crates/taverngym/tests/mechanics.rs",
+    "cases_passed": 4
+  },
+  "scope": "Offline static metadata only; effects and combat require separate real engine tests.",
+  "training_steps": 0,
+  "model_evaluation_games": 0
+}
