@@ -78,9 +78,103 @@ def train_arm(label: str, transform: bool) -> dict:
         env.close()
 
 
+
+def play_bounded_model(seed: int, model_path: str) -> dict:
+    """Run genuine Game to completion with a documented, legal end-turn safety rule.
+
+    The 256-step experimental models can repeatedly select non-progressing actions.
+    Starting at the 26th own action of a turn, force END TURN only when legal;
+    otherwise use the baseline legal-action policy. This is a hybrid policy,
+    not an unconstrained PPO model.
+    """
+    import taverngym
+    import numpy as np
+    from sb3_contrib import MaskablePPO
+    from tavern_ai.baseline import BaselinePolicy
+    from tavern_ai.contract import FEATURES, CARDS, ACTIONS
+
+    engine = verify_engine()
+    game = taverngym.Game(seed=seed)
+    model = MaskablePPO.load(model_path, device="cpu")
+    fallback = BaselinePolicy()
+    decisions = 0
+    forced_end_turns = 0
+    fallback_other = 0
+    last_turn = -1
+    used_this_turn = 0
+    for _ in range(30000):
+        if game.is_over():
+            break
+        turn = int(game.turn)
+        if turn != last_turn:
+            last_turn, used_this_turn = turn, 0
+        progress = False
+        for seat in range(game.num_players):
+            if not game.needs_action(seat):
+                continue
+            progress = True
+            if seat != 0:
+                game.bot_play(seat)
+                continue
+            fbytes, cbytes = game.observe2(0)
+            features = np.frombuffer(fbytes, dtype="<f4").copy()
+            cards = np.frombuffer(cbytes, dtype="<i4").copy()
+            mask = np.frombuffer(game.legal_mask(0), dtype=np.uint8).astype(bool)
+            if (features.shape != (FEATURES,) or cards.shape != (CARDS,)
+                    or mask.shape != (ACTIONS,) or not mask.any()):
+                raise RuntimeError("Invalid pinned observe2 or legal-action mask")
+            if used_this_turn >= 25 and mask[0]:
+                action = 0
+                forced_end_turns += 1
+            elif used_this_turn >= 25:
+                action = fallback.act(
+                    {"features": features, "cards": cards, "action_mask": mask},
+                    {"turn": turn, "actions_used": used_this_turn})
+                fallback_other += 1
+            else:
+                action, _ = model.predict(
+                    {"features": features, "cards": cards},
+                    action_masks=mask, deterministic=True)
+                action = int(action)
+            if not mask[int(action)]:
+                raise RuntimeError("Illegal masked action selected")
+            game.step(0, int(action))
+            used_this_turn += 1
+            decisions += 1
+        if not progress and not game.is_over():
+            raise RuntimeError("Genuine TavernGym game stalled")
+    if not game.is_over():
+        raise RuntimeError("Bounded model failed to finish the game")
+    from datetime import datetime, timezone
+    receipt = {
+        "schema": 1,
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "environment": "TavernGym",
+        "engine_source_hash": engine["source_hash"],
+        "engine_version": engine["version"],
+        "agent_id": SESSION,
+        "policy": "model_bounded_25",
+        "seed": seed,
+        "completed": True,
+        "turns": int(game.turn),
+        "decisions": decisions,
+        "placements": [int(x) for x in game.placements()],
+        "truncated_combats": int(game.truncated_combats),
+        "turn_limit_end": bool(game.turn_limit_end),
+        "git_sha": os.getenv("GITHUB_SHA", ""),
+        "model_sha256": hashlib.sha256(Path(model_path).read_bytes()).hexdigest(),
+        "illegal_actions": 0,
+        "safety_max_actions_per_turn": 25,
+        "safety_end_turn_count": forced_end_turns,
+        "safety_other_fallback_count": fallback_other,
+    }
+    validate(receipt)
+    return receipt
+
+
 def play_and_record(label: str, seed: int, model_path: str | None) -> dict:
     policy = "model" if model_path else "baseline"
-    receipt = play(seed, SESSION, policy, model_path)
+    receipt = (play_bounded_model(seed, model_path) if model_path\n               else play(seed, SESSION, policy, None))
     validate(receipt)
     filename = f"001-{seed}.json" if label == "signed_log" and seed == EVAL_SEEDS[0] else f"001-{label}-{seed}.json"
     write_json(ROOT / filename, receipt)
