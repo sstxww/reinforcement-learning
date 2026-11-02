@@ -1,0 +1,10 @@
+# s-20261102-490e3c78 Round 002 — de-duplicated V5 Release preflight
+
+- Base main: `c85d566cccccf5e2ef7de09b6cc95e1aa506da9c`, after merged [PR #87](https://github.com/sstxww/reinforcement-learning/pull/87) registry.
+- Originating wider R001 [PR #89](https://github.com/sstxww/reinforcement-learning/pull/89) remains historical evidence but must not merge its duplicate `models/registry.json`. R001 full game: successful [Actions 41427592476](https://github.com/sstxww/reinforcement-learning/actions/runs/41427592476), own genuine baseline seed 59001, rank 8, 16 turns, 39 decisions, no safety truncation; receipt copied verbatim to R002 unique session path.
+- Hypothesis: an SHA-matching Release ZIP can still lack `policy.optimizer.pth` or have mismatched training steps/environment metadata; fail closed before expensive restore.
+- Added only unique `tavern_ai/release_preflight_490e3c78.py`, regression tests, read-only finite workflow, session research docs and own receipt; no existing main shared files changed.
+- Dedicated workflow run [Actions 41428615729](https://github.com/sstxww/reinforcement-learning/actions/runs/41428615729): **pending final result**; genuinely downloads public V2 Release ZIP and metadata, validates archive and claims, then baseline complete-game seed 59002. If it fails, record error and do not claim successful Release verification.
+- Current round's own PPO gradient steps: **0**; no new model created or promoted. Existing published V2 Release model is 1280 steps, heldout ranks [8,8,8,8]. This is storage/engineering, **not** gameplay improvement.
+- The old paired PPO action diagnostics in draft PR #60 show model selections with 0 BUY actions and premature END, but legal BUY opportunity denominator is not yet established. Next P2 target is independent mask-aware opportunity logging before scaling training.
+- For integration: require independent latest-PR-head CI including full eight-seat match and no duplicate registry promotion.
