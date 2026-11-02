@@ -1,0 +1,59 @@
+{
+  "schema": 1,
+  "experiment": "rank8_legal_buy_opportunity",
+  "candidate_model_sha256": "a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632",
+  "seed": 99128,
+  "seat": 0,
+  "games_per_arm": 1,
+  "baseline_placement": 8,
+  "model_placement": 8,
+  "baseline_opportunities": {
+    "decisions": 39,
+    "by_action_family": {
+      "choose": 5,
+      "buy": 14,
+      "buy_legal_decisions": 21,
+      "play": 8,
+      "end_turn": 9,
+      "all_end_turns": 9,
+      "upgrade": 3
+    },
+    "buy_legal_decisions": 21,
+    "distinct_turns_with_legal_buy": 8,
+    "unique_public_states_with_legal_buy": 21,
+    "end_while_buy_legal": 0,
+    "turns_with_end_while_buy_legal": 0,
+    "buy_chosen": 14,
+    "all_end_turns": 9,
+    "consecutive_identical_public_observation": 0,
+    "conditional_buy_rate_given_legal": 0.6666666666666666,
+    "conditional_end_rate_given_legal_buy": 0.0,
+    "caveat": "Every masked BUY is legal; action-level opportunities are temporally dependent. Not all missed legal BUY actions are mistakes."
+  },
+  "model_opportunities": {
+    "decisions": 117,
+    "by_action_family": {
+      "choose": 2,
+      "reroll": 37,
+      "buy_legal_decisions": 35,
+      "other": 70,
+      "end_turn": 7,
+      "all_end_turns": 7,
+      "upgrade": 1
+    },
+    "buy_legal_decisions": 35,
+    "distinct_turns_with_legal_buy": 7,
+    "unique_public_states_with_legal_buy": 35,
+    "end_while_buy_legal": 0,
+    "turns_with_end_while_buy_legal": 0,
+    "buy_chosen": 0,
+    "all_end_turns": 7,
+    "consecutive_identical_public_observation": 0,
+    "conditional_buy_rate_given_legal": 0.0,
+    "conditional_end_rate_given_legal_buy": 0.0,
+    "caveat": "Every masked BUY is legal; action-level opportunities are temporally dependent. Not all missed legal BUY actions are mistakes."
+  },
+  "model_guard_forced_end": 0,
+  "causal_root_status": "NOT_ESTABLISHED_FROM_ONE_PAIRED_GAME",
+  "claim": "Genuine observational telemetry; not a policy repair or Champion promotion"
+}

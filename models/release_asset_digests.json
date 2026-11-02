@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "source": "Public GitHub Releases asset API digest field (2026-11-02); expected digests, NOT downloaded-byte verification",
+  "source": "GitHub Release API asset digests with explicit per-asset verification flags; only V5 1408 bytes were redownloaded in verified Actions 41428692617.",
   "assets": [
     {
       "id": "v2-learning-41413557445",
@@ -91,6 +91,23 @@
       "metadata_bytes_verified": false,
       "model_load_verified": false,
       "optimizer_resume_verified": false
+    },
+    {
+      "id": "v5-s-20261102-68099929-1408-41428692617",
+      "weights": {
+        "url": "https://github.com/sstxww/reinforcement-learning/releases/download/v5-s-20261102-68099929-1408-41428692617/model.zip",
+        "sha256": "a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632"
+      },
+      "metadata": {
+        "url": "https://github.com/sstxww/reinforcement-learning/releases/download/v5-s-20261102-68099929-1408-41428692617/model.metadata.json",
+        "sha256": "51a651c3a1921447e7bc06c301a52e85331411e75d61b35b5330c43a55aeba9c"
+      },
+      "weights_bytes_verified": true,
+      "metadata_bytes_verified": true,
+      "model_load_verified": false,
+      "optimizer_resume_verified": false,
+      "verify_run": "https://github.com/sstxww/reinforcement-learning/actions/runs/41428692617",
+      "verification_scope": "Published Release bytes and metadata downloaded and byte-compared; model load checked on identical source Artifact, but NOT rerun from published Release; no optimizer resume from new published tag."
     }
   ]
 }

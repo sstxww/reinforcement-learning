@@ -18,8 +18,8 @@ def registry():
 
 def test_source_registry_is_consistent_and_unpromoted():
     result = validate_registry(registry())
-    assert result["latest_id"] == "v2-learning-41413557445"
-    assert result["latest_steps"] == 1280
+    assert result["latest_id"] == "v5-s-20261102-68099929-1408-41428692617"
+    assert result["latest_steps"] == 1408
     assert result["champion"] is None
     assert result["checkpoint_bytes_checked"] is False
 

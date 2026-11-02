@@ -1,0 +1,163 @@
+name: V5 candidate custody s-20261102-68099929
+on:
+  push:
+    branches:
+      - agent/s-20261102-68099929/optimization-001
+    paths:
+      - '.github/workflows/candidate-custody-68099929.yml'
+permissions:
+  contents: write
+  actions: read
+concurrency:
+  group: candidate-custody-68099929
+  cancel-in-progress: false
+jobs:
+  archive-after-paired-games:
+    if: github.repository == 'sstxww/reinforcement-learning' && github.ref == 'refs/heads/agent/s-20261102-68099929/optimization-001'
+    runs-on: ubuntu-latest
+    timeout-minutes: 95
+    env:
+      GH_TOKEN: ${{ github.token }}
+      SESSION_ID: s-20261102-68099929
+      RECOVERY_RUN: '41427963534'
+      SOURCE_MODEL_SHA256: a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run repository tests and pinned real TavernGym contract
+        run: |
+          set -euo pipefail
+          python -m pip install -e '.[train,test]'
+          python -m pytest
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Retrieve original real 1408-step weights from successful earlier workflow artifact
+        run: |
+          set -euo pipefail
+          mkdir -p restore
+          gh run view "$RECOVERY_RUN" --repo "$GITHUB_REPOSITORY" --json conclusion --jq '.conclusion' | grep -x success
+          gh run download "$RECOVERY_RUN" --repo "$GITHUB_REPOSITORY" --name v5-release-resume-audit-s-68099929 --dir restore
+          test -s restore/checkpoints/resumed/model.zip
+          test -s restore/checkpoints/resumed/model.metadata.json
+          printf '%s  %s\n' "$SOURCE_MODEL_SHA256" restore/checkpoints/resumed/model.zip | sha256sum -c -
+          python - <<'PY'
+          import json, os, hashlib
+          from pathlib import Path
+          from sb3_contrib import MaskablePPO
+          import torch
+          torch.set_num_threads(1)
+          model=Path('restore/checkpoints/resumed/model.zip')
+          meta_path=Path('restore/checkpoints/resumed/model.metadata.json')
+          meta=json.loads(meta_path.read_text(encoding='utf-8'))
+          assert meta.get('total_timesteps') == 1408
+          policy=MaskablePPO.load(str(model), device='cpu')
+          assert policy.num_timesteps == 1408
+          assert meta['engine']['version'] == '1.1.0'
+          assert meta['engine']['source_hash'] == '6d8712c93022ba11'
+          meta['checkpoint_sha256']=os.environ['SOURCE_MODEL_SHA256']
+          meta['compatibility']={'engine':meta['engine']}
+          meta['parent_model_release']='v2-learning-41413557445'
+          meta['parent_training_steps']=1280
+          meta['increment_training_steps']=128
+          meta['model_architecture']='MaskablePPO MultiInputPolicy TavernExtractor'
+          meta['checkpoint_source_actions_run']=int(os.environ['RECOVERY_RUN'])
+          meta['checkpoint_source_code_sha']='a7ffcbb566ed9a3e2dc5d1edc59d8021e23d8103'
+          meta['role']='Challenger_unpromoted'
+          meta_path.write_text(json.dumps(meta,indent=2)+'\n',encoding='utf-8')
+          print('Verified archive source: SHA256, model load, exact total steps')
+          PY
+      - name: Three genuine paired seed eight-seat model and baseline full games
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "experiments/$SESSION_ID" "reports/$SESSION_ID"
+          for seed in 99125 99126 99127; do
+            timeout 360s python -m tavern_ai.canary --agent-id "$SESSION_ID" --seed "$seed" --policy baseline --receipt "experiments/$SESSION_ID/002-baseline-$seed.json"
+            python -m tavern_ai.validate_receipt "experiments/$SESSION_ID/002-baseline-$seed.json"
+            timeout 360s python -m tavern_ai.canary --agent-id "$SESSION_ID" --seed "$seed" --policy model --model restore/checkpoints/resumed/model.zip --receipt "experiments/$SESSION_ID/002-model-$seed.json"
+            python -m tavern_ai.validate_receipt "experiments/$SESSION_ID/002-model-$seed.json"
+          done
+      - name: Validate pair count, model hash, genuine rank comparison and persist research report
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json,os,statistics
+          from pathlib import Path
+          sid=os.environ['SESSION_ID']
+          root=Path('experiments')/sid
+          seeds=[99125,99126,99127]
+          baseline=[json.loads((root/f'002-baseline-{s}.json').read_text()) for s in seeds]
+          model=[json.loads((root/f'002-model-{s}.json').read_text()) for s in seeds]
+          digest=os.environ['SOURCE_MODEL_SHA256']
+          for s,b,m in zip(seeds,baseline,model):
+              assert b['completed'] and m['completed'] and b['seed']==m['seed']==s
+              assert b['policy']=='baseline' and m['policy']=='model'
+              assert m['model_sha256']==digest
+              assert b['truncated_combats']==m['truncated_combats']==0
+              assert b['turn_limit_end'] is False and m['turn_limit_end'] is False
+              assert sorted(b['placements'])==list(range(1,9))
+              assert sorted(m['placements'])==list(range(1,9))
+          br=[r['placements'][0] for r in baseline]; mr=[r['placements'][0] for r in model]
+          metrics={
+            'schema':1, 'session_id':sid,'source_run':int(os.environ['RECOVERY_RUN']),
+            'candidate_sha256':digest,'candidate_training_steps':1408,'source_release':'v2-learning-41413557445',
+            'seed_set':seeds,'games_per_arm':len(seeds),'baseline_ranks':br,'candidate_ranks':mr,
+            'baseline_mean_rank':statistics.mean(br),'candidate_mean_rank':statistics.mean(mr),
+            'paired_mean_delta_rank':statistics.mean([m-b for m,b in zip(mr,br)]),
+            'candidate_top4_rate':sum(x<=4 for x in mr)/len(mr),
+            'candidate_first_rate':sum(x==1 for x in mr)/len(mr),
+            'model_full_games_completed':True,'no_guard_fallback_in_main_canary':True,
+            'performance_verdict':'NOT_PROVEN_BETTER_small_n3',
+            'model_role':'Challenger_unpromoted','champion_updated':False,
+            'note':'Real engine and model. Only 3 matched seeds, seat0; no promotion or strength claim.'
+          }
+          p=Path('reports')/sid/'002-paired-custody.json'
+          p.write_text(json.dumps(metrics,indent=2)+'\n')
+          print(json.dumps(metrics))
+          PY
+      - name: Create unique experimental GitHub Release (never replace Champion)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          tag="v5-s-20261102-68099929-1408-${GITHUB_RUN_ID}"
+          echo "ARCHIVE_TAG=$tag" >> "$GITHUB_ENV"
+          gh release create "$tag" \
+            restore/checkpoints/resumed/model.zip \
+            restore/checkpoints/resumed/model.metadata.json \
+            reports/s-20261102-68099929/002-paired-custody.json \
+            experiments/s-20261102-68099929/002-model-99125.json \
+            experiments/s-20261102-68099929/002-model-99126.json \
+            experiments/s-20261102-68099929/002-model-99127.json \
+            --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --prerelease \
+            --title "V5 unpromoted 1408-step candidate $tag" \
+            --notes "From verified v2 Release (1280) + 128 real PPO steps in Actions 41427963534. Three genuine paired small-n model games, never Champion; 1408 steps, SHA256 $SOURCE_MODEL_SHA256."
+          mkdir -p verify-published
+          gh release download "$tag" --repo "$GITHUB_REPOSITORY" --pattern model.zip --pattern model.metadata.json --dir verify-published
+          printf '%s  %s\n' "$SOURCE_MODEL_SHA256" verify-published/model.zip | sha256sum -c -
+          cmp restore/checkpoints/resumed/model.zip verify-published/model.zip
+          cmp restore/checkpoints/resumed/model.metadata.json verify-published/model.metadata.json
+          printf '{"release_tag":"%s","model_sha256":"%s","model_steps":1408,"download_sha256_verified":true,"champion_promoted":false}\n' "$tag" "$SOURCE_MODEL_SHA256" > reports/s-20261102-68099929/002-release-published.json
+      - name: Commit own real evidence and Release receipt (no CI push loop)
+        if: success()
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add experiments/s-20261102-68099929/002-*.json reports/s-20261102-68099929/002-*.json
+          git diff --cached --quiet && exit 0
+          git commit -m "results(s-20261102-68099929): paired genuine games and immutable candidate Release"
+          git pull --rebase origin "$GITHUB_REF_NAME"
+          git push origin "HEAD:$GITHUB_REF_NAME"
+      - name: Retain evidence if any gate fails, without imaginary Release
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: custody-evidence-s-68099929-${{ github.run_id }}
+          path: |
+            experiments/s-20261102-68099929/002-*.json
+            reports/s-20261102-68099929/002-*.json
+          if-no-files-found: ignore
+          retention-days: 30

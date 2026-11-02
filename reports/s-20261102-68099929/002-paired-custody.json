@@ -1,0 +1,35 @@
+{
+  "schema": 1,
+  "session_id": "s-20261102-68099929",
+  "source_run": 41427963534,
+  "candidate_sha256": "a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632",
+  "candidate_training_steps": 1408,
+  "source_release": "v2-learning-41413557445",
+  "seed_set": [
+    99125,
+    99126,
+    99127
+  ],
+  "games_per_arm": 3,
+  "baseline_ranks": [
+    6,
+    8,
+    8
+  ],
+  "candidate_ranks": [
+    8,
+    8,
+    8
+  ],
+  "baseline_mean_rank": 7.333333333333333,
+  "candidate_mean_rank": 8,
+  "paired_mean_delta_rank": 0.6666666666666666,
+  "candidate_top4_rate": 0.0,
+  "candidate_first_rate": 0.0,
+  "model_full_games_completed": true,
+  "no_guard_fallback_in_main_canary": true,
+  "performance_verdict": "NOT_PROVEN_BETTER_small_n3",
+  "model_role": "Challenger_unpromoted",
+  "champion_updated": false,
+  "note": "Real engine and model. Only 3 matched seeds, seat0; no promotion or strength claim."
+}

@@ -1,0 +1,7 @@
+# V5 engineering failure report: post-success workflow YAML parse
+
+- **Failure signature:** GitHub Actions `action_required`/failure with no jobs for `.github/workflows/release-audit-68099929.yml` after the initial genuine successful recovery. Failing run: [41429937042](https://github.com/sstxww/reinforcement-learning/actions/runs/41429937042), `conclusion=failure`, jobs=[].
+- **What failed:** attempted one-shot gating of an already completed workflow using an **unquoted YAML inline `if:`** containing `ci(v5): verify...`. The `colon+space` inside a plain YAML scalar made the workflow parser reject it. This was **not** a model training failure, simulation failure or negative model run. Source first training run 41427963534 had already succeeded at exact source commit.
+- **Repair:** replaced invalid job-level condition by `if: false # One-shot 1408-step recovery already succeeded...` in owned workflow, commit `a5723c3b3edb4b318383668bb3288dc925311fc2`, preserving runnable source code in history but preventing duplicate training from registry writes.
+- **Verification:** later Actions run [41430214173](https://github.com/sstxww/reinforcement-learning/actions/runs/41430214173) reported correctly **skipped job**, not parser failure. This deliberate skip is not a claim that the workflow's tests ran again; real initial success remains run 41427963534. PR #106 independent full-game CI is a separate gate.
+- **Retry budget:** one substantive fix, no repeated real training for an already verified exact source SHA. No other agent runs canceled/modified.

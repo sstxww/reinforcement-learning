@@ -28,14 +28,15 @@ def fixture(tmp_path):
     candidate = next(c for c in canonical()["candidates"] if c["id"]==model_id)
     canonical_copy = canonical()
     next(c for c in canonical_copy["candidates"] if c["id"]==model_id)["checkpoint_sha256"] = asset["weights"]["sha256"]
-    canonical_copy["latest"]["checkpoint_sha256"] = asset["weights"]["sha256"]
+    if canonical_copy["latest"]["id"] == model_id:
+        canonical_copy["latest"]["checkpoint_sha256"] = asset["weights"]["sha256"]
     asset["metadata"]["sha256"] = hashlib.sha256(meta.read_bytes()).hexdigest()
     return index, canonical_copy, model_id, weights, meta
 
 def test_index_matches_existing_canonical_registry():
     report = validate_asset_index(real_index(), canonical())
     assert report["canonical_candidates_matched"] >= 4
-    assert report["indexed_releases"] == 6
+    assert report["indexed_releases"] == 7
     assert report["does_not_claim_verification"]
 
 def test_local_good_hashes_no_fake_resume(tmp_path):
