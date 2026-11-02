@@ -24,12 +24,15 @@
 - Main's `reports/s-20261102-68099929/003-buy-opportunity.json`: 1408-step candidate seed 99128, rank 8, 35 buy-legal decisions, zero buys; matched baseline rank 8 and 14 buys from 21 legal decisions. Not causal proof from a single game.
 - Thus the model's BUY non-selection when legal **is observed**; whether this alone explains rank 8 is **NOT established**. Raw action 1/2 state effects, long-horizon board/economy and reward/advantage diagnostics still require verified probes. PR #107 reports a negative forced-buy ablation and must not be promoted based on its title.
 
+## Additional negative P2 test evidence (external Draft, not model improvement)
+- Draft [PR #107](https://github.com/sstxww/reinforcement-learning/pull/107), dependent on Draft #103, reports a pinned-engine [successful 9-match run 41429432385](https://github.com/sstxww/reinforcement-learning/actions/runs/41429432385): across three matched seeds baseline ranks [8,8,8], guarded original V2 [8,8,8], guarded forced-BUY hybrid [8,8,8]. Explicit override produced 46 buys vs 0, while guarded end-turn interventions increased 1→18; observation also reports frequent Play/Cancel action cycling. These are **Draft PR evidence**, not independently reproduced here. Interpretation: forcing BUY alone did not improve these seeds, so a multi-bottleneck action loop, hand/board state issue, or decision-state mismatch must be tested before scaling PPO.
+
 ## Train / archive gate (not executed here)
 - Canonical `models/registry.json` sets Champion/Best null, Latest to unpromoted 1408-step V5 release `v5-s-20261102-68099929-1408-41428692617`, which has a three-game heldout [8,8,8] rank series. Release presence and recorded SHA are **not** evidence that this session independently re-downloaded, loaded, resumed or trained it.
-- Trained steps in this session: **0**. New model checkpoint: **none**. Real games: **pending isolated workflow**. No falsely claimed strength improvement.
+- Trained steps in this session: **0**. New model checkpoint: **none**. Real games: **1 authentic eight-seat TavernGym baseline** (not a PPO-model game). Dedicated run [41450157687](https://github.com/sstxww/reinforcement-learning/actions/runs/41450157687) succeeded; source receipt seed 95031, rank 8, turns 15, decisions 36, zero combat truncations/turn-limit guards, fixed engine 1.1.0 hash 6d8712c93022ba11. Retrieved the original run Artifact and committed `experiments/s-20261102-a280d7eb/001-95031.json` with recorded source HEAD `28f92f6a7911cd1df43d744514686c857b904805`. No falsely claimed strength improvement.
 
 ## Next checks
-1. Execute unique isolated Actions baseline canary and attach its actual receipt; verify unit tests and PR exact-head CI.
+1. **Completed own baseline canary and committed real receipt**. Run 41450157687 passed strict paired tests, bootstrap, engine contract and full game. Now verify final-head PR CI (the later strict missing-guard-disclosure fix needs that CI).
 2. Recheck latest main/PR conflicts before any integration; do not bypass #9->#15 dependency.
 3. Use strict paired reducer on verified raw V2 and Baseline same seed/seat receipts; add controlled/observed Gold and repeated 1/2 action effects before changing reward or expanding PPO.
 4. Only after reliable resume + independent raw model full matches and valid matched evidence should a new PPO training budget be considered.
