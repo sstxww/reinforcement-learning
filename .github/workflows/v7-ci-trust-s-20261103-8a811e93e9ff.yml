@@ -1,0 +1,60 @@
+name: V7 - trusted CI source audit s-20261103-8a811e93e9ff
+
+on:
+  push:
+    branches:
+      - agent/s-20261103-8a811e93e9ff/optimization-001
+    paths:
+      - scripts/v7_ci_trust_boundary_8a811e93e9ff.py
+      - tests/test_v7_ci_trust_boundary_8a811e93e9ff.py
+      - .github/workflows/v7-ci-trust-s-20261103-8a811e93e9ff.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: v7-s-20261103-8a811e93e9ff-trust-smoke
+  cancel-in-progress: false
+
+jobs:
+  regression-and-genuine-baseline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install isolated test dependencies
+        run: python -m pip install -e '.[test]'
+      - name: Fail-closed trusted CI path regression tests
+        run: python -m pytest -q tests/test_v7_ci_trust_boundary_8a811e93e9ff.py
+      - name: Install pinned TavernGym engine
+        run: bash scripts/bootstrap_engine.sh
+      - name: Verify pinned engine 1.1.0 contract
+        run: python -m tavern_ai.contract
+      - name: Genuine eight-seat baseline-only canary seed 99679
+        run: |
+          python -m tavern_ai.canary \
+            --agent-id s-20261103-8a811e93e9ff \
+            --seed 99679 --policy baseline \
+            --receipt outputs/s-20261103-8a811e93e9ff-001-99679.json
+          python -m tavern_ai.validate_receipt outputs/s-20261103-8a811e93e9ff-001-99679.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from tavern_ai.receipt_integrity import validate_integrity
+          data=json.loads(Path("outputs/s-20261103-8a811e93e9ff-001-99679.json").read_text())
+          assert data["agent_id"]=="s-20261103-8a811e93e9ff"
+          assert data["seed"]==99679 and data["policy"]=="baseline"
+          assert validate_integrity(data)
+          print("Original baseline receipt: full eight-seat game independently validated")
+          PY
+      - name: Preserve original receipt (temporary artifact)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v7-trusted-ci-receipt-s-20261103-8a811e93e9ff-${{ github.run_id }}
+          path: outputs/s-20261103-8a811e93e9ff-001-99679.json
+          if-no-files-found: ignore
+          retention-days: 30
