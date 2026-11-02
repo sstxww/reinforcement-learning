@@ -1,0 +1,59 @@
+name: Agent evaluation - real V1 experiment
+on:
+  push:
+    branches: ['agent/evaluation/v1']
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: v1-evaluation-experiment
+  cancel-in-progress: false
+jobs:
+  full-game-experiment:
+    runs-on: ubuntu-latest
+    timeout-minutes: 80
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[test]'
+      - name: Unit tests
+        run: python -m pytest
+      - name: Install pinned TavernGym and validate observe2
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Execute real experiment to Game.is_over
+        shell: bash
+        run: |
+          mkdir -p experiments/evaluation reports/evaluation
+          python -m tavern_ai.canary --agent-id evaluation --seed 1303 --policy baseline --receipt experiments/evaluation/v1-full-match.json
+          python -m tavern_ai.validate_receipt experiments/evaluation/v1-full-match.json
+          python -m tavern_ai.evaluate --policy baseline --games 4 --start-seed 24000 --out reports/evaluation/v1-baseline.json
+      - name: Commit only actual match receipts and compact metrics
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add experiments/evaluation/ reports/evaluation/
+          git diff --cached --quiet && exit 0
+          git commit -m "results(evaluation): record real V1 full-match evidence"
+          test "$GITHUB_REF_NAME" = "agent/evaluation/v1"
+          git push origin HEAD:"$GITHUB_REF_NAME"
+      - name: Upload verification evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: agent-evaluation-v1-evidence
+          path: |
+            experiments/evaluation/*.json
+            reports/evaluation/*.json
+          if-no-files-found: ignore
+          retention-days: 30
