@@ -20,7 +20,8 @@ def fixtures():
           "head": {"sha": HEAD}, "base": {"ref": "main", "sha": MAIN}}
     runs = [{"id": 112, "name": "CI - full-match gate", "status": "completed",
              "conclusion": "success", "event": "pull_request", "head_sha": HEAD,
-             "created_at": "2026-11-03T00:00:00Z", "html_url": "https://github.com/test/runs/112"}]
+             "created_at": "2026-11-03T00:00:00Z", "html_url": "https://github.com/test/runs/112",
+             "pull_requests": [{"number": 42, "head": {"sha": HEAD}, "base": {"sha": MAIN}}]}]
     jobs = {"total_count": 1, "jobs": [{"name": "tests-and-full-match", "conclusion": "success",
              "steps": [{"name": s, "conclusion": "success", "status": "completed"}
                        for s in subject._REQUIRED_STEPS]}]}
@@ -96,3 +97,12 @@ def test_invalid_sha_or_repo_input_refused():
         subject.validate("sstxww/../other", pr, MAIN, HEAD, runs, jobs)
     with pytest.raises(ValueError):
         subject.validate("sstxww/reinforcement-learning", pr, MAIN, "short", runs, jobs)
+
+
+def test_wrong_pr_or_old_tested_base_cannot_reuse_green_ci():
+    pr, runs, jobs = fixtures()
+    runs[0]["pull_requests"][0]["number"] = 99
+    assert not assess(pr, runs, jobs)["ci_preflight_passed"]
+    runs[0]["pull_requests"][0]["number"] = 42
+    runs[0]["pull_requests"][0]["base"]["sha"] = "c" * 40
+    assert not assess(pr, runs, jobs)["ci_preflight_passed"]
