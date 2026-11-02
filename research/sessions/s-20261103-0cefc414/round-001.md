@@ -1,0 +1,15 @@
+# V7 R001 — Real successful bounded Actions preflight + game evidence
+
+**Implementation:** a pure-stdlib read-only GitHub Actions capacity preflight at `scripts/v7_workload_budget_0cefc414.py`. It scans six active status types, rejects missing or truncated pages, mismatched run statuses/IDs and exhausted advisory limits. It deduplicates run IDs, conservatively classifies names containing PPO/train/resume/self-play, excludes own run ID, does not dispatch/cancel or write any GitHub state. `tests/test_v7_workload_budget_0cefc414.py` covers five fail-closed cases. Name-only detection and sequential snapshots remain heuristic, non-atomic; a real enforcement layer is still necessary.
+
+**Actual Actions:** [#41513647561](https://github.com/sstxww/reinforcement-learning/actions/runs/41513647561) at exact source HEAD `214281eaf222882287a5196f677edc47d5b3da5e`, concluded `completed/success`. Job 125511522078 ran five regression tests, pinned AutoTavern source `fb61201a557ddd36a411cf44aac51ce4d9b606ce`, SHA256-pinned observe2 patch, engine contract, independent complete 8-player baseline game, receipt validator and original Artifact upload. Original ZIP SHA256 `9c2ad17fdbd82bdea5bdb629b246f6a48bb792fef446ac115b5940f660c7c9be`. Receipt SHA256 `40751a14bdb7ba1e0b434f1d31800796f11ab66ce7bec5e7632c1774e2aefa44`.
+
+**Observed true game:** TavernGym 1.1.0, seed 99697, seat 0 baseline, seven scripted bots, placement 7, `completed=true`, places `[7,4,1,2,8,3,5,6]`, 13 turns and 67 decisions, no truncations, model SHA=null. Original identical receipt committed in `experiments/s-20261103-0cefc414/001-99697.json`. It is infrastructure smoke **not a model-controlled game**.
+
+**Training/model:** zero PPO steps, no checkpoint or Release, no optimizer restoration, no paired comparison, no Best/Champion. Historical registered V5 1408 source SHA256 a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632 was **not loaded**.
+
+**Integration:** live main `c1b828734527bae6141805581693d890cc3bff94` had successful exact main CI #41512315964. #185 was separately reviewed for unauthorized outsider approval and earlier missing own receipt. No main merge attempted, global serial lease unproven due #182. Next: open scoped non-Draft PR, require own exact-head CI and authentic receipt, external substantive review and enforced integration queue. Retire one-shot workflow after success to avoid push replays.
+
+### Corrective regression from live GitHub API (same R001)
+
+Read-only GitHub API initially returned 53 historical records from `status=action_required` with actual `run.status=completed`; the parameter filters conclusion not an active state. Initial six-filter implementation would systematically reject this history. Removed that filter, added a targeted negative regression, and retained conservative rejection of inconsistent page totals (observed queue `total_count=24` vs 21 returned during concurrent activity). This is a real repaired integration-semantic defect, **not** evidence of budget enforcement or PPO progress. Post-fix latest-head PR CI must be checked separately.
