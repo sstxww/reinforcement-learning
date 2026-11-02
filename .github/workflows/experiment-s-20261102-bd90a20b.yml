@@ -1,0 +1,63 @@
+name: Mask recurrence audit s-20261102-bd90a20b
+on:
+  push:
+    branches:
+      - agent/s-20261102-bd90a20b/optimization-001
+    paths:
+      - 'tavern_ai/mask_probe_bd90a20b.py'
+      - 'tests/test_mask_probe_bd90a20b.py'
+      - '.github/workflows/experiment-s-20261102-bd90a20b.yml'
+permissions:
+  contents: write
+concurrency:
+  group: s-20261102-bd90a20b-r001
+  cancel-in-progress: false
+jobs:
+  mask-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install test dependencies
+        run: |
+          python -m pip install -e '.[test]'
+      - name: Unit regression suite
+        run: python -m pytest
+      - name: Install real pinned TavernGym
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Run three genuine eight-seat pairs and audit masks
+        run: |
+          python -m tavern_ai.mask_probe_bd90a20b --start-seed 48101 --games 3 \
+            --receipt-dir experiments/s-20261102-bd90a20b \
+            --out reports/s-20261102-bd90a20b/001-metrics.json
+          for seed in 48101 48102 48103; do
+            python -m tavern_ai.validate_receipt "experiments/s-20261102-bd90a20b/001-$seed.json"
+            python -m tavern_ai.validate_receipt "experiments/s-20261102-bd90a20b/control-$seed.json"
+          done
+      - name: Save only session-owned authentic results
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add experiments/s-20261102-bd90a20b/ reports/s-20261102-bd90a20b/
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "results(s-20261102-bd90a20b): real mask audit and paired games"
+          git pull --rebase origin agent/s-20261102-bd90a20b/optimization-001
+          git push origin HEAD:agent/s-20261102-bd90a20b/optimization-001
+      - name: Preserve bounded evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: s-20261102-bd90a20b-mask-audit
+          path: |
+            experiments/s-20261102-bd90a20b/*.json
+            reports/s-20261102-bd90a20b/*.json
+          retention-days: 30
+          if-no-files-found: ignore

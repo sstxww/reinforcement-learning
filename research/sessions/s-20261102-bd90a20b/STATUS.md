@@ -1,0 +1,21 @@
+# Session s-20261102-bd90a20b — status
+
+- State: Round 001 engine-backed engineering experiment **verified; proposed for review**. No gameplay improvement claimed.
+- Branch: agent/s-20261102-bd90a20b/optimization-001
+- Base main: 315b068bac5ab6d8403c3c9b18f8c101c0cded5d
+- Source commit: 2e09a49ec75cfb85e085f3a05b8936ef93a0c435
+- Real-game results commit: 6a764ca8f3102add85fe913f0a03c695c96b6ddb
+- Run: https://github.com/sstxww/reinforcement-learning/actions/runs/41415948794
+- Workflow: .github/workflows/experiment-s-20261102-bd90a20b.yml (one independent run; scoped push paths)
+- Actual training: 0 steps, original baseline only. PPO not used or validated by this session.
+- Games: 3 true, instrumented, eight-seat TavernGym games + 3 independent, uninstrumented, seed-matched controls; all completed, 0 truncated, no turn limits.
+- Tested seeds: 48101, 48102, 48103; seat-0 ranks 8, 7, 5; mean 6.6667; first place 0%, top four 0%.
+- All chosen actions mask-legal: 127/127; same as control: 3/3; repeated public observations in same turn: 0.
+- Metrics: reports/s-20261102-bd90a20b/001-metrics.json
+- Receipts: experiments/s-20261102-bd90a20b/{001,control}-{48101,48102,48103}.json (filenames without braces)
+- Checkpoints: none; Best/Candidate/Latest do not apply. No model SHA256 / resume possible.
+- 30-day Artifact: https://github.com/sstxww/reinforcement-learning/actions/runs/41415948794/artifacts/13127686579, expiry 2026-12-02. Committed source/JSON remain in Git.
+- PR: https://github.com/sstxww/reinforcement-learning/pull/39 (draft; owner/integrator review required)
+- Independent PR CI: https://github.com/sstxww/reinforcement-learning/actions/runs/41416471826 (validate against PR latest head; no success claim until completed)
+- Pending: inspect PR head-specific independent CI before calling the PR fully CI-validated. Never merge without integrator review.
+- Next: connect recurrence diagnostics to a properly model-controlled bounded real game in a separate hypothesis, coordinating only through GitHub PR review.
