@@ -1,0 +1,231 @@
+{
+  "schema": 1,
+  "session_id": "s-20261103-630ed53f",
+  "policy": "raw_model_no_fallback",
+  "model_sha256": "a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632",
+  "seed": 99631,
+  "engine": {
+    "version": "1.1.0",
+    "source_hash": "6d8712c93022ba11",
+    "features": 4017,
+    "cards": 447,
+    "actions": 245,
+    "n_cards": 3984
+  },
+  "completed": true,
+  "incomplete_reason": null,
+  "turns_reached": 17,
+  "model_rank": 8,
+  "model_decisions": 149,
+  "truncated_combats": 0,
+  "turn_limit_end": false,
+  "action_counts": {
+    "choose": 5,
+    "dark_gift": 3,
+    "end_turn": 8,
+    "freeze": 80,
+    "play": 3,
+    "refresh": 46,
+    "sell": 3,
+    "upgrade": 1
+  },
+  "per_turn": {
+    "0": {
+      "decisions": 1,
+      "choose": 1
+    },
+    "1": {
+      "decisions": 14,
+      "refresh": 3,
+      "buy_legal_exposures": 2,
+      "freeze": 10,
+      "end_turn": 1
+    },
+    "2": {
+      "decisions": 15,
+      "refresh": 4,
+      "buy_legal_exposures": 3,
+      "freeze": 10,
+      "end_turn": 1
+    },
+    "3": {
+      "decisions": 18,
+      "refresh": 3,
+      "buy_legal_exposures": 5,
+      "dark_gift": 1,
+      "choose": 1,
+      "play": 1,
+      "sell": 1,
+      "freeze": 10,
+      "end_turn": 1
+    },
+    "4": {
+      "decisions": 19,
+      "refresh": 4,
+      "buy_legal_exposures": 5,
+      "dark_gift": 1,
+      "choose": 1,
+      "play": 1,
+      "freeze": 10,
+      "sell": 1,
+      "end_turn": 1
+    },
+    "5": {
+      "decisions": 20,
+      "refresh": 5,
+      "buy_legal_exposures": 6,
+      "dark_gift": 1,
+      "choose": 1,
+      "play": 1,
+      "freeze": 10,
+      "sell": 1,
+      "end_turn": 1
+    },
+    "6": {
+      "decisions": 21,
+      "choose": 1,
+      "refresh": 8,
+      "buy_legal_exposures": 8,
+      "upgrade": 1,
+      "freeze": 10,
+      "end_turn": 1
+    },
+    "7": {
+      "decisions": 20,
+      "refresh": 9,
+      "buy_legal_exposures": 9,
+      "freeze": 10,
+      "end_turn": 1
+    },
+    "8": {
+      "decisions": 21,
+      "refresh": 10,
+      "buy_legal_exposures": 10,
+      "freeze": 10,
+      "end_turn": 1
+    }
+  },
+  "when_buy_is_mask_legal": {
+    "decision_state_exposures": 48,
+    "selected_buy_count": 0,
+    "mean_buy_probability": 0.406067,
+    "mean_best_buy_probability": 0.159541,
+    "mean_refresh_freeze_probability": 0.338996,
+    "mean_end_turn_probability": 0.114613,
+    "mean_play_probability": 0.013314,
+    "mean_selected_action_probability": 0.189458,
+    "mean_top_action_probability": 0.189458,
+    "mean_masked_entropy_nats": 1.902398,
+    "mean_legal_buy_slots": 3.25,
+    "mean_legal_action_count": 7.125
+  },
+  "example_public_decisions": [
+    {
+      "turn": 1,
+      "chosen_family": "refresh",
+      "legal_buy_slots": 4,
+      "buy_probability": 0.5542,
+      "refresh_freeze_probability": 0.32876,
+      "top_action_probability": 0.17407
+    },
+    {
+      "turn": 1,
+      "chosen_family": "refresh",
+      "legal_buy_slots": 1,
+      "buy_probability": 0.2572,
+      "refresh_freeze_probability": 0.56135,
+      "top_action_probability": 0.30029
+    },
+    {
+      "turn": 2,
+      "chosen_family": "refresh",
+      "legal_buy_slots": 4,
+      "buy_probability": 0.47824,
+      "refresh_freeze_probability": 0.2877,
+      "top_action_probability": 0.15325
+    },
+    {
+      "turn": 2,
+      "chosen_family": "refresh",
+      "legal_buy_slots": 4,
+      "buy_probability": 0.55042,
+      "refresh_freeze_probability": 0.33673,
+      "top_action_probability": 0.17626
+    },
+    {
+      "turn": 2,
+      "chosen_family": "refresh",
+      "legal_buy_slots": 1,
+      "buy_probability": 0.25729,
+      "refresh_freeze_probability": 0.55781,
+      "top_action_probability": 0.29992
+    },
+    {
+      "turn": 3,
+      "chosen_family": "refresh",
+      "legal_buy_slots": 4,
+      "buy_probability": 0.40733,
+      "refresh_freeze_probability": 0.2521,
+      "top_action_probability": 0.13122
+    },
+    {
+      "turn": 3,
+      "chosen_family": "dark_gift",
+      "legal_buy_slots": 4,
+      "buy_probability": 0.40458,
+      "refresh_freeze_probability": 0.25335,
+      "top_action_probability": 0.13167
+    },
+    {
+      "turn": 3,
+      "chosen_family": "play",
+      "legal_buy_slots": 1,
+      "buy_probability": 0.19027,
+      "refresh_freeze_probability": 0.42874,
+      "top_action_probability": 0.24585
+    },
+    {
+      "turn": 3,
+      "chosen_family": "refresh",
+      "legal_buy_slots": 1,
+      "buy_probability": 0.19726,
+      "refresh_freeze_probability": 0.44419,
+      "top_action_probability": 0.22979
+    },
+    {
+      "turn": 3,
+      "chosen_family": "refresh",
+      "legal_buy_slots": 1,
+      "buy_probability": 0.25423,
+      "refresh_freeze_probability": 0.56425,
+      "top_action_probability": 0.29883
+    },
+    {
+      "turn": 4,
+      "chosen_family": "refresh",
+      "legal_buy_slots": 4,
+      "buy_probability": 0.40367,
+      "refresh_freeze_probability": 0.25439,
+      "top_action_probability": 0.1324
+    },
+    {
+      "turn": 4,
+      "chosen_family": "dark_gift",
+      "legal_buy_slots": 4,
+      "buy_probability": 0.40706,
+      "refresh_freeze_probability": 0.24892,
+      "top_action_probability": 0.13188
+    }
+  ],
+  "forced_end_turns": 0,
+  "baseline_fallback_actions": 0,
+  "ppo_training_steps_this_probe": 0,
+  "promoted_to_champion": false,
+  "not_an_official_canary_receipt": true,
+  "limitations": [
+    "Each legal-BUY exposure is a possibly correlated decision state, not an independent good buying opportunity.",
+    "Probability concentration in REFRESH/FREEZE is an observed policy outcome; this probe alone cannot identify the reward, features, or optimizer as a cause.",
+    "Only raw model actions are used. If the game is incomplete, do not treat it as a completed match.",
+    "Rank is not a strength difference without comparable independently seeded baseline/model evaluation."
+  ]
+}
