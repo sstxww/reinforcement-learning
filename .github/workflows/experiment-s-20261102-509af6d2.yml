@@ -1,0 +1,68 @@
+name: Opening-upgrade ablation s-20261102-509af6d2
+on:
+  push:
+    branches:
+      - 'agent/s-20261102-509af6d2/optimization-001'
+    paths:
+      - '.github/workflows/experiment-s-20261102-509af6d2.yml'
+      - 'tavern_ai/s_20261102_509af6d2.py'
+      - 'tests/test_s_20261102_509af6d2.py'
+permissions:
+  contents: write
+concurrency:
+  group: experiment-s-20261102-509af6d2
+  cancel-in-progress: false
+jobs:
+  paired-eight-player-matches:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install bounded experiment dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[test]'
+      - name: Test the policy and existing project
+        run: python -m pytest
+      - name: Install actual pinned TavernGym engine and verify hash
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Run four paired real eight-seat TavernGym games
+        run: |
+          python -m tavern_ai.s_20261102_509af6d2 \
+            --seeds 38101 38102 38103 38104 \
+            --out-dir experiments/s-20261102-509af6d2 \
+            --report reports/s-20261102-509af6d2/upgrade-timing-comparison.json
+          for path in experiments/s-20261102-509af6d2/*.json; do
+            python -m tavern_ai.validate_receipt "$path"
+          done
+      - name: Commit only own genuine game evidence (no trigger loop)
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = "agent/s-20261102-509af6d2/optimization-001"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add experiments/s-20261102-509af6d2/ reports/s-20261102-509af6d2/
+          if ! git diff --cached --quiet; then
+            git commit -m "results(s-20261102-509af6d2): save genuine seeded TavernGym eight-seat receipts"
+            git pull --rebase origin "$GITHUB_REF_NAME"
+            git push origin HEAD:"$GITHUB_REF_NAME"
+          fi
+      - name: Preserve isolated evidence backup
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: opening-upgrade-s-20261102-509af6d2-evidence
+          path: |
+            experiments/s-20261102-509af6d2/*.json
+            reports/s-20261102-509af6d2/*.json
+          if-no-files-found: ignore
+          retention-days: 30
