@@ -1,0 +1,52 @@
+name: V5 resume fail-closed proof s-20261103-bf44b161
+
+on:
+  push:
+    branches:
+      - agent/s-20261103-bf44b161/optimization-001
+    paths:
+      - research/sessions/s-20261103-bf44b161/run-trigger.txt
+
+permissions:
+  contents: write
+
+concurrency:
+  group: proof-s-20261103-bf44b161
+  cancel-in-progress: false
+
+jobs:
+  proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Unit and fail-closed restore regression
+        run: |
+          python -m pip install -e '.[test]'
+          python -m pytest tests/test_restore_checkpoint_fail_closed.py
+          python -m pytest
+      - name: Install pinned TavernGym engine
+        run: bash scripts/bootstrap_engine.sh
+      - name: Genuine eight-seat game and receipt validation
+        run: |
+          python -m tavern_ai.canary --agent-id s-20261103-bf44b161 --seed 98631 --policy baseline --receipt experiments/s-20261103-bf44b161/001-98631.json
+          python -m tavern_ai.validate_receipt experiments/s-20261103-bf44b161/001-98631.json
+      - name: Commit real receipt to this session branch only
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add experiments/s-20261103-bf44b161/001-98631.json
+          git diff --cached --quiet && { echo 'No new receipt'; exit 3; }
+          git commit -m 'test: record authentic V5 resume-gate baseline match s-20261103-bf44b161'
+          git push origin HEAD:refs/heads/agent/s-20261103-bf44b161/optimization-001
+      - name: Preserve receipt evidence for independent audit
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v5-proof-s-20261103-bf44b161
+          path: experiments/s-20261103-bf44b161/*.json
+          if-no-files-found: ignore
+          retention-days: 30
