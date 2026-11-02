@@ -1,0 +1,7 @@
+# Failure 001 — old schema-less synthetic fixture under stricter prelearn gate
+
+- Failed exact PR CI: https://github.com/sstxww/reinforcement-learning/actions/runs/41512804901 , job 125508673631 , original HEAD `c7682c91fd1b182d8d10b4b6b41dc6e6146cb11b`.
+- Actual signature: `tests/test_train_resume_s_20261102_001b7da1.py::test_refuse_wrong_step_count_after_load`: `AssertionError Regex pattern did not match`, expected `step counters differ`, actual `Unknown parent checkpoint schema (refusing downgrade)`. Full result: **1 failed, 393 passed, 1 skipped**. The CI stopped before an actual eight-seat game; failure is test-fixture integration, not simulator or PPO evidence.
+- Confirmed root cause: test was simulating a SHA-bound parent checkpoint without a `schema`; a new fail-closed precompute validator correctly rejects that unsupported parent before deserialization. That fixture cannot exercise the later `model.num_timesteps` mismatch.
+- Fix attempt 1 (actual commit [2ea1c93](https://github.com/sstxww/reinforcement-learning/commit/2ea1c93bccd6c6de42ad09d2aaa5265da25d7cc5)): add explicit `schema: 1` ONLY to this test's valid parent fixture. Keep production validation strict. Re-run the exact PR branch CI (GitHub push triggers PR checks), read log and real game receipt before marking repaired.
+- This is a synthetic contract test. Do not claim any model result or a completed game from this failed CI.
