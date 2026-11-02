@@ -1,0 +1,80 @@
+{
+  "schema": 1,
+  "session_id": "s-20261103-bf44b161",
+  "round": 2,
+  "status": "rejected_raw_game_safety_limit_but_released_for_diagnostics",
+  "run_id": 41509203645,
+  "run_url": "https://github.com/sstxww/reinforcement-learning/actions/runs/41509203645",
+  "engine": {
+    "version": "1.1.0",
+    "source_hash": "6d8712c93022ba11",
+    "features": 4017,
+    "cards": 447,
+    "actions": 245
+  },
+  "source_release": "v5-s-20261102-68099929-1408-41428692617",
+  "source_steps": 1408,
+  "source_checkpoint_sha256": "a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632",
+  "incremental_ppo_steps": 128,
+  "candidate_total_steps": 1536,
+  "candidate_sha256": "ce1e1f35841eb4239f854ebc2706505af126d7a820cf589cadb93a79502a735b",
+  "baseline_game": {
+    "seed": 98632,
+    "completed": true,
+    "policy": "baseline",
+    "placement": 7,
+    "placements": [
+      7,
+      8,
+      3,
+      1,
+      5,
+      6,
+      2,
+      4
+    ],
+    "turns": 15,
+    "decisions": 43,
+    "truncated_combats": 0
+  },
+  "raw_model_game": {
+    "seed": 98633,
+    "completed": false,
+    "error": "Full-game safety limit exceeded",
+    "placement": null,
+    "receipt": null
+  },
+  "heldout": {
+    "seeds": [
+      98634,
+      98635
+    ],
+    "status": "not_run_due_to_raw_game_gate",
+    "games": 0
+  },
+  "artifact": {
+    "id": 13172197990,
+    "run_id": 41509203645,
+    "name": "v5-s-20261103-bf44b161-r002-unpromoted-41509203645",
+    "expires_at": "2027-01-31T19:21:38Z",
+    "is_durable": false
+  },
+  "champion_eligible": false,
+  "champion_promoted": false,
+  "rejected_release": {
+    "tag": "v5-rejected-s-20261103-bf44b161-1536-41509203645",
+    "url": "https://github.com/sstxww/reinforcement-learning/releases/tag/v5-rejected-s-20261103-bf44b161-1536-41509203645",
+    "run_id": 41510224472,
+    "run_conclusion": "success",
+    "assets": [
+      "model.zip",
+      "model.metadata.json",
+      "checksums.sha256",
+      "rejection.json"
+    ],
+    "checkpoint_sha256_verified": true,
+    "independent_redownload_byte_comparison": true,
+    "registered_as_best": false,
+    "model_candidate_rejected": true
+  }
+}
