@@ -39,3 +39,9 @@ All 13 recorded matches have `Game.is_over()`, receipt schema validation, no eng
 
 ## Recovery
 On this branch: install `pip install -e '.[test]'`; `bash scripts/bootstrap_engine.sh`; `python -m pytest tests/test_economy_gate_s_20261102_13020d89.py`; run `python -m tavern_ai.economy_gate_s_20261102_13020d89` in an isolated environment. This uses the same fixed 13 seeds and overwrites only this session's own receipts. For new independent evidence, edit test seeds in own new optimization round rather than pretending replay is heldout.
+
+## Review integration update (current real GitHub status)
+- Draft PR: https://github.com/sstxww/reinforcement-learning/pull/73
+- PR initial latest-head full-match CI: https://github.com/sstxww/reinforcement-learning/actions/runs/41422866540 — completed SUCCESS: unit tests, receipt gate, pinned engine and an independent real eight-player canary.
+- No promotion: small heldout n=4, both policies top-4 rate 0%; PR intentionally remains draft.
+- The status-only documentation commit may trigger a new latest-head PR CI; check that final SHA's checks before integration.

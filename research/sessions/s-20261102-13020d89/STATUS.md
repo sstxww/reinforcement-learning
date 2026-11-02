@@ -12,3 +12,9 @@
 - Champion: unchanged; recommendation RETEST, not PROMOTE. No robust competitive improvement established.
 - Current issue: choice of threshold 2 over 5 from tie only, training signal not discriminative. Additional independent seeds and card-value learning necessary.
 - Resume: inspect this branch's metrics and exact 13 receipts, run the 13-source tests if modifying. Do not rerun identical seed batch repeatedly as fresh evidence or force-push. Create own R002 branch if new work.
+
+## Review integration update (current real GitHub status)
+- Draft PR: https://github.com/sstxww/reinforcement-learning/pull/73
+- PR initial latest-head full-match CI: https://github.com/sstxww/reinforcement-learning/actions/runs/41422866540 — completed SUCCESS: unit tests, receipt gate, pinned engine and an independent real eight-player canary.
+- No promotion: small heldout n=4, both policies top-4 rate 0%; PR intentionally remains draft.
+- The status-only documentation commit may trigger a new latest-head PR CI; check that final SHA's checks before integration.
