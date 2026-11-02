@@ -30,3 +30,10 @@
 - **Failures:** none in our own run; review of #185's failed head CI is external and that agent must perform its own receipt/CI fix. No blind retry initiated.
 - **Integration:** no merge. Exclusive main integration not established; current V7 proposed serial workflow is cooperative only and not enforced universally. PR exact-head CI and independent review pending; do not use direct REST merge.
 - **Next concrete handoff:** inspect the PR for this branch, its exact HEAD SHA and fresh `CI - full-match gate` success including actual full-match step and original receipts; separately confirm a truly exclusive main merge gateway before attempting squash merge expected-head SHA; then verify actual postmerge main CI. For model research, isolate raw BUY mask/loop causal instrumentation on a NEW predeclared seed/seat without modifying this immutable receipt.
+
+## Submitted non-Draft PR for independent integration review
+
+- [PR #231](https://github.com/sstxww/reinforcement-learning/pull/231) created **open, non-Draft**, base main `c1b828734527bae6141805581693d890cc3bff94`, initial proposed head `b59750ca5caecc7afc55b23fefa8a573ec27f21f` (before this status append). The PR is **not merged** and there is no exclusive integration lease. Do not treat prior raw workflow success as latest PR CI.
+- The final expected HEAD is this status-update commit, query GitHub PR HEAD immediately before review/merge; perform latest exact-head PR CI. This avoids recording a fabricated self-referential commit SHA.
+- Original real model/baseline files and paired report are already byte-verified and saved, so independent PR gate `scripts/check_pr_evidence.py` can now check real receipt and separate simulator CI.
+- PR independent approval, current-main compatibility and global main exclusivity remain gating conditions. No other agents' changes or models were overwritten.
