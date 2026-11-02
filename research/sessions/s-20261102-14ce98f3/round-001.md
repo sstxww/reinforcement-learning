@@ -20,3 +20,15 @@
 - Reusable failure: a legal-mask-only PPO model can repeat legal non-progress actions indefinitely; impose explicit decision budgets and report intervention count, separately from pure model evaluation. Keep full-game safety hard-stop.
 - Cleanup: no temporary logs/checkpoint binaries committed to Git; small experiment JSON and matching models in expiring artifact only.
 - Next: inspect recovery run receipts, collect override rate and ranks, run further independent model seeds, investigate time-aware anti-loop penalties or more PPO timesteps.
+
+## Final guarded-recovery verification (2026-11-02)
+
+- PR: [#19](https://github.com/sstxww/reinforcement-learning/pull/19) (draft; final PR CI pending).
+- [Independent complete model games: Actions #41414076487](https://github.com/sstxww/reinforcement-learning/actions/runs/41414076487) — **all job steps SUCCESS**, including actual simulator installation, saved model retrieval, both SHA256 checks, and receipt validation.
+- Original reward PPO model evaluated under `model_guarded` with cap 18: seed **26012**, completed **True**, rank **8**, full placements `[8,5,6,2,1,4,7,3]`, 14 turns, 27 seat-0 decisions, **0** forced end-turns, 0 illegal actions, 0 truncated combats, `turn_limit_end=False`. Receipt `experiments/s-20261102-14ce98f3/003-26012.json`.
+- Scaled reward PPO model under the **same guarded policy** and seed **26012**: completed **True**, rank **8**, full placements `[8,4,1,7,2,6,3,5]`, 16 turns, 101 seat-0 decisions, **5** forced end-turns, 0 illegal actions, 0 truncated combats, `turn_limit_end=False`. Receipt `experiments/s-20261102-14ce98f3/002-26012.json`.
+- Neither model achieved top four. Guarded original arm had fewer decisions and did not require interventions, but this is **one paired evaluation seed only**, not statistical proof or evidence for reward scale gain. Uncapped scaled model previously failed, and its failure is preserved in run #41413148710.
+- Recovery source commit: `4bd49b30b0889027c907d5c89b93dce492125f82`. Recorded receipts commit: `fef1d4f158a8a923ded5310f6a90578cce972a7d`.
+- Overall round 001: **512 actual PPO steps + three separate genuinely completed eight-seat games (one baseline, two guarded models); no model win or placement improvement verified.** Training job reported overall failure specifically due to uncapped-model nontermination; recovery job succeeded.
+- Retention: both model ZIPs only in [artifact 13127120696](https://github.com/sstxww/reinforcement-learning/actions/runs/41413148710/artifacts/13127120696), expires 2026-12-02. No permanent copy verified, and no training weights in Git.
+- Suggested next iteration: investigate decision/action-repetition penalties and time-aware budget in training (separate from inference guard); train >=2048 PPO steps to expose nonzero terminal rewards to policy updates; compare >=20 paired seeds with uncertainty bounds.
