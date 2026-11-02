@@ -1,0 +1,63 @@
+{
+  "experiment": "seeded_full_game_replay_determinism",
+  "session_id": "s-20261102-d97f219e",
+  "game_engine": "TavernGym (real engine, observe2)",
+  "candidate_policy": "unchanged V0 baseline",
+  "note": "Reproducibility audit only; not a model-strength comparison",
+  "seeds": [
+    36011,
+    36012,
+    36013
+  ],
+  "execution_order": [
+    36011,
+    36012,
+    36013,
+    36013,
+    36012,
+    36011
+  ],
+  "full_matches": 6,
+  "seed_pairs": 3,
+  "comparisons": [
+    {
+      "seed": 36011,
+      "identical": true,
+      "different_fields": [],
+      "first_trace_sha256": "24390f75c4181a0a6195d616b7a27346f1fa4f0487b40b84b0a9edb547b6ad8f",
+      "replayed_trace_sha256": "24390f75c4181a0a6195d616b7a27346f1fa4f0487b40b84b0a9edb547b6ad8f",
+      "first_placement": 8,
+      "replayed_placement": 8
+    },
+    {
+      "seed": 36012,
+      "identical": true,
+      "different_fields": [],
+      "first_trace_sha256": "25d8555986c99a3414df1701ba6a332957d96ae0f8ec9ed2ea0b706772b123c2",
+      "replayed_trace_sha256": "25d8555986c99a3414df1701ba6a332957d96ae0f8ec9ed2ea0b706772b123c2",
+      "first_placement": 7,
+      "replayed_placement": 7
+    },
+    {
+      "seed": 36013,
+      "identical": true,
+      "different_fields": [],
+      "first_trace_sha256": "ad98499e5dc8898af9bd99cefaa543cfe2260d3bd88bef5067d613e62b803dc9",
+      "replayed_trace_sha256": "ad98499e5dc8898af9bd99cefaa543cfe2260d3bd88bef5067d613e62b803dc9",
+      "first_placement": 8,
+      "replayed_placement": 8
+    }
+  ],
+  "all_reproducible": true,
+  "all_games_completed": true,
+  "placements_first_pass": [
+    8,
+    7,
+    8
+  ],
+  "first_pass_mean_placement": 7.666666666666667,
+  "first_pass_top4_rate": 0.0,
+  "first_pass_first_place_rate": 0.0,
+  "ppo_training_steps": 0,
+  "checkpoint": null
+}

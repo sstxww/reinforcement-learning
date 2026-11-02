@@ -1,0 +1,87 @@
+name: Replay audit s-20261102-d97f219e
+
+on:
+  push:
+    branches: ['agent/s-20261102-d97f219e/optimization-001']
+    paths-ignore:
+      - 'experiments/s-20261102-d97f219e/**'
+      - 'reports/s-20261102-d97f219e/**'
+      - 'research/sessions/s-20261102-d97f219e/**'
+      - 'research/knowledge/proposals/s-20261102-d97f219e-001.md'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: replay-audit-s-20261102-d97f219e
+  cancel-in-progress: false
+
+jobs:
+  real-engine-seeded-replay:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 65
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install test dependencies and run regressions
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[test]'
+          python -m pytest
+      - name: Install exact upstream TavernGym with verified observe2 patch
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Real six full-game replay audit (three independent seed pairs)
+        id: audit
+        shell: bash
+        run: |
+          set +e
+          python -m tavern_ai.replay_audit_d97f219e \
+            --agent-id s-20261102-d97f219e \
+            --seeds 36011 36012 36013 \
+            --receipt experiments/s-20261102-d97f219e/001-36011.json \
+            --out reports/s-20261102-d97f219e/replay-001.json
+          STATUS=$?
+          echo "$STATUS" > audit-status.txt
+          exit 0
+      - name: Verify independently executed complete-game receipt
+        if: always()
+        run: |
+          test -f experiments/s-20261102-d97f219e/001-36011.json
+          python -m tavern_ai.validate_receipt experiments/s-20261102-d97f219e/001-36011.json
+      - name: Commit only own real receipts and compact reproducibility results
+        if: always()
+        shell: bash
+        run: |
+          test "$GITHUB_REF_NAME" = 'agent/s-20261102-d97f219e/optimization-001'
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A -- experiments/s-20261102-d97f219e/ reports/s-20261102-d97f219e/
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'results(s-20261102-d97f219e): save real seeded replay evidence'
+          git pull --rebase origin "$GITHUB_REF_NAME"
+          git push origin HEAD:"$GITHUB_REF_NAME"
+      - name: Upload evidence, including failed-audit results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: replay-audit-s-20261102-d97f219e-${{ github.run_id }}
+          path: |
+            experiments/s-20261102-d97f219e/
+            reports/s-20261102-d97f219e/
+            audit-status.txt
+          if-no-files-found: ignore
+          retention-days: 30
+      - name: Enforce audit result
+        if: always()
+        shell: bash
+        run: |
+          test -s audit-status.txt
+          test "$(cat audit-status.txt)" = "0"
