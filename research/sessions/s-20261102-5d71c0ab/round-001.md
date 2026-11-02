@@ -26,3 +26,7 @@ No new PPO steps: **0**. No Champion/Best promotion. No official Arena. Repeated
 
 ## Integration next gate
 Recheck PR #118 exact final-head CI after this commit and recheck main's current head. If green and conflicts absent, have integration owner review and merge with exact-head SHA; post-merge main CI must also pass. If concurrent integration claims cannot be safely held, leave PR open rather than racing main.
+
+## Pinned source confirms refresh/freeze action mapping
+- Read-only upstream: [actions.rs, pinned commit fb61201](https://github.com/MCG-NJU/AutoTavern/blob/fb61201a557ddd36a411cf44aac51ce4d9b606ce/crates/taverngym/src/actions.rs): action **1 = Refresh** and **2 = Freeze**; BUY is **8..15**. These are verified semantics from the actual version, not labels inferred from frequency.
+- In the two independent real seed games above, the candidate chose Refresh **85** times and Freeze **140** times out of **249** actions; BUY **0** while BUY was legal in **82** decision exposures. Combined model rank [8,8] vs baseline [6,7]. This supports a dominant Refresh/Freeze behavior pattern; it does **not** isolate the underlying learning failure or prove a beneficial counterfactual override.
