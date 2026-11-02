@@ -1,0 +1,130 @@
+{
+  "schema": 1,
+  "session_id": "s-20261102-2d73e890",
+  "main_base_sha": "315b068bac5ab6d8403c3c9b18f8c101c0cded5d",
+  "engine": {
+    "version": "1.1.0",
+    "source_hash": "6d8712c93022ba11",
+    "features": 4017,
+    "cards": 447,
+    "actions": 245,
+    "n_cards": 3984
+  },
+  "mechanism": "buy 8..15, sell 16..22, play 46..125, magnetize 126..195",
+  "training_method": "bounded full-game heuristic parameter search, not PPO",
+  "actual_ppo_steps": 0,
+  "train_seeds": [
+    68310,
+    68311,
+    68312,
+    68313
+  ],
+  "holdout_seeds": [
+    68410,
+    68411,
+    68412,
+    68413,
+    68414,
+    68415,
+    68416,
+    68417
+  ],
+  "train": {
+    "0": {
+      "games": 4,
+      "placements": [
+        8,
+        7,
+        8,
+        8
+      ],
+      "mean_placement": 7.75,
+      "top4_rate": 0.0,
+      "first_rate": 0.0,
+      "mean_sale_actions": 0,
+      "forced_end_count": 0,
+      "all_completed_without_engine_guard": true
+    },
+    "1": {
+      "games": 4,
+      "placements": [
+        8,
+        7,
+        8,
+        8
+      ],
+      "mean_placement": 7.75,
+      "top4_rate": 0.0,
+      "first_rate": 0.0,
+      "mean_sale_actions": 3.25,
+      "forced_end_count": 0,
+      "all_completed_without_engine_guard": true
+    },
+    "2": {
+      "games": 4,
+      "placements": [
+        8,
+        8,
+        8,
+        6
+      ],
+      "mean_placement": 7.5,
+      "top4_rate": 0.0,
+      "first_rate": 0.0,
+      "mean_sale_actions": 4.75,
+      "forced_end_count": 0,
+      "all_completed_without_engine_guard": true
+    }
+  },
+  "budget_selected_on_training_only": 2,
+  "holdout_control": {
+    "games": 8,
+    "placements": [
+      8,
+      6,
+      6,
+      7,
+      8,
+      2,
+      7,
+      7
+    ],
+    "mean_placement": 6.375,
+    "top4_rate": 0.125,
+    "first_rate": 0.0,
+    "mean_sale_actions": 0,
+    "forced_end_count": 0,
+    "all_completed_without_engine_guard": true
+  },
+  "holdout_challenger": {
+    "games": 8,
+    "placements": [
+      7,
+      8,
+      5,
+      8,
+      7,
+      8,
+      6,
+      7
+    ],
+    "mean_placement": 7,
+    "top4_rate": 0.0,
+    "first_rate": 0.0,
+    "mean_sale_actions": 5.75,
+    "forced_end_count": 0,
+    "all_completed_without_engine_guard": true
+  },
+  "paired_placement_deltas_negative_is_better": [
+    -1,
+    2,
+    -1,
+    1,
+    -1,
+    6,
+    -1,
+    0
+  ],
+  "paired_mean_delta": 0.625,
+  "caution": "Eight heldout paired seeds vs seven scripted bots; not Arena MMR, not established superiority."
+}

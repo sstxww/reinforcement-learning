@@ -1,0 +1,29 @@
+{
+  "schema": 1,
+  "environment": "TavernGym",
+  "engine_source_hash": "6d8712c93022ba11",
+  "engine_version": "1.1.0",
+  "agent_id": "s-20261102-2d73e890",
+  "policy": "sell-cycle-budget-2",
+  "seed": 68412,
+  "completed": true,
+  "turns": 14,
+  "decisions": 103,
+  "placements": [
+    5,
+    6,
+    8,
+    1,
+    7,
+    4,
+    3,
+    2
+  ],
+  "truncated_combats": 0,
+  "turn_limit_end": false,
+  "git_sha": "8de320413b0e601d1f0eda3bf2d533bda02a2a93",
+  "model_sha256": null,
+  "tuning_budget": 2,
+  "sale_actions": 5,
+  "forced_end_count": 0
+}
