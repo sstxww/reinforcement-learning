@@ -71,6 +71,24 @@ def build_checkpoint_metadata(
     meta["increment_timesteps"] = total_timesteps - previous
     return meta
 
+def preflight_resume_parent(*, engine: dict, parent: dict, parent_sha256: str) -> None:
+    """Reject incompatible parent lineage BEFORE model load or PPO computation.
+
+    Metadata construction after training remains the final authority for actual
+    cumulative timesteps. This early check only validates the already-known
+    source contract, without predicting or fabricating a trained checkpoint.
+    """
+    if not isinstance(parent, dict):
+        raise ValueError("Invalid parent checkpoint metadata")
+    previous = parent.get("total_timesteps")
+    if type(previous) is not int or previous < 1:
+        raise ValueError("Missing or invalid parent training-step counter")
+    build_checkpoint_metadata(
+        engine=engine, seed=0, total_timesteps=previous + 1,
+        parent=parent, parent_sha256=parent_sha256,
+    )
+
+
 def run(steps: int, seed: int, model_out: Path, resume: Path | None = None):
     from sb3_contrib import MaskablePPO
     from .model import TavernExtractor
@@ -92,6 +110,7 @@ def run(steps: int, seed: int, model_out: Path, resume: Path | None = None):
             if not isinstance(prev, dict) or prev.get("engine") != engine:
                 raise ValueError("Checkpoint engine or card vocabulary mismatch")
             parent_sha256 = require_verified_resume(resume, prev)
+            preflight_resume_parent(engine=engine, parent=prev, parent_sha256=parent_sha256)
             model = MaskablePPO.load(str(resume), env=env, device="cpu")
             if type(prev.get("total_timesteps")) is not int or (
                 int(model.num_timesteps) != prev["total_timesteps"]
