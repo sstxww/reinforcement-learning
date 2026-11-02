@@ -1,0 +1,113 @@
+{
+  "schema": 1,
+  "session_id": "s-20261103-406afe60",
+  "round": "R001",
+  "task_key": "policy/raw-ppo-sampling-vs-argmax-99831",
+  "status": "verified_negative_strength_result",
+  "engine": {
+    "name": "TavernGym",
+    "version": "1.1.0",
+    "source_hash": "6d8712c93022ba11",
+    "observation_floats": 4017,
+    "card_slots": 447,
+    "action_mask_count": 245
+  },
+  "source_checkpoint": {
+    "role": "latest_experimental_unpromoted",
+    "model_id": "v5-s-20261102-68099929-1408-41428692617",
+    "training_steps": 1408,
+    "sha256": "a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632",
+    "release_url": "https://github.com/sstxww/reinforcement-learning/releases/tag/v5-s-20261102-68099929-1408-41428692617"
+  },
+  "provenance": {
+    "source_run_url": "https://github.com/sstxww/reinforcement-learning/actions/runs/41511916662",
+    "source_run_conclusion": "success",
+    "source_commit": "b7260914ab2d7264cc44f1abc41f63bdf7f598f3",
+    "source_artifact_id": 13174485348,
+    "evidence_import_run_url": "https://github.com/sstxww/reinforcement-learning/actions/runs/41512673429",
+    "evidence_import_conclusion": "success",
+    "receipt_bytes_sha256_verified": true
+  },
+  "setup": {
+    "seed": 99831,
+    "controlled_seat": 0,
+    "opponents": "seven pinned TavernGym scripted bots",
+    "new_ppo_steps": 0,
+    "sampled_rng_seed": 100237,
+    "raw_model_has_rule_assistance": false
+  },
+  "arms": [
+    {
+      "policy": "baseline",
+      "mode": "scripted",
+      "receipt": "experiments/s-20261103-406afe60/001-baseline-99831.json",
+      "receipt_sha256": "4149499bd7fed09b45de93b5801d1b9db4cf9dd10c58df9f3045a7944876a97b",
+      "complete": true,
+      "rank": 8,
+      "turns": 15,
+      "decisions": 37,
+      "buy": 13,
+      "mask_legal_buy_decisions": 20,
+      "freeze": 0,
+      "refresh": 0,
+      "guard_forced_ends": 0,
+      "fallback_actions": 0,
+      "top4": false,
+      "win": false
+    },
+    {
+      "policy": "model",
+      "mode": "deterministic_argmax",
+      "receipt": "experiments/s-20261103-406afe60/002-argmax-99831.json",
+      "receipt_sha256": "aba5a0b30e205119c0ce52e06fbc446febf8338cb24c11626410bf5f2abb61dc",
+      "complete": true,
+      "rank": 8,
+      "turns": 14,
+      "decisions": 125,
+      "buy": 0,
+      "mask_legal_buy_decisions": 47,
+      "freeze": 70,
+      "refresh": 39,
+      "guard_forced_ends": 0,
+      "fallback_actions": 0,
+      "top4": false,
+      "win": false
+    },
+    {
+      "policy": "model",
+      "mode": "stochastic_masked",
+      "receipt": "experiments/s-20261103-406afe60/003-sampled-99831.json",
+      "receipt_sha256": "6355ab8757a1d6343480a2438b34f81784fb78adac7635b69efc1703592d3751",
+      "complete": true,
+      "rank": 8,
+      "turns": 15,
+      "decisions": 45,
+      "buy": 4,
+      "mask_legal_buy_decisions": 17,
+      "freeze": 8,
+      "refresh": 10,
+      "guard_forced_ends": 0,
+      "fallback_actions": 0,
+      "top4": false,
+      "win": false
+    }
+  ],
+  "paired_model_mean_placement_delta_sampled_minus_argmax": 0,
+  "model_conditional_buy_rates": {
+    "argmax": 0,
+    "sampled": 0.23529411764705882
+  },
+  "games_per_arm": 1,
+  "confidence_interval": null,
+  "model_strength_improved": false,
+  "model_promoted": false,
+  "new_model_checkpoint_release": null,
+  "caveats": [
+    "One seed/one controlled seat only; not a reliable competitive effect estimate",
+    "Legal BUY decision exposures are sequentially correlated, not independent purchase opportunities",
+    "Policy selection changes trajectories and later mask exposures",
+    "No new PPO training or optimizer-state persistence was performed",
+    "No ranked Arena games or estimated rating/MRR claim",
+    "Scripted baseline match is never model performance evidence"
+  ]
+}
