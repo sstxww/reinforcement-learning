@@ -1,0 +1,99 @@
+name: V5 checkpoint and real-game resume audit s-20261102-309d57fc
+
+on:
+  push:
+    branches:
+      - agent/s-20261102-309d57fc/optimization-001
+    paths:
+      - 'tavern_ai/checkpoint_integrity.py'
+      - 'tavern_ai/train.py'
+      - 'tests/test_checkpoint_integrity.py'
+      - '.github/workflows/experiment-s-20261102-309d57fc.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: checkpoint-s-20261102-309d57fc
+  cancel-in-progress: false
+
+jobs:
+  verify-resume-and-play:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install CPU training and test stack
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[train,test]'
+          python -m pytest tests/test_checkpoint_integrity.py
+      - name: Install pinned real TavernGym
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Download durable V2 Release and verify bytes, metadata and engine
+        run: |
+          mkdir -p checkpoints/source
+          gh release download v2-learning-41413557445 --repo "$GITHUB_REPOSITORY" \
+            --pattern model.zip --pattern model.metadata.json --dir checkpoints/source
+          python -m tavern_ai.checkpoint_integrity checkpoints/source/model.zip \
+            --check-engine \
+            --expected-sha256 73bde2666426cecce39f135980a897bb2cd4a7d70783ba04c9c0d29477a6664a
+      - name: Real bounded 128-step PPO resume (no champion promotion)
+        run: |
+          python -m tavern_ai.train --steps 128 --seed 42 \
+            --resume checkpoints/source/model.zip --out checkpoints/candidate.zip
+          python -m tavern_ai.checkpoint_integrity checkpoints/candidate.zip --check-engine
+      - name: Candidate plays a genuinely complete eight-seat game
+        run: |
+          python -m tavern_ai.canary --agent-id s-20261102-309d57fc \
+            --seed 63011 --policy model --model checkpoints/candidate.zip \
+            --receipt experiments/s-20261102-309d57fc/001-63011.json
+          python -m tavern_ai.validate_receipt experiments/s-20261102-309d57fc/001-63011.json
+      - name: Paired two-seed diagnostic comparison (not a strength claim)
+        run: |
+          python -m tavern_ai.evaluate --model checkpoints/candidate.zip \
+            --compare-baseline --games 2 --start-seed 63100 \
+            --out reports/s-20261102-309d57fc/resume-paired.json
+      - name: Commit owned real receipts and compact metrics only
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add experiments/s-20261102-309d57fc/ reports/s-20261102-309d57fc/
+          if ! git diff --cached --quiet; then
+            git commit -m 'results(v5): checkpoint smoke resume and real TavernGym evidence'
+            test "$GITHUB_REF_NAME" = 'agent/s-20261102-309d57fc/optimization-001'
+            git pull --rebase origin "$GITHUB_REF_NAME"
+            git push origin HEAD:"$GITHUB_REF_NAME"
+          fi
+      - name: Publish candidate-only durable Release after full verification
+        run: |
+          gh release create "v5-resume-${GITHUB_RUN_ID}" \
+            checkpoints/candidate.zip checkpoints/candidate.metadata.json \
+            experiments/s-20261102-309d57fc/001-63011.json \
+            reports/s-20261102-309d57fc/resume-paired.json \
+            --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
+            --prerelease --title "V5 verified resume candidate ${GITHUB_RUN_ID}" \
+            --notes '128-step smoke resumed from pinned V2 release; full-game plus two paired diagnostics; NOT a champion promotion.'
+      - name: Preserve failure diagnostics even if resume or game fails
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: checkpoint-audit-s-20261102-309d57fc-${{ github.run_id }}
+          path: |
+            checkpoints/*.zip
+            checkpoints/*.metadata.json
+            experiments/s-20261102-309d57fc/*.json
+            reports/s-20261102-309d57fc/*.json
+          if-no-files-found: ignore
+          retention-days: 30
