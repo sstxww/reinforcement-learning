@@ -15,7 +15,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   release-audit:
-    if: github.ref == 'refs/heads/agent/s-20261102-68099929/optimization-001' && github.event.head_commit.message == 'ci(v5): verify v2 Release download, SHA256, load, 128-step resume and genuine games'
+    if: false # One-shot 1408-step recovery already succeeded in run 41427963534; prevent duplicate training.
     runs-on: ubuntu-latest
     timeout-minutes: 90
     env:
