@@ -8,7 +8,7 @@ import pytest
 
 from tavern_ai.checkpoint_registry import file_sha256, validate_registry, verify_release
 
-REGISTRY = Path("models/registry.json")
+REGISTRY = Path("models/sessions/s-20261102-decfc670/registry.json")
 
 
 def inventory():
