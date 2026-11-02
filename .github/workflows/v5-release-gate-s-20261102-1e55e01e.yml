@@ -1,0 +1,64 @@
+name: V5 independent Release-gate proof s-20261102-1e55e01e
+
+on:
+  push:
+    branches:
+      - 'agent/s-20261102-1e55e01e/optimization-001'
+    paths:
+      - '.github/workflows/v5-release-gate-s-20261102-1e55e01e.yml'
+      - 'scripts/v5_train_release_source_1e55e01e.py'
+      - 'tests/test_v5_train_release_source_1e55e01e.py'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: v5-release-gate-s-20261102-1e55e01e
+  cancel-in-progress: false
+
+jobs:
+  source-gate-and-real-match:
+    runs-on: ubuntu-latest
+    timeout-minutes: 65
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Test canonical Release source selection and integrity
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[test]'
+          python -m pytest -q tests/test_v5_train_release_source_1e55e01e.py
+          python scripts/v5_train_release_source_1e55e01e.py \
+            | tee /tmp/release-source-selection.json
+      - name: Install pinned TavernGym engine
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Play independent complete eight-seat TavernGym match
+        run: |
+          mkdir -p experiments/s-20261102-1e55e01e
+          python -m tavern_ai.canary \
+            --agent-id s-20261102-1e55e01e \
+            --policy baseline --seed 95001 \
+            --receipt experiments/s-20261102-1e55e01e/001-95001.json
+          python -m tavern_ai.validate_receipt experiments/s-20261102-1e55e01e/001-95001.json
+      - name: Explain permanent receipt provenance
+        run: |
+          echo 'The completed seed-95001 receipt from workflow run 41450170855'
+          echo 'was downloaded from actual Actions Artifact 13144577744 and'
+          echo 'committed by the integration session as experiments/s-20261102-1e55e01e/001-95001.json.'
+          echo 'Do not push from a stale Actions checkout; preserve new proof in the current run Artifact.'
+      - name: Preserve independent game evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v5-release-gate-s-20261102-1e55e01e
+          path: |
+            experiments/s-20261102-1e55e01e/*.json
+          if-no-files-found: ignore
+          retention-days: 30

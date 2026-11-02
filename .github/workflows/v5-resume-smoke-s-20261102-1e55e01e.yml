@@ -1,0 +1,101 @@
+name: V5 isolated Release-resume 128-step smoke s-20261102-1e55e01e
+
+on:
+  push:
+    branches: ['agent/s-20261102-1e55e01e/optimization-001']
+    paths: ['.github/workflows/v5-resume-smoke-s-20261102-1e55e01e.yml']
+
+permissions:
+  contents: write
+
+concurrency:
+  group: v5-128-step-s-20261102-1e55e01e
+  cancel-in-progress: false
+
+jobs:
+  verified-bounded-continuation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install training dependencies and pinned TavernGym
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[train,test]'
+          python -m pytest -q tests/test_v5_train_release_source_1e55e01e.py
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Download and byte-verify registered durable source Release
+        run: |
+          mkdir -p checkpoints artifacts
+          python scripts/v5_train_release_source_1e55e01e.py > artifacts/source-selection.json
+          MODEL="$(python -c 'import json;print(json.load(open("artifacts/source-selection.json"))["model_id"])')"
+          SHA="$(python -c 'import json;print(json.load(open("artifacts/source-selection.json"))["expected_sha256"])')"
+          METASHA="$(python -c 'import json;print(json.load(open("artifacts/source-selection.json"))["metadata_sha256"])')"
+          gh release download "$MODEL" --repo "$GITHUB_REPOSITORY" \
+            --pattern 'model.zip' --pattern 'model.metadata.json' --dir checkpoints
+          echo "$METASHA  checkpoints/model.metadata.json" | sha256sum --check -
+          python -m tavern_ai.checkpoint_preflight \
+            --model checkpoints/model.zip \
+            --metadata checkpoints/model.metadata.json \
+            --expected-sha256 "$SHA" --probe-inference > artifacts/source-preflight.json
+      - name: Restore optimizer and perform 128 real PPO steps
+        run: |
+          python -m tavern_ai.train --resume checkpoints/model.zip \
+            --steps 128 --seed 95001 --out checkpoints/resumed.zip \
+            | tee artifacts/train-output.txt
+          python - <<'PY'
+          import json
+          a=json.load(open("checkpoints/model.metadata.json"))
+          b=json.load(open("checkpoints/resumed.metadata.json"))
+          assert a["engine"] == b["engine"]
+          assert b["total_timesteps"] >= a["total_timesteps"] + 128
+          print("RESUME_TOTAL",a["total_timesteps"],b["total_timesteps"])
+          PY
+      - name: Strict model-controlled full eight-seat game
+        run: |
+          python -m tavern_ai.canary --agent-id s-20261102-1e55e01e \
+            --policy model --model checkpoints/resumed.zip --seed 95011 \
+            --receipt artifacts/resumed-model-95011.json
+          python -m tavern_ai.validate_receipt artifacts/resumed-model-95011.json
+      - name: Small heldout candidate versus baseline paired evaluation
+        run: |
+          python -m tavern_ai.evaluate --policy model --model checkpoints/resumed.zip \
+            --compare-baseline --games 2 --start-seed 95021 \
+            --out artifacts/paired-eval.json
+      - name: Publish and re-download durable unpromoted research candidate
+        run: |
+          TAG="v5-s-20261102-1e55e01e-smoke-$GITHUB_RUN_ID"
+          sha256sum checkpoints/resumed.zip checkpoints/resumed.metadata.json > artifacts/checkpoint.sha256
+          gh release create "$TAG" \
+            checkpoints/resumed.zip#model.zip \
+            checkpoints/resumed.metadata.json#model.metadata.json \
+            artifacts/source-selection.json artifacts/source-preflight.json \
+            artifacts/resumed-model-95011.json artifacts/paired-eval.json \
+            artifacts/checkpoint.sha256 \
+            --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --prerelease \
+            --title "UNPROMOTED 128-step V5 Release-resume engineering smoke" \
+            --notes "Independent engineering-only candidate; source SHA and metadata independently checked. No Champion and no validated competitive gain. Compare paired games and guard attribution before use."
+          mkdir -p artifacts/published
+          gh release download "$TAG" --repo "$GITHUB_REPOSITORY" \
+            --pattern 'model.zip' --pattern 'model.metadata.json' --dir artifacts/published
+          cmp checkpoints/resumed.zip artifacts/published/model.zip
+          cmp checkpoints/resumed.metadata.json artifacts/published/model.metadata.json
+      - name: Preserve actual training or failure evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v5-smoke-s-20261102-1e55e01e
+          path: |
+            artifacts/*.json
+            artifacts/*.txt
+            artifacts/*.sha256
+            checkpoints/resumed.zip
+            checkpoints/resumed.metadata.json
+          if-no-files-found: ignore
+          retention-days: 14

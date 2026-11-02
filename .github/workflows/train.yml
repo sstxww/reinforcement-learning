@@ -1,12 +1,12 @@
-name: Train - incremental V1
+name: Train - gated Release continuation V5
 
 on:
   workflow_dispatch:
     inputs:
       steps:
-        description: 'PPO steps: 128 to 20000'
+        description: 'Bounded PPO verification steps: 128 to 512'
         required: true
-        default: '2048'
+        default: '128'
       eval_games:
         description: 'Held-out full games: 1 to 10'
         required: true
@@ -15,7 +15,7 @@ on:
     - cron: '13 4 * * 1'
 
 permissions:
-  contents: read
+  contents: write
   actions: read
 
 concurrency:
@@ -40,39 +40,47 @@ jobs:
           python -m pip install -e '.[train,test]'
       - name: Install pinned TavernGym 1.1 engine
         run: bash scripts/bootstrap_engine.sh
-      - name: Restore last successful compatible model
+      - name: Choose canonical registered source, download durable Release and verify actual bytes
         shell: bash
         run: |
-          mkdir -p checkpoints
-          RUN_ID="$(gh api "repos/${GITHUB_REPOSITORY}/actions/workflows/train.yml/runs?branch=main&status=success&per_page=1" --jq '.workflow_runs[0].id // empty' || true)"
-          if [[ -n "$RUN_ID" ]]; then
-            if gh run download "$RUN_ID" --repo "$GITHUB_REPOSITORY" --name v1-model --dir checkpoints; then
-              test -f checkpoints/model.zip
-              test -f checkpoints/model.metadata.json
-            else
-              echo "No compatible prior artifact; initializing a fresh checkpoint"
-              rm -f checkpoints/model.zip checkpoints/model.metadata.json
-            fi
-          else
-            echo "First run; training from scratch"
-          fi
+          mkdir -p checkpoints artifacts
+          python scripts/v5_train_release_source_1e55e01e.py \
+            | tee artifacts/source-selection.json
+          MODEL_ID="$(python -c 'import json;print(json.load(open("artifacts/source-selection.json"))["model_id"])')"
+          SHA="$(python -c 'import json;print(json.load(open("artifacts/source-selection.json"))["expected_sha256"])')"
+          META_SHA="$(python -c 'import json;print(json.load(open("artifacts/source-selection.json"))["metadata_sha256"])')"
+          gh release download "$MODEL_ID" --repo "$GITHUB_REPOSITORY" \
+            --pattern 'model.zip' --pattern 'model.metadata.json' --dir checkpoints
+          test -s checkpoints/model.zip
+          test -s checkpoints/model.metadata.json
+          echo "$META_SHA  checkpoints/model.metadata.json" | sha256sum --check -
+          python -m tavern_ai.checkpoint_preflight \
+            --model checkpoints/model.zip --metadata checkpoints/model.metadata.json \
+            --expected-sha256 "$SHA" --probe-inference \
+            | tee artifacts/source-preflight.json
       - name: Incremental Maskable PPO
         shell: bash
         env:
-          STEPS: ${{ github.event.inputs.steps || '2048' }}
+          STEPS: ${{ github.event.inputs.steps || '128' }}
         run: |
-          if [[ ! "$STEPS" =~ ^[0-9]+$ ]] || (( STEPS < 128 || STEPS > 20000 )); then
-            echo 'steps must be 128..20000'; exit 2
+          if [[ ! "$STEPS" =~ ^[0-9]+$ ]] || (( STEPS < 128 || STEPS > 512 )); then
+            echo 'steps must be 128..512 until validation gates permit more'; exit 2
           fi
-          args=(--steps "$STEPS" --seed 42 --out checkpoints/model.zip)
-          if [[ -f checkpoints/model.zip ]]; then
-            args+=(--resume checkpoints/model.zip)
-          fi
-          python -m tavern_ai.train "${args[@]}"
+          python -m tavern_ai.train --steps "$STEPS" --seed 42 \
+            --resume checkpoints/model.zip --out checkpoints/challenger.zip \
+            | tee artifacts/training-log.txt
+          STEPS="$STEPS" python - <<'PY'
+          import json,os
+          old=json.load(open('checkpoints/model.metadata.json'))
+          new=json.load(open('checkpoints/challenger.metadata.json'))
+          assert old['engine']==new['engine']
+          assert new['total_timesteps'] >= old['total_timesteps']+int(os.environ['STEPS'])
+          print('Real PPO continuation:', old['total_timesteps'], '->', new['total_timesteps'])
+          PY
       - name: Model plays full eight-seat game
         run: |
           python -m tavern_ai.canary --agent-id training-v1 \
-            --policy model --model checkpoints/model.zip --seed 9001 \
+            --policy model --model checkpoints/challenger.zip --seed 9001 \
             --receipt artifacts/trained-canary.json
           python -m tavern_ai.validate_receipt artifacts/trained-canary.json
       - name: Evaluate model on held-out seeds
@@ -83,17 +91,41 @@ jobs:
           if [[ ! "$EVAL_GAMES" =~ ^[0-9]+$ ]] || (( EVAL_GAMES < 1 || EVAL_GAMES > 10 )); then
             echo 'eval_games must be 1..10'; exit 2
           fi
-          python -m tavern_ai.evaluate --model checkpoints/model.zip \
-            --games "$EVAL_GAMES" --start-seed 24000 \
+          python -m tavern_ai.evaluate --model checkpoints/challenger.zip \
+            --compare-baseline --games "$EVAL_GAMES" --start-seed 24000 \
             --out artifacts/evaluation.json
-      - name: Save resumable checkpoint and evidence
+      - name: Publish only game-completing unpromoted candidate as immutable Release
+        shell: bash
+        run: |
+          TAG="v5-main-unpromoted-$GITHUB_RUN_ID"
+          sha256sum checkpoints/challenger.zip checkpoints/challenger.metadata.json \
+            > artifacts/checkpoint.sha256
+          gh release create "$TAG" \
+            checkpoints/challenger.zip#model.zip \
+            checkpoints/challenger.metadata.json#model.metadata.json \
+            artifacts/source-selection.json artifacts/source-preflight.json \
+            artifacts/trained-canary.json artifacts/evaluation.json \
+            artifacts/checkpoint.sha256 \
+            --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --prerelease \
+            --title "UNPROMOTED V5 bounded continuation $GITHUB_RUN_ID" \
+            --notes "Only after verified source Release, real PPO continuation, strict model game and paired evaluation. No Champion promotion or proven competitive gain."
+          mkdir -p artifacts/release-redownload
+          gh release download "$TAG" --repo "$GITHUB_REPOSITORY" \
+            --pattern 'model.zip' --pattern 'model.metadata.json' --dir artifacts/release-redownload
+          cmp checkpoints/challenger.zip artifacts/release-redownload/model.zip
+          cmp checkpoints/challenger.metadata.json artifacts/release-redownload/model.metadata.json
+      - name: Preserve short-lived audit artifact even on failure
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: v1-model
+          name: v5-main-verification-${{ github.run_id }}
           path: |
-            checkpoints/model.zip
-            checkpoints/model.metadata.json
+            checkpoints/challenger.zip
+            checkpoints/challenger.metadata.json
+            artifacts/source-selection.json
+            artifacts/source-preflight.json
+            artifacts/checkpoint.sha256
             artifacts/trained-canary.json
             artifacts/evaluation.json
           if-no-files-found: error
-          retention-days: 90
+          retention-days: 30
