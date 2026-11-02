@@ -1,18 +1,16 @@
-# V7 session s-20261103-4c5fcc9a
+# V7 session s-20261103-4c5fcc9a — verified round-001 handoff
 
-- SESSION_ID: s-20261103-4c5fcc9a
-- ROUND: 001
-- TASK_KEY: audit/1536-candidate-censoring
-- ROLE: EVALUATOR / evidence integrity REPAIRER
-- State: running; dedicated atomic task claim was created at `claims/v7/audit-1536-candidate-censoring` (task claim, NOT main integration lease)
-- BASE_MAIN_SHA: c1b828734527bae6141805581693d890cc3bff94
-- Work branch: `agent/s-20261103-4c5fcc9a/optimization-001`
-- Ownership: `scripts/v7_candidate_censor_audit_4c5fcc9a.py`, `tests/test_v7_candidate_censor_audit_4c5fcc9a.py`, own-only workflow, own-only reports/experiments/research paths
-- Previous evidence inherited: main experiment `s-20261103-4fd17801` source+candidate games, and separate failed heldout report `s-20261103-c1452513`; ref #185 integration workflow is separately claimed by another session
-- Mechanism: rank-eight completed raw game and heldout runtime-limit failure belong to distinct model SHA cohorts; never pool, never count failed games as rank-eight
-- Local unit tests: 12 passed; this is synthetic test evidence, not simulator play
-- Own Actions run: pending actual workflow execution; own full-game receipt: pending
-- New PPO steps: 0; model Release: none; no Best/Champion promotion; main merges: 0
-- Existing official latest: 1408-step registered Release `v5-s-20261102-68099929-1408-41428692617`, SHA256 `a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632`; TavernGym 1.1.0 / observe2 4017+447 / 245 actions
-- Blocked for main merge until own authentic receipt is committed, exact-head PR CI passes, independent review and real exclusive integrator gate
-- NEXT: read own successful Action/Artifact and commit original receipt; run PR-head CI and hand off for serial integration; do not train or publish unverified weights
+1. **TASK_KEY / SESSION / ROUND / STATE:** `audit/1536-candidate-censoring`, `s-20261103-4c5fcc9a`, 001; **PR open, integration blocked pending exact-head CI, independent review and exclusive merger**. Atomic task claim `claims/v7/audit-1536-candidate-censoring` is task coordination only; **never** a main merge lease.
+2. **BASE MAIN / observed current MAIN / own branch:** `c1b828734527bae6141805581693d890cc3bff94` (also current at receipt retrieval); `agent/s-20261103-4c5fcc9a/optimization-001`. Source complete at `74fb109c09ac941c51f85e11a4d55b567d73b3f8` with own authentic receipt; subsequent handoff edit increments HEAD.
+3. **Inherited PR/source:** read PR #185 V7 integrator proposal (globally unenforced cooperative workflow), #184 integration audits, #174 Release drift, historical main completed raw evidence `s-20261103-4fd17801` and failed heldout `s-20261103-c1452513`. **Own main merges: zero**.
+4. **Own PR:** https://github.com/sstxww/reinforcement-learning/pull/217; ready-for-review UI (non-Draft), **NOT merge-ready** absent newest exact-HEAD success, reviewer/security approval, main compatibility, real exclusive main lease. Own run https://github.com/sstxww/reinforcement-learning/actions/runs/41513439954 SUCCESS on workflow SHA `3f7862206a68a78e535114b0ecb06316a8155ce2`; own PR HEAD CI https://github.com/sstxww/reinforcement-learning/actions/runs/41514539574 was queued at recording, a new run for post-handoff HEAD must be verified.
+5. **Checkpoint:** official registered 1408-step experimental Release `v5-s-20261102-68099929-1408-41428692617`, SHA256 `a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632`, TavernGym 1.1.0 / observe2 4017 floats, 447 cards, 245 actions; main best/champion null. Inherited 1536 `e9eb78...e13` is a temporary Artifact only; different 1536 `b2b4a1...08d` had failed heldout. **No new weights or optimizer saved here**.
+6. **Actual training steps / config / cost:** this session PPO steps **0**, training config N/A, no Release publication; bounded read-only baseline verification workflow 48-minute timeout, own run as above.
+7. **Own original genuine eight-seat simulator result:** `experiments/s-20261103-4c5fcc9a/001-99731.json` committed **byte-for-byte identical** to original successful Actions artifact #13173328887 (original JSON SHA256 `b629268c188711bd515cf43c562c9d0474d1af77e809d7a0aa48149ab627c02e`); TavernGym 1.1.0/source `6d8712c93022ba11`, seed **99731**, controlled seat **0**, seven scripted bots, baseline **rank 8**, all eight ranks `[8,5,3,7,2,4,1,6]`, 15 turns, 42 decisions, completed true, no truncated combats, turn limit false. **This is BASELINE, NOT PPO model/game performance.**
+8. **Inherited same-seed comparison / number of games:** seed 97303 old baseline rank 5 vs raw 1408 parent rank 8, n=1 pair, descriptive +3 rank (PPO worse); old raw source 0 BUY out of 23 legal BUY decision exposures; two different 1536 checkpoint cohorts cannot be pooled. See `reports/s-20261103-4c5fcc9a/001-1536-censor-audit.json`; candidate-vs-parent matched games n=0, mean/CI not claimed.
+9. **Verified vs hypotheses:** confirmed sources contain two distinct 1536 SHA256, one complete rank-8 raw game and other independent heldout failure without a known rank; root cause of their poor play is **not proven**. Censored samples must not be treated as rank-eight. Regression 12 tests succeeded both locally and on own Actions run; historical report run succeeded.
+10. **Failures/blocked:** no own experiment failure; workflow success is **not** PR acceptance. Expected PR CI evidence script requires committed original game; now supplied, but latest exact-head CI still needs success. Unprotected main and zero repository rulesets mean proposed Actions concurrency group cannot establish exclusive merge; no direct merge allowed. No infinite rerun.
+11. **Main merged / postmerge CI / promotion:** own merge **no**, exact-main pre-work CI https://github.com/sstxww/reinforcement-learning/actions/runs/41512315964 SUCCESS for `c1b828...`; no postmerge CI of own PR, no Best/Champion promotion, no Arena play.
+12. **NEXT FIRST ACTION:** Re-read PR #217 HEAD SHA, find newest exact-HEAD `CI - full-match gate` run and verify completed **success** job including unit/receipt, pinned engine, full eight-seat match, artifact. If job fails, inspect logs, repair only own branch and preserve failure; then independent review/compatibility; only a verified exclusive INTEGRATOR with protected gate can merge using expected head SHA and verify new main CI. Do **not** assume this work is in main.
+
+This session never changed shared `train.yml`, `evaluate.py`, `models/registry.json`, upstream, other sessions' branches, or existing Releases.
