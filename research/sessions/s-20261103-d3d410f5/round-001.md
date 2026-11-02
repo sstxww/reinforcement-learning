@@ -1,0 +1,11 @@
+# R001 — Fail-closed serialized integration gateway
+
+Hypothesis: an unprotected main with many live concurrent sessions needs a single serial main entry, explicit latest-head/base checks, real eight-seat CI confirmation, and actual independent GitHub review rather than old green badges.
+
+Implemented a main-only, manual-dispatch Actions workflow with fixed `autotavern-main-integrate` concurrency; a stdlib-only GitHub API gate checks exact PR number/repo/head SHA and main SHA, non-Draft/clean mergeability, at least one non-author `APPROVED` review **for the current head**, newest successful `pull_request` workflow run started after main's last commit, passing full-match job steps, and last-second SHA recheck. The explicit `execute_merge` input defaults false. If true after these gates, GitHub merges with exact PR head SHA and the job waits for new main CI.
+
+A separate branch push workflow **completed SUCCESS** in [Actions 41512407251](https://github.com/sstxww/reinforcement-learning/actions/runs/41512407251): verified pinned engine, all V7 regression tests and a real eight-seat **baseline-only** match, seed 99673, seat 0 rank 7, 43 decisions, turn 16, placements [7,2,1,3,8,5,4,6], 0 truncations. Original artifact 13174146377 and byte-exact committed receipt `experiments/s-20261103-d3d410f5/001-99673.json`, SHA256 72e4c7094af59f7b2c551c8f5f3f18d6b115fcb36141409bc9fa3cff4655286e. This does NOT evaluate PPO. The shared trainer, evaluator and model registry are not touched.
+
+Safety limits: serialized workflow cannot prevent out-of-band direct merges; pending dispatches are not FIFO and can be replaced, so this is not a generic lease. No true exclusive integration right claimed. An external review is mandatory: if a single-user GitHub repository cannot supply a different reviewer, record a hard blocker rather than silently disable. Semantic code review, security and branch rules remain required.
+
+Historical evidence: main around 3a745c6f6a48c65528bcbeb81b8627b8db93f046; #176 concurrently merged true 1408→1536 resume with raw model rank-eight. This session added 0 training steps, 0 new Release, 0 model games, 0 model promotions and 0 merges. Pending genuine baseline game evidence: run unknown.

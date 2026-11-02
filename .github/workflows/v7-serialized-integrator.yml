@@ -1,0 +1,83 @@
+name: V7 - serialized reviewed main integration
+
+on:
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: "Non-Draft main-target PR; exact-head independent GitHub approval required"
+        required: true
+        type: number
+      expected_head_sha:
+        description: "40-hex PR head SHA"
+        required: true
+        type: string
+      expected_main_sha:
+        description: "40-hex main SHA"
+        required: true
+        type: string
+      execute_merge:
+        description: "False: read-only preflight. True: merge only after all gates pass."
+        required: true
+        default: false
+        type: boolean
+
+permissions: {}
+concurrency:
+  group: autotavern-main-integrate
+  cancel-in-progress: false
+
+jobs:
+  read-only-preflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    permissions:
+      contents: read
+      pull-requests: read
+      actions: read
+    steps:
+      - name: Trusted main source, never PR head source
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Test fail-closed merge gate without write token
+        run: |
+          python -m pip install pytest
+          python -m pytest -q tests/test_v7_serial_integrator_d3d410f5.py
+      - name: Read-only exact-head preflight
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          INPUT_PR: ${{ inputs.pr_number }}
+          INPUT_HEAD: ${{ inputs.expected_head_sha }}
+          INPUT_MAIN: ${{ inputs.expected_main_sha }}
+        run: |
+          python scripts/v7_serial_integrator.py \
+            --pr "$INPUT_PR" --head "$INPUT_HEAD" --main "$INPUT_MAIN"
+
+  sha-bound-merge:
+    if: ${{ inputs.execute_merge }}
+    needs: read-only-preflight
+    runs-on: ubuntu-latest
+    timeout-minutes: 28
+    permissions:
+      contents: write
+      pull-requests: write
+      actions: read
+    steps:
+      - name: Trusted main source with no persisted checkout credentials
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: false
+      - name: SHA-bound reviewed merge and exact main CI verification
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          INPUT_PR: ${{ inputs.pr_number }}
+          INPUT_HEAD: ${{ inputs.expected_head_sha }}
+          INPUT_MAIN: ${{ inputs.expected_main_sha }}
+        run: |
+          python3 scripts/v7_serial_integrator.py \
+            --pr "$INPUT_PR" --head "$INPUT_HEAD" --main "$INPUT_MAIN" --apply
