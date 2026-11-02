@@ -3,7 +3,7 @@
 - Round: 001 completed, awaiting PR CI review
 - Branch: `agent/s-20261102-cbc3c4927c/optimization-001`
 - Base: `6ac59235b8238196a0e6462de77b72413c829372`
-- PR: to be linked in a follow-up status-only commit
+- PR: [#22](https://github.com/sstxww/reinforcement-learning/pull/22) (draft; final CI review pending)
 - Code: factorized card encoder + masked legal end-turn safety experiment; isolated tests/workflow
 - Training: two real independent runs of 128 timesteps = 256 timesteps executed; final saved PPO was trained for 128 timesteps (not resumed)
 - Failed attempt: [Actions 41413377072](https://github.com/sstxww/reinforcement-learning/actions/runs/41413377072), unguarded PPO game hit loop safety limit
