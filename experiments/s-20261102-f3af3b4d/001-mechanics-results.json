@@ -1,0 +1,140 @@
+{
+  "schema": 1,
+  "agent_id": "s-20261102-f3af3b4d",
+  "engine": {
+    "version": "1.1.0",
+    "source_hash": "6d8712c93022ba11",
+    "features": 4017,
+    "cards": 447,
+    "actions": 245,
+    "n_cards": 3984
+  },
+  "seed": 78101,
+  "action_partitions": {
+    "activate": 7,
+    "buy": 8,
+    "cancel": 1,
+    "choose": 16,
+    "dark_gift": 1,
+    "end": 1,
+    "freeze": 1,
+    "hero_power": 2,
+    "magnetize": 70,
+    "move": 49,
+    "play": 80,
+    "refresh": 1,
+    "sell": 7,
+    "upgrade": 1
+  },
+  "card_coverage": {
+    "all_cards": 3983,
+    "embedding_vocab_including_padding": 3984,
+    "in_pool": 667,
+    "reachable": 1163,
+    "scripted": 1896,
+    "implemented": 2194,
+    "reachable_pool_implemented": 666,
+    "types": {
+      "dark_gift": 47,
+      "hero": 143,
+      "hero_power": 176,
+      "minion": 2596,
+      "quest": 23,
+      "quest_reward": 73,
+      "spell": 297,
+      "tavern_spell": 208,
+      "trinket_greater": 219,
+      "trinket_lesser": 201
+    },
+    "generated_catalog_sha256": "3717a8dd6c0bb80acb9d0fcf494806f391c1aec69035a959670d9c7f57e4bb48",
+    "limits": "Engine metadata flags are not effect-trigger verification."
+  },
+  "controlled_mechanics_probes": [
+    {
+      "seed": 78101,
+      "initial_choice_count": 2,
+      "zero_gold_legal_buy_count": 0,
+      "high_gold_legal_buy_count": 4,
+      "positive_price_unaffordable_cases": 4,
+      "transitions": {
+        "freeze": {
+          "executed": true,
+          "toggled": true,
+          "gold_delta": 0
+        },
+        "upgrade": {
+          "executed": true,
+          "tier_before": 1,
+          "tier_after": 2
+        },
+        "buy": {
+          "executed": true,
+          "index": 8,
+          "gold_before": 100,
+          "gold_after": 97,
+          "hand_before": 0,
+          "hand_after": 1
+        },
+        "refresh": {
+          "executed": true,
+          "shop_after": 4
+        },
+        "end": {
+          "executed": true,
+          "still_needs_action": false
+        }
+      },
+      "warning": "Debug gold interventions are not natural game observations or training inputs."
+    },
+    {
+      "seed": 78102,
+      "initial_choice_count": 2,
+      "zero_gold_legal_buy_count": 0,
+      "high_gold_legal_buy_count": 4,
+      "positive_price_unaffordable_cases": 4,
+      "transitions": {
+        "freeze": {
+          "executed": true,
+          "toggled": true,
+          "gold_delta": 0
+        },
+        "upgrade": {
+          "executed": true,
+          "tier_before": 1,
+          "tier_after": 2
+        },
+        "buy": {
+          "executed": true,
+          "index": 8,
+          "gold_before": 100,
+          "gold_after": 97,
+          "hand_before": 0,
+          "hand_after": 1
+        },
+        "refresh": {
+          "executed": true,
+          "shop_after": 4
+        },
+        "end": {
+          "executed": true,
+          "still_needs_action": false
+        }
+      },
+      "warning": "Debug gold interventions are not natural game observations or training inputs."
+    }
+  ],
+  "full_match_receipt": "001-real-eight-seat.json",
+  "full_match_rank": 8,
+  "train_steps": 0,
+  "model_checkpoint": null,
+  "strength_claim": null,
+  "features": 4017,
+  "card_slots": 447,
+  "actions": 245,
+  "limits": [
+    "No PPO/BC training and no learned strategy demonstrated.",
+    "Catalog effect flags do not verify the meaning of card text.",
+    "Debug interventions never enter policy observations.",
+    "One baseline full-match is an engineering gate, not evidence of improvement."
+  ]
+}
