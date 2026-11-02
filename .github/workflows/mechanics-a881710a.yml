@@ -1,0 +1,47 @@
+name: Mechanics catalog and real-game probe a881710a
+on:
+  push:
+    branches: ['agent/s-20261102-a881710a/optimization-001']
+    paths:
+      - 'tavern_ai/mechanics_probe_a881710a.py'
+      - 'tests/test_mechanics_probe_a881710a.py'
+      - '.github/workflows/mechanics-a881710a.yml'
+permissions:
+  contents: read
+concurrency:
+  group: mechanics-a881710a
+  cancel-in-progress: false
+jobs:
+  metadata-and-real-match:
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install project and run isolated unit tests
+        run: |
+          python -m pip install -e '.[test]'
+          python -m pytest tests/test_mechanics_probe_a881710a.py
+          python -m pytest
+      - name: Build and verify pinned TavernGym only
+        run: bash scripts/bootstrap_engine.sh
+      - name: Extract source-bound card metadata and play instrumented real game
+        run: |
+          python -m tavern_ai.mechanics_probe_a881710a \
+            --seed 27861 --out experiments/s-20261102-a881710a
+      - name: Run independent full 8-seat baseline match and validate true receipt
+        run: |
+          python -m tavern_ai.canary \
+            --agent-id s-20261102-a881710a --seed 27862 --policy baseline \
+            --receipt experiments/s-20261102-a881710a/001-27862.json
+          python -m tavern_ai.validate_receipt experiments/s-20261102-a881710a/001-27862.json
+      - name: Upload isolated, finite source and game evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mechanics-a881710a-evidence
+          path: experiments/s-20261102-a881710a/
+          if-no-files-found: ignore
+          retention-days: 30
