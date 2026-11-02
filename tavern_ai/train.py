@@ -24,6 +24,33 @@ def require_verified_resume(resume: Path, metadata: dict) -> str:
     return sha256_file(resume)
 
 
+def verify_parent_before_load(engine: dict, parent: dict) -> None:
+    """Fail closed on incompatible resume metadata before PPO deserialization/learn.
+
+    This preflight is deliberately repeated by build_checkpoint_metadata after
+    training; the post-save gate alone cannot protect expensive GPU/CPU steps.
+    A bound checkpoint digest is checked separately before MaskablePPO.load.
+    """
+    if not isinstance(parent, dict) or parent.get("engine") != engine:
+        raise ValueError("Incompatible parent engine before PPO load")
+    previous = parent.get("total_timesteps")
+    if type(previous) is not int or previous < 1:
+        raise ValueError("Invalid parent total_timesteps before PPO load")
+    schema = parent.get("schema")
+    if schema == 1:
+        return
+    if schema != 2:
+        raise ValueError("Unknown parent checkpoint schema before PPO load")
+    from .contract import CATALOG_SHA256, PATCH_SHA256, RULESET_ID, UPSTREAM_COMMIT
+    expected = {
+        "engine": engine, "catalog_sha256": CATALOG_SHA256,
+        "patch_sha256": PATCH_SHA256, "ruleset_id": RULESET_ID,
+        "upstream_commit": UPSTREAM_COMMIT,
+    }
+    if parent.get("compatibility") != expected:
+        raise ValueError("Parent schema-2 compatibility provenance mismatch before PPO load")
+
+
 def build_checkpoint_metadata(
     *, engine: dict, seed: int, total_timesteps: int,
     parent: dict | None = None, parent_sha256: str | None = None,
@@ -91,6 +118,7 @@ def run(steps: int, seed: int, model_out: Path, resume: Path | None = None):
             prev = json.loads(meta_path.read_text(encoding="utf-8"))
             if not isinstance(prev, dict) or prev.get("engine") != engine:
                 raise ValueError("Checkpoint engine or card vocabulary mismatch")
+            verify_parent_before_load(engine, prev)
             parent_sha256 = require_verified_resume(resume, prev)
             model = MaskablePPO.load(str(resume), env=env, device="cpu")
             if type(prev.get("total_timesteps")) is not int or (
