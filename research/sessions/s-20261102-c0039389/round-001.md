@@ -22,8 +22,15 @@ New `tavern_ai/seat_position_experiment.py`:
 ## Baseline, training and interpretation
 Baseline: untouched V0 rule policy controlling seat 0. Experimental arm: the **same** V0 rule policy controlling seat 4. Not a trained PPO candidate. PPO training steps: **0**. No model checkpoint or Best promotion. Both arms share each seed, but distinct seats may receive distinct heroes and action order; any rank difference is descriptive only.
 
-## Real execution evidence
-**Pending**. No run link, completed match, seed-based ranks, performance metrics or check-point hash should be claimed until GitHub Actions actually succeeds. On success, inspect the run and receipt files, update this report with factual run URL, final head, canary rank/decisions, other seven placements, 3+3 paired comparison, all safety assertions, and CI.
+## Real execution evidence (verified)
+- Successful isolated run: https://github.com/sstxww/reinforcement-learning/actions/runs/41416587540. Job `125181813694` completed **success**. Workflow trigger SHA `4f775d7edab7114a17a740f864d26777b308c72f`. Evidence bot commit `f201284469f777a9dec0fe80f206a461c9dbb100`.
+- The complete repository pytest suite passed, real pinned TavernGym bootstrap and contract passed, **7 independent full eight-seat TavernGym games** passed all validation, and generated data was committed to our session branch.
+- Required self-controlled game: `experiments/s-20261102-c0039389/001-45600.json`. Seed `45600`, controlled seat `4`, final controlled rank **4**, decisions **67**, game turns **17**, eight placements `[3,1,8,6,4,2,5,7]`, `Game.is_over()==True`. No invalid actions, truncations (`0`) or turn-limit end (`false`).
+- Three untouched control games at seat 0 and three identical-policy experimental games at seat 4, paired by held-out seeds `45601,45602,45603`. Seat-0 ranks `[8,8,8]` vs seat-4 ranks `[7,7,4]`. Mean rank seat0 `8.0`, seat4 `6.0`; paired rank differences `[-1,-1,-4]`, average `-2.0`. Top-four rates `0/3` vs `1/3`; first-place rates both `0/3`. Evidence `reports/s-20261102-c0039389/seat-comparison.json`, each original full receipt under `experiments/s-20261102-c0039389/`.
+- Real engine `TavernGym 1.1.0`, fingerprint `6d8712c93022ba11`, observe2 4017 / 447 / 245. Original untouched rule policy source SHA256 `e4722a44660f8a880c9eeb949c80e81ebb652926f43d71acd64f958762bd6bac`.
+- **Not a gain:** seat assignment may also change heroes, opponents and action order. This small sample establishes seat sensitivity for these seeds, **not** a causal effect or improvement in underlying decision policy. No PPO model was used; training steps `0`, checkpoint `null`, Best/Latest unchanged. No formal inference from n=3.
+- Artifact ID `13127922958` expires `2026-12-02T08:57:41Z`; compact immutable evidence is preserved in the branch. No permanent model artifact was created.
+- Faults / repairs: none in this experimental run. Final PR-head CI will be reported separately; do not infer PR CI success from this branch's custom workflow.
 
 ## Next hypothesis
 If seat 0 and 4 differ, test all eight seats over larger independent seeds with hero stratification and explicit sampling uncertainty, separate from actual policy optimization.
