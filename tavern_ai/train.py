@@ -37,6 +37,8 @@ def verify_parent_before_load(engine: dict, parent: dict) -> None:
     if type(previous) is not int or previous < 1:
         raise ValueError("Invalid parent total_timesteps before PPO load")
     schema = parent.get("schema")
+    if type(schema) is not int:
+        raise ValueError("Invalid parent checkpoint schema before PPO load")
     if schema == 1:
         return
     if schema != 2:
