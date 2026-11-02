@@ -4,7 +4,7 @@
 - Branch: `agent/s-20261102-2b0d8089/optimization-001`; base main `6ac59235b8238196a0e6462de77b72413c829372`.
 - Run-head source commit: `ca47e15b45bf0b068fa4837f8da15f4927c27b76`.
 - Receipt-only commit: `90c9eb41e713b1a180bf3d3835eb69b0acc7486b`.
-- Pull request: **pending creation**; must remain draft for integrator review.
+- Pull request: [#21](https://github.com/sstxww/reinforcement-learning/pull/21), **draft**, awaiting PR-specific CI and integrator review.
 - Successful run: https://github.com/sstxww/reinforcement-learning/actions/runs/41414058042
 - Failed attempts: 41412952801 (model non-progress); 41413587545 (Python newline syntax).
 - Steps: **512 on successful comparable run** (256/arm). Another 512 actually ran on the first failed attempt; cumulative work 1024.
