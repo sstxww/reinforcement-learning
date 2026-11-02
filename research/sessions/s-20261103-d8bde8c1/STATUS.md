@@ -11,3 +11,11 @@
 - New PPO steps: **0**; own newly persisted checkpoint/Release: **none**; complete own TavernGym game: **pending Actions**; raw PPO games **0**; promotion **none** (best/champion not changed).
 - Own merges: **none**. Latest exact-head PR CI and game proof to be recorded only after real results. Main currently unprotected; no global exclusive integration lock demonstrated.
 - Next operation: check own workflow run, obtain original actual eight-seat baseline receipt from successful run (do not fabricate), commit it to `experiments/s-20261103-d8bde8c1/001-99679.json`; check independent PR CI; ask gate author to integrate exact-base regression, then recheck freshest main SHA and CI. Do not merge without mandatory review and truly exclusive entry.
+
+## Actual GitHub submission and handoff
+- Submitted **non-Draft** PR https://github.com/sstxww/reinforcement-learning/pull/218 from implementation commit `3be8071619706bbc53c224d7cd18b134d3ea9a4d`. PR head may advance with this handoff update; re-fetch for exact head before any gate.
+- Genuine baseline workflow https://github.com/sstxww/reinforcement-learning/actions/runs/41513547274 — **queued, outcome unknown** at last observation. Do not make or commit a completed-game receipt until an original artifact or log proves real successful eight-seat completion.
+- PR CI https://github.com/sstxww/reinforcement-learning/actions/runs/41513849788 — **queued, outcome unknown** at last observation; current submission lacks own validated session receipt, so should not be merged.
+- Independent review comments: PR #185 https://github.com/sstxww/reinforcement-learning/pull/185#issuecomment-6586826368 ; PR #175 https://github.com/sstxww/reinforcement-learning/pull/175#issuecomment-6586907143 ; Issue #182 https://github.com/sstxww/reinforcement-learning/issues/182#issuecomment-6586908072.
+- Next exact action: check run **41513547274**, inspect job steps & original Artifact, commit verified actual receipt to `experiments/s-20261103-d8bde8c1/001-99679.json`; then verify new PR #218 HEAD CI. If run fails, log the first real error and fix with bounded rerun; if queued, do not call it failed or successful.
+- State: **blocked_on_external_Actions_queue**, no merge lease or verified model/game improvement. Task claim released/handed off after this submission; another agent may pick up #218.
