@@ -1,0 +1,14 @@
+# s-20261103-ad1c30ff — current handoff status
+
+- Priority: V5 P0/P1 integration reliability, **read-only remote Release discovery drift**, not PPO retraining or Champion selection.
+- Source: latest Gmail V5 TXT; authorized repository `sstxww/reinforcement-learning` only.
+- Branch: `agent/s-20261103-ad1c30ff/optimization-001`, from main `df07dd23c99079449417fa8e645cf2b6c76b9704`.
+- Submitted: `scripts/v5_release_discovery_ad1c30ff.py`, `tests/test_v5_release_discovery_ad1c30ff.py`, one-shot isolated Actions workflow.
+- Own Actions: https://github.com/sstxww/reinforcement-learning/actions/runs/41509414911 ; triggered at `95ca68f57f330c5f1c08550ba798e2cc0ff742fb`. At initial handoff this run was queued; **no game success or recorded placement is asserted until its original receipt is checked**.
+- Verified historical state from current main canonical registry: latest **registered**, unpromoted 1408-step model `v5-s-20261102-68099929-1408-41428692617`, digest `a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632`; historical heldout ranks [8,8,8]; baseline same-seed ranks [6,8,8]; best/champion null. This session did not re-download or resume its bytes.
+- Live public Releases API showed multiple later unpromoted/rejected `.zip` plus metadata asset pairs, not automatically indexed as canonical candidates. Publishing does **not** prove resume or competitive ability.
+- P0 overlap: existing PR #157 was verified and concurrently merged by another integration session. PR #15 is stacked on draft #9; new trainer/resume drafts #160/#161 overlap other changes; do not blind-merge.
+- P1 blocker: current main train.yml is manual-only, registered-Release based, but a newly published model still requires independent pinned bytes, optimizer continuation and actual model-only complete-game proof. Earlier draft #121 reported Release HTTP 403. A model-only 1536-step rank-eight outcome is not a strength improvement.
+- P2 evidence: historical raw V5 and V2 models repeatedly miss legal BUY opportunities; negative forced-BUY ablation still ranked eighth. Distinguish observed behavior from demonstrated causal explanation.
+- This session: **0 PPO training steps; 0 new model Release; 0 model promoted; 0 Arena matches**. Independent test and baseline canary outcome are pending verification, not invented.
+- Next: read own Actions logs/artifact; if authentic complete-game receipt exists, commit it; run final-head CI; reviewer may then consider this non-invasive discovery improvement. No bulk PPO before V5 P0-P2 gates.
