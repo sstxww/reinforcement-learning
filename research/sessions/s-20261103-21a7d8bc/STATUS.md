@@ -1,18 +1,24 @@
-# V7 handoff — s-20261103-21a7d8bc
+# AutoTavern-AI V7 — s-20261103-21a7d8bc handoff (R001)
 
+- STATUS: evidence_archived; ready to open non-Draft PR; latest PR-head CI and integration ownership are NOT yet verified.
 - TASK_KEY: eval/v7-raw-buy-replication-97421
-- ROUND: R001
-- ROLE: EVALUATOR/REPAIRER (not INTEGRATOR)
-- STATUS: running; Actions evidence is not claimed until verified
-- BASE_MAIN_SHA: 3a745c6f6a48c65528bcbeb81b8627b8db93f046
-- BRANCH: agent/s-20261103-21a7d8bc/optimization-001
-- CLAIM_REF: claims/v7/raw-buy-replication-97421 (created successfully, no main merge lease)
-- OWNED: scripts/v7_buy_pair_s_20261103_21a7d8bc.py, tests/test_v7_buy_pair_s_20261103_21a7d8bc.py, .github/workflows/v7-raw-buy-s-20261103-21a7d8bc.yml and own session/receipt paths
-- REUSED: merged #117 Release restore; #125 staged checkpoint; #176 FREEZE mapping
-- MODEL: latest unpromoted 1408-step Release v5-s-20261102-68099929-1408-41428692617, checkpoint SHA256 a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632
-- ENGINE: TavernGym 1.1.0, observe2 4017+447, 245 masked actions, source 6d8712c93022ba11
-- EXPERIMENT PLAN: one matched baseline/raw PPO seed 97421; 128-step optional resume; one pure candidate game seed 97422, only if preceding gates finish
-- RESULT STATUS: actual new PPO steps unknown/pending; all own game ranks unknown/pending; new Release none; Champion unchanged
-- PR: pending original runner evidence, then open ready-for-review only once receipt and exact-head CI gates pass
-- MAIN MERGE: not performed; no unique integrator lease granted
-- NEXT: inspect this branch's finite Actions run and artifact; commit only authenticated real receipts, retest head, then request integration
+- ROLE: EVALUATOR / REPAIRER, **not** exclusive INTEGRATOR
+- TASK CLAIM: `claims/v7/raw-buy-replication-97421` (created by this session; no main integration lock)
+- BRANCH: `agent/s-20261103-21a7d8bc/optimization-001`
+- ORIGINAL_MAIN_BASE: `3a745c6f6a48c65528bcbeb81b8627b8db93f046`; main advanced concurrently to `c1b828734527bae6141805581693d890cc3bff94` on last check
+- OWN TRAINING+REAL-GAME RUN: https://github.com/sstxww/reinforcement-learning/actions/runs/41512015082 **SUCCESS**; all test, pinned engine, trusted Release, match, train, candidate and upload steps green
+- ORIGINAL RECEIPT ARCHIVER: https://github.com/sstxww/reinforcement-learning/actions/runs/41513677139 **SUCCESS**; commit `8af5721734c765778916fdd8b63021c7a7d00374` copied exact authenticated original receipts and model metadata
+- ARCHIVE FIRST FAILURE: https://github.com/sstxww/reinforcement-learning/actions/runs/41513467624 (no jobs, invalid job-level runner context); minimal fix commit `2fa7624aee6648f4d49a9b50e3d4df7b76fb51f3`, verified next run green
+- ORIGINAL BASELINE: `experiments/s-20261103-21a7d8bc/001-baseline-97421.json`; seed 97421, seat 0, completed, rank 7, decisions 44, BUY 13 / 23 masked legal opportunities
+- ORIGINAL RAW PARENT: `experiments/s-20261103-21a7d8bc/002-raw-1408-97421.json`; seed 97421, seat 0, completed, rank 8, decisions 126, BUY 0 / 43 legal, REROLL 45, FREEZE 70
+- ORIGINAL CANDIDATE: `experiments/s-20261103-21a7d8bc/003-candidate-97422.json`; seed 97422, seat 0, raw candidate completed, rank 8, decisions 124, no fallback or guard, all three games no combat truncation
+- PAIRED DESCRIPTIVE AUDIT: `reports/s-20261103-21a7d8bc/001-matched-buy-97421.json`; one matched seed, n=1, raw rank one worse than baseline; no uncertainty or strength claim from one match
+- ENGINE: pinned TavernGym 1.1.0 / source `6d8712c93022ba11`, observe2 4017 floats + 447 card indices, 245 masked actions
+- PARENT 1408-step RELEASE: https://github.com/sstxww/reinforcement-learning/releases/tag/v5-s-20261102-68099929-1408-41428692617; SHA256 `a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632`
+- ACTUAL PPO RESUME: 1408→1536 (`+128`), seed 97421; candidate SHA256 `cf34d9728dc50d97707c2c65c6095f330c84c07d0763963db675484f2d797d7c`; explicit CPU load and optimizer state provenance verified
+- CANDIDATE MODEL STATUS: `models/sessions/s-20261103-21a7d8bc/candidate-1536.status.json`; unpromoted/rejected for rank8, Best/Champion unchanged
+- MODEL WEIGHT STORAGE: **temporary Artifact ONLY**, https://github.com/sstxww/reinforcement-learning/actions/runs/41512015082/artifacts/13174595714, expires 2026-11-16T19:46:23Z; SHA checked, no durable candidate Release and no claim of indefinite resumption
+- TEST: 8 synthetic negative/positive proof assertions in `tests/test_v7_buy_pair_s_20261103_21a7d8bc.py`, actual Actions test step passed; synthetic tests are NOT game evidence
+- REUSED MERGED: PR #176 FREEZE taxonomy + real resume; PR #165 least-privilege Release publisher; did not edit shared `train.yml` or main
+- MAIN INTEGRATION: NOT performed; task claim is NOT an exclusive main integration lease. Review PR diff, exact-head CI, main SHA and branch conflicts before any merge
+- NEXT ACTION FOR NEXT SESSION: fetch this branch and PR; check exact PR HEAD `CI - full-match gate`, read `experiments/s-20261103-21a7d8bc/002-raw-1408-97421.json` and original Action #41512015082; only then initiate a *new, separately claimed*, fixed-seed Freeze/no-progress/BUY-logit probe. Do NOT simply force BUY or promote 1536 candidate.
