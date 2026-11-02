@@ -1,0 +1,60 @@
+name: Choice-priority ablation s-20261102-8555759e
+on:
+  push:
+    branches:
+      - 'agent/s-20261102-8555759e/optimization-001'
+permissions:
+  contents: write
+concurrency:
+  group: choice-ablation-s-20261102-8555759e
+  cancel-in-progress: false
+jobs:
+  paired-full-matches:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install tests
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[test]'
+      - name: Run unit tests
+        run: python -m pytest
+      - name: Bootstrap genuine pinned TavernGym
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Execute 12 independent full eight-seat matches
+        run: |
+          python -m tavern_ai.experiment_s_20261102_8555759e --games 6 --start-seed 855570
+          for receipt in experiments/s-20261102-8555759e/*.json; do
+            python -m tavern_ai.validate_receipt "$receipt"
+          done
+          python -m tavern_ai.validate_receipt experiments/s-20261102-8555759e/001-855570.json
+      - name: Persist scoped real-game receipts and metrics
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add experiments/s-20261102-8555759e/ reports/s-20261102-8555759e/
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'results(choice): record bounded real eight-seat paired matches'
+          test "$GITHUB_REF_NAME" = 'agent/s-20261102-8555759e/optimization-001'
+          git pull --rebase origin "$GITHUB_REF_NAME"
+          git push origin HEAD:"$GITHUB_REF_NAME"
+      - name: Preserve isolated run evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: choice-ablation-s-20261102-8555759e-evidence
+          path: |
+            experiments/s-20261102-8555759e/*.json
+            reports/s-20261102-8555759e/*.json
+          if-no-files-found: ignore
+          retention-days: 30
