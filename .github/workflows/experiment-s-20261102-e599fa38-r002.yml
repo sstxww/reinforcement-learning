@@ -1,0 +1,74 @@
+name: Isolated guard budget ablation s-20261102-e599fa38 R002
+on:
+  push:
+    branches:
+      - agent/s-20261102-e599fa38/optimization-002
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: experiment-s-20261102-e599fa38-r002
+  cancel-in-progress: false
+jobs:
+  compare-budgets:
+    if: ${{ !contains(github.event.head_commit.message, '[docs-only]') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 70
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install test and inference dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[train,test]'
+      - name: Unit tests plus real pinned TavernGym engine
+        run: |
+          python -m pytest
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Restore only this session's exact first-round checkpoint
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh run download 41415158420 --repo "$GITHUB_REPOSITORY" \
+            --name s-20261102-e599fa38-guard-evidence --dir restored
+          test -f restored/checkpoints/s-20261102-e599fa38/model.zip
+          test -f restored/checkpoints/s-20261102-e599fa38/model.metadata.json
+          echo "5b66d29acccb4ecefb302f28a86d40aaa981e121fb830bfe1e752923fc602fcb  restored/checkpoints/s-20261102-e599fa38/model.zip" | sha256sum --check
+      - name: Compare two guarded PPO policies on six independent seeds
+        shell: bash
+        run: |
+          for seed in 33001 33002 33003 33004 33005 33006; do
+            python -m tavern_ai.guarded_model_probe \
+              --agent-id s-20261102-e599fa38 --seed "$seed" \
+              --model restored/checkpoints/s-20261102-e599fa38/model.zip \
+              --max-turn-actions 16 \
+              --receipt "experiments/s-20261102-e599fa38/002-$seed.json"
+            python -m tavern_ai.validate_receipt "experiments/s-20261102-e599fa38/002-$seed.json"
+            python -m tavern_ai.guarded_model_probe \
+              --agent-id s-20261102-e599fa38 --seed "$seed" \
+              --model restored/checkpoints/s-20261102-e599fa38/model.zip \
+              --max-turn-actions 32 \
+              --receipt "experiments/s-20261102-e599fa38/controls/002-$seed.json"
+            python -m tavern_ai.validate_receipt "experiments/s-20261102-e599fa38/controls/002-$seed.json"
+          done
+      - name: Summarize exact paired receipt statistics
+        run: |
+          python -m tavern_ai.guard_budget_eval \
+            --lower experiments/s-20261102-e599fa38/002-*.json \
+            --higher experiments/s-20261102-e599fa38/controls/002-*.json \
+            --out reports/s-20261102-e599fa38/round-002.json
+      - name: Preserve short-lived full-game evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: s-20261102-e599fa38-r002-budget-evidence
+          path: |
+            experiments/s-20261102-e599fa38/002-*.json
+            experiments/s-20261102-e599fa38/controls/002-*.json
+            reports/s-20261102-e599fa38/round-002.json
+          if-no-files-found: warn
+          retention-days: 30
