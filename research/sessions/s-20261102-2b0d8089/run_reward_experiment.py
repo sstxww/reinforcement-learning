@@ -174,7 +174,8 @@ def play_bounded_model(seed: int, model_path: str) -> dict:
 
 def play_and_record(label: str, seed: int, model_path: str | None) -> dict:
     policy = "model" if model_path else "baseline"
-    receipt = (play_bounded_model(seed, model_path) if model_path\n               else play(seed, SESSION, policy, None))
+    receipt = (play_bounded_model(seed, model_path) if model_path
+               else play(seed, SESSION, policy, None))
     validate(receipt)
     filename = f"001-{seed}.json" if label == "signed_log" and seed == EVAL_SEEDS[0] else f"001-{label}-{seed}.json"
     write_json(ROOT / filename, receipt)
