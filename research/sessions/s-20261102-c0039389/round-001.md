@@ -34,3 +34,8 @@ Baseline: untouched V0 rule policy controlling seat 0. Experimental arm: the **s
 
 ## Next hypothesis
 If seat 0 and 4 differ, test all eight seats over larger independent seeds with hero stratification and explicit sampling uncertainty, separate from actual policy optimization.
+
+## Pull request and CI
+- PR: https://github.com/sstxww/reinforcement-learning/pull/44 (draft for owner/integrator; no auto-merge).
+- PR full-match CI `41417091572` completed **success** on head `c90a12b2ea5b4bf996364e5ba4aa827b9b8e86c2`, including tests, PR receipt evidence, engine contract and an additional full eight-seat game. https://github.com/sstxww/reinforcement-learning/actions/runs/41417091572
+- Final documentation update changes branch head without modifying experiment code; check the resulting PR CI again before integration.

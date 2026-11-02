@@ -1,7 +1,7 @@
 # Session s-20261102-c0039389 — STATUS
 
 ## Current state
-- **Research status:** `completed_for_review` for the isolated engineering experiment; PR and latest-head CI still to verify.
+- **Research status:** `completed_for_review`. PR #44 is open for integrator review; branch CI at `c90a12b2ea5b4bf996364e5ba4aa827b9b8e86c2` passed. Recheck CI after final evidence-documentation commit.
 - **Branch:** `agent/s-20261102-c0039389/optimization-001`, based on main `315b068bac5ab6d8403c3c9b18f8c101c0cded5d`.
 - **Evidence commit:** `f201284469f777a9dec0fe80f206a461c9dbb100` (bot-committed independent receipts and report).
 - **Successful Actions:** https://github.com/sstxww/reinforcement-learning/actions/runs/41416587540; triggered SHA `4f775d7edab7114a17a740f864d26777b308c72f`; all steps successful, including all repository unit tests, pinned engine bootstrap, 7 genuine full matches, evidence upload and evidence commit.
@@ -12,5 +12,5 @@
 - **Interpretation:** demonstrated sensitivity to controlled seat under these three seeds; seat changes hero allocations, opponent schedule and action order, so **not causal proof** of seat advantage and **not a policy improvement**. Larger stratified evaluation needed.
 - **Evidence retention:** full compact receipts and report committed on branch; workflow artifact `13127922958` expires at `2026-12-02T08:57:41Z` (30-day TTL); no model storage implied.
 - **Faults:** no failures in this run; no repair needed.
-- **PR:** pending creation and final-head CI; integrator-only merge.
+- **PR:** https://github.com/sstxww/reinforcement-learning/pull/44 (Draft; not merged). Successful PR full-game CI on evidence head: https://github.com/sstxww/reinforcement-learning/actions/runs/41417091572. A final docs-only commit requires latest-head CI re-verification.
 - **Next research direction:** quantify seat/hero interactions across all eight seats and more independent seeds, or implement seat-stratified metrics before Best promotion without changing shared modules.
