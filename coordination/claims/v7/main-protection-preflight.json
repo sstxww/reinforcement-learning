@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "task_key": "integrate/main-protection-preflight",
+  "owner_session": "s-20261103-210f5f9e",
+  "round": "001",
+  "role": "REPAIRER/REVIEWER",
+  "base_main_sha": "c1b828734527bae6141805581693d890cc3bff94",
+  "branch": "agent/s-20261103-210f5f9e/optimization-001",
+  "claim_ref": "claims/v7/main-protection-preflight",
+  "state": "running",
+  "scope": [
+    "tavern_ai/v7_merge_entry_audit_210f5f9e.py",
+    "tests/test_v7_merge_entry_audit_210f5f9e.py",
+    ".github/workflows/v7-merge-audit-210f5f9e.yml",
+    "research/sessions/s-20261103-210f5f9e/",
+    "research/knowledge/proposals/s-20261103-210f5f9e-001.md"
+  ],
+  "not_integration_lock": true,
+  "non_overwrite_policy": "No other session's code, workflow, checkpoint, Release or branch",
+  "release_rule": "Mark claim closed/handoff after verified PR evidence; branch records remain immutable"
+}
