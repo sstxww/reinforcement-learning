@@ -1,0 +1,19 @@
+{
+  "checked_other_prs": 1,
+  "ci_receipt_release_gate": "not_evaluated",
+  "no_overlap_is_not_merge_approval": true,
+  "overlaps": [
+    {
+      "draft": true,
+      "high_risk": true,
+      "paths": [
+        ".github/workflows/train.yml"
+      ],
+      "pr": 149,
+      "review_only": true
+    }
+  ],
+  "schema": 1,
+  "target_head_sha": "0442497d77deae0b0d31a9b0d22443a77de89f92",
+  "target_pr": 165
+}

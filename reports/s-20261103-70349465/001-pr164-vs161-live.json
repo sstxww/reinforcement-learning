@@ -1,0 +1,19 @@
+{
+  "checked_other_prs": 1,
+  "ci_receipt_release_gate": "not_evaluated",
+  "no_overlap_is_not_merge_approval": true,
+  "overlaps": [
+    {
+      "draft": false,
+      "high_risk": true,
+      "paths": [
+        "tavern_ai/train.py"
+      ],
+      "pr": 161,
+      "review_only": true
+    }
+  ],
+  "schema": 1,
+  "target_head_sha": "3cc16b0d9a08f0d5d92e46cdb9e75d72b0304472",
+  "target_pr": 164
+}
