@@ -1,0 +1,62 @@
+name: Isolated discover-choice experiment s-20261102-d1116e51
+
+on:
+  push:
+    branches:
+      - agent/s-20261102-d1116e51/optimization-001
+    paths:
+      - tavern_ai/discover_choice_experiment.py
+      - tests/test_discover_choice_experiment.py
+      - .github/workflows/experiment-s-20261102-d1116e51.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: discover-choice-s-20261102-d1116e51
+  cancel-in-progress: false
+
+jobs:
+  real-taverngym-comparison:
+    runs-on: ubuntu-latest
+    timeout-minutes: 85
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install project and run unit regression tests
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[test]'
+          python -m pytest -q
+      - name: Bootstrap pinned authentic TavernGym and observe2 patch
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Play candidate-controlled canary and six paired heldout eight-seat games
+        run: |
+          python -m tavern_ai.discover_choice_experiment --session s-20261102-d1116e51 --seed 49001 --pairs 3
+          python -m tavern_ai.validate_receipt experiments/s-20261102-d1116e51/001-49001.json
+          test "$(find experiments/s-20261102-d1116e51 -maxdepth 1 -name '*.json' | wc -l)" -eq 7
+      - name: Archive all actual evidence even on persistence failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: discover-choice-s-20261102-d1116e51-${{ github.run_id }}
+          path: |
+            experiments/s-20261102-d1116e51/*.json
+            reports/s-20261102-d1116e51/*.json
+          if-no-files-found: warn
+          retention-days: 30
+      - name: Commit only this session's verified JSON evidence
+        if: success()
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add experiments/s-20261102-d1116e51/ reports/s-20261102-d1116e51/
+          if ! git diff --cached --quiet; then
+            git commit -m 'results(s-20261102-d1116e51): persist genuine complete TavermGym matches'
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi
