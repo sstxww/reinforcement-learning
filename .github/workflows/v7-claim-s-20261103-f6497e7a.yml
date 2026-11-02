@@ -1,0 +1,47 @@
+name: V7 task CAS and real eight-seat canary s-20261103-f6497e7a
+
+on:
+  push:
+    branches:
+      - agent/s-20261103-f6497e7a/optimization-001
+    paths:
+      - .github/workflows/v7-claim-s-20261103-f6497e7a.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: v7-claim-s-20261103-f6497e7a-r001
+  cancel-in-progress: false
+
+jobs:
+  claim-regression-real-game:
+    runs-on: ubuntu-latest
+    timeout-minutes: 65
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install project and test tools
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[test]'
+      - name: Real two-clone atomic-lease regression
+        run: python -m unittest discover -s tests -p 'test_v7_task_claim*.py' -v
+      - name: Pinned TavernGym bootstrap
+        run: bash scripts/bootstrap_engine.sh
+      - name: Verify observation and action contract
+        run: python -m tavern_ai.contract
+      - name: Independent true complete eight-seat baseline game
+        run: |
+          python -m tavern_ai.canary --agent-id s-20261103-f6497e7a --seed 99841 --policy baseline --receipt experiments/s-20261103-f6497e7a/001-99841.json
+          python -m tavern_ai.validate_receipt experiments/s-20261103-f6497e7a/001-99841.json
+      - name: Preserve original test/game receipt (temporary)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v7-claim-s-20261103-f6497e7a-r001
+          path: experiments/s-20261103-f6497e7a/*.json
+          if-no-files-found: ignore
+          retention-days: 30
