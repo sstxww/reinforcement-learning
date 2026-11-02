@@ -22,6 +22,8 @@ def clean(root: Path, apply: bool = False) -> list[str]:
     root = root.resolve()
     if not root.is_dir():
         raise ValueError(f"Not a directory: {root}")
+    if any(part in PROTECTED_DIRS for part in root.parts):
+        raise ValueError(f"Refusing cleanup inside protected directory: {root}")
     targets: list[Path] = []
     for base, dirs, files in os.walk(root, topdown=True, followlinks=False):
         current = Path(base)
