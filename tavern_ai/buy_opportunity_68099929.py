@@ -32,6 +32,8 @@ def classify(action: int) -> str:
         return "upgrade"
     if action == 1:
         return "reroll"
+    if action == 2:
+        return "freeze"
     if 30 <= action < 46:
         return "choose"
     if 46 <= action < 126:
