@@ -1,0 +1,54 @@
+{
+  "session": "s-20261102-1f73f4a5",
+  "base_main": "315b068bac5ab6d8403c3c9b18f8c101c0cded5d",
+  "engine": {
+    "version": "1.1.0",
+    "source_hash": "6d8712c93022ba11",
+    "features": 4017,
+    "cards": 447,
+    "actions": 245,
+    "n_cards": 3984
+  },
+  "training_seeds": [
+    56100,
+    56101
+  ],
+  "heldout_seeds": [
+    56103,
+    56104
+  ],
+  "train": {
+    "gradient_steps": 5,
+    "epochs": 5,
+    "final_minibatch_loss": 2.6092116832733154,
+    "teacher_samples": 113,
+    "optimizer": "Adam",
+    "learning_rate": 0.0006
+  },
+  "model_sha256": "7be2f5b2a7b2778ce5f3a2a7c0ca4d5c8f79fa0d15e16d83a5ee0e4c71eec669",
+  "teacher_agreement": {
+    "samples": 88,
+    "exact_action_accuracy": 0.6363636363636364,
+    "masked_legal_rate": 1.0
+  },
+  "teacher_train_placements": [
+    8,
+    7
+  ],
+  "teacher_eval_placements": [
+    8,
+    6
+  ],
+  "student_guarded_eval_placements": [
+    8,
+    8
+  ],
+  "student_guard_triggers": [
+    2,
+    1
+  ],
+  "paired_mean_rank_delta_student_minus_teacher": 1.0,
+  "claim": "pilot only; guarded BC is not pure model; n=2 cannot prove improvement",
+  "checkpoint_durable": false,
+  "checkpoint_storage": "Actions artifact with expiration"
+}
