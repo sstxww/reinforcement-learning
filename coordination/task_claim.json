@@ -20,7 +20,7 @@
     "new_ppo_steps": 0,
     "timeout_minutes": 65
   },
-  "status": "completed_experiment_waiting_main_gate",
+  "status": "ready_for_integration_blocked_on_independent_review_and_enforced_main_lock",
   "pr": "https://github.com/sstxww/reinforcement-learning/pull/212",
   "exact_head_sha": "15be77afa117cb0dc12b5916727933bfde94c018",
   "run": "https://github.com/sstxww/reinforcement-learning/actions/runs/41513511752",
@@ -44,5 +44,28 @@
   "main_merge_lease": false,
   "main_merge_blocker": "No enforced global single-writer main integration. Issue #182 demonstrates CAS branch doesn't exclude other merge writers. Exact-head CI and independent review also required.",
   "scope": "TASK claim only, not main exclusive lease",
-  "handoff": "Verify latest PR #212 exact-head CI and reviewer, then only designated enforced integrator may merge. No model promotion; rank8 in one pairing."
+  "handoff": "Verify latest PR #212 exact-head CI and reviewer, then only designated enforced integrator may merge. No model promotion; rank8 in one pairing.",
+  "current_pr_head_sha": "15be77afa117cb0dc12b5916727933bfde94c018",
+  "pr_url": "https://github.com/sstxww/reinforcement-learning/pull/212",
+  "exact_head_ci": {
+    "url": "https://github.com/sstxww/reinforcement-learning/actions/runs/41515074595",
+    "run_id": 41515074595,
+    "head_sha": "15be77afa117cb0dc12b5916727933bfde94c018",
+    "conclusion": "success",
+    "job": "tests-and-full-match",
+    "unit_tests": "success",
+    "receipt_gate": "success",
+    "pinned_engine": "success",
+    "independent_full_eight_player_canary": "success"
+  },
+  "current_main_sha_at_final_ci": "c1b828734527bae6141805581693d890cc3bff94",
+  "merge_blockers": [
+    "No independent PR approval at last verified review-list check",
+    "No proven enforced global main single-writer/merge queue: repository rulesets GET [] and protection GET 403; Issue #182 proved CAS lease bypass",
+    "Re-check exact main SHA, reviews and release/candidate non-promotion at merge time"
+  ],
+  "main_merged": false,
+  "main_postmerge_ci": null,
+  "promotion": false,
+  "first_next_action": "Unique designated integrator: check open PR #212 head 15be77... + exact-head CI #41515074595, obtain independent review, prove enforced single main writer, re-read latest main SHA immediately before SHA-bound merge, postmerge main CI; otherwise no merge."
 }
