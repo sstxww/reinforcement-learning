@@ -2,7 +2,7 @@
 from __future__ import annotations
 import json,os
 from pathlib import Path
-from tavern_ai.validate_receipt import validate
+from tavern_ai.receipt_integrity import validate_integrity
 
 def main():
     head=os.environ.get("GITHUB_HEAD_REF","").strip()
@@ -18,7 +18,7 @@ def main():
     matched=0
     for path in candidates:
         payload=json.loads(path.read_text(encoding="utf-8"))
-        validate(payload)
+        validate_integrity(payload)
         if payload["agent_id"]==agent_id:matched+=1
     if not matched:raise SystemExit("Agent receipt identity mismatch")
     print(f"Validated {matched} completed game receipts for {agent_id}")
