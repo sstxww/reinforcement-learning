@@ -13,7 +13,8 @@ import re
 import zipfile
 from pathlib import Path
 
-from .contract import ACTIONS, CARDS, ENGINE_HASH, FEATURES
+from .contract import (ACTIONS, CARDS, ENGINE_HASH, FEATURES, CATALOG_SHA256,
+                       RULESET_ID, PATCH_SHA256, UPSTREAM_COMMIT)
 
 _STATUSES = {"Unverified", "Challenger", "Latest", "Population", "Rejected", "Champion"}
 _REQUIRED_ZIP_MEMBERS = {"data", "policy.pth", "policy.optimizer.pth"}
@@ -84,13 +85,26 @@ def verify_archive(entry: dict, checkpoint: Path, metadata: Path) -> dict:
     if actual_sha != entry["sha256"]:
         raise ValueError("Checkpoint SHA256 mismatch; refusing to restore")
     recorded = json.loads(metadata.read_text(encoding="utf-8"))
-    if recorded.get("schema") != 1 or recorded.get("algorithm") != "MaskablePPO":
+    if recorded.get("schema") not in (1, 2) or recorded.get("algorithm") != "MaskablePPO":
         raise ValueError("Unsupported training metadata")
     engine = recorded.get("engine")
     expected = {"version": "1.1.0", "source_hash": ENGINE_HASH,
                 "features": FEATURES, "cards": CARDS, "actions": ACTIONS}
     if not isinstance(engine, dict) or any(engine.get(key) != value for key, value in expected.items()):
         raise ValueError("Engine, observation, card vocabulary or action space mismatch")
+    if recorded["schema"] == 2:
+        compatibility = recorded.get("compatibility")
+        expected_compatibility = {
+            "engine": engine,
+            "catalog_sha256": CATALOG_SHA256,
+            "ruleset_id": RULESET_ID,
+            "patch_sha256": PATCH_SHA256,
+            "upstream_commit": UPSTREAM_COMMIT,
+        }
+        if compatibility != expected_compatibility:
+            raise ValueError("Schema 2 catalog/ruleset/patch/upstream compatibility mismatch")
+        if recorded.get("checkpoint_sha256") != actual_sha:
+            raise ValueError("Embedded checkpoint SHA256 mismatch")
     if entry.get("training_steps") is not None and recorded.get("total_timesteps") != entry["training_steps"]:
         raise ValueError("Training step count conflicts with registry")
     try:
