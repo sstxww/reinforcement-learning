@@ -10,3 +10,5 @@
 - Evidence verdict: initial run FAILED; do not claim its intermediate receipts as candidate games or promote a policy. Re-run on new commit, then update this document with re-test evidence.
 
 - Rerun #41422715265 (commit d7ed628106379352047ea84e630f2c729243b2c5) failed in own-player layout gate: `hand count observation mismatch`. Direct examination of pinned `obs.rs` showed my indexing error: global[32] is gem_hp, global[33] is board length, global[34] is hand length. The previous check incorrectly used [32]/[33]. This is a second substantive correction on the same layout verification failure family, no model games completed yet. Next retry will be final.
+
+- FINAL RETEST: GitHub Actions https://github.com/sstxww/reinforcement-learning/actions/runs/41423127192 at code head 082cb263a87016c82cb37a0a43404b565b455366 passed all tests, authentic pinned engine and 15 full eight-seat games. Evidence auto-commit e14d5576ac5a4dc5ecf3702bc80bffdf2d6bb762. Candidate had no heldout rank gain. No further retries.
