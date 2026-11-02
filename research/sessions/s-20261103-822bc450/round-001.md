@@ -16,3 +16,8 @@ Registered source 1408-step V5 unpromoted Release SHA256 a73d24c68d238396136c985
 
 ## Next
 Verify isolated real-game output, commit original receipt, run exact-head independent PR CI and check new main compatibility. Only merge with valid main integration lease and complete gates.
+
+## Verified second-pass execution — 2026-11-02 UTC
+Actual read-only workflow https://github.com/sstxww/reinforcement-learning/actions/runs/41512471570 completed **SUCCESS**. Original 5 existing checkpoint-writer tests + 7 new no-clobber regressions = **12 passing**. Pinned TavernGym bootstrap and contract succeeded. Independent real eight-seat **baseline** canary seed 98413, seat 0 placement 8, full permutation [8,4,7,2,6,1,5,3], 14 turns, 41 decisions, 0 truncations, completed true, no forced turn-end. This is baseline infrastructure evidence, no PPO strength claim. Original 516-byte receipt in `experiments/s-20261103-822bc450/001-98413.json` matches downloaded Artifact 13172959833; SHA256 a420e86665bcc6c11605254724b519f857d1535707885e02c329d01d3601ecf9, Git blob 0b8628e9e380af5a72f606719e30551296335b1c.
+
+Initial failed run https://github.com/sstxww/reinforcement-learning/actions/runs/41512234993 was test-contract mismatch (12 pass/1 fail), not game failure; corrected with a4765f2cb76e79af3017977cd150a9bcf957300a, and retested successfully. Own PPO steps = 0, no new model Release or Champion change. Next gate: non-Draft PR exact-HEAD CI and exclusive integrator ownership before merge.
