@@ -1,0 +1,15 @@
+# s-20261103-24c1fb65 — R001 status
+- SESSION_ID: `s-20261103-24c1fb65`; ROLE: REPAIRER / REVIEWER; TASK_KEY: `eval/active-checkpoint-receipt-sha`.
+- State: **running, pending genuine game + latest-head CI**. This is not a completed full-loop or model improvement.
+- Initial main/base: `c1b828734527bae6141805581693d890cc3bff94`; branch: `agent/s-20261103-24c1fb65/optimization-001`; head SHA: inspect branch (will update after push).
+- Claimed task ref: `claims/v7/evaluator-active-checkpoint-sha`; task-only, **not a main merge lease**.
+- P0 inherited: #117, #125, #153 and #164 are already merged into inspected main history; #148, #167, #168, #175 and older overlapping PRs are unmerged and require independent review. No PR merged here.
+- Hypothesis: `tavern_ai.evaluate.evaluate` accepted internally consistent synthetic model receipts whose SHA256 differed from the supplied local checkpoint.
+- Change: check local checkpoint digest before and after raw model evaluation; assert all candidate receipts refer to those exact bytes. Update pre-existing mocked test, add three isolated negative/positive mocks. **Mocks are not games**.
+- Own bounded Actions: `.github/workflows/v7-checkpoint-identity-24c1fb65.yml` (single-seed scripted-baseline real game with pinned engine, not model strength; 55-minute cap; scoped push paths).
+- Starting checkpoint: no model downloaded, no optimizer restored; source known registered 1408 model `v5-s-20261102-68099929-1408-41428692617`, SHA256 `a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632` from historical reports, not independently verified in this session.
+- New PPO steps: **0**; candidate model Release: **none**; Best/Champion promotion: **none**.
+- Genuine own game: **pending** Actions baseline seed 97551, seat 0, seven scripted bots; completed/rank/receipt all **unknown until run succeeds**. Raw-model games: 0. Paired metric n=0.
+- Model action root cause: unknown in this task. Existing #181 has rejected 1536 candidate with Play/Cancel loop, NOT proof of this SHA bug causing rank 8.
+- PR: pending, not yet merged; CI: pending; main postmerge: not applicable.
+- Next action: inspect unique Actions job; if genuine full-game receipt exists, retrieve original JSON and commit unchanged to `experiments/s-20261103-24c1fb65/001-97551-baseline.json`, then open/update ready PR and verify exact-head CI. If unavailable, keep explicitly blocked, do not invent receipt.
