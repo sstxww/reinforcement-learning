@@ -103,3 +103,6 @@ jobs:
             artifacts/evaluation.json
           if-no-files-found: error
           retention-days: 90
+      - name: Remove regenerable caches safely
+        if: always()
+        run: python scripts/cleanup_temporary.py --apply
