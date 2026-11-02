@@ -12,3 +12,10 @@
 - Status as of initial commit: implementation and synthetic regression cases committed; original full TavernGym match and Actions CI *not yet verified*. This is not a model-strength result.
 - Proposed promotion: **none**. Any guarded result remains diagnostic; model candidates unchanged.
 - Next one action: run bounded own branch regression and original baseline-controlled eight-seat TavernGym canary; attach original receipt only after actual completion, and re-check CI on exact PR HEAD.
+
+## Verified R001 actual Actions outcome (2026-11-02 19:30 UTC)
+- Workflow [41510277587](https://github.com/sstxww/reinforcement-learning/actions/runs/41510277587) on **original head** `7494e5ebdb87f308c65d3ab6c97ca376ea489d01`: SUCCESS. Pinned engine bootstrap, **35 tests passed**, and own genuine eight-seat canary passed.
+- Original downloadable [artifact 13173212201](https://github.com/sstxww/reinforcement-learning/actions/runs/41510277587/artifacts/13173212201), receipt copied into `experiments/s-20261103-17407c36/001-99412.json`; artifact JSON SHA256 `dd4fba2af13865c5744eee1f2432f46b1903b1b1ed49c24190980c2229500635`.
+- **Baseline**, controlled seat 0, seed 99412; pinned TavernGym 1.1.0 hash `6d8712c93022ba11`, full placements `[8,4,1,5,2,7,6,3]`, 19 turns, 39 decisions, 0 truncated combats, turn_limit_end=false, no model weights. Rank 8 was **baseline**, not PPO.
+- Actual newly-trained PPO steps **0**; no candidate model Release, no Champion promotion. No synthetic fixture is represented as actual completed play.
+- PR [#172](https://github.com/sstxww/reinforcement-learning/pull/172) remains **Draft** pending updated exact-head CI after evidence commit and unique INTEGRATOR review. No main merge.
