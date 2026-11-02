@@ -37,13 +37,18 @@ def _check(rows: list[dict], policy: str) -> dict[tuple[int, int], dict]:
         if row["engine_source_hash"] != ENGINE or row["engine_version"] != "1.1.0":
             raise ValueError("Engine contract mismatch")
         # model is a pure, unguarded action selector, not an assisted policy.
-        if policy == "model" and (
-            row.get("guarded") is True
-            or row.get("raw_model_only") is False
-            or any(row.get(k, 0) for k in
-                   ("guard_forced_ends", "model_guard_forced_end", "fallback_count", "safety_fallbacks"))
-        ):
-            raise ValueError("Guarded or fallback-assisted model result cannot be treated as raw")
+        if policy == "model":
+            # An absent disclosure is *not* proof that no guard was used.
+            # Require auditable raw-model provenance, rather than treating
+            # missing keys as zero interventions.
+            if (row.get("raw_model_only") is not True
+                    or type(row.get("guard_forced_ends")) is not int
+                    or row["guard_forced_ends"] != 0
+                    or row.get("guarded") is True):
+                raise ValueError("Guarded/undisclosed model result cannot be treated as raw")
+            for key in ("model_guard_forced_end", "fallback_count", "safety_fallbacks"):
+                if key in row and (type(row[key]) is not int or row[key] != 0):
+                    raise ValueError("Guarded or fallback-assisted model result cannot be treated as raw")
         key = (row["seed"], _seat(row))
         if key in paired:
             raise ValueError("Duplicate seed/seat evaluation receipt")
