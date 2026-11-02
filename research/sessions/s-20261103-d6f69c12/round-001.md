@@ -11,7 +11,7 @@
 - Add `raw_action_category_counts` and `raw_choice_when_buy_legal` alongside already present executed-action / guard counters. This prevents forced END_TURN from overwriting the model's intended action distribution.
 - Add offline, synthetic boundary and out-of-range tests; update existing action 244 test.
 - Reproduction (on checked-out branch): `python -m pytest -q tests/test_behavior_audit_v5_880b8a71.py tests/test_action_taxonomy_s_20261103_d6f69c12.py`.
-- Existing engine bootstrap: `bash scripts/bootstrap_engine.sh`. New games/training not claimed before observing actual workflow outcome.
+- Actual proof: [Actions #41509611319](https://github.com/sstxww/reinforcement-learning/actions/runs/41509611319) ran offline regression checks, pinned engine bootstrapping and runtime source action-name audit successfully; the genuine eight-seat baseline seed 93471 finished rank 6, 16 turns, 47 decisions, placements [6,4,7,3,2,5,8,1], zero truncated combats, no turn limit. Original Artifact [#13172837469](https://github.com/sstxww/reinforcement-learning/actions/runs/41509611319/artifacts/13172837469) was downloaded and the faithful JSON content is committed to `experiments/s-20261103-d6f69c12/001-93471.json`. The baseline match verifies infrastructure only, not PPO improvement. Final workflow conclusion remains to be checked.
 
 ## Evidence and limitations
 - Main report `reports/s-20261102-83d91476/001-buy-opportunity-report.json` cites real Actions #41428098018: V2 in two completed games ranked [8,8], had **74 BUY-mask-legal decision exposures and zero BUY**, and 222/248 raw actions were IDs 1 or 2. Baseline in the same seeds bought 33 times with 48 legal-buy exposures and ranked [6,7]. This is genuine observational evidence, not causal proof.
