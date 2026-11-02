@@ -1,0 +1,41 @@
+{
+  "by_seat": {
+    "0": {
+      "first_place_rate": 0,
+      "games": 2,
+      "mean_placement": 8,
+      "placements_by_seed": {
+        "51101": 8,
+        "51102": 8
+      },
+      "top4_rate": 0
+    },
+    "1": {
+      "first_place_rate": 0,
+      "games": 2,
+      "mean_placement": 7.5,
+      "placements_by_seed": {
+        "51101": 7,
+        "51102": 8
+      },
+      "top4_rate": 0
+    }
+  },
+  "competitive_strength_claim": "not established",
+  "interpretation": "Descriptive only; hero assignment and scripted opponents also change with seat.",
+  "paired_deltas_by_seed": {
+    "51101": -1,
+    "51102": 0
+  },
+  "paired_mean_delta_seat1_minus_seat0": -0.5,
+  "paired_seeds": [
+    51101,
+    51102
+  ],
+  "policy": "baseline-seat-probe",
+  "seats": [
+    0,
+    1
+  ],
+  "total_games": 4
+}
