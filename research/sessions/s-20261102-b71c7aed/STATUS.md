@@ -20,3 +20,11 @@
 ## One targeted recovery run
 - Updated only session-owned workflow in commit `984b23c00b8a6884e4c6b6e1c748b12561143f5b` to collect non-intervention raw policy action families (capped 320) and independent own-session real Baseline receipt **before** preserving strict candidate/full-game stop.
 - [GitHub Actions run 41450837403](https://github.com/sstxww/reinforcement-learning/actions/runs/41450837403) queued when recorded. Treat its outcome as unverified pending actual logs and artifacts. No policy modification, no bounded PPO train if raw policy cannot finish, no ranked Arena.
+
+## R001 second run final, unguarded real candidate failed twice
+
+- [Second real Actions run 41450837403](https://github.com/sstxww/reinforcement-learning/actions/runs/41450837403): terminal **FAILURE** from same strict raw-model safety check after successful original Baseline, bounded forensic, unit tests, pinned engine and Release download. This is a **confirmed candidate noncompletion**, not a CI infrastructure failure.
+- Own 100%-authentic Baseline complete eight-seat canary: [experiments/s-20261102-b71c7aed/001-baseline-920021.json](../../../experiments/s-20261102-b71c7aed/001-baseline-920021.json), seed 920021, rank **7**, 71 decisions, 16 turns, no combat truncations; this is **not** model-strength proof.
+- Raw PPO telemetry permanently committed: [reports/s-20261102-b71c7aed/001-raw-loop-920011.json](../../../reports/s-20261102-b71c7aed/001-raw-loop-920011.json). Seed 920011: 320 own actions, stop turn 6, 237 actions in that turn; 306 actions in broad `other` bucket, including observed repeating action IDs 1 (refresh) / 2 (freeze) in first 32. 32 legal-BUY exposures, **zero BUY actions**, 0 guard-forced ends. `other` is not exclusively refresh/freeze and no full-game rank exists.
+- Exact raw game paired evaluator again raised `Too many actions in one turn`; 128-step extra PPO, model game, model comparison and new durable Release were **not executed**. Cumulative Latest experimental checkpoint remains preexisting 1408 steps, Champion null, **new steps 0**.
+- Complete failure report and bounds: [failures/001-raw-turn-loop.md](failures/001-raw-turn-loop.md). The one substantive forensic retry is exhausted; do not repeatedly burn Actions on the same failing SHA/seed.
