@@ -128,3 +128,36 @@ def test_empty_arms_rejected():
 def test_cannot_pretend_baseline_is_model():
     with pytest.raises(ValueError, match="Expected model"):
         compare([receipt(policy="baseline")], [receipt(policy="baseline")])
+
+
+
+def test_actual_main_v5_1408_four_paired_games_not_misreported_as_raw():
+    """Read authentic main receipts, not synthetic fixtures or mock match results.
+
+    Three older model-game receipts do NOT record safety guard status, so a
+    combined four-game report must not silently assert all-raw PPO evidence.
+    """
+    import json
+    from pathlib import Path
+
+    root = Path(__file__).resolve().parents[1]
+    folder = root / "experiments" / "s-20261102-68099929"
+    seeds = (99125, 99126, 99127, 99128)
+    candidate = [
+        json.loads((folder / f"{'002' if seed < 99128 else '003'}-model-{seed}.json").read_text("utf-8"))
+        for seed in seeds
+    ]
+    baseline = [
+        json.loads((folder / f"{'002' if seed < 99128 else '003'}-baseline-{seed}.json").read_text("utf-8"))
+        for seed in seeds
+    ]
+    r = compare(candidate, baseline)
+    assert r["games_per_arm"] == 4
+    assert r["model_sha256"] == "a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632"
+    assert r["candidate_ranks"] == [8, 8, 8, 8]
+    assert r["baseline_ranks"] == [6, 8, 8, 8]
+    assert r["candidate_minus_baseline_mean_rank"] == 0.5
+    assert r["guard_status_unknown_games"] == 3
+    assert r["guard_evidence"] == "guard_status_unknown"
+    assert r["eligible_for_raw_model_claim"] is False
+    assert r["champion_promoted"] is False
