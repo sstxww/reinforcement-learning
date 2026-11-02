@@ -80,7 +80,7 @@ jobs:
             publish/resume-summary.json publish/full-game-receipt.json \
             publish/heldout-evaluation.json \
             --repo "$GITHUB_REPOSITORY" \
-            --target "66e1db7" --prerelease \
+            --target "$GITHUB_SHA" --prerelease \
             --title "AutoTavern 384-step verified-resume candidate" \
             --notes "Genuine 256-to-384-step resumed MaskablePPO. Full eight-seat model game and 3 held-out games completed, all rank 8. This is NOT Best. Original source Release v1-learning-9eada5801f99; source run 41413508653; model sha256 79f90ee56e1bf49eac86e39cb76e0df70e2316a5baf5067515bced15649829e7."
       - name: Independently redownload Release and compare exact model and metadata
