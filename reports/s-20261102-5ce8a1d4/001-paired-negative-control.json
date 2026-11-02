@@ -1,0 +1,33 @@
+{
+  "schema": 1,
+  "method": "same_engine_seed_seat_paired",
+  "games_per_policy": 1,
+  "baseline_mode": "raw",
+  "candidate_mode": "raw",
+  "fallback_telemetry": "caller_supplied_not_independently_attested",
+  "baseline_mean_rank": 7,
+  "candidate_mean_rank": 7,
+  "baseline_top4_rate": 0.0,
+  "candidate_top4_rate": 0.0,
+  "baseline_first_rate": 0.0,
+  "candidate_first_rate": 0.0,
+  "mean_delta_candidate_minus_baseline": 0,
+  "bootstrap_95pct_interval_if_n_at_least_10": null,
+  "limitations": "No CI for n<10; CI is descriptive. Game completion and masks do not prove a raw model is useful. This tool never promotes Champion.",
+  "champion_promoted": false,
+  "pairs": [
+    {
+      "seed": 90131,
+      "controlled_seat": 0,
+      "baseline_rank": 7,
+      "candidate_rank": 7,
+      "delta_candidate_minus_baseline": 0,
+      "baseline_controller": "baseline",
+      "candidate_controller": "baseline",
+      "baseline_checkpoint_sha256": null,
+      "candidate_checkpoint_sha256": null,
+      "baseline_fallback_count": 0,
+      "candidate_fallback_count": 0
+    }
+  ]
+}
