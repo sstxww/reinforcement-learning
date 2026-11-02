@@ -1,0 +1,69 @@
+name: "Model registry integrity and genuine game s-20261102-6b4eaf12"
+
+on:
+  push:
+    branches:
+      - agent/s-20261102-6b4eaf12/optimization-001
+    paths:
+      - tavern_ai/model_registry.py
+      - tests/test_model_registry.py
+      - models/registry.json
+      - .github/workflows/model-registry-6b4eaf12.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: registry-smoke-s-20261102-6b4eaf12
+  cancel-in-progress: false
+
+jobs:
+  registry-and-full-match:
+    runs-on: ubuntu-latest
+    timeout-minutes: 70
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install and run repository unit tests
+        run: |
+          python -m pip install -e '.[test]'
+          python -m pytest
+          python -m tavern_ai.model_registry
+      - name: Install exact TavernGym engine
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Genuine complete eight-seat baseline canary (not PPO)
+        run: |
+          mkdir -p experiments/s-20261102-6b4eaf12
+          if [[ ! -f experiments/s-20261102-6b4eaf12/001-88131.json ]]; then
+            python -m tavern_ai.canary --agent-id s-20261102-6b4eaf12 \
+              --seed 88131 --policy baseline \
+              --receipt experiments/s-20261102-6b4eaf12/001-88131.json
+          else
+            echo "Previously committed authentic receipt present; preserving immutable evidence"
+          fi
+          python -m tavern_ai.validate_receipt \
+            experiments/s-20261102-6b4eaf12/001-88131.json
+      - name: Commit authentic receipt only to this isolated branch
+        if: success()
+        shell: bash
+        run: |
+          test "$GITHUB_REF_NAME" = "agent/s-20261102-6b4eaf12/optimization-001"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add experiments/s-20261102-6b4eaf12/001-88131.json
+          if ! git diff --cached --quiet; then
+            git commit -m "[s-20261102-6b4eaf12] record authentic baseline full-game receipt"
+            git push origin "HEAD:$GITHUB_REF_NAME"
+          fi
+      - name: Retain artifact evidence even on failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: model-registry-s-20261102-6b4eaf12-${{ github.run_id }}
+          path: experiments/s-20261102-6b4eaf12/*.json
+          if-no-files-found: ignore
+          retention-days: 30
