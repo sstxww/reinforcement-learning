@@ -1,0 +1,110 @@
+{
+  "schema": 1,
+  "decisions": 6000,
+  "action_families": {
+    "cancel": 2965,
+    "choose": 1,
+    "end_turn": 4,
+    "freeze": 40,
+    "play": 2966,
+    "refresh": 24
+  },
+  "buy_legal_decisions": 2988,
+  "buy_opportunity_turns": 5,
+  "actual_buys": 0,
+  "model_end_turns": 4,
+  "end_with_legal_buy": 0,
+  "max_consecutive_same_action_in_turn": 10,
+  "by_turn": [
+    {
+      "turn": 0,
+      "decisions": 1,
+      "buy_legal_decisions": 0,
+      "buys": 0,
+      "end_turns": 0,
+      "end_with_legal_buy": 0,
+      "actions_by_family": {
+        "choose": 1
+      }
+    },
+    {
+      "turn": 1,
+      "decisions": 14,
+      "buy_legal_decisions": 2,
+      "buys": 0,
+      "end_turns": 1,
+      "end_with_legal_buy": 0,
+      "actions_by_family": {
+        "refresh": 3,
+        "freeze": 10,
+        "end_turn": 1
+      }
+    },
+    {
+      "turn": 2,
+      "decisions": 15,
+      "buy_legal_decisions": 4,
+      "buys": 0,
+      "end_turns": 1,
+      "end_with_legal_buy": 0,
+      "actions_by_family": {
+        "refresh": 4,
+        "freeze": 10,
+        "end_turn": 1
+      }
+    },
+    {
+      "turn": 3,
+      "decisions": 16,
+      "buy_legal_decisions": 4,
+      "buys": 0,
+      "end_turns": 1,
+      "end_with_legal_buy": 0,
+      "actions_by_family": {
+        "refresh": 5,
+        "freeze": 10,
+        "end_turn": 1
+      }
+    },
+    {
+      "turn": 4,
+      "decisions": 17,
+      "buy_legal_decisions": 6,
+      "buys": 0,
+      "end_turns": 1,
+      "end_with_legal_buy": 0,
+      "actions_by_family": {
+        "refresh": 6,
+        "freeze": 10,
+        "end_turn": 1
+      }
+    },
+    {
+      "turn": 5,
+      "decisions": 5937,
+      "buy_legal_decisions": 2972,
+      "buys": 0,
+      "end_turns": 0,
+      "end_with_legal_buy": 0,
+      "actions_by_family": {
+        "play": 2966,
+        "cancel": 2965,
+        "refresh": 6
+      }
+    }
+  ],
+  "interpretation": "A BUY was legal at these decision points; this does not prove that buying was strategically optimal. Repeated available BUY across one turn is not multiple independent purchase opportunities. No hidden-state input.",
+  "environment": "TavernGym",
+  "seed": 90321,
+  "source_model_sha256": "a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632",
+  "complete_eight_seat_game": false,
+  "model_controlled": true,
+  "policy_variant": "raw_ppo_model",
+  "guard_interventions": 0,
+  "safety_fallback_count": 0,
+  "diagnostic_iteration_limit": 6000,
+  "last_observed_turn": 5,
+  "failure_reason": "model_failed_to_finish_before_bounded_iteration_limit",
+  "final_controlled_placement": null,
+  "note": "Real policy observations; NOT a completed game or a valid match receipt."
+}

@@ -1,0 +1,153 @@
+name: V5 matched old-vs-resumed raw PPO R002 s-20261102-8e64a0da
+on:
+  push:
+    branches:
+      - 'agent/s-20261102-8e64a0da/optimization-002'
+    paths:
+      - '.github/workflows/v5-paired-raw-r002-s-20261102-8e64a0da.yml'
+permissions:
+  contents: write
+concurrency:
+  group: v5-paired-raw-s-20261102-8e64a0da-r002
+  cancel-in-progress: false
+jobs:
+  real-matched-pairs:
+    if: github.repository == 'sstxww/reinforcement-learning' && github.ref == 'refs/heads/agent/s-20261102-8e64a0da/optimization-002'
+    runs-on: ubuntu-latest
+    timeout-minutes: 105
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies, run regression, verify pinned engine
+        run: |
+          python -m pip install -e '.[train,test]'
+          python -m pytest -q
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Download both immutable archived models and verify ALL four asset digests
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p checkpoints/old checkpoints/new
+          gh release download v5-s-20261102-68099929-1408-41428692617 --repo sstxww/reinforcement-learning --pattern model.zip --pattern model.metadata.json --dir checkpoints/old
+          gh release download v5-smoke-s-20261102-8e64a0da-resume128 --repo sstxww/reinforcement-learning --pattern model.zip --pattern model.metadata.json --dir checkpoints/new
+          echo 'a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632  checkpoints/old/model.zip' | sha256sum -c -
+          echo '51a651c3a1921447e7bc06c301a52e85331411e75d61b35b5330c43a55aeba9c  checkpoints/old/model.metadata.json' | sha256sum -c -
+          echo 'c3bc7cd952bbf02fb4a15e3866a13c98bc9f1486eb3de35fd119b1651f81a73a  checkpoints/new/model.zip' | sha256sum -c -
+          echo '8c0648adcc781d04f28e96f4f3b1e36e836d2ff2c9f073988880bbd739201c04  checkpoints/new/model.metadata.json' | sha256sum -c -
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from sb3_contrib import MaskablePPO
+          for arm, expected_steps in [('old', 1408), ('new', 1536)]:
+              dir = Path('checkpoints') / arm
+              meta = json.loads((dir / 'model.metadata.json').read_text())
+              assert meta['total_timesteps'] == expected_steps, (arm, meta)
+              assert meta['engine']['version'] == '1.1.0'
+              assert meta['engine']['source_hash'] == '6d8712c93022ba11'
+              model = MaskablePPO.load(str(dir / 'model.zip'), device='cpu')
+              assert model.num_timesteps == expected_steps, (arm, model.num_timesteps)
+              assert model.action_space.n == 245
+          print('Verified both exact released MaskablePPO policies, all four SHA256 assets, and step lineage')
+          PY
+      - name: Run TWO new matched baseline, original PPO, resumed PPO seat0 triples
+        shell: bash
+        run: |
+          set -uo pipefail
+          mkdir -p experiments/s-20261102-8e64a0da reports/s-20261102-8e64a0da
+          for seed in 90321 90322; do
+            set -e
+            python -m tavern_ai.canary --agent-id s-20261102-8e64a0da --policy baseline --seed "$seed" --receipt "experiments/s-20261102-8e64a0da/002-baseline-$seed.json"
+            python -m tavern_ai.validate_receipt "experiments/s-20261102-8e64a0da/002-baseline-$seed.json"
+            set +e
+            for arm in old new; do
+              timeout 420s python -m tavern_ai.behavior_probe_ba09e2d4 \
+                --model "checkpoints/$arm/model.zip" \
+                --seed "$seed" --agent-id s-20261102-8e64a0da \
+                --receipt "experiments/s-20261102-8e64a0da/002-$arm-$seed.json" \
+                --metrics "reports/s-20261102-8e64a0da/002-$arm-$seed-metrics.json"
+              code=$?
+              if test "$code" -eq 0; then
+                python -m tavern_ai.validate_receipt "experiments/s-20261102-8e64a0da/002-$arm-$seed.json"
+                code=$?
+              fi
+              if test "$code" -ne 0; then
+                rm -f "experiments/s-20261102-8e64a0da/002-$arm-$seed.json"
+                echo "Raw $arm PPO seed $seed failed with exit $code; no completed receipt; metrics if available are diagnostic only"
+              fi
+              printf '{"schema":1,"arm":"%s","seed":%d,"exit_code":%d,"raw_model":true}\n' "$arm" "$seed" "$code" > "reports/s-20261102-8e64a0da/002-$arm-$seed-status.json"
+            done
+          done
+      - name: Strictly aggregate only authentic completed same-seed games
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json, statistics
+          from pathlib import Path
+          from tavern_ai.validate_receipt import validate
+          root=Path('experiments/s-20261102-8e64a0da')
+          report_root=Path('reports/s-20261102-8e64a0da')
+          seeds=[90321,90322]
+          matches=[]
+          for seed in seeds:
+              rec={'seed':seed,'arms':{}}
+              for arm in ('baseline','old','new'):
+                  file=root/f'002-{arm}-{seed}.json'
+                  record=None
+                  if file.exists():
+                      record=json.loads(file.read_text())
+                      validate(record)
+                      if record['seed']!=seed or record['agent_id']!='s-20261102-8e64a0da':
+                          raise ValueError('Incorrect receipt seed or agent')
+                      if sorted(record['placements'])!=list(range(1,9)):
+                          raise ValueError('Incomplete eight-seat rank permutation')
+                      if arm=='baseline' and record['policy']!='baseline':
+                          raise ValueError('Wrong baseline policy')
+                      if arm!='baseline' and record['policy']!='model':
+                          raise ValueError('Wrong raw model policy')
+                  metric_path=report_root/f'002-{arm}-{seed}-metrics.json'
+                  metrics=json.loads(metric_path.read_text()) if metric_path.exists() else None
+                  if arm!='baseline':
+                      expected='a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632' if arm=='old' else 'c3bc7cd952bbf02fb4a15e3866a13c98bc9f1486eb3de35fd119b1651f81a73a'
+                      if record and record['model_sha256']!=expected:
+                          raise ValueError('Model receipt SHA mismatch')
+                      if metrics and metrics.get('guard_interventions',0):
+                          raise ValueError('Guarded policy leaked into raw comparison')
+                  rec['arms'][arm]=dict(completed=record is not None,placement=record['placements'][0] if record else None,decisions=record['decisions'] if record else None,receipt=str(file) if record else None,actions=metrics.get('action_families') if metrics else None,buy_legal_decisions=metrics.get('buy_legal_decisions') if metrics else None,actual_buys=metrics.get('actual_buys') if metrics else None,failure_reason=metrics.get('failure_reason') if metrics else None)
+              rec['all_three_complete']=all(v['completed'] for v in rec['arms'].values())
+              rec['new_minus_old_placement']=rec['arms']['new']['placement']-rec['arms']['old']['placement'] if rec['all_three_complete'] else None
+              matches.append(rec)
+          paired=[m['new_minus_old_placement'] for m in matches if m['all_three_complete']]
+          summary=dict(schema=1,session_id='s-20261102-8e64a0da',round=2,source_workflow_run='https://github.com/sstxww/reinforcement-learning/actions/runs/${{ github.run_id }}',seeds=seeds,source_sha256_old='a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632',source_sha256_new='c3bc7cd952bbf02fb4a15e3866a13c98bc9f1486eb3de35fd119b1651f81a73a',steps_old=1408,steps_new=1536,additional_ppo_steps_this_round=0,model_policy_variant='unguarded_raw_ppo',matched_complete_seed_count=len(paired),paired_new_minus_old_rank_delta=paired,mean_new_minus_old_rank_delta=statistics.mean(paired) if paired else None,per_seed=matches,champion_promoted=False,competitive_improvement_verified=False,caveat='Only new independent seeds and true Game.is_over receipts; small n cannot establish reliable strength gains. Incomplete raw games are failures, not bottom-ranked completed games.')
+          file=report_root/'002-paired-raw-1536-vs-1408.json'
+          file.write_text(json.dumps(summary,indent=2)+'\n')
+          print(json.dumps({k:v for k,v in summary.items() if k!='per_seed'},indent=2))
+          PY
+      - name: Commit ONLY own truthful full-match receipts and raw policy metrics
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = agent/s-20261102-8e64a0da/optimization-002
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add experiments/s-20261102-8e64a0da reports/s-20261102-8e64a0da
+          if ! git diff --cached --quiet; then
+            git commit -m 'evidence(s-20261102-8e64a0da R002): matched raw PPO old/new and baseline games'
+            git pull --rebase origin "$GITHUB_REF_NAME"
+            git push origin "HEAD:$GITHUB_REF_NAME"
+          fi
+      - name: Preserve bounded paired real-game evidence for review
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v5-paired-r002-s-20261102-8e64a0da
+          path: |
+            reports/s-20261102-8e64a0da/002-*.json
+            experiments/s-20261102-8e64a0da/002-*.json
+          if-no-files-found: ignore
+          retention-days: 30
