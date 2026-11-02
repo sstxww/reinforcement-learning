@@ -48,10 +48,12 @@ jobs:
             | tee artifacts/source-selection.json
           MODEL_ID="$(python -c 'import json;print(json.load(open("artifacts/source-selection.json"))["model_id"])')"
           SHA="$(python -c 'import json;print(json.load(open("artifacts/source-selection.json"))["expected_sha256"])')"
+          META_SHA="$(python -c 'import json;print(json.load(open("artifacts/source-selection.json"))["metadata_sha256"])')"
           gh release download "$MODEL_ID" --repo "$GITHUB_REPOSITORY" \
             --pattern 'model.zip' --pattern 'model.metadata.json' --dir checkpoints
           test -s checkpoints/model.zip
           test -s checkpoints/model.metadata.json
+          echo "$META_SHA  checkpoints/model.metadata.json" | sha256sum --check -
           python -m tavern_ai.checkpoint_preflight \
             --model checkpoints/model.zip --metadata checkpoints/model.metadata.json \
             --expected-sha256 "$SHA" --probe-inference \
