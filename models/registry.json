@@ -1,0 +1,92 @@
+{
+  "schema": 1,
+  "policy": "No champion is assigned without verified independent competitive improvement.",
+  "champion_model_id": null,
+  "latest_independently_verified_resumable_model_id": null,
+  "latest_published_candidate_id": "v2-learning-41413557445",
+  "models": [
+    {
+      "model_id": "v2-learning-41413557445",
+      "role": "Challenger",
+      "release": "https://github.com/sstxww/reinforcement-learning/releases/tag/v2-learning-41413557445",
+      "checkpoint_filename": "model.zip",
+      "checkpoint_sha256": "73bde2666426cecce39f135980a897bb2cd4a7d70783ba04c9c0d29477a6664a",
+      "metadata_sha256": "6f0b433191a8242dcedc627f6be49d1551a82788ce7bfd8e60416ede8146acc0",
+      "environment": {
+        "version": "1.1.0",
+        "source_hash": "6d8712c93022ba11",
+        "features": 4017,
+        "cards": 447,
+        "actions": 245
+      },
+      "algorithm": "MaskablePPO",
+      "total_timesteps": 1280,
+      "parent_model_id": "v1-learning-9eada5801f99",
+      "published_release_assets_observed": true,
+      "independent_download_hash_load_resume_check": "pending",
+      "reported_full_game": {
+        "seed": 23002,
+        "placement": 8,
+        "completed": true,
+        "fallback_accounting": "not separately reported"
+      },
+      "reported_heldout": {
+        "games": 4,
+        "seeds": [
+          24000,
+          24001,
+          24002,
+          24003
+        ],
+        "placements": [
+          8,
+          8,
+          8,
+          8
+        ],
+        "mean_placement": 8,
+        "top4_rate": 0,
+        "first_place_rate": 0
+      },
+      "evidence_pr": "https://github.com/sstxww/reinforcement-learning/pull/15",
+      "promotion_eligible": false
+    },
+    {
+      "model_id": "v1-learning-9eada5801f99",
+      "role": "Population",
+      "release": "https://github.com/sstxww/reinforcement-learning/releases/tag/v1-learning-9eada5801f99",
+      "checkpoint_filename": "model.zip",
+      "checkpoint_sha256": "dc5195658995358e70c0d565a979b9cf05ccc5e47ae7adaa0a2f078f01cad917",
+      "metadata_sha256": "74a6b25af97087a003d74a3b8e274ac9dbf95bf91fa409eb0fea1a5cc05e5ac6",
+      "environment": {
+        "version": "1.1.0",
+        "source_hash": "6d8712c93022ba11",
+        "features": 4017,
+        "cards": 447,
+        "actions": 245
+      },
+      "algorithm": "MaskablePPO",
+      "total_timesteps": 256,
+      "parent_model_id": null,
+      "published_release_assets_observed": true,
+      "independent_download_hash_load_resume_check": "pending",
+      "reported_heldout": {
+        "games": 4,
+        "seeds": [
+          24000,
+          24001,
+          24002,
+          24003
+        ],
+        "placements": [
+          8,
+          8,
+          8,
+          8
+        ]
+      },
+      "evidence_pr": "https://github.com/sstxww/reinforcement-learning/pull/15",
+      "promotion_eligible": false
+    }
+  ]
+}
