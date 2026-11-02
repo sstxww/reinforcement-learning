@@ -1,0 +1,147 @@
+{
+  "caveat": "Small n and any incomplete raw model games mean no strength claim. Each masked-legal BUY decision exposure is temporally dependent.",
+  "champion_promoted": false,
+  "competitive_gain_verified": false,
+  "continued_steps": 1536,
+  "engine": "TavernGym 1.1.0 observe2",
+  "forced_turn_ends": 0,
+  "fully_paired": [
+    {
+      "baseline_rank": 8,
+      "continued_minus_source_rank": 0,
+      "continued_rank": 8,
+      "seed": 99372450,
+      "source_rank": 8
+    }
+  ],
+  "fully_paired_seed_count": 1,
+  "paired_mean_placement_delta": 0,
+  "raw_model_only": true,
+  "rows": [
+    {
+      "action_families": {
+        "all_end_turns": 9,
+        "buy": 19,
+        "buy_legal_decisions": 29,
+        "choose": 7,
+        "end_turn": 9,
+        "play": 13,
+        "upgrade": 4
+      },
+      "arm": "baseline",
+      "buy_chosen": 19,
+      "buy_legal_decisions": 29,
+      "complete": true,
+      "consecutive_identical_public_observation": 0,
+      "decisions": 52,
+      "end_while_buy_legal": 0,
+      "model_sha256": null,
+      "rank": 8,
+      "seed": 99372450
+    },
+    {
+      "action_families": {
+        "all_end_turns": 7,
+        "buy_legal_decisions": 39,
+        "choose": 3,
+        "end_turn": 7,
+        "other": 70,
+        "reroll": 41,
+        "upgrade": 1
+      },
+      "arm": "source",
+      "buy_chosen": 0,
+      "buy_legal_decisions": 39,
+      "complete": true,
+      "consecutive_identical_public_observation": 0,
+      "decisions": 122,
+      "end_while_buy_legal": 0,
+      "model_sha256": "a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632",
+      "rank": 8,
+      "seed": 99372450
+    },
+    {
+      "action_families": {
+        "all_end_turns": 7,
+        "buy": 1,
+        "buy_legal_decisions": 43,
+        "choose": 2,
+        "end_turn": 7,
+        "other": 70,
+        "play": 3,
+        "reroll": 46,
+        "sell": 2,
+        "upgrade": 1
+      },
+      "arm": "continued",
+      "buy_chosen": 1,
+      "buy_legal_decisions": 43,
+      "complete": true,
+      "consecutive_identical_public_observation": 0,
+      "decisions": 132,
+      "end_while_buy_legal": 0,
+      "model_sha256": "0f2c9705fb1078815f3c74d511aa3a770550b2348d1528072920f1bec02539f8",
+      "rank": 8,
+      "seed": 99372450
+    },
+    {
+      "action_families": {
+        "all_end_turns": 9,
+        "buy": 13,
+        "buy_legal_decisions": 21,
+        "choose": 6,
+        "end_turn": 9,
+        "play": 10,
+        "upgrade": 3
+      },
+      "arm": "baseline",
+      "buy_chosen": 13,
+      "buy_legal_decisions": 21,
+      "complete": true,
+      "consecutive_identical_public_observation": 0,
+      "decisions": 41,
+      "end_while_buy_legal": 0,
+      "model_sha256": null,
+      "rank": 7,
+      "seed": 99372451
+    },
+    {
+      "action_families": {
+        "all_end_turns": 7,
+        "buy": 1,
+        "buy_legal_decisions": 46,
+        "choose": 3,
+        "end_turn": 7,
+        "other": 70,
+        "play": 2,
+        "reroll": 41,
+        "upgrade": 1
+      },
+      "arm": "source",
+      "buy_chosen": 1,
+      "buy_legal_decisions": 46,
+      "complete": true,
+      "consecutive_identical_public_observation": 0,
+      "decisions": 125,
+      "end_while_buy_legal": 0,
+      "model_sha256": "a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632",
+      "rank": 8,
+      "seed": 99372451
+    },
+    {
+      "arm": "continued",
+      "complete": false,
+      "rank": null,
+      "seed": 99372451
+    }
+  ],
+  "run_id": "41451177738",
+  "schema": 1,
+  "seeds": [
+    99372450,
+    99372451
+  ],
+  "session_id": "s-20261102-99372431",
+  "source_steps": 1408,
+  "training_steps_this_workflow": 0
+}
