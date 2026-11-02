@@ -50,6 +50,7 @@ def summarize(events: list[dict]) -> dict:
     had_buy_in_turn = set()
     selected_buys = 0
     forced_end = 0
+    forced_mandatory = 0
     buy_overrides = 0
     observed_unchanged = 0
     repeats = 0
@@ -69,6 +70,8 @@ def summarize(events: list[dict]) -> dict:
             selected_buys += 1
         if row["forced_end"]:
             forced_end += 1
+        if row.get("forced_mandatory_action"):
+            forced_mandatory += 1
         if row.get("buy_override"):
             buy_overrides += 1
         if row.get("public_observation_unchanged") is True:
@@ -85,7 +88,7 @@ def summarize(events: list[dict]) -> dict:
         state["model_ends"] += int(action == 0 and not row["forced_end"])
         state["forced_ends"] += int(row["forced_end"])
     return {
-        "model_actions": len(events) - forced_end,
+        "model_actions": len(events) - forced_end - forced_mandatory,
         "total_controlled_actions": len(events),
         "action_counts": dict(categories),
         "buy_legal_decision_states": legal_buy,
@@ -94,6 +97,7 @@ def summarize(events: list[dict]) -> dict:
         "end_turn_while_buy_legal": end_with_legal_buy,
         "turns_ended_with_buy_legal": len(ended_turn_with_buy),
         "guard_forced_end_turns": forced_end,
+        "guard_forced_mandatory_actions": forced_mandatory,
         "explicit_buy_overrides": buy_overrides,
         "same_action_adjacent_within_turn": repeats,
         "observable_unchanged_post_actions": observed_unchanged,
@@ -112,6 +116,28 @@ def first_legal_buy_if_empty_board(proposed: int, mask: np.ndarray, board_size: 
     if enabled and proposed in (1, 2) and board_size == 0 and bool(mask[8:16].any()):
         return int(np.flatnonzero(mask[8:16])[0]) + 8
     return proposed
+
+
+def safe_budget_action(mask: np.ndarray, used: int) -> int:
+    """Fail closed on invalid masks; never force an illegal END_TURN.
+
+    At the soft budget, first finish mandatory choices/plays before ending.
+    At the hard budget, declare the candidate nonviable instead of looping.
+    """
+    if used >= 120:
+        raise RuntimeError("Hard turn decision limit exceeded (120)")
+    if used < TURN_BUDGET:
+        raise ValueError("Budget fallback invoked before threshold")
+    if mask[0]:
+        return 0
+    for lo, hi in ((30, 46), (46, 126), (126, 196), (8, 16)):
+        indices = np.flatnonzero(mask[lo:hi])
+        if len(indices):
+            return int(indices[0]) + lo
+    remaining = np.flatnonzero(mask)
+    if not len(remaining):
+        raise RuntimeError("No legal actions at forced-mandatory budget")
+    return int(remaining[0])
 
 
 def run(seed: int, model_path: Path, expected_sha256: str, *, buy_when_empty_board: bool = False) -> dict:
@@ -154,9 +180,7 @@ def run(seed: int, model_path: Path, expected_sha256: str, *, buy_when_empty_boa
             forced = used >= TURN_BUDGET
             proposed_action = None
             if forced:
-                if not mask[0]:
-                    raise RuntimeError("No legal end turn at budget")
-                action = 0
+                action = safe_budget_action(mask, used)
             else:
                 proposal, _ = model.predict({"features": features, "cards": cards},
                                             action_masks=mask, deterministic=True)
@@ -169,7 +193,8 @@ def run(seed: int, model_path: Path, expected_sha256: str, *, buy_when_empty_boa
                 "turn": turn, "action": action,
                 "model_proposed_action": proposed_action,
                 "buy_override": bool(proposed_action is not None and proposed_action != action),
-                "forced_end": forced,
+                "forced_end": bool(forced and action == 0),
+                "forced_mandatory_action": bool(forced and action != 0),
                 "buy_legal": bool(mask[8:16].any()),
                 "board_size_observed": float(features[33]),
                 "hand_size_observed": float(features[34]),
