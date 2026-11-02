@@ -2,7 +2,7 @@
 import numpy as np
 import pytest
 
-from tavern_ai.hero_power_ablation_s20261102_3a93dae9 import AffordableHeroPowerPolicy
+from tavern_ai.hero_power_ablation_s20261102_3a93dae9 import AffordableHeroPowerPolicy, POLICY_NAME
 
 
 def observation(*, free=True, second=False, pending=False):
@@ -60,3 +60,16 @@ def test_bad_feature_shape_fails_closed():
     obs["features"] = np.zeros(5, dtype=np.float32)
     with pytest.raises(ValueError, match="feature layout"):
         p.act(obs, {"turn": 1})
+
+
+def test_hero_power_requires_three_gold_reserve():
+    p = AffordableHeroPowerPolicy()
+    obs = observation()
+    obs["features"][17] = 0.4  # costs 2 gold
+    obs["features"][7] = 0.4  # holds 4 gold
+    assert p.act(obs, {"turn": 3, "actions_used": 0}) == 8
+    assert p.hero_actions == 0
+
+
+def test_candidate_policy_receipt_name_is_unambiguous():
+    assert POLICY_NAME == "affordable_hero_power_gold_reserve_v2"
