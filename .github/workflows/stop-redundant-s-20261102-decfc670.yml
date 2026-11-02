@@ -1,0 +1,31 @@
+name: Stop redundant self-triggered runs s-20261102-decfc670
+
+on:
+  push:
+    branches:
+      - 'agent/s-20261102-decfc670/optimization-001'
+    paths:
+      - '.github/workflows/stop-redundant-s-20261102-decfc670.yml'
+
+permissions:
+  contents: read
+  actions: write
+
+jobs:
+  only-own-excess-runs:
+    if: github.ref == 'refs/heads/agent/s-20261102-decfc670/optimization-001'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Cancel precisely three duplicate verification runs from path edit
+        shell: bash
+        run: |
+          set -u
+          for RUN in 41429380408 41429386219 41429392570; do
+            echo "Request cancellation for own known redundant run $RUN"
+            gh api --method POST "repos/${GITHUB_REPOSITORY}/actions/runs/${RUN}/cancel" \
+              >/dev/null && echo "Cancellation accepted: $RUN" || echo "Already done or cancellation unavailable: $RUN"
+          done
+          echo 'Previously successful evidence runs are intentionally untouched.'
