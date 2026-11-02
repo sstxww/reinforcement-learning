@@ -20,7 +20,7 @@ import numpy as np
 
 from .baseline import BaselinePolicy
 from .canary import run as baseline_run
-from .contract import CATALOG_SHA256, verify_engine
+from .contract import CATALOG_SHA256, CARDS, verify_engine
 from .validate_receipt import validate
 
 SESSION_ID = "s-20261102-aca5a929"
@@ -74,7 +74,7 @@ def best_buy(observation: dict, weights: Weights, static: np.ndarray, dims: dict
     cards = np.asarray(observation["cards"], dtype=np.int64)
     mask = np.asarray(observation["action_mask"], dtype=bool)
     board, hand, shop = card_offsets(dims)
-    if cards.shape != (dims["OBS_CARDS"],) or mask.shape != (245,):
+    if cards.shape != (CARDS,) or mask.shape != (245,):
         raise ValueError("Incorrect observe2 input shape")
     owned = np.concatenate((cards[board:board + N_BOARD], cards[hand:hand + N_HAND]))
     owned = owned[(owned > 0) & (owned < len(static))]
@@ -203,7 +203,19 @@ def experiment() -> dict:
     engine = verify_engine()
     _, dims = catalog()
     if tuple(card_offsets(dims)) != (19,26,36):
-        raise RuntimeError("Unrecognized card layout")
+        raise RuntimeError("Unrecognized legacy card layout")
+    # observe2 extends the original card stream. Verify the public-card
+    # prefix before using legacy board/hand/shop offsets.
+    import taverngym
+    probe = taverngym.Game(seed=79110)
+    old_cards = np.frombuffer(probe.observe(0)[1], dtype="<i4")
+    new_cards = np.frombuffer(probe.observe2(0)[1], dtype="<i4")
+    if old_cards.shape != (dims["OBS_CARDS"],) or new_cards.shape != (CARDS,):
+        raise RuntimeError(f"Unexpected old/observe2 dimensions {old_cards.shape}/{new_cards.shape}")
+    if not np.array_equal(old_cards, new_cards[:len(old_cards)]):
+        raise RuntimeError(
+            "observe2 does not retain legacy card-index prefix; refuse unverified shop offsets"
+        )
     root = Path("experiments") / SESSION_ID
     report_root = Path("reports") / SESSION_ID
     # Finite black-box search; training games are part of the optimization, NOT heldout eval.
