@@ -1,0 +1,1 @@
+Run exactly one isolated proof: offline regression, pinned TavernGym install, genuine baseline eight-seat seed 98631. Do not treat baseline as PPO performance.
