@@ -1,0 +1,51 @@
+name: V7 report receipt integrity - s-20261103-80bb83fb
+
+on:
+  push:
+    branches:
+      - agent/s-20261103-80bb83fb/optimization-001
+    paths:
+      - .github/workflows/v7-report-integrity-s-20261103-80bb83fb.yml
+      - scripts/check_report_receipt_refs_v7.py
+      - tests/test_report_receipt_refs_v7_80bb83fb.py
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: v7-report-integrity-s-20261103-80bb83fb
+  cancel-in-progress: false
+
+jobs:
+  evidence:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install offline test dependencies
+        run: python -m pip install -e '.[test]'
+      - name: Verify actual reference verifier tests
+        run: python -m pytest -q tests/test_report_receipt_refs_v7_80bb83fb.py
+      - name: Pin and check real TavernGym contract
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Independently complete one real eight-seat baseline (not PPO)
+        run: |
+          mkdir -p outputs
+          python -m tavern_ai.canary --agent-id s-20261103-80bb83fb --policy baseline --seed 99395 --receipt outputs/001-99395-baseline.json
+          python -m tavern_ai.validate_receipt outputs/001-99395-baseline.json
+          sha256sum outputs/001-99395-baseline.json
+          cat outputs/001-99395-baseline.json
+      - name: Keep original game evidence temporarily
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v7-s-20261103-80bb83fb-${{ github.run_id }}
+          path: outputs/*
+          if-no-files-found: ignore
+          retention-days: 30
