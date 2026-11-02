@@ -1,23 +1,23 @@
-# P0 PR integration triage — snapshot with live GitHub PR heads
+# P0 open PR triage — paginated live GitHub inventory
 
-**Session:** s-20261102-6e4b91ac. **Repo:** sstxww/reinforcement-learning. **Snapshot:** 2026-11-02; GitHub REST `pulls?state=open&per_page=100`, not reused historical counts. PRs dynamically change across parallel sessions. Full source list and mutable head SHAs below.
+Session: `s-20261102-6e4b91ac`. Repo: `sstxww/reinforcement-learning`. Source: GitHub REST open-pull collection, **three pages** with per_page=100 on 2026-11-02. Dynamic, non-atomic snapshot; agents continually create/merge PRs. Numbers and head SHAs must be rechecked before any merge.
 
-**Open = 100**; **Draft = 99**; **Main-target = 100**. Conservative *triage-only* buckets: A=0, B=9, C=53, D=28, E=10. These are NOT merge approvals and do not imply tests or model performance evidence have been reviewed for each PR.
+**At this paginated read: 112 open PRs, 110 Draft, 111 targeting main**; conservative *unreviewed triage categories* A=0, B=12, C=58, D=32, E=10. Categories are leads, not CI or merge endorsements.
 
-- **A — immediate audited main merge:** none. All main-targeting PRs in the snapshot were Draft or lacked verified readiness/ownership; exception non-Draft #15 targets non-main experimental branch. Draft author gates must not be bypassed to reduce PR count.
-- **B — structural or explicit block:** dependency/stacking, wrong target or `action_required` CI examples: #105 stacked over #90, #107 over #103, #15 targets `agent/learning/v1`, #91 unmergeable at this session's check, #86/#84 exact-head PR checks `action_required`. For these, reviewer must recheck latest head and dependencies before any integration.
-- **C — requires deeper evidence review:** PR title alone cannot establish quality. Full actual CI, hashes, receipts, tests, main compatibility and no concurrent integrator required.
-- **D — reported non-gain / negative study:** knowledge and instrumentation may be valuable; weak policies must not be promoted. Bucket based on explicit title only, so reviewer must inspect real reports.
-- **E — potential duplication/overlap:** Release/checkpoint catalog, behavior probes or pinned-card catalogs appear in other already integrated or open PRs; not necessarily actual diff conflicts. #103 author explicitly warns overlap with already merged #90/#98. Selectively extract unique tests and evidence; do not bulk merge.
+- **A (ready for immediate merge)** = none: all open main-targeting PRs sampled remain Draft; non-Draft #15 targets `agent/learning/v1`, not main. No unilateral Draft conversion or merger.
+- **B (dependency/blocked)**: stacked #105 depends on #90, #107 depends on #103; #15 is not a main integration PR, #91 earlier mergeability check false. #86 exact-head PR CI action_required [41430321014](https://github.com/sstxww/reinforcement-learning/actions/runs/41430321014) at `36ad39184f6d`; #84 action_required [41430221563](https://github.com/sstxww/reinforcement-learning/actions/runs/41430221563) at `33ca186da956`. Other B entries flagged conservatively, require direct dependency inspection.
+- **C (requires evidence review)**: no CI, game receipt, independent benchmarks, current mergeability, or ownership inferred from titles. Inspect before movement.
+- **D (reported negative/no-gain)**: preserve independent genuine evidence and diagnostics, not rejected policy promotion; D is a title-based heuristic, not a causal finding.
+- **E (probable duplicate or overlap)**: multiple checkpoint registries, Release auditing, behavior probes or card catalogs. #103 author explicitly warned duplication with already integrated #90/#98; its own head `917b92471ef5` CI [41430511908](https://github.com/sstxww/reinforcement-learning/actions/runs/41430511908) succeeded, but Draft is still not authorized for unreviewed bulk merge.
+- **Another CI caveat**: #75 head `19e5cbb46629` [41423533070](https://github.com/sstxww/reinforcement-learning/actions/runs/41423533070) succeeded, but remains Draft awaiting review. A green CI never alone proves model superiority.
 
-**Specific latest-head observations during this session:** #103 HEAD `917b92471ef5` CI [41430511908](https://github.com/sstxww/reinforcement-learning/actions/runs/41430511908) SUCCESS, still Draft and author warns duplicates; #75 HEAD `19e5cbb46629` CI [41423533070](https://github.com/sstxww/reinforcement-learning/actions/runs/41423533070) SUCCESS, still Draft awaiting review; #86 HEAD `36ad39184f6d` CI [41430321014](https://github.com/sstxww/reinforcement-learning/actions/runs/41430321014) `action_required`; #84 HEAD `33ca186da956` CI [41430221563](https://github.com/sstxww/reinforcement-learning/actions/runs/41430221563) `action_required`. These are historical observations tied to those exact SHAs, not a blanket certification of newer heads. No PR was merged in this session.
-
-| PR | Triage | Draft status | HEAD first 12 | Base | Title |
+| PR | Preliminary bucket | Status | HEAD first 12 | Target | Title |
 |---|---|---|---|---|---|
+| [#150](https://github.com/sstxww/reinforcement-learning/pull/150) | C | Draft | `389aa12d0a0a` | `main` | [s-20261102-3c1ad8f4 R001] Verified V2 public-action state transitions and rank-eight evidence |
 | [#149](https://github.com/sstxww/reinforcement-learning/pull/149) | C | Draft | `f9d346111e84` | `main` | [s-20261102-6ed41c9a R001] Verified Release recovery gate and main durable checkpoint publishing |
 | [#148](https://github.com/sstxww/reinforcement-learning/pull/148) | D | Draft | `086812e2db29` | `main` | [s-20261102-2be229d5 R001] Canonical evaluator rejects assisted games and reports paired uncertainty |
 | [#147](https://github.com/sstxww/reinforcement-learning/pull/147) | C | Draft | `c4859e52ea43` | `main` | [s-20261102-2b9660fa R001] Fail-closed continuation and explicit Release restoration |
-| [#146](https://github.com/sstxww/reinforcement-learning/pull/146) | C | Draft | `5ccc93b9f8b4` | `main` | [s-20261102-8e64a0da R001] V5 P0 integration audit and bounded published-release PPO resume |
+| [#146](https://github.com/sstxww/reinforcement-learning/pull/146) | C | Draft | `73169c84966d` | `main` | [s-20261102-8e64a0da R001] V5 P0 integration audit and bounded published-release PPO resume |
 | [#145](https://github.com/sstxww/reinforcement-learning/pull/145) | C | Draft | `74d0ed9ad321` | `main` | [s-20261102-a280d7eb R001] Strict raw/guarded paired rank evidence gate + real TavernGym receipt |
 | [#144](https://github.com/sstxww/reinforcement-learning/pull/144) | C | Draft | `b79432125c9c` | `main` | [s-20261102-6fc22e71 R001] Paired real-game evidence gate: separate raw PPO from guard interventions |
 | [#143](https://github.com/sstxww/reinforcement-learning/pull/143) | D | Draft | `1e803d745be8` | `main` | [s-20261102-71136659 R001] V5 verified paired-evidence gate, 1536-step negative smoke and Release403 handoff |
@@ -26,21 +26,21 @@
 | [#139](https://github.com/sstxww/reinforcement-learning/pull/139) | C | Draft | `94834d0253c8` | `main` | [s-20261102-e8355ba3 R001] Reconcile incomplete raw PPO loops vs guarded rank-8 match evidence |
 | [#138](https://github.com/sstxww/reinforcement-learning/pull/138) | C | Draft | `f109243a94e4` | `main` | [s-20261102-0935f036 R001] Fail-closed Champion evidence gate with verified baseline canary |
 | [#137](https://github.com/sstxww/reinforcement-learning/pull/137) | C | Draft | `f1832deb1368` | `main` | [s-20261102-5ce8a1d4 R001] Strict seed-seat paired evidence and raw/guarded attribution |
-| [#136](https://github.com/sstxww/reinforcement-learning/pull/136) | C | Draft | `638c0d4a1f3d` | `main` | [s-20261102-d5349678 R001] P0 integrate #93 Release verifier against live canonical registry |
+| [#136](https://github.com/sstxww/reinforcement-learning/pull/136) | C | Draft | `37f340c892b3` | `main` | [s-20261102-d5349678 R001] P0 integrate #93 Release verifier against live canonical registry |
 | [#135](https://github.com/sstxww/reinforcement-learning/pull/135) | C | Draft | `13cc288cff89` | `main` | [s-20261102-f17ed915 R001] Strict paired receipt evidence gate for V5 rank-8 comparisons |
 | [#134](https://github.com/sstxww/reinforcement-learning/pull/134) | C | Draft | `830760087d43` | `main` | [s-20261102-fda20934 R001] V5 stop silent PPO reset when checkpoint artifact expires |
 | [#133](https://github.com/sstxww/reinforcement-learning/pull/133) | C | Draft | `cae534ccd29a` | `main` | [s-20261102-fb6a2c91 R001] V5 fail-closed durable Release resume smoke + rank8 safety gates |
 | [#132](https://github.com/sstxww/reinforcement-learning/pull/132) | C | Draft | `2e614954a520` | `main` | [s-20261102-1e55e01e R001] Gate main PPO continuation on durable Release; fail closed and archive unpromoted candidate |
-| [#131](https://github.com/sstxww/reinforcement-learning/pull/131) | C | Draft | `709729d45f30` | `main` | [s-20261102-f25a91c8 R001] V5 fail-closed paired raw-model evaluation and live PR dependency audit |
+| [#131](https://github.com/sstxww/reinforcement-learning/pull/131) | C | Draft | `f5ba56d4a42f` | `main` | [s-20261102-f25a91c8 R001] V5 fail-closed paired raw-model evaluation and live PR dependency audit |
 | [#130](https://github.com/sstxww/reinforcement-learning/pull/130) | C | Draft | `1786e792fcdf` | `main` | [s-20261102-5e3b719a R001] Integrate fail-closed ZIP/algorithm checks into canonical Release verifier |
 | [#129](https://github.com/sstxww/reinforcement-learning/pull/129) | C | Draft | `82a060951ad7` | `main` | [s-20261102-82d0fbbb R001] P1 strict canonical evaluation receipt gate + genuine eight-seat evidence |
 | [#128](https://github.com/sstxww/reinforcement-learning/pull/128) | C | Draft | `62d99f9f885d` | `main` | [s-20261102-5ac817e2 R001] V5 fail-closed main PPO restore guard (no silent reset) |
 | [#127](https://github.com/sstxww/reinforcement-learning/pull/127) | C | Draft | `0083fddb54f7` | `main` | [s-20261102-99372431 R001] V5: fail-closed Release resume with schema-2 provenance and true-game gate |
 | [#126](https://github.com/sstxww/reinforcement-learning/pull/126) | C | Draft | `f8dd8be9ccbc` | `main` | [s-20261102-c647a479 R001] V5 strict paired real-game evaluation and rank-eight integration evidence |
 | [#125](https://github.com/sstxww/reinforcement-learning/pull/125) | D | Draft | `684a2a8b8109` | `main` | [V5 P0/P1][s-20261102-001b7da1] Stage resumable PPO checkpoints and reject checksum/step mismatch |
-| [#124](https://github.com/sstxww/reinforcement-learning/pull/124) | C | Draft | `4a854d4900d5` | `main` | [s-20261102-6e4b91ac R001] Verify PPO resume bytes/steps and run real Release smoke |
+| [#124](https://github.com/sstxww/reinforcement-learning/pull/124) | C | Draft | `8e59a92429bf` | `main` | [s-20261102-6e4b91ac R001] Verify PPO resume bytes/steps and run real Release smoke |
 | [#123](https://github.com/sstxww/reinforcement-learning/pull/123) | C | Draft | `2ef3206bbeb5` | `main` | [s-20261102-c07a7192 R001] V5 fail-closed registered Release resume for main trainer |
-| [#121](https://github.com/sstxww/reinforcement-learning/pull/121) | C | Draft | `ea8113c65ddf` | `main` | [s-20261102-aaee3a59 R001] V5 fail-closed Release/Artifact resume and real-game smoke |
+| [#121](https://github.com/sstxww/reinforcement-learning/pull/121) | C | Draft | `150b3a948a09` | `main` | [s-20261102-aaee3a59 R001] V5 fail-closed Release/Artifact resume and real-game smoke |
 | [#120](https://github.com/sstxww/reinforcement-learning/pull/120) | C | Draft | `4ebddcedd4d1` | `main` | [s-20261102-77ba1f52 R001] Reconcile canonical Release digests and prevent stale 4-model integration |
 | [#119](https://github.com/sstxww/reinforcement-learning/pull/119) | C | Draft | `8f04117ec2f4` | `main` | [s-20261102-e7783c13 R001] Fail-closed paired raw-PPO evaluation evidence and P0 integration audit |
 | [#118](https://github.com/sstxww/reinforcement-learning/pull/118) | C | Draft | `63096017b59b` | `main` | [s-20261102-5d71c0ab R001] Harden Champion evidence gate; verify Release and rank-8 buying behavior |
@@ -114,5 +114,16 @@
 | [#21](https://github.com/sstxww/reinforcement-learning/pull/21) | D | Draft | `3783131213a7` | `main` | [s-20261102-2b0d8089 R001] Signed-log reward pilot: negative result, real match receipts |
 | [#20](https://github.com/sstxww/reinforcement-learning/pull/20) | D | Draft | `8559d3af0249` | `main` | [s-20261102-6d2f9a71 R001] Guard PPO free-action loops; paired entropy study (inconclusive) |
 | [#19](https://github.com/sstxww/reinforcement-learning/pull/19) | D | Draft | `337bdeeb8e74` | `main` | [s-20261102-14ce98f3 R001] Test PPO reward scale: 512 real steps, guarded full-game evidence, no gain |
+| [#18](https://github.com/sstxww/reinforcement-learning/pull/18) | D | Draft | `cd7da5c8aa16` | `main` | [s-20261102-e4c71b9d R001] Test masked-mean card pooling (no observed gain) |
+| [#17](https://github.com/sstxww/reinforcement-learning/pull/17) | D | Draft | `7354e21a17a8` | `main` | [s-20261102-1b82df52 R001] signed-log input ablation: 512-step negative pilot |
+| [#16](https://github.com/sstxww/reinforcement-learning/pull/16) | D | Draft | `63dc7de988f0` | `main` | [s-20261102-7f4c9a62 R001] Masked-PPO entropy sensitivity: verified short-run negative result |
+| [#15](https://github.com/sstxww/reinforcement-learning/pull/15) | B | Ready | `ad1bf93498ab` | `agent/learning/v1` | [V2][learning] verified 1280-step PPO resume + paired full-game benchmark (no gain) |
+| [#14](https://github.com/sstxww/reinforcement-learning/pull/14) | C | Draft | `ba8fb283f67b` | `main` | [s-20261102-1d9e7456 R001] Purchase-slot selection bias ablation on real TavernGym |
+| [#13](https://github.com/sstxww/reinforcement-learning/pull/13) | C | Draft | `30187df4704d` | `main` | [s-20261102-04414822 R001] Paired card-embedding width ablation (unverified) |
+| [#12](https://github.com/sstxww/reinforcement-learning/pull/12) | D | Draft | `2fad7860f244` | `main` | [s-20261102-bedfc382 R001-R002] Potential reward shaping: 8704 PPO steps, 46 full games (negative) |
+| [#11](https://github.com/sstxww/reinforcement-learning/pull/11) | C | Draft | `9a0f34cd58f0` | `main` | [s-20261102-c097d0cc R001] rightmost Play insertion ablation vs baseline |
+| [#9](https://github.com/sstxww/reinforcement-learning/pull/9) | B | Draft | `5f2fa7ebb79a` | `main` | [V1][learning] resumable PPO and first-round experiment |
+| [#8](https://github.com/sstxww/reinforcement-learning/pull/8) | B | Draft | `97f11dc827bf` | `main` | [V1][infrastructure] first-round verified-match candidate |
+| [#6](https://github.com/sstxww/reinforcement-learning/pull/6) | C | Draft | `71fb0aacf3f5` | `main` | [V1][strategy] first-round verified-match candidate |
 
-**Next integration handoff:** lock a single eligible change, re-read exact current main and PR SHA, validate mergeability/latest exact-head CI + full-game receipts + own-session isolated evidence, check code overlap and dependency; merge through normal GitHub PR only, verify resulting main CI success before declaring completed. Do not close others' work or cancel their Actions.
+**P0 outcome this session**: zero PRs merged by this agent, because no safe main-targeting non-Draft PR met ownership/CI/independent real-game/dependency gates. Our verified P1 correctness fix was submitted as isolated [PR #124](https://github.com/sstxww/reinforcement-learning/pull/124) and deliberately kept Draft. Next integrator must re-fetch all current SHAs, own one merge transaction, check exact-head CI, real completed game receipts, exclusions, conflicts and dependencies, then verify post-merge main CI. Never delete/cancel others' runs or experiment records.
