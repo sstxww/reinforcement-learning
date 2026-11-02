@@ -1,0 +1,76 @@
+name: PPO action telemetry R002 s-20261102-24728f13
+
+on:
+  push:
+    branches: ['agent/s-20261102-24728f13/optimization-002']
+    paths:
+      - 'tavern_ai/action_trace_24728f13.py'
+      - 'tests/test_action_trace_24728f13.py'
+      - '.github/workflows/telemetry-s-20261102-24728f13.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: isolated-r002-action-trace-s-20261102-24728f13
+  cancel-in-progress: false
+
+jobs:
+  real-action-traces:
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '2'
+      MKL_NUM_THREADS: '2'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install test and inference dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[train,test]'
+      - name: Unit regressions
+        run: python -m pytest tests/test_action_trace_24728f13.py
+      - name: Install and fingerprint real pinned TavernGym
+        run: bash scripts/bootstrap_engine.sh
+      - name: Download exact R001 checkpoint artifact
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 41416467100
+          name: lr-study-s-20261102-24728f13-41416467100
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: .
+      - name: Replay six new full eight-seat games with isolated action-level telemetry
+        run: python -m tavern_ai.action_trace_24728f13
+      - name: Validate candidate genuine completed receipt
+        run: |
+          python -m tavern_ai.validate_receipt experiments/s-20261102-24728f13/002-42174.json
+          python -m pytest tests/test_action_trace_24728f13.py
+      - name: Commit only own R002 receipts and compact telemetry
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = 'agent/s-20261102-24728f13/optimization-002'
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add experiments/s-20261102-24728f13/002-*.json reports/s-20261102-24728f13/002-action-telemetry.json
+          git commit -m 'results(s-20261102-24728f13): record six R002 real-model action traces'
+          git push origin HEAD:"$GITHUB_REF_NAME"
+      - name: Upload evidence (not duplicated weights)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: r002-telemetry-s-20261102-24728f13-${{ github.run_id }}
+          path: |
+            experiments/s-20261102-24728f13/002-*.json
+            reports/s-20261102-24728f13/002-action-telemetry.json
+          if-no-files-found: ignore
+          retention-days: 30
