@@ -1,0 +1,61 @@
+name: V5 isolated integration and model-evidence gate a0dea573
+
+on:
+  push:
+    branches: ['agent/s-20261102-a0dea573/optimization-001']
+    paths: ['.github/workflows/v5-integration-s-20261102-a0dea573.yml']
+
+permissions:
+  contents: read
+
+concurrency:
+  group: v5-integration-a0dea573
+  cancel-in-progress: false
+
+jobs:
+  audit-and-real-games:
+    runs-on: ubuntu-latest
+    timeout-minutes: 65
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install project
+        run: |
+          python -m pip install -e '.[train,test]'
+      - name: Offline registry promotion regressions
+        run: |
+          python -m pytest -q tests/test_model_registry.py
+          python -m tavern_ai.model_registry --registry models/release_inventory_v5.json
+      - name: Install and validate pinned TavernGym
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Own real eight-player baseline receipt
+        run: |
+          mkdir -p outputs
+          timeout 600 python -m tavern_ai.canary --agent-id s-20261102-a0dea573 --seed 99231 --policy baseline --receipt outputs/own-baseline-99231.json
+          python -m tavern_ai.validate_receipt outputs/own-baseline-99231.json
+      - name: Download immutable V5 Release and check SHA256
+        run: |
+          mkdir -p inputs
+          curl --fail --location --silent --show-error --retry 2 --max-time 180 -o inputs/model.zip 'https://github.com/sstxww/reinforcement-learning/releases/download/v5-s-20261102-68099929-1408-41428692617/model.zip'
+          curl --fail --location --silent --show-error --retry 2 --max-time 180 -o inputs/model.metadata.json 'https://github.com/sstxww/reinforcement-learning/releases/download/v5-s-20261102-68099929-1408-41428692617/model.metadata.json'
+          echo 'a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632  inputs/model.zip' | sha256sum -c -
+          python -m tavern_ai.checkpoint_preflight --model inputs/model.zip --metadata inputs/model.metadata.json --expected-sha256 a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632 --probe-inference > outputs/checkpoint-preflight.json
+      - name: One bounded pure-model behavior probe (no fallback)
+        run: |
+          timeout 600 python -m tavern_ai.model_gate_s9450775f --model inputs/model.zip --metadata inputs/model.metadata.json --expected-sha256 a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632 --seed 99231 --max-decisions 350 --out outputs/pure-model-diagnostic-99231.json
+      - name: Independent pure-model eight-seat receipt
+        run: |
+          timeout 600 python -m tavern_ai.canary --agent-id s-20261102-a0dea573 --seed 99231 --policy model --model inputs/model.zip --receipt outputs/own-model-99231.json
+          python -m tavern_ai.validate_receipt outputs/own-model-99231.json
+      - name: Preserve bounded audit evidence even on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v5-a0dea573-evidence-${{ github.run_id }}
+          path: outputs/*.json
+          if-no-files-found: warn
+          retention-days: 30
