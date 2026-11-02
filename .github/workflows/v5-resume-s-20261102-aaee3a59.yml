@@ -43,13 +43,22 @@ jobs:
             --policy baseline --seed 94431 \
             --receipt experiments/s-20261102-aaee3a59/001-94431.json
           python -m tavern_ai.validate_receipt experiments/s-20261102-aaee3a59/001-94431.json
-      - name: Preserve true baseline evidence on this session branch
+      - name: Verify reproducible baseline against already archived real receipt
         run: |
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add experiments/s-20261102-aaee3a59/001-94431.json
-          git diff --cached --quiet || git commit -m 'evidence: real eight-seat baseline smoke seed 94431'
-          git push origin HEAD:agent/s-20261102-aaee3a59/optimization-001
+          python - <<'PY'
+          import json, subprocess
+          from pathlib import Path
+          path = "experiments/s-20261102-aaee3a59/001-94431.json"
+          archive = json.loads(subprocess.check_output(["git", "show", "HEAD:" + path], text=True))
+          fresh = json.loads(Path(path).read_text(encoding="utf-8"))
+          fields = ("engine_source_hash", "engine_version", "agent_id", "policy", "seed",
+                    "completed", "turns", "decisions", "placements", "truncated_combats",
+                    "turn_limit_end")
+          for key in fields:
+              if archive[key] != fresh[key]:
+                  raise RuntimeError("Baseline replay mismatch: " + key)
+          print("Real baseline replay agrees with logged/archived complete game")
+          PY
       - name: Download exact registered unpromoted Release
         shell: bash
         run: |
@@ -82,6 +91,8 @@ jobs:
         run: |
           git add experiments/s-20261102-aaee3a59/002-94433.json
           git diff --cached --quiet || git commit -m 'evidence: model-controlled eight-seat continuation canary'
+          git fetch origin agent/s-20261102-aaee3a59/optimization-001
+          git rebase origin/agent/s-20261102-aaee3a59/optimization-001
           git push origin HEAD:agent/s-20261102-aaee3a59/optimization-001
       - name: Short-lived diagnostic outputs (NOT permanent model storage)
         if: always()
