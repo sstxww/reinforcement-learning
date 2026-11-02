@@ -69,3 +69,46 @@ def test_missing_parent_and_untrusted_digest_fail_closed():
                     "total_timesteps": 1280},
             parent_sha256="not-a-sha",
         )
+
+
+def test_real_run_path_rejects_invalid_schema2_before_model_load(monkeypatch, tmp_path):
+    """Synthetic caller integration, no real PPO training or match performed."""
+    import hashlib
+    import json
+    import sys
+    from types import ModuleType
+    import tavern_ai.train as train
+
+    source = tmp_path / "parent.zip"
+    source.write_bytes(b"synthetic archive; this must not be deserialized")
+    source.with_suffix(".metadata.json").write_text(json.dumps({
+        "schema": 2,
+        "engine": ENGINE,
+        "compatibility": {**COMPAT, "patch_sha256": "tampered"},
+        "total_timesteps": 1280,
+        "checkpoint_sha256": hashlib.sha256(source.read_bytes()).hexdigest(),
+    }), encoding="utf-8")
+
+    calls = {"load": 0, "closed": 0}
+
+    class StubEnv:
+        def __init__(self, seed): self.seed = seed
+        def close(self): calls["closed"] += 1
+
+    class StubPPO:
+        @staticmethod
+        def load(*args, **kwargs):
+            calls["load"] += 1
+            raise AssertionError("MaskablePPO.load must not run on invalid parent")
+
+    sb3 = ModuleType("sb3_contrib")
+    sb3.MaskablePPO = StubPPO
+    model = ModuleType("tavern_ai.model")
+    model.TavernExtractor = object
+    monkeypatch.setitem(sys.modules, "sb3_contrib", sb3)
+    monkeypatch.setitem(sys.modules, "tavern_ai.model", model)
+    monkeypatch.setattr(train, "verify_engine", lambda: ENGINE)
+    monkeypatch.setattr(train, "TavernEnv", StubEnv)
+    with pytest.raises(ValueError, match="compatibility"):
+        train.run(128, 42, tmp_path / "child.zip", resume=source)
+    assert calls == {"load": 0, "closed": 1}
