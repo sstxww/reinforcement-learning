@@ -1,0 +1,12 @@
+{
+  "model_id": "v2-learning-41413557445",
+  "model_sha256": "73bde2666426cecce39f135980a897bb2cd4a7d70783ba04c9c0d29477a6664a",
+  "hash_verified": true,
+  "metadata_compatible": true,
+  "cpu_load_verified": true,
+  "legal_inference_verified": true,
+  "resume_verified": false,
+  "full_game_verified": false,
+  "champion_promoted": false,
+  "first_action": 30
+}
