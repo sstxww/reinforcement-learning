@@ -1,0 +1,80 @@
+name: Public-card shop ranking - s-20261102-aca5a929
+on:
+  push:
+    branches:
+      - agent/s-20261102-aca5a929/optimization-001
+    paths:
+      - tavern_ai/card_synergy_aca5a929.py
+      - tests/test_card_synergy_aca5a929.py
+      - .github/workflows/experiment-s-20261102-aca5a929.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: isolated-card-ranking-s-20261102-aca5a929
+  cancel-in-progress: false
+
+jobs:
+  train-and-evaluate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install project and run unit regressions
+        run: |
+          python -m pip install -e '.[test]'
+          python -m pytest tests/test_card_synergy_aca5a929.py tests/test_baseline.py
+      - name: Install pinned actual TavernGym engine
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Bounded true-engine grid training and heldout full matches
+        run: |
+          python -m tavern_ai.card_synergy_aca5a929 --run
+      - name: Verify all completed game receipts and checkpoint
+        run: |
+          python - <<'PY'
+          import glob, json, hashlib
+          from tavern_ai.validate_receipt import validate
+          paths=sorted(glob.glob('experiments/s-20261102-aca5a929/*.json'))
+          assert len(paths)==16, f'expected 8 training and 8 evaluation matches, got {len(paths)}'
+          for path in paths:
+              with open(path, encoding='utf8') as f:
+                  validate(json.load(f))
+          p='reports/s-20261102-aca5a929/001-weights.json'
+          data=open(p,'rb').read()
+          r=json.load(open('reports/s-20261102-aca5a929/001-results.json'))
+          assert r['actual_training_games']==8
+          assert r['checkpoint_sha256']==hashlib.sha256(data).hexdigest()
+          assert r['heldout_baseline']['n']==4 and r['heldout_challenger']['n']==4
+          print('Validated', len(paths), 'actual eight-seat completed receipts')
+          PY
+      - name: Commit ONLY own real-engine receipts, compact metrics and tiny parameters
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = "agent/s-20261102-aca5a929/optimization-001"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add experiments/s-20261102-aca5a929/ reports/s-20261102-aca5a929/
+          if ! git diff --cached --quiet; then
+            git commit -m "results(s-20261102-aca5a929): store 16 genuine eight-seat game receipts and finite search checkpoint"
+            git pull --rebase origin "$GITHUB_REF_NAME"
+            git push origin HEAD:"$GITHUB_REF_NAME"
+          fi
+      - name: Preserve short-lived recovery artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: s-20261102-aca5a929-card-rank-evidence
+          if-no-files-found: ignore
+          retention-days: 30
+          path: |
+            experiments/s-20261102-aca5a929/*.json
+            reports/s-20261102-aca5a929/*.json
