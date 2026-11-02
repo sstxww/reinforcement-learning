@@ -61,7 +61,7 @@ def test_wrong_engine_rejected(tmp_path):
 
 @pytest.mark.parametrize("mutation,expected", [
     ("duplicate","duplicate"),("missing","missing asset"),("mismatch","mismatch"),
-    ("sha","SHA256"),("url","URL"),("bool","flag"),("bad_role","Champion"),
+    ("sha","SHA256"),("url","URL"),("bool","flag"),("bad_role","champion"),
     ("false_resume","Contradictory"),
 ])
 def test_mutations_rejected(mutation,expected):
