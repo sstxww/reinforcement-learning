@@ -1,0 +1,51 @@
+{
+  "schema": 1,
+  "updated_on": "2026-11-02",
+  "changelog": "Observed Release listing and historical PR descriptions; no independent model download/load done by this audit.",
+  "champion": null,
+  "latest_verified_resumable": null,
+  "baseline": {
+    "model_id": "v0-scripted-rule-baseline",
+    "type": "non-neural",
+    "notes": "Stable engineering comparator, not a champion."
+  },
+  "candidates": [
+    {
+      "model_id": "v1-learning-9eada5801f99",
+      "storage_type": "github_release",
+      "release_url": "https://github.com/sstxww/reinforcement-learning/releases/tag/v1-learning-9eada5801f99",
+      "model_zip": "model.zip",
+      "metadata": "model.metadata.json",
+      "reported_sha256": "dc5195658995358e70c0d565a979b9cf05ccc5e47ae7adaa0a2f078f01cad917",
+      "reported_steps": 256,
+      "reported_match_ranks": [
+        8,
+        8,
+        8
+      ],
+      "verification": "REPORTED_BY_PR_9_NOT_INDEPENDENTLY_VERIFIED",
+      "load_verified": false,
+      "resume_verified": false,
+      "champion_eligible": false
+    },
+    {
+      "model_id": "v2-learning-41413557445",
+      "storage_type": "github_release",
+      "release_url": "https://github.com/sstxww/reinforcement-learning/releases/tag/v2-learning-41413557445",
+      "model_zip": "model.zip",
+      "metadata": "model.metadata.json",
+      "reported_sha256": "73bde2666426cecce39f135980a897bb2cd4a7d70783ba04c9c0d29477a6664a",
+      "reported_steps": 1280,
+      "reported_match_ranks": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "verification": "REPORTED_BY_PR_15_NOT_INDEPENDENTLY_VERIFIED",
+      "load_verified": false,
+      "resume_verified": false,
+      "champion_eligible": false
+    }
+  ]
+}

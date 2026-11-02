@@ -1,0 +1,61 @@
+name: "V5 checkpoint gate and real canary s-20261102-ba09e2d4"
+on:
+  push:
+    branches: ['agent/s-20261102-ba09e2d4/optimization-001']
+    paths:
+      - 'tavern_ai/checkpoint_audit_ba09e2d4.py'
+      - 'tests/test_checkpoint_audit_ba09e2d4.py'
+      - 'models/registry-v5.json'
+      - '.github/workflows/experiment-s-20261102-ba09e2d4.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: v5-checkpoint-s-20261102-ba09e2d4
+  cancel-in-progress: false
+
+jobs:
+  audit-and-real-match:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install and test offline checkpoint audit
+        run: |
+          python -m pip install -e '.[test]'
+          python -m pytest
+      - name: Install pinned simulator
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Real independent eight-seat baseline game (not PPO gain)
+        run: |
+          python -m tavern_ai.canary --agent-id s-20261102-ba09e2d4 --seed 87101 --policy baseline --receipt experiments/s-20261102-ba09e2d4/001-87101.json
+          python -m tavern_ai.validate_receipt experiments/s-20261102-ba09e2d4/001-87101.json
+      - name: Persist only own authentic match receipt
+        shell: bash
+        run: |
+          test "${GITHUB_REF_NAME}" = 'agent/s-20261102-ba09e2d4/optimization-001'
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- experiments/s-20261102-ba09e2d4/001-87101.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'evidence(s-20261102-ba09e2d4): actual full eight-seat baseline receipt'
+            git pull --rebase origin 'agent/s-20261102-ba09e2d4/optimization-001'
+            git push origin HEAD:'agent/s-20261102-ba09e2d4/optimization-001'
+          fi
+      - name: Preserve audit evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: checkpoint-audit-s-20261102-ba09e2d4-${{ github.run_id }}
+          path: experiments/s-20261102-ba09e2d4/*.json
+          if-no-files-found: ignore
+          retention-days: 30
