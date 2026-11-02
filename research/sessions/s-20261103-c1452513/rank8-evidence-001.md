@@ -27,3 +27,12 @@
 ## P1/P2 handoff
 
 Address fail-closed registered Release restoration, independent SHA and optimizer checks, separated write-token publishing and persisted byte roundtrip before scaling training. This branch's bounded source-to-1536 experiment workflow is distinct from the manually gated production trainer, has no automatic Best promotion, and records failure honestly if any match/publisher step fails.
+
+## Actual bounded PPO continuation and fail-closed evaluation (2026-11-03)
+
+- Action https://github.com/sstxww/reinforcement-learning/actions/runs/41509707315 executed a genuine registered, hashed, CPU-loaded 1408-step V5 Release -> 128 additional MaskablePPO steps -> 1536-step candidate. Source SHA a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632; new candidate SHA b2b4a1039ca0f5c0e8475646c80996601d26efd081be533972638607c277508d.
+- Parent 1408 pure-model heldout seeds 932040/932041 had placements [8,8], paired baseline [6,8]. Source report reports/s-20261103-c1452513/001-parent-paired-932040.json.
+- Candidate 1536 raw model completed authentic eight-player seed 932031 rank8, 18 turns, 114 model decisions, no truncated combats. Source receipt experiments/s-20261103-c1452513/002-model-932031.json.
+- **FAILURE:** candidate heldout evaluation on planned 932040/932041 aborted with RuntimeError: Full-game safety limit exceeded, before an evaluable pair report could be produced. The failing seed within the batch was not logged, and no candidate heldout rank is claimed.
+- Consequently the write-only Release publish job was skipped. The failed-run artifact 13171404727 contains source evaluation JSON, candidate full-game receipt and candidate metadata but **not** the candidate model.zip; therefore these new weights are **not durable** and are NOT ready for promotion. This loss motivates adding a separately quarantined temporary failed-weight Artifact to the production train workflow (without bypassing publish gates).
+- Authoritative JSON report reports/s-20261103-c1452513/002-1536-candidate-heldout-failure.json. No Champion/Best. Stop increasing PPO budget until non-progress decision loops are isolated; never count incomplete heldout as an eighth-place completed game.
