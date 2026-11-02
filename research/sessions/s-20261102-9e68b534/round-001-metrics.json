@@ -1,0 +1,48 @@
+{
+  "session_id": "s-20261102-9e68b534",
+  "experiment": "baseline rank uncertainty (not a PPO experiment)",
+  "policy": "baseline",
+  "actual_ppo_train_steps": 0,
+  "github_run_url": "https://github.com/sstxww/reinforcement-learning/actions/runs/41415933253",
+  "git_sha_at_run_start": "e1015eb6d2dca166e00818f219b9703e0bdaf034",
+  "engine_version": "1.1.0",
+  "engine_source_hash": "6d8712c93022ba11",
+  "total_decisions": 256,
+  "truncated_combats": 0,
+  "turn_limit_end": false,
+  "all_completed": true,
+  "statistics": {
+    "games": 4,
+    "seeds": [
+      392500,
+      392501,
+      392502,
+      392503
+    ],
+    "ranks": [
+      4,
+      6,
+      8,
+      8
+    ],
+    "mean_rank": 6.5,
+    "mean_rank_bootstrap_95pct": [
+      5.0,
+      8.0
+    ],
+    "first_place_rate": 0.0,
+    "first_place_wilson_95pct": [
+      0.0,
+      0.4898908364545973
+    ],
+    "top4_rate": 0.25,
+    "top4_wilson_95pct": [
+      0.04558726080970055,
+      0.6993581574175981
+    ],
+    "insufficient_for_strength_claim": true,
+    "interpretation": "Descriptive 95% intervals, not proof of strength; multiple seeds and sufficient training required."
+  },
+  "model_checkpoint": null,
+  "claim": "Baseline-only variability diagnostic; no policy or PPO improvement claimed."
+}
