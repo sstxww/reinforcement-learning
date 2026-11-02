@@ -1,0 +1,97 @@
+{
+  "baseline": {
+    "buy_legal_decisions": 66,
+    "buy_legal_turns": 24,
+    "buy_per_legal_decision": 0.6060606060606061,
+    "decisions": 131,
+    "ends_while_buy_legal": 0,
+    "first_rate": 0.0,
+    "games": 3,
+    "guard_forced_ends": 0,
+    "mean_rank": 8,
+    "ranks": [
+      8,
+      8,
+      8
+    ],
+    "selected_buy_actions": 40,
+    "top4_rate": 0.0
+  },
+  "buy_overrides": 46,
+  "champion_promoted": false,
+  "checkpoint_sha256": "73bde2666426cecce39f135980a897bb2cd4a7d70783ba04c9c0d29477a6664a",
+  "engine": {
+    "actions": 245,
+    "cards": 447,
+    "features": 4017,
+    "n_cards": 3984,
+    "source_hash": "6d8712c93022ba11",
+    "version": "1.1.0"
+  },
+  "hybrid_buy_override_guarded": {
+    "buy_legal_decisions": 46,
+    "buy_legal_turns": 21,
+    "buy_per_legal_decision": 1.0,
+    "decisions": 1425,
+    "ends_while_buy_legal": 0,
+    "first_rate": 0.0,
+    "games": 3,
+    "guard_forced_ends": 18,
+    "mean_rank": 8,
+    "ranks": [
+      8,
+      8,
+      8
+    ],
+    "selected_buy_actions": 46,
+    "top4_rate": 0.0
+  },
+  "limitations": [
+    "First legal shop slot is a simple selection rule, not card-value reasoning.",
+    "All model/hybrid game results are guarded by the same 75-action legal EndTurn cap.",
+    "Three new heldout seed pairs cannot establish general strength improvement.",
+    "Rule-hybrid performance cannot be attributed to PPO learning.",
+    "Per-decision buy legality is not a statistically independent opportunity."
+  ],
+  "mean_paired_rank_delta": 0,
+  "model_control_guarded": {
+    "buy_legal_decisions": 99,
+    "buy_legal_turns": 20,
+    "buy_per_legal_decision": 0.0,
+    "decisions": 415,
+    "ends_while_buy_legal": 0,
+    "first_rate": 0.0,
+    "games": 3,
+    "guard_forced_ends": 1,
+    "mean_rank": 8,
+    "ranks": [
+      8,
+      8,
+      8
+    ],
+    "selected_buy_actions": 0,
+    "top4_rate": 0.0
+  },
+  "model_weights_updated": false,
+  "paired_rank_delta_hybrid_minus_model": [
+    0,
+    0,
+    0
+  ],
+  "per_game_buy_overrides": [
+    14,
+    18,
+    14
+  ],
+  "ppo_steps_in_this_round": 0,
+  "release": "v2-learning-41413557445",
+  "round": 2,
+  "schema": 1,
+  "seeds": [
+    89111,
+    89112,
+    89113
+  ],
+  "session_id": "s-20261102-90e24c7b",
+  "source_type": "source-model inference plus explicitly counted rule override; NOT PPO retraining"
+}
