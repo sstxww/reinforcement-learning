@@ -1,0 +1,434 @@
+{
+  "schema": 1,
+  "timestamp": "2026-11-02T19:45:58.510304+00:00",
+  "environment": "TavernGym",
+  "engine_version": "1.1.0",
+  "engine_source_hash": "6d8712c93022ba11",
+  "agent_id": "s-20261103-6d43ab93",
+  "seed": 99741,
+  "seat": 1,
+  "policy": "baseline",
+  "completed": true,
+  "turns": 15,
+  "decisions": 80,
+  "placements": [
+    7,
+    1,
+    5,
+    4,
+    8,
+    6,
+    3,
+    2
+  ],
+  "agent_placement": 1,
+  "truncated_combats": 0,
+  "turn_limit_end": false,
+  "git_sha": "2c434ad543b876a2335decd957a6b14b374a8199",
+  "model_sha256": null,
+  "guard_forced_ends": 0,
+  "fallback_actions": 0,
+  "raw_action_diagnostics": {
+    "raw_action_histogram": {
+      "0": 15,
+      "3": 5,
+      "8": 19,
+      "11": 2,
+      "30": 16,
+      "46": 15,
+      "70": 2,
+      "86": 2,
+      "110": 2,
+      "183": 1,
+      "190": 1
+    },
+    "same_observation_consecutive": 0,
+    "recent_public_observation_and_raw_actions": [
+      {
+        "turn": 4,
+        "raw_action": 46,
+        "visible_obs_digest": "feae9400ca44fdf78b713a00",
+        "legal_count": 16
+      },
+      {
+        "turn": 4,
+        "raw_action": 0,
+        "visible_obs_digest": "b709b3856077e92e935d1b32",
+        "legal_count": 19
+      },
+      {
+        "turn": 5,
+        "raw_action": 46,
+        "visible_obs_digest": "ea5d2ae2c62731d21c1a733e",
+        "legal_count": 29
+      },
+      {
+        "turn": 5,
+        "raw_action": 30,
+        "visible_obs_digest": "793eea5263e188f4218705a4",
+        "legal_count": 9
+      },
+      {
+        "turn": 5,
+        "raw_action": 3,
+        "visible_obs_digest": "9ebaabcd55305c7986a0d639",
+        "legal_count": 28
+      },
+      {
+        "turn": 5,
+        "raw_action": 8,
+        "visible_obs_digest": "1c8065eee4ee803761e51dba",
+        "legal_count": 27
+      },
+      {
+        "turn": 5,
+        "raw_action": 46,
+        "visible_obs_digest": "9f864ec24f34ef05e3c5154c",
+        "legal_count": 24
+      },
+      {
+        "turn": 5,
+        "raw_action": 0,
+        "visible_obs_digest": "46f36217cefe68e73571e291",
+        "legal_count": 28
+      },
+      {
+        "turn": 6,
+        "raw_action": 30,
+        "visible_obs_digest": "66493b0e7fcf94f83c4dcdcc",
+        "legal_count": 4
+      },
+      {
+        "turn": 6,
+        "raw_action": 46,
+        "visible_obs_digest": "98dca86de27f10bbecf8298a",
+        "legal_count": 37
+      },
+      {
+        "turn": 6,
+        "raw_action": 30,
+        "visible_obs_digest": "7cdc166e5d27ff391014f8b5",
+        "legal_count": 10
+      },
+      {
+        "turn": 6,
+        "raw_action": 8,
+        "visible_obs_digest": "2181d454f8ac77e2cd44d16b",
+        "legal_count": 36
+      },
+      {
+        "turn": 6,
+        "raw_action": 46,
+        "visible_obs_digest": "cdcf08177c9d3956b1070c59",
+        "legal_count": 37
+      },
+      {
+        "turn": 6,
+        "raw_action": 11,
+        "visible_obs_digest": "a5f7c952fe2e58c552f4be2c",
+        "legal_count": 42
+      },
+      {
+        "turn": 6,
+        "raw_action": 46,
+        "visible_obs_digest": "3b6c03d1004b23e5bb508bdc",
+        "legal_count": 42
+      },
+      {
+        "turn": 6,
+        "raw_action": 0,
+        "visible_obs_digest": "8f5351fa64f187d42b70d810",
+        "legal_count": 41
+      },
+      {
+        "turn": 7,
+        "raw_action": 46,
+        "visible_obs_digest": "124d478eca3a5bfdc22978c2",
+        "legal_count": 49
+      },
+      {
+        "turn": 7,
+        "raw_action": 30,
+        "visible_obs_digest": "fef1f02094e73a2f6fc96360",
+        "legal_count": 11
+      },
+      {
+        "turn": 7,
+        "raw_action": 3,
+        "visible_obs_digest": "9a2ac53da387cab385e3d153",
+        "legal_count": 48
+      },
+      {
+        "turn": 7,
+        "raw_action": 8,
+        "visible_obs_digest": "6e635f5c2fa89f7b229e36f8",
+        "legal_count": 47
+      },
+      {
+        "turn": 7,
+        "raw_action": 46,
+        "visible_obs_digest": "a8ac65af4add2cde35af9662",
+        "legal_count": 46
+      },
+      {
+        "turn": 7,
+        "raw_action": 0,
+        "visible_obs_digest": "f305d47ae170647b1b8129ea",
+        "legal_count": 52
+      },
+      {
+        "turn": 8,
+        "raw_action": 46,
+        "visible_obs_digest": "a4107f731c787389fcdc87d5",
+        "legal_count": 64
+      },
+      {
+        "turn": 8,
+        "raw_action": 30,
+        "visible_obs_digest": "bd21d3d3d2f4a53ffd808bdc",
+        "legal_count": 13
+      },
+      {
+        "turn": 8,
+        "raw_action": 46,
+        "visible_obs_digest": "d2d9e181ef77de514e0aa9b1",
+        "legal_count": 63
+      },
+      {
+        "turn": 8,
+        "raw_action": 30,
+        "visible_obs_digest": "45081c2cc6f920eaddac469a",
+        "legal_count": 13
+      },
+      {
+        "turn": 8,
+        "raw_action": 8,
+        "visible_obs_digest": "126239a96577aff3182d9d55",
+        "legal_count": 62
+      },
+      {
+        "turn": 8,
+        "raw_action": 8,
+        "visible_obs_digest": "0490e919b4451b73a7812f06",
+        "legal_count": 60
+      },
+      {
+        "turn": 8,
+        "raw_action": 8,
+        "visible_obs_digest": "990883529ec8ed4c31fb144c",
+        "legal_count": 59
+      },
+      {
+        "turn": 8,
+        "raw_action": 0,
+        "visible_obs_digest": "e71e781a60409ee0a50e6da5",
+        "legal_count": 54
+      },
+      {
+        "turn": 9,
+        "raw_action": 30,
+        "visible_obs_digest": "8e0b362e89f32b7e06e6ba21",
+        "legal_count": 4
+      },
+      {
+        "turn": 9,
+        "raw_action": 70,
+        "visible_obs_digest": "f498fad8a875031e91106e85",
+        "legal_count": 63
+      },
+      {
+        "turn": 9,
+        "raw_action": 30,
+        "visible_obs_digest": "9fe975f6213240cac14fd1e5",
+        "legal_count": 13
+      },
+      {
+        "turn": 9,
+        "raw_action": 70,
+        "visible_obs_digest": "6c4116b35487dda9fc2f37bd",
+        "legal_count": 62
+      },
+      {
+        "turn": 9,
+        "raw_action": 30,
+        "visible_obs_digest": "b1c7ec6dc9a6694293df8734",
+        "legal_count": 13
+      },
+      {
+        "turn": 9,
+        "raw_action": 8,
+        "visible_obs_digest": "c3b23dd696baa4804cf27c08",
+        "legal_count": 61
+      },
+      {
+        "turn": 9,
+        "raw_action": 8,
+        "visible_obs_digest": "748c2b71bd5c4734194fa664",
+        "legal_count": 60
+      },
+      {
+        "turn": 9,
+        "raw_action": 11,
+        "visible_obs_digest": "210bc3ad8585f75d42ad3c86",
+        "legal_count": 55
+      },
+      {
+        "turn": 9,
+        "raw_action": 86,
+        "visible_obs_digest": "548143b6d6a0b0d87b48e584",
+        "legal_count": 53
+      },
+      {
+        "turn": 9,
+        "raw_action": 30,
+        "visible_obs_digest": "6b9889a747253abdf8e56415",
+        "legal_count": 10
+      },
+      {
+        "turn": 9,
+        "raw_action": 0,
+        "visible_obs_digest": "89a04b49288a78661d28515f",
+        "legal_count": 52
+      },
+      {
+        "turn": 10,
+        "raw_action": 86,
+        "visible_obs_digest": "800ec733b7b99dbc3672443d",
+        "legal_count": 63
+      },
+      {
+        "turn": 10,
+        "raw_action": 30,
+        "visible_obs_digest": "8857ae1794a115ef5f1b8d86",
+        "legal_count": 13
+      },
+      {
+        "turn": 10,
+        "raw_action": 8,
+        "visible_obs_digest": "9435d8dbc96e441d76754ae4",
+        "legal_count": 62
+      },
+      {
+        "turn": 10,
+        "raw_action": 8,
+        "visible_obs_digest": "b94aebca19cc4af9dd0909ea",
+        "legal_count": 60
+      },
+      {
+        "turn": 10,
+        "raw_action": 8,
+        "visible_obs_digest": "b18c1d2ee3d10ac122d5ae9d",
+        "legal_count": 59
+      },
+      {
+        "turn": 10,
+        "raw_action": 0,
+        "visible_obs_digest": "e664bab1ffc77450c1e3d31a",
+        "legal_count": 54
+      },
+      {
+        "turn": 11,
+        "raw_action": 110,
+        "visible_obs_digest": "2e54cea0ad811797971ce1a1",
+        "legal_count": 63
+      },
+      {
+        "turn": 11,
+        "raw_action": 30,
+        "visible_obs_digest": "6f73edf12d66f2462480a459",
+        "legal_count": 13
+      },
+      {
+        "turn": 11,
+        "raw_action": 3,
+        "visible_obs_digest": "e20230766ea3f32ee6996ee5",
+        "legal_count": 62
+      },
+      {
+        "turn": 11,
+        "raw_action": 8,
+        "visible_obs_digest": "23b7f7160fcdbfadd7693bc6",
+        "legal_count": 61
+      },
+      {
+        "turn": 11,
+        "raw_action": 183,
+        "visible_obs_digest": "a692c03aac597afcb9c102ef",
+        "legal_count": 53
+      },
+      {
+        "turn": 11,
+        "raw_action": 0,
+        "visible_obs_digest": "83a6557aad8ee7ef32a05ef5",
+        "legal_count": 52
+      },
+      {
+        "turn": 12,
+        "raw_action": 110,
+        "visible_obs_digest": "fc76e92680ed602c1330b089",
+        "legal_count": 63
+      },
+      {
+        "turn": 12,
+        "raw_action": 30,
+        "visible_obs_digest": "b48f4244d601dfedff96d366",
+        "legal_count": 13
+      },
+      {
+        "turn": 12,
+        "raw_action": 8,
+        "visible_obs_digest": "0a2a7201139a36623dc12d4a",
+        "legal_count": 62
+      },
+      {
+        "turn": 12,
+        "raw_action": 8,
+        "visible_obs_digest": "ac773ea82572a7ff1208b874",
+        "legal_count": 60
+      },
+      {
+        "turn": 12,
+        "raw_action": 190,
+        "visible_obs_digest": "22bebc875dd40113f3f85b19",
+        "legal_count": 55
+      },
+      {
+        "turn": 12,
+        "raw_action": 8,
+        "visible_obs_digest": "1a67ee382c0974ae11a2f33e",
+        "legal_count": 59
+      },
+      {
+        "turn": 12,
+        "raw_action": 0,
+        "visible_obs_digest": "44729945db8b1b9e68721cfe",
+        "legal_count": 54
+      },
+      {
+        "turn": 13,
+        "raw_action": 3,
+        "visible_obs_digest": "c9acf10793696467c4d844d9",
+        "legal_count": 55
+      },
+      {
+        "turn": 13,
+        "raw_action": 0,
+        "visible_obs_digest": "ec2885735f932878bf001eff",
+        "legal_count": 54
+      },
+      {
+        "turn": 14,
+        "raw_action": 0,
+        "visible_obs_digest": "e5ac1afe4017fcb47e23143b",
+        "legal_count": 54
+      },
+      {
+        "turn": 15,
+        "raw_action": 0,
+        "visible_obs_digest": "92cadca1bcd3f5e3966f47ae",
+        "legal_count": 54
+      }
+    ],
+    "raw_model_no_fallback": false
+  }
+}
