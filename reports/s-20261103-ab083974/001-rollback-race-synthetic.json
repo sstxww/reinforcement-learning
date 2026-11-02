@@ -1,0 +1,15 @@
+{
+  "kind": "synthetic_concurrency_regression",
+  "source_pr": 175,
+  "source_head_sha": "979932f36928dfbd30fd4109a29841178e3c19a1",
+  "local_probe": "independent code equivalent to proposed PR #175 helper",
+  "failure_injection": "second os.link raises PermissionError; Path.samefile returns true; competing writer replaces target after identity check and before cleanup unlink",
+  "race_triggered": true,
+  "third_party_file_survived": false,
+  "staged_source_intact": true,
+  "real_game": false,
+  "game_receipt": null,
+  "github_actions_tested": false,
+  "conclusion": "PR #175 owner-guarded rollback is not ownership-safe under a post-check pathname replacement; request no-rollback fail-closed or atomic publish design",
+  "review_comment": "https://github.com/sstxww/reinforcement-learning/pull/175#issuecomment-6586652843"
+}
