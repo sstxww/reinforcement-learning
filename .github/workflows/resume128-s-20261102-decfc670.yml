@@ -1,11 +1,7 @@
 name: Bounded V2 PPO continuation and permanent candidate Release - s-20261102-decfc670
 
 on:
-  push:
-    branches:
-      - 'agent/s-20261102-decfc670/optimization-001'
-    paths:
-      - '.github/workflows/resume128-s-20261102-decfc670.yml'
+  workflow_dispatch:
 
 permissions:
   contents: write
