@@ -15,7 +15,7 @@ on:
     - cron: '13 4 * * 1'
 
 permissions:
-  contents: read
+  contents: write
   actions: read
 
 concurrency:
@@ -30,37 +30,48 @@ jobs:
     env:
       GH_TOKEN: ${{ github.token }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout$v4
+      - uses: actions/setup-python$v5
         with:
           python-version: '3.12'
       - name: Install Python training dependencies
         run: |
           python -m pip install --upgrade pip
           python -m pip install -e '.[train,test]'
-      - name: Install pinned TavernGym 1.1 engine
+      - name: Install pinned TavernGym engine
         run: bash scripts/bootstrap_engine.sh
-      - name: Restore last successful compatible model
+      - name: Restore latest saved checkpoint, with permanent Release fallback
         shell: bash
         run: |
-          mkdir -p checkpoints
-          RUN_ID="$(gh api "repos/${GITHUB_REPOSITORY}/actions/workflows/train.yml/runs?branch=main&status=success&per_page=1" --jq '.workflow_runs[0].id // empty' || true)"
-          if [[ -n "$RUN_ID" ]]; then
-            if gh run download "$RUN_ID" --repo "$GITHUB_REPOSITORY" --name v1-model --dir checkpoints; then
-              test -f checkpoints/model.zip
-              test -f checkpoints/model.metadata.json
-            else
-              echo "No compatible prior artifact; initializing a fresh checkpoint"
-              rm -f checkpoints/model.zip checkpoints/model.metadata.json
+          set -euo pipefail
+          mkdir -p checkpoints artifacts
+          source_kind=none
+          run_id="$(gh api "repos/${GITHUB_REPOSITORY}/actions/workflows/train.yml/runs?branch=main&status=success&per_page=1" --jq '.workflow_runs[0].id // empty' || true)"
+          if [[ -n "$run_id" ]] && gh run download "$run_id" --repo "$GITHUB_REPOSITORY" --name v1-model --dir checkpoints; then
+            if [[ -s checkpoints/model.zip && -s checkpoints/model.metadata.json ]]; then
+              source_kind=artifact
             fi
-          else
-            echo "First run; training from scratch"
           fi
+          if [[ "$source_kind" == none ]]; then
+            rm -f checkpoints/model.zip checkpoints/model.metadata.json
+            tag="$(gh release list --repo "$GITHUB_REPOSITORY" --limit 100 --json tagName,publishedAt \
+              --jq '[.[] | select(.tagName | startswith("v1-main-"))] | sort_by(.publishedAt) | last | .tagName // empty' || true)"
+            if [[ -n "$tag" ]]; then
+              gh release download "$tag" --repo "$GITHUB_REPOSITORY" \
+                --pattern 'model.zip' --pattern 'model.metadata.json' --dir checkpoints
+              test -s checkpoints/model.zip
+              test -s checkpoints/model.metadata.json
+              source_kind="release:$tag"
+            fi
+          fi
+          echo "Checkpoint restored from: $source_kind"
+          echo "RESTORE_SOURCE=$source_kind" >> "$GITHUB_ENV"
       - name: Incremental Maskable PPO
         shell: bash
         env:
           STEPS: ${{ github.event.inputs.steps || '2048' }}
         run: |
+          set -euo pipefail
           if [[ ! "$STEPS" =~ ^[0-9]+$ ]] || (( STEPS < 128 || STEPS > 20000 )); then
             echo 'steps must be 128..20000'; exit 2
           fi
@@ -68,32 +79,51 @@ jobs:
           if [[ -f checkpoints/model.zip ]]; then
             args+=(--resume checkpoints/model.zip)
           fi
-          python -m tavern_ai.train "${args[@]}"
-      - name: Model plays full eight-seat game
+          python -m tavern_ai.train "${args[$]}"
+      - name: Model plays a real full eight-seat game
         run: |
           python -m tavern_ai.canary --agent-id training-v1 \
             --policy model --model checkpoints/model.zip --seed 9001 \
             --receipt artifacts/trained-canary.json
           python -m tavern_ai.validate_receipt artifacts/trained-canary.json
-      - name: Evaluate model on held-out seeds
+      - name: Held-out seeded evaluation
         shell: bash
         env:
           EVAL_GAMES: ${{ github.event.inputs.eval_games || '3' }}
         run: |
+          set -euo pipefail
           if [[ ! "$EVAL_GAMES" =~ ^[0-9]+$ ]] || (( EVAL_GAMES < 1 || EVAL_GAMES > 10 )); then
             echo 'eval_games must be 1..10'; exit 2
           fi
           python -m tavern_ai.evaluate --model checkpoints/model.zip \
             --games "$EVAL_GAMES" --start-seed 24000 \
             --out artifacts/evaluation.json
-      - name: Save resumable checkpoint and evidence
-        uses: actions/upload-artifact@v4
+      - name: Publish candidate checkpoint to durable GitHub Release
+        shell: bash
+        run: |
+          set -euo pipefail
+          sha256sum checkpoints/model.zip > artifacts/model.sha256
+          tag="v1-main-${GITHUB_RUN_ID}"
+          gh release create "$tag" \
+            checkpoints/model.zip checkpoints/model.metadata.json \
+            artifacts/model.sha256 artifacts/trained-canary.json artifacts/evaluation.json \
+            --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
+            --prerelease --title "AutoTavern V1 candidate $tag" \
+            --notes "Unpromoted MaskablePPO candidate from main CI run ${GITHUB_RUN_ID}. Restore with gh release download; verify metadata and model.sha256 first. No claim of increased strength."
+          echo "Persistent candidate release: $tag"
+      - name: Preserve resumable artifact and evidence
+        if: always()
+        uses: actions/upload-artifact$v4
         with:
           name: v1-model
           path: |
             checkpoints/model.zip
             checkpoints/model.metadata.json
+            artifacts/model.sha256
             artifacts/trained-canary.json
             artifacts/evaluation.json
-          if-no-files-found: error
+          if-no-files-found: ignore
           retention-days: 90
+      - name: Remove only regenerable cache files
+        if: always()
+        run: python scripts/cleanup_temporary.py --apply
