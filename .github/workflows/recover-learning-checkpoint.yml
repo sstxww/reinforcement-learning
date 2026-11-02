@@ -1,0 +1,138 @@
+name: Recover verified failed-game PPO checkpoint (candidate only)
+
+on:
+  push:
+    branches: ['agent/infrastructure/v1']
+    paths: ['.github/workflows/recover-learning-checkpoint.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: recover-v1-41412048034
+  cancel-in-progress: false
+
+jobs:
+  recover-candidate:
+    if: github.repository == 'sstxww/reinforcement-learning'
+    runs-on: ubuntu-latest
+    timeout-minutes: 65
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install model loading dependencies
+        run: python -m pip install -e '.[train]'
+      - name: Recover genuine training artifact and verify the recorded checkpoint hash
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh run download 41412048034 --repo "$GITHUB_REPOSITORY" --name agent-learning-v1-evidence --dir recovered
+          SOURCE_MODEL="$(find recovered -type f -name model.zip -print -quit)"
+          SOURCE_META="$(find recovered -type f -name model.metadata.json -print -quit)"
+          test -n "$SOURCE_MODEL" && test -n "$SOURCE_META"
+          mkdir -p checkpoints
+          cp "$SOURCE_MODEL" checkpoints/model.zip
+          cp "$SOURCE_META" checkpoints/model.metadata.json
+          printf '%s  %s\n' '59b7bb16e9e52225e5f8573dec1eee73f2b18c6504b4ade6900776fffc34483d' checkpoints/model.zip | sha256sum --check -
+      - name: Verify metadata and real PyTorch policy loading/inference
+        shell: bash
+        run: |
+          python - <<'PY'
+          import hashlib,json
+          from pathlib import Path
+          import numpy as np
+          import torch
+          from sb3_contrib import MaskablePPO
+          torch.set_num_threads(1)
+          checkpoint=Path("checkpoints/model.zip")
+          m=json.loads(Path("checkpoints/model.metadata.json").read_text())
+          digest=hashlib.sha256(checkpoint.read_bytes()).hexdigest()
+          assert digest=="59b7bb16e9e52225e5f8573dec1eee73f2b18c6504b4ade6900776fffc34483d"
+          assert m["checkpoint_sha256"]==digest
+          assert m["total_timesteps"]==256 and m["increment_timesteps"]==256
+          e=m["engine"]
+          assert e["version"]=="1.1.0" and e["source_hash"]=="6d8712c93022ba11"
+          assert (e["features"],e["cards"],e["actions"])==(4017,447,245)
+          assert m["compatibility"]["engine"]==e
+          model=MaskablePPO.load(str(checkpoint),device="cpu")
+          legal=np.ones(245,dtype=bool)
+          obs={"features":np.zeros(4017,dtype=np.float32),"cards":np.zeros(447,dtype=np.int32)}
+          action,_=model.predict(obs,action_masks=legal,deterministic=True)
+          assert 0<=int(action)<245
+          print(json.dumps({"loaded":True,"inference_action":int(action),"steps":256,"sha256":digest,"full_game_passed":False}))
+          PY
+      - name: Publish diagnostic checkpoint as versioned prerelease (not Best)
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          TAG="autotavern-v1-ppo-256-run41412048034"
+          cat > checkpoints/PROVENANCE.md <<'EOF'
+          # AutoTavern-AI V1 diagnostic checkpoint
+          Training GitHub Actions run: https://github.com/sstxww/reinforcement-learning/actions/runs/41412048034
+          Training commit: 9b53e35797b6d448454d21dc3f2157a0c725ac05
+          Model: MaskablePPO; 256 actual steps; training seed 42
+          TavernGym: 1.1.0, source 6d8712c93022ba11; observe2 4017/447/245
+          Model SHA-256: 59b7bb16e9e52225e5f8573dec1eee73f2b18c6504b4ade6900776fffc34483d
+          IMPORTANT: full-game model canary FAILED (Full-game safety limit exceeded).
+          Never promote this checkpoint to Best without successfully completing full games
+          and passing statistically credible matched-seed evaluation. Saved for failure
+          analysis, reproducibility, and possible resume experiments only.
+          EOF
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "Existing prerelease found: $TAG"
+          else
+            gh release create "$TAG"               checkpoints/model.zip checkpoints/model.metadata.json checkpoints/PROVENANCE.md               --target 9b53e35797b6d448454d21dc3f2157a0c725ac05               --prerelease               --title "Diagnostic PPO 256-step checkpoint (full-game failed)"               --notes-file checkpoints/PROVENANCE.md
+          fi
+          gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json assets --jq '.assets[].name' | grep -Fx 'model.zip'
+          gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json assets --jq '.assets[].name' | grep -Fx 'model.metadata.json'
+      - name: Persist explicit model role registry on infrastructure branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p models
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          item={
+            "id":"autotavern-v1-ppo-256-run41412048034",
+            "role":"candidate_diagnostic",
+            "status":"full_game_failed",
+            "training_steps":256,
+            "training_seed":42,
+            "training_source_commit":"9b53e35797b6d448454d21dc3f2157a0c725ac05",
+            "training_run":"https://github.com/sstxww/reinforcement-learning/actions/runs/41412048034",
+            "release":"https://github.com/sstxww/reinforcement-learning/releases/tag/autotavern-v1-ppo-256-run41412048034",
+            "checkpoint_sha256":"59b7bb16e9e52225e5f8573dec1eee73f2b18c6504b4ade6900776fffc34483d",
+            "engine_version":"1.1.0",
+            "engine_source_hash":"6d8712c93022ba11",
+            "observe2":{"features":4017,"cards":447,"actions":245},
+            "full_game_passed":False,
+            "independent_evaluation_passed":False,
+            "resume_train_test_passed":False
+          }
+          p=Path("models/registry.json")
+          if p.exists():
+            registry=json.loads(p.read_text())
+            registry.setdefault("candidates",[])
+            registry["candidates"]=[x for x in registry["candidates"] if x.get("id")!=item["id"]]+[item]
+          else:registry={"schema":1,"best":None,"latest":None,"candidates":[item]}
+          p.write_text(json.dumps(registry,indent=2,ensure_ascii=False)+"\n")
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add models/registry.json
+          git diff --cached --quiet && exit 0
+          git commit -m "models: index verified diagnostic checkpoint without promotion"
+          git pull --rebase origin "$GITHUB_REF_NAME"
+          git push origin "HEAD:refs/heads/$GITHUB_REF_NAME"
