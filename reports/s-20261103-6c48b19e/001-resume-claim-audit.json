@@ -1,0 +1,27 @@
+{
+  "automatic_latest_or_champion_promotion": false,
+  "checkpoint_bytes_downloaded_by_this_audit": false,
+  "explanation": "Historical true flags never override a missing or false model-specific claim. Even all manifest flags set true are NOT live download, optimizer resume, real-game or merge proof. Revalidate source bytes and optimizer with an independent bounded GitHub Actions run before training.",
+  "historical_latest_release_resume_claim": true,
+  "historical_vs_specific_claim_requires_review": true,
+  "latest_model_sha256_claim": "a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632",
+  "latest_steps": 1408,
+  "main_registry_latest_id": "v5-s-20261102-68099929-1408-41428692617",
+  "new_model_games_by_this_audit": 0,
+  "new_ppo_steps_by_this_audit": 0,
+  "optimizer_state_loaded_by_this_audit": false,
+  "per_release_claims": {
+    "independent_optimizer_resume_from_this_release_tested": false,
+    "model_load_from_downloaded_release_tested": false,
+    "release_download_sha256_verified": true
+  },
+  "per_release_manifest_flags_complete": false,
+  "release_ready_for_automatic_training_by_this_audit": false,
+  "repository": "sstxww/reinforcement-learning",
+  "schema": 1,
+  "status": "manual_reverification_required",
+  "unmet_per_release_claims": [
+    "model_load_from_downloaded_release_tested",
+    "independent_optimizer_resume_from_this_release_tested"
+  ]
+}
