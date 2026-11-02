@@ -80,7 +80,9 @@ def test_refuse_wrong_step_count_after_load(monkeypatch, tmp_path):
     source = tmp_path / "model.zip"
     source.write_bytes(b"any")
     source.with_suffix(".metadata.json").write_text(json.dumps({
-        "engine": ENGINE, "total_timesteps": 128,
+        # The parent must be a *valid* legacy schema-1 checkpoint to reach
+        # the later saved-model-vs-metadata step-counter integrity check.
+        "schema": 1, "engine": ENGINE, "total_timesteps": 128,
         "checkpoint_sha256": hashlib.sha256(source.read_bytes()).hexdigest(),
     }), encoding="utf-8")
     with pytest.raises(ValueError, match="step counters differ"):

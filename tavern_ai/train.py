@@ -24,6 +24,33 @@ def require_verified_resume(resume: Path, metadata: dict) -> str:
     return sha256_file(resume)
 
 
+def validate_resume_parent(parent: dict, engine: dict) -> None:
+    """Fail closed on provenance before deserializing or training an old PPO."""
+    if not isinstance(parent, dict) or parent.get("engine") != engine:
+        raise ValueError("Incompatible parent engine")
+    steps = parent.get("total_timesteps")
+    if type(steps) is not int or steps < 1:
+        raise ValueError("Invalid parent cumulative training steps")
+    schema = parent.get("schema")
+    if type(schema) is not int:
+        raise ValueError("Parent checkpoint schema must be an integer")
+    if schema == 1:
+        return
+    if schema != 2:
+        raise ValueError("Unknown parent checkpoint schema (refusing downgrade)")
+    delta = parent.get("increment_timesteps")
+    if type(delta) is not int or not (0 < delta <= steps):
+        raise ValueError("Invalid parent schema-2 incremental step counter")
+    from .contract import CATALOG_SHA256, PATCH_SHA256, RULESET_ID, UPSTREAM_COMMIT
+    expected = {
+        "engine": engine, "catalog_sha256": CATALOG_SHA256,
+        "patch_sha256": PATCH_SHA256, "ruleset_id": RULESET_ID,
+        "upstream_commit": UPSTREAM_COMMIT,
+    }
+    if parent.get("compatibility") != expected:
+        raise ValueError("Parent schema-2 compatibility provenance mismatch")
+
+
 def build_checkpoint_metadata(
     *, engine: dict, seed: int, total_timesteps: int,
     parent: dict | None = None, parent_sha256: str | None = None,
@@ -45,8 +72,7 @@ def build_checkpoint_metadata(
     }
     if parent is None:
         return meta
-    if not isinstance(parent, dict) or parent.get("engine") != engine:
-        raise ValueError("Incompatible parent engine")
+    validate_resume_parent(parent, engine)
     previous = parent.get("total_timesteps")
     if type(previous) is not int or previous < 1 or total_timesteps <= previous:
         raise ValueError("Missing or non-increasing cumulative PPO steps")
@@ -92,6 +118,7 @@ def run(steps: int, seed: int, model_out: Path, resume: Path | None = None):
             if not isinstance(prev, dict) or prev.get("engine") != engine:
                 raise ValueError("Checkpoint engine or card vocabulary mismatch")
             parent_sha256 = require_verified_resume(resume, prev)
+            validate_resume_parent(prev, engine)
             model = MaskablePPO.load(str(resume), env=env, device="cpu")
             if type(prev.get("total_timesteps")) is not int or (
                 int(model.num_timesteps) != prev["total_timesteps"]
