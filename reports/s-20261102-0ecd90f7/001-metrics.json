@@ -1,0 +1,144 @@
+{
+  "session": "s-20261102-0ecd90f7",
+  "base_sha": "315b068bac5ab6d8403c3c9b18f8c101c0cded5d",
+  "source_action_layout": "MCG-NJU/AutoTavern@fb61201a557ddd36a411cf44aac51ce4d9b606ce:crates/taverngym/src/actions.rs",
+  "engine": {
+    "version": "1.1.0",
+    "source_hash": "6d8712c93022ba11",
+    "features": 4017,
+    "cards": 447,
+    "actions": 245,
+    "n_cards": 3984
+  },
+  "method": "public-observation logistic multi-label legal-family probe",
+  "label_source": "real legal_mask targets, NEVER an input feature",
+  "train_seeds": [
+    87900,
+    87901,
+    87902
+  ],
+  "heldout_seeds": [
+    87910,
+    87911
+  ],
+  "train_states": 123,
+  "heldout_states": 124,
+  "gradient_updates": 240,
+  "ppo_steps": 0,
+  "selected_public_feature_columns": 128,
+  "checkpoint_sha256": "9359104563e01e644c85a8c03c9890a1cc8995cb549736935898d48f232250c5",
+  "checkpoint_restored": true,
+  "family": {
+    "refresh": {
+      "n": 124,
+      "true_prevalence": 0.5483870967741935,
+      "train_prevalence": 0.5609756112098694,
+      "tp": 54,
+      "fp": 23,
+      "fn": 14,
+      "tn": 33,
+      "f1": 0.7448275862068966,
+      "model_brier": 0.23329685628414154,
+      "train_prior_brier": 0.24781717360019684
+    },
+    "freeze": {
+      "n": 124,
+      "true_prevalence": 0.7580645161290323,
+      "train_prevalence": 0.8536585569381714,
+      "tp": 94,
+      "fp": 28,
+      "fn": 0,
+      "tn": 2,
+      "f1": 0.8703703703703703,
+      "model_brier": 0.21182288229465485,
+      "train_prior_brier": 0.19254091382026672
+    },
+    "upgrade": {
+      "n": 124,
+      "true_prevalence": 0.20967741935483872,
+      "train_prevalence": 0.17073170840740204,
+      "tp": 14,
+      "fp": 21,
+      "fn": 12,
+      "tn": 77,
+      "f1": 0.45901639344262296,
+      "model_brier": 0.1467593014240265,
+      "train_prior_brier": 0.167229562997818
+    },
+    "buy": {
+      "n": 124,
+      "true_prevalence": 0.5161290322580645,
+      "train_prevalence": 0.49593496322631836,
+      "tp": 50,
+      "fp": 21,
+      "fn": 14,
+      "tn": 39,
+      "f1": 0.7407407407407407,
+      "model_brier": 0.21765121817588806,
+      "train_prior_brier": 0.25014761090278625
+    },
+    "sell": {
+      "n": 124,
+      "true_prevalence": 0.7096774193548387,
+      "train_prevalence": 0.8048780560493469,
+      "tp": 87,
+      "fp": 28,
+      "fn": 1,
+      "tn": 8,
+      "f1": 0.8571428571428571,
+      "model_brier": 0.20806926488876343,
+      "train_prior_brier": 0.2150985449552536
+    },
+    "choose": {
+      "n": 124,
+      "true_prevalence": 0.24193548387096775,
+      "train_prevalence": 0.1463414579629898,
+      "tp": 2,
+      "fp": 0,
+      "fn": 28,
+      "tn": 94,
+      "f1": 0.125,
+      "model_brier": 0.21182288229465485,
+      "train_prior_brier": 0.19254091382026672
+    },
+    "play": {
+      "n": 124,
+      "true_prevalence": 0.31451612903225806,
+      "train_prevalence": 0.21138212084770203,
+      "tp": 11,
+      "fp": 2,
+      "fn": 28,
+      "tn": 83,
+      "f1": 0.4230769230769231,
+      "model_brier": 0.2106761932373047,
+      "train_prior_brier": 0.2262323647737503
+    },
+    "magnetize": {
+      "n": 124,
+      "true_prevalence": 0.008064516129032258,
+      "train_prevalence": 0.008130080997943878,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "tn": 123,
+      "f1": 0.0,
+      "model_brier": 0.007857934571802616,
+      "train_prior_brier": 0.007999484427273273
+    }
+  },
+  "game_policy": "baseline, no learned policy evaluated",
+  "complete_real_games": 5,
+  "ranks": [
+    7,
+    8,
+    7,
+    7,
+    8
+  ],
+  "mean_rank": 7.4,
+  "top4_rate": 0.0,
+  "first_place_rate": 0.0,
+  "simulator_guards_triggered": 0,
+  "conclusion": "Mechanics diagnostic only. No demonstrated competitive improvement.",
+  "promotion": "REJECT as Champion; RETEST diagnostic on more heldout seeds"
+}
