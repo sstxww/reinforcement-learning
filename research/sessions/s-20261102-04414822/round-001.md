@@ -1,0 +1,27 @@
+# Round 001 · card embedding width ablation
+
+- Session: `s-20261102-04414822`
+- Main base commit: `6ac59235b8238196a0e6462de77b72413c829372`
+- Branch: `agent/s-20261102-04414822/optimization-001`
+- GitHub Actions run: https://github.com/sstxww/reinforcement-learning/actions/runs/41413164417
+- Hypothesis: increasing the card embedding from 8 to 16 changes early MaskablePPO results without invalid actions.
+- Prior reviewed material: `research/knowledge/README.md` has no confirmed card-width findings; open PR #6 baseline, #7 evaluation, #8 infrastructure, #9 trainer are unmerged leads, not verified improvements.
+- Code: optional `card_embedding_dim` in `tavern_ai/model.py`; isolated `tavern_ai/card_ablation.py`; independent push workflow. Shared train.yml unchanged.
+- Engine: 1.1.0, source hash `6d8712c93022ba11`, upstream `fb61201a557ddd36a411cf44aac51ce4d9b606ce`, patch SHA256 `1e48a071cad63c284debbf917cb012595a405a4ef5ab66180eb2918e205aaac0`.
+- Contract: 4017 float features, 447 card IDs, 245 mask actions; shape and nonempty legal mask checked before training.
+- Config: same seed=27110, steps=128 per variant; PPO n_steps=128, batch_size=64, epochs=4, gamma=.99, lambda=.95, LR=3e-4, entropy=.01; CPU, timeout from workflow.
+- Actual training: d8=128, d16=128; total=256.
+- Test seeds (paired): [27111, 27112].
+- d8 mean rank / rates: unavailable (0 complete games)
+- d16 mean rank / rates: 8.000; top4=0.000; first=0.000; n=2
+- Incomplete game failures: d8=[{"seed": 27111, "error": "RuntimeError('Full-game safety limit exceeded')"}, {"seed": 27112, "error": "RuntimeError('Full-game safety limit exceeded')"}]; d16=[].
+- Independent baseline receipt: `experiments/s-20261102-04414822/001-27100.json` (created by separate genuine TavernGym canary workflow step).
+- Model-game receipts: `experiments/s-20261102-04414822/001-<seed>-d8.json`, `...-d16.json` only when an actual full match completes.
+- Checkpoints: `checkpoints/s-20261102-04414822/card-d8.zip` SHA256=dc91c1888e51070de913e6bf813750dd478cca1134a9b6c62297141fa1503d82; `card-d16.zip` SHA256=bdcbb23079b4ba404ffaaff7e8a3e0553a6142cfe7beaeba79ccb909e030ed74. Uploaded only to run-specific, expiring GitHub Actions artifact, **not permanently archived**.
+- Verdict: tiny sample, performance improvement **unverified**; numerical rank differences are not statistically decisive. No TavernArena game or Elo.
+- What worked: isolated CPU training and receipt recording, if supported by successful run and receipts.
+- What did not work: any per-seed failures above. Otherwise no failure demonstrated; lack of power prevents positive claim.
+- Clean-up: no weights, rollout, caches or virtual environments committed; retain run artifact while valid.
+- Next: >=20 paired seeds, confidence intervals, investigate normalization/padding semantics separately before wider changes.
+- PR: https://github.com/sstxww/reinforcement-learning/pull/13 (draft); never merge automatically.
+- Core failure to investigate: the d8 checkpoint repeatedly hits the canary 30,000-iteration safety guard on both seeds; collect per-action frequencies before changing policy or crediting card width. This is not evidence of an illegal action, and gives no valid d8 placement.

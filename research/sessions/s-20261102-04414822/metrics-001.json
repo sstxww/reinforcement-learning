@@ -1,0 +1,107 @@
+{
+  "schema": 1,
+  "session_id": "s-20261102-04414822",
+  "timestamp": "2026-11-02T08:30:31.998855+00:00",
+  "github_run_id": "41413164417",
+  "github_sha": "b5ab348309db3168c06477c4e8551573e8638698",
+  "github_run_url": "https://github.com/sstxww/reinforcement-learning/actions/runs/41413164417",
+  "engine": {
+    "version": "1.1.0",
+    "source_hash": "6d8712c93022ba11",
+    "features": 4017,
+    "cards": 447,
+    "actions": 245,
+    "n_cards": 3984
+  },
+  "upstream_commit": "fb61201a557ddd36a411cf44aac51ce4d9b606ce",
+  "patch_sha256": "1e48a071cad63c284debbf917cb012595a405a4ef5ab66180eb2918e205aaac0",
+  "train_seed": 27110,
+  "requested_timesteps_per_variant": 128,
+  "eval_seeds": [
+    27111,
+    27112
+  ],
+  "variants": {
+    "d8": {
+      "checkpoint": "checkpoints/s-20261102-04414822/card-d8.zip",
+      "schema": 1,
+      "variant": "d8",
+      "seed": 27110,
+      "requested_timesteps": 128,
+      "actual_timesteps": 128,
+      "checkpoint_sha256": "dc91c1888e51070de913e6bf813750dd478cca1134a9b6c62297141fa1503d82",
+      "embedding_dim": 8,
+      "note": "Temporary GitHub Actions artifact; not persistent storage",
+      "games": [],
+      "failures": [
+        {
+          "seed": 27111,
+          "error": "RuntimeError('Full-game safety limit exceeded')"
+        },
+        {
+          "seed": 27112,
+          "error": "RuntimeError('Full-game safety limit exceeded')"
+        }
+      ],
+      "completed_games": 0,
+      "mean_rank": null,
+      "top4_rate": null,
+      "first_place_rate": null
+    },
+    "d16": {
+      "checkpoint": "checkpoints/s-20261102-04414822/card-d16.zip",
+      "schema": 1,
+      "variant": "d16",
+      "seed": 27110,
+      "requested_timesteps": 128,
+      "actual_timesteps": 128,
+      "checkpoint_sha256": "bdcbb23079b4ba404ffaaff7e8a3e0553a6142cfe7beaeba79ccb909e030ed74",
+      "embedding_dim": 16,
+      "note": "Temporary GitHub Actions artifact; not persistent storage",
+      "games": [
+        {
+          "seed": 27111,
+          "receipt": "experiments/s-20261102-04414822/001-27111-d16.json",
+          "rank": 8,
+          "decisions": 142,
+          "placements": [
+            8,
+            4,
+            5,
+            1,
+            2,
+            6,
+            3,
+            7
+          ],
+          "truncated_combats": 0,
+          "turn_limit_end": false
+        },
+        {
+          "seed": 27112,
+          "receipt": "experiments/s-20261102-04414822/001-27112-d16.json",
+          "rank": 8,
+          "decisions": 134,
+          "placements": [
+            8,
+            4,
+            3,
+            6,
+            7,
+            1,
+            5,
+            2
+          ],
+          "truncated_combats": 0,
+          "turn_limit_end": false
+        }
+      ],
+      "failures": [],
+      "completed_games": 2,
+      "mean_rank": 8,
+      "top4_rate": 0.0,
+      "first_place_rate": 0.0
+    }
+  },
+  "total_actual_timesteps": 256
+}
