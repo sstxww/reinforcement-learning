@@ -1,0 +1,87 @@
+{
+  "schema": 1,
+  "kind": "actual_own_completed_eight_seat_paired_receipts_verified_from_original_Actions_artifact",
+  "session_id": "s-20261103-5638d3bc",
+  "round": 1,
+  "task_key": "eval/v7/raw-v5-1408-seed-1256380",
+  "source_commit": "59d821ece38ddf1312ffa5473ba7c24bfda692a5",
+  "workflow_run": "https://github.com/sstxww/reinforcement-learning/actions/runs/41513735245",
+  "workflow_status": "completed",
+  "workflow_conclusion": "success",
+  "job_id": 125511826641,
+  "source_artifact_id": 13174089273,
+  "artifact_url": "https://github.com/sstxww/reinforcement-learning/actions/runs/41513735245/artifacts/13174089273",
+  "artifact_zip_sha256": "db237694960aa95a9279588fe58b4d2b3b963128cb65cc68ee780353440b1857",
+  "artifact_zip_crc_ok": true,
+  "seed": 1256380,
+  "seat": 0,
+  "engine": {
+    "version": "1.1.0",
+    "source_hash": "6d8712c93022ba11",
+    "features": 4017,
+    "cards": 447,
+    "actions": 245
+  },
+  "source_model": {
+    "release": "v5-s-20261102-68099929-1408-41428692617",
+    "sha256": "a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632",
+    "reported_timesteps": 1408,
+    "download_and_sha_in_own_run_verified": true,
+    "new_training_steps": 0
+  },
+  "own_real_games": [
+    {
+      "policy": "baseline",
+      "receipt_path": "experiments/s-20261103-5638d3bc/001-1256380-baseline.json",
+      "receipt_sha256": "7bc8f1725f395114a6127df592ec44e566ed63882583ce2f9a6b309420424997",
+      "completed": true,
+      "rank": 6,
+      "placements": [
+        6,
+        2,
+        8,
+        1,
+        5,
+        3,
+        7,
+        4
+      ],
+      "turns": 16,
+      "decisions": 71,
+      "truncated_combats": 0,
+      "turn_limit_end": false
+    },
+    {
+      "policy": "model",
+      "mode": "pure_raw_unassisted",
+      "receipt_path": "experiments/s-20261103-5638d3bc/001-1256380-model.json",
+      "receipt_sha256": "6d6f614007b454f89f9d1975a4916904a9bb03819039274f3fe6c83070f79667",
+      "completed": true,
+      "rank": 8,
+      "placements": [
+        8,
+        6,
+        7,
+        1,
+        5,
+        2,
+        3,
+        4
+      ],
+      "turns": 15,
+      "decisions": 151,
+      "truncated_combats": 0,
+      "turn_limit_end": false
+    }
+  ],
+  "paired_summary_original_path": "reports/s-20261103-5638d3bc/001-1256380-paired-original.json",
+  "paired_summary_sha256": "82efafd7128b4ae17566d314954136c92c512f627352eafe19574f64cd90af44",
+  "pairs": 1,
+  "model_minus_baseline_mean_placement_delta": 2,
+  "improvement_established": false,
+  "confidence_interval": null,
+  "new_release": false,
+  "model_promoted": false,
+  "pr_latest_head_ci": "not yet run",
+  "main_merged": false
+}

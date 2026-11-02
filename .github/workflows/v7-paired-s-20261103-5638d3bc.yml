@@ -1,0 +1,85 @@
+name: V7 paired raw 1408 probe - s-20261103-5638d3bc
+on:
+  push:
+    branches:
+      - agent/s-20261103-5638d3bc/optimization-001
+    paths:
+      - .github/workflows/v7-paired-s-20261103-5638d3bc.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+concurrency:
+  group: v7-paired-s-20261103-5638d3bc
+  cancel-in-progress: false
+
+jobs:
+  paired:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned simulator and read-only model dependencies
+        run: |
+          python -m pip install -e '.[train,test]'
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Download and SHA-verify registered unpromoted 1408-step Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          python -m tavern_ai.release_restore_entry --model-id v5-s-20261102-68099929-1408-41428692617 --out-dir checkpoints
+          echo "registered model sha256:"
+          sha256sum checkpoints/model.zip
+      - name: Real baseline eight-seat same-seed control
+        run: |
+          set -euo pipefail
+          mkdir -p outputs
+          python -m tavern_ai.canary --agent-id s-20261103-5638d3bc --policy baseline --seed 1256380 --receipt outputs/001-1256380-baseline.json
+          python -m tavern_ai.validate_receipt outputs/001-1256380-baseline.json
+      - name: Real raw model eight-seat match, no guard or baseline fallback
+        shell: bash
+        run: |
+          set -euo pipefail
+          timeout 900s python -m tavern_ai.canary --agent-id s-20261103-5638d3bc --policy model --model checkpoints/model.zip --seed 1256380 --receipt outputs/001-1256380-model.json
+          python -m tavern_ai.validate_receipt outputs/001-1256380-model.json
+      - name: Verify paired receipt identity and summarize strictly n=1
+        run: |
+          python - <<'PY'
+          import json, hashlib
+          from pathlib import Path
+          from tavern_ai.receipt_integrity import validate_integrity
+          path = Path("outputs")
+          baseline = json.loads((path / "001-1256380-baseline.json").read_text())
+          model = json.loads((path / "001-1256380-model.json").read_text())
+          for row, arm in ((baseline,"baseline"),(model,"model")):
+              validate_integrity(row)
+              assert row["policy"] == arm and row["seed"] == 1256380
+              assert row["agent_id"] == "s-20261103-5638d3bc"
+              assert row["truncated_combats"] == 0 and row["turn_limit_end"] is False
+          sha = hashlib.sha256(Path("checkpoints/model.zip").read_bytes()).hexdigest()
+          assert sha == "a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632"
+          assert model["model_sha256"] == sha
+          summary = {"schema": 1, "session": "s-20261103-5638d3bc", "seed": 1256380, "seat": 0,
+                     "games_per_arm": 1, "policy": "raw unassisted model",
+                     "parent_model_sha256": sha, "parent_trained_steps": 1408,
+                     "new_training_steps": 0, "baseline_rank": baseline["placements"][0],
+                     "model_rank": model["placements"][0],
+                     "paired_delta_model_minus_baseline": model["placements"][0] - baseline["placements"][0],
+                     "improvement_established": False, "best_or_champion_promoted": False,
+                     "note": "Single matched seed cannot establish rank or statistical improvement."}
+          (path / "001-1256380-paired.json").write_text(json.dumps(summary, indent=2)+"\n")
+          print(json.dumps(summary))
+          PY
+      - name: Preserve originals and failure evidence (expiring, never a Release)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v7-paired-s-20261103-5638d3bc-${{ github.run_id }}
+          path: outputs/*
+          if-no-files-found: ignore
+          retention-days: 30
