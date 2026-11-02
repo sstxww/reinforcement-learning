@@ -1,0 +1,108 @@
+name: V5 bounded durable-resume integration s-20261102-fe461d0d
+
+on:
+  push:
+    branches:
+      - agent/s-20261102-fe461d0d/optimization-001
+    paths:
+      - .github/workflows/v5-release-integrate-fe461d0d.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: v5-release-integrate-fe461d0d
+  cancel-in-progress: false
+
+jobs:
+  bounded-real-gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install tests, PPO and pinned engine
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[train,test]'
+          bash scripts/bootstrap_engine.sh
+      - name: Validate integration and existing canonical validators
+        run: |
+          python -m pytest tests/test_release_restore_entry_fe461d0d.py tests/test_registry_integrity.py tests/test_checkpoint_preflight.py tests/test_release_asset_verifier.py
+          python -m tavern_ai.contract
+      - name: Independent authentic full eight-seat baseline control
+        run: |
+          python -m tavern_ai.canary --agent-id s-20261102-fe461d0d \
+            --policy baseline --seed 52611 \
+            --receipt experiments/s-20261102-fe461d0d/001-52611.json
+          python -m tavern_ai.validate_receipt experiments/s-20261102-fe461d0d/001-52611.json
+      - name: Commit only generated complete own-session receipt
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = "agent/s-20261102-fe461d0d/optimization-001"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add experiments/s-20261102-fe461d0d/001-52611.json
+          git commit -m "test(v5): archive genuine full eight-seat integration control"
+          git push origin HEAD:refs/heads/agent/s-20261102-fe461d0d/optimization-001
+      - name: Verify current registered latest Release asset pair and load on CPU
+        run: |
+          python -m tavern_ai.release_restore_entry --model-id latest --out-dir checkpoints
+      - name: Real 128-step PPO continuation from durable registered weights
+        run: |
+          python -m tavern_ai.train --steps 128 --seed 42 \
+            --resume checkpoints/model.zip --out checkpoints/candidate.zip
+          python - <<'PY'
+          import json
+          old = json.load(open('checkpoints/model.metadata.json'))
+          new = json.load(open('checkpoints/candidate.metadata.json'))
+          assert new['total_timesteps'] == old['total_timesteps'] + 128, (old, new)
+          PY
+      - name: Continued candidate controls full eight-seat game
+        run: |
+          python -m tavern_ai.canary --agent-id s-20261102-fe461d0d \
+            --policy model --model checkpoints/candidate.zip --seed 52612 \
+            --receipt experiments/s-20261102-fe461d0d/002-52612.json
+          python -m tavern_ai.validate_receipt experiments/s-20261102-fe461d0d/002-52612.json
+      - name: Small paired independent heldout (exploratory only)
+        run: |
+          python -m tavern_ai.evaluate --model checkpoints/candidate.zip \
+            --games 1 --start-seed 52614 --compare-baseline \
+            --out reports/s-20261102-fe461d0d/001-paired.json
+      - name: Preserve unpromoted candidate as a durable Release
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="v5-s-20261102-fe461d0d-smoke-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
+          mkdir -p archive
+          cp checkpoints/candidate.zip archive/model.zip
+          cp checkpoints/candidate.metadata.json archive/model.metadata.json
+          cp experiments/s-20261102-fe461d0d/002-52612.json archive/model-game.json
+          cp reports/s-20261102-fe461d0d/001-paired.json archive/paired.json
+          gh release create "$tag" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
+            --prerelease --title "Unpromoted P1 resume smoke $tag" \
+            --notes "128-step verified continuation from canonical Release; exploratory 1-seed evaluation, no Champion or strength claim" \
+            archive/model.zip archive/model.metadata.json archive/model-game.json archive/paired.json
+          mkdir -p redownload
+          gh release download "$tag" --repo "$GITHUB_REPOSITORY" \
+            --pattern model.zip --pattern model.metadata.json --dir redownload
+          cmp archive/model.zip redownload/model.zip
+          cmp archive/model.metadata.json redownload/model.metadata.json
+      - name: Keep diagnostics even after failure, never as sole model storage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: integration-fe461d0d-${{ github.run_id }}
+          path: |
+            experiments/s-20261102-fe461d0d/*.json
+            reports/s-20261102-fe461d0d/*.json
+            checkpoints/*.metadata.json
+          if-no-files-found: ignore
+          retention-days: 30

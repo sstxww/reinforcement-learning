@@ -52,10 +52,35 @@ def read_registry(path: Path) -> dict:
     for key in ("champion", "challenger", "latest"):
         if roles.get(key) is not None and roles[key] not in ids:
             raise ValueError(f"Role {key} references an unknown model")
+    # Named population/rejected pools must reference known immutable model IDs.
+    for role in ("population", "rejected"):
+        members = roles.get(role, [])
+        if not isinstance(members, list) or len(members) != len(set(
+                member for member in members if isinstance(member, str))):
+            raise ValueError(f"Invalid {role} model pool")
+        if any(not isinstance(member, str) or member not in ids for member in members):
+            raise ValueError(f"Unknown model in {role} pool")
     if roles.get("champion") is not None:
         selected = next(e for e in entries if e["id"] == roles["champion"])
         if selected["review_status"] != "verified":
             raise ValueError("Unverified checkpoint cannot be Champion")
+        # A review label alone does not establish model integrity or strength.
+        # These are evidence assertions, not a substitute for external audit.
+        required_evidence = (
+            "durable_download_verified",
+            "hash_verified",
+            "load_verified",
+            "resume_verified",
+            "complete_match_verified",
+            "unassisted_complete_match_verified",
+            "independent_paired_evaluation_verified",
+            "competitive_gain_verified",
+        )
+        missing = [key for key in required_evidence if selected.get(key) is not True]
+        if missing:
+            raise ValueError("Champion evidence incomplete: " + ", ".join(missing))
+        if selected.get("safety_fallback_used") is not False:
+            raise ValueError("Champion must explicitly attest no safety fallback in raw games")
     return obj
 
 

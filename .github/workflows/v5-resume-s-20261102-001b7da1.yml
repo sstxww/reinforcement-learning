@@ -1,0 +1,134 @@
+name: V5 s-20261102-001b7da1 bounded Release-resume smoke
+
+on:
+  push:
+    branches:
+      - agent/s-20261102-001b7da1/optimization-001
+    paths:
+      - .github/workflows/v5-resume-s-20261102-001b7da1.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: v5-resume-s-20261102-001b7da1
+  cancel-in-progress: false
+
+jobs:
+  verified-release-continuation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 100
+    env:
+      GH_TOKEN: ${{ github.token }}
+      SOURCE_TAG: v5-s-20261102-68099929-1408-41428692617
+      EXPECTED_SHA256: a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install training dependencies
+        run: python -m pip install -e '.[train,test]'
+      - name: Unit tests
+        run: python -m pytest tests/test_checkpoint_writer_s_20261102_001b7da1.py tests/test_train_resume_s_20261102_001b7da1.py
+      - name: Install pinned TavernGym
+        run: bash scripts/bootstrap_engine.sh
+      - name: Download and authenticate existing experimental 1408-step Release
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p inputs outputs
+          gh release download "$SOURCE_TAG" --repo "$GITHUB_REPOSITORY" --pattern 'model.zip' --pattern 'model.metadata.json' --dir inputs
+          echo "$EXPECTED_SHA256  inputs/model.zip" | sha256sum --check --status
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from tavern_ai.registry_integrity import validate_registry, verify_checkpoint
+          registry = json.loads(Path("models/registry.json").read_text())
+          validate_registry(registry)
+          row = next(item for item in registry["candidates"] if item["id"] == "v5-s-20261102-68099929-1408-41428692617")
+          verify_checkpoint(Path("inputs/model.zip"), row["checkpoint_sha256"])
+          meta = json.loads(Path("inputs/model.metadata.json").read_text())
+          assert meta["total_timesteps"] == 1408, "Wrong source step count"
+          print("Validated source Release SHA256 and 1408-step metadata")
+          PY
+      - name: Actually continue PPO 128 steps from verified Release
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m tavern_ai.train --steps 128 --seed 91802 --resume inputs/model.zip --out outputs/model.zip
+      - name: Verify new checkpoint hash, lineage, CPU load and step counter
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import hashlib, json
+          from pathlib import Path
+          from sb3_contrib import MaskablePPO
+          from tavern_ai.checkpoint_writer import verify_resume_digest
+          out=Path("outputs/model.zip")
+          meta=json.loads(Path("outputs/model.metadata.json").read_text())
+          assert verify_resume_digest(out,meta)
+          assert meta["total_timesteps"] == 1536, "Expected 1408+128 total steps"
+          assert meta["parent_checkpoint_sha256"] == "a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632"
+          model=MaskablePPO.load(str(out),device="cpu")
+          assert int(model.num_timesteps)==1536
+          report={"source_tag":"v5-s-20261102-68099929-1408-41428692617",
+                  "source_sha256":meta["parent_checkpoint_sha256"],
+                  "new_sha256":meta["checkpoint_sha256"],"new_steps":128,
+                  "cumulative_steps":1536,"hash_verified":True,"cpu_load_verified":True,
+                  "source_release_resume_verified":True,"model_strength_gain_verified":False,
+                  "champion_promoted":False}
+          Path("outputs/resume-smoke.json").write_text(json.dumps(report,indent=2))
+          print(json.dumps(report))
+          PY
+      - name: Honest one-game model-controlled full-match probe
+        id: model_game
+        continue-on-error: true
+        timeout-minutes: 12
+        run: |
+          timeout 600s python -m tavern_ai.canary --agent-id s-20261102-001b7da1 --seed 91831 --policy model --model outputs/model.zip --receipt outputs/model-match.json
+          python -m tavern_ai.validate_receipt outputs/model-match.json
+      - name: Explicitly record whether pure-model game completed
+        if: always()
+        shell: bash
+        env:
+          MODEL_OUTCOME: ${{ steps.model_game.outcome }}
+        run: |
+          mkdir -p outputs
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          outcome=os.environ["MODEL_OUTCOME"]
+          obj={"model_full_match_outcome":outcome,
+               "model_full_match_receipt_exists":Path("outputs/model-match.json").is_file(),
+               "no_fallback_used":True,
+               "model_strength_gain_verified":False}
+          Path("outputs/match-status.json").write_text(json.dumps(obj,indent=2))
+          print(json.dumps(obj))
+          PY
+      - name: Save research checkpoint and real outcome as temporary recovery artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v5-s-20261102-001b7da1-resume-${{ github.run_id }}
+          path: outputs/
+          if-no-files-found: warn
+          retention-days: 30
+      - name: Publish SHA-verified unpromoted checkpoint to durable versioned Release
+        if: steps.model_game.outcome == 'success' || steps.model_game.outcome == 'failure'
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s outputs/model.zip
+          test -s outputs/model.metadata.json
+          test -s outputs/resume-smoke.json
+          TAG="v5-s-20261102-001b7da1-resume1536-${GITHUB_RUN_ID}"
+          gh release create "$TAG" \
+            "outputs/model.zip#model.zip" \
+            "outputs/model.metadata.json#model.metadata.json" \
+            "outputs/resume-smoke.json#resume-smoke.json" \
+            "outputs/match-status.json#match-status.json" \
+            --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --prerelease \
+            --title "UNPROMOTED PPO 1536-step verified 128-step resume (s-20261102-001b7da1)" \
+            --notes "Bounded research-only Release from verified 1408-step V5 parent. No Champion or strength claim. Read resume-smoke.json and match-status.json: successful engineering resume is not evidence of competitive strength."
