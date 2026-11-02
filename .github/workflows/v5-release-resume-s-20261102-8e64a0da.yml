@@ -1,0 +1,144 @@
+name: V5 bounded Release resume s-20261102-8e64a0da
+on:
+  push:
+    branches:
+      - 'agent/s-20261102-8e64a0da/optimization-001'
+    paths:
+      - '.github/workflows/v5-release-resume-s-20261102-8e64a0da.yml'
+permissions:
+  contents: write
+concurrency:
+  group: v5-resume-s-20261102-8e64a0da-r001
+  cancel-in-progress: false
+jobs:
+  release-resume:
+    if: github.repository == 'sstxww/reinforcement-learning' && github.ref == 'refs/heads/agent/s-20261102-8e64a0da/optimization-001'
+    runs-on: ubuntu-latest
+    timeout-minutes: 95
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install test and CPU training dependencies
+        run: |
+          python -m pip install -e '.[train,test]'
+          python -m pytest -q
+      - name: Verify pinned real TavernGym
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Redownload immutable Release and verify both actual assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p checkpoints/source
+          gh release download v5-s-20261102-68099929-1408-41428692617 --repo sstxww/reinforcement-learning --pattern model.zip --pattern model.metadata.json --dir checkpoints/source
+          echo 'a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632  checkpoints/source/model.zip' | sha256sum -c -
+          python -m tavern_ai.release_asset_verifier --model-id v5-s-20261102-68099929-1408-41428692617 --weights checkpoints/source/model.zip --metadata checkpoints/source/model.metadata.json --check-load
+      - name: Perform exactly 128 real optimizer-state PPO resume steps
+        run: |
+          python -m tavern_ai.train --steps 128 --seed 92602 --resume checkpoints/source/model.zip --out checkpoints/candidate/model.zip
+      - name: Independently reload and inspect optimizer progression
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p reports/s-20261102-8e64a0da
+          python - <<'PY'
+          import hashlib, json, os
+          from pathlib import Path
+          from sb3_contrib import MaskablePPO
+          source = Path('checkpoints/source/model.zip')
+          candidate = Path('checkpoints/candidate/model.zip')
+          meta_path = Path('checkpoints/candidate/model.metadata.json')
+          before = MaskablePPO.load(str(source), device='cpu')
+          after = MaskablePPO.load(str(candidate), device='cpu')
+          def steps_of_optimizer(model):
+              values = []
+              for state in model.policy.optimizer.state.values():
+                  if 'step' in state:
+                      values.append(int(state['step']))
+              if not values:
+                  raise RuntimeError('No persisted Adam optimizer steps in PPO checkpoint')
+              return min(values), max(values)
+          old_steps, new_steps = steps_of_optimizer(before), steps_of_optimizer(after)
+          assert before.num_timesteps == 1408, before.num_timesteps
+          assert after.num_timesteps == 1536, after.num_timesteps
+          assert new_steps[0] > old_steps[1], (old_steps, new_steps)
+          digest = hashlib.sha256(candidate.read_bytes()).hexdigest()
+          info = json.loads(meta_path.read_text())
+          assert info['total_timesteps'] == 1536
+          info.update(checkpoint_sha256=digest, parent_release='v5-s-20261102-68099929-1408-41428692617', additional_steps=128)
+          meta_path.write_text(json.dumps(info, indent=2) + '\n')
+          report = dict(schema=1, session_id='s-20261102-8e64a0da', source_release=info['parent_release'], source_sha256='a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632', source_steps=1408, new_steps=1536, actual_ppo_steps=128, new_checkpoint_sha256=digest, old_adam_step_min_max=list(old_steps), new_adam_step_min_max=list(new_steps), optimizer_continuation_tested=True, candidate_load_tested=True, new_model_strength_gain_verified=False, champion_promotion=False, run_id=os.getenv('GITHUB_RUN_ID'), source_commit=os.getenv('GITHUB_SHA'))
+          Path('reports/s-20261102-8e64a0da/001-resume-smoke.json').write_text(json.dumps(report, indent=2) + '\n')
+          print(json.dumps(report))
+          PY
+      - name: Genuine full eight-seat baseline safety canary
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p experiments/s-20261102-8e64a0da
+          python -m tavern_ai.canary --agent-id s-20261102-8e64a0da --policy baseline --seed 90311 --receipt experiments/s-20261102-8e64a0da/001-baseline-90311.json
+          python -m tavern_ai.validate_receipt experiments/s-20261102-8e64a0da/001-baseline-90311.json
+      - name: Attempt bounded UNGUARDED model full-game (failure is diagnostic)
+        shell: bash
+        run: |
+          set -uo pipefail
+          mkdir -p reports/s-20261102-8e64a0da
+          if timeout 480s python -m tavern_ai.canary --agent-id s-20261102-8e64a0da --seed 90312 --policy model --model checkpoints/candidate/model.zip --receipt experiments/s-20261102-8e64a0da/002-model-90312.json && python -m tavern_ai.validate_receipt experiments/s-20261102-8e64a0da/002-model-90312.json; then
+            echo '{"schema":1,"model_raw_full_game_completed":true,"guarded":false,"seed":90312}' > reports/s-20261102-8e64a0da/002-model-game-status.json
+          else
+            code=$?
+            rm -f experiments/s-20261102-8e64a0da/002-model-90312.json
+            printf '{"schema":1,"model_raw_full_game_completed":false,"guarded":false,"seed":90312,"exit_code":%d,"warning":"No complete model-game receipt; do not promote"}\n' "$code" > reports/s-20261102-8e64a0da/002-model-game-status.json
+          fi
+          cat reports/s-20261102-8e64a0da/002-model-game-status.json
+      - name: Publish unique non-Champion diagnostic Release and redownload verify
+        shell: bash
+        run: |
+          set -euo pipefail
+          TAG=v5-smoke-s-20261102-8e64a0da-resume128
+          gh release create "$TAG" --repo sstxww/reinforcement-learning --target "$GITHUB_SHA" --prerelease --title "Experimental V5 resume smoke s-20261102-8e64a0da (NOT Champion)" --notes "Exactly 128 PPO steps from SHA-verified unpromoted V5 1408-step Release; optimizer continuation audited. This is diagnostic storage only: see model-game-status before making any full-game or strength claims." checkpoints/candidate/model.zip checkpoints/candidate/model.metadata.json
+          mkdir -p checkpoints/redownload
+          gh release download "$TAG" --repo sstxww/reinforcement-learning --pattern model.zip --pattern model.metadata.json --dir checkpoints/redownload
+          cmp checkpoints/candidate/model.zip checkpoints/redownload/model.zip
+          cmp checkpoints/candidate/model.metadata.json checkpoints/redownload/model.metadata.json
+          python - <<'PY'
+          import hashlib,json
+          from pathlib import Path
+          directory=Path('reports/s-20261102-8e64a0da')
+          p=directory/'001-resume-smoke.json'
+          r=json.loads(p.read_text())
+          r['published_prerelease_tag']='v5-smoke-s-20261102-8e64a0da-resume128'
+          r['published_bytes_redownload_verified']=True
+          r['raw_model_game']=json.loads((directory/'002-model-game-status.json').read_text())
+          r['baseline_receipt']='experiments/s-20261102-8e64a0da/001-baseline-90311.json'
+          p.write_text(json.dumps(r,indent=2)+'\n')
+          PY
+          gh release upload "$TAG" reports/s-20261102-8e64a0da/001-resume-smoke.json reports/s-20261102-8e64a0da/002-model-game-status.json --repo sstxww/reinforcement-learning
+      - name: Commit authentic own-session receipts and compact report only
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = agent/s-20261102-8e64a0da/optimization-001
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add experiments/s-20261102-8e64a0da reports/s-20261102-8e64a0da
+          if ! git diff --cached --quiet; then
+            git commit -m 'evidence(s-20261102-8e64a0da): genuine resume smoke and full-match status'
+            git pull --rebase origin "$GITHUB_REF_NAME"
+            git push origin "HEAD:$GITHUB_REF_NAME"
+          fi
+      - name: Preserve temporary diagnostics (Release is persistent store)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v5-smoke-s-20261102-8e64a0da
+          path: |
+            reports/s-20261102-8e64a0da/*.json
+            experiments/s-20261102-8e64a0da/*.json
+          if-no-files-found: ignore
+          retention-days: 30
