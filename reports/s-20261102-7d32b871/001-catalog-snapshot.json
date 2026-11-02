@@ -1,0 +1,29 @@
+{
+  "asset_index_count": 7,
+  "automatic_resume_ready": false,
+  "canonical_candidate_count": 5,
+  "canonical_latest_id": "v5-s-20261102-68099929-1408-41428692617",
+  "champion": null,
+  "champion_eligible": false,
+  "checks": {
+    "bytes_reverified_in_this_execution": false,
+    "canonical_independent_resume_claim": false,
+    "cpu_load_reverified_in_this_execution": false,
+    "historical_cpu_load_claim": false,
+    "historical_metadata_bytes_claim": true,
+    "historical_optimizer_resume_claim": false,
+    "historical_weights_bytes_claim": true,
+    "optimizer_resumed_in_this_execution": false,
+    "real_game_in_this_execution": false,
+    "release_asset_digest_index_present": true
+  },
+  "cumulative_steps": 1408,
+  "decision": "DOWNLOAD_AND_VERIFY_BYTES_LOAD_AND_OPTIMIZER_BEFORE_RESUME",
+  "expected_sha256": "a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632",
+  "independent_inventory_count": 6,
+  "independent_inventory_latest_id": null,
+  "model_release_url": "https://github.com/sstxww/reinforcement-learning/releases/tag/v5-s-20261102-68099929-1408-41428692617",
+  "note": "An inventory's null latest is not a verified contradiction: it is an independent audit catalog. Historical flags are evidence claims, not fresh checks. No weight was downloaded in this snapshot.",
+  "schema": 1,
+  "source": "checked-in-catalog-snapshot"
+}

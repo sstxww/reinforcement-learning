@@ -1,0 +1,123 @@
+name: V5 isolated readiness and 1408 Release resume smoke 7d32b871
+on:
+  push:
+    branches:
+      - agent/s-20261102-7d32b871/optimization-001
+    paths:
+      - 'tavern_ai/model_readiness_s_7d32b871.py'
+      - 'tests/test_model_readiness_s_7d32b871.py'
+      - '.github/workflows/v5-readiness-s-20261102-7d32b871.yml'
+permissions:
+  contents: write
+  actions: read
+concurrency:
+  group: v5-readiness-s-20261102-7d32b871
+  cancel-in-progress: false
+jobs:
+  release-readiness-and-real-game:
+    if: github.repository == 'sstxww/reinforcement-learning' && github.ref == 'refs/heads/agent/s-20261102-7d32b871/optimization-001'
+    runs-on: ubuntu-latest
+    timeout-minutes: 100
+    env:
+      GH_TOKEN: ${{ github.token }}
+      SESSION_ID: s-20261102-7d32b871
+      SOURCE_RELEASE: v5-s-20261102-68099929-1408-41428692617
+      SOURCE_SHA256: a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Existing regressions and cross-catalog fail-closed tests
+        run: |
+          set -euo pipefail
+          python -m pip install -e '.[train,test]'
+          python -m pytest
+          mkdir -p "reports/$SESSION_ID"
+          python -m tavern_ai.model_readiness_s_7d32b871 > "reports/$SESSION_ID/001-catalog-snapshot.json"
+      - name: Install pinned real TavernGym and verify contract
+        run: |
+          set -euo pipefail
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Own genuine eight-seat baseline full game (not a synthetic receipt)
+        run: |
+          set -euo pipefail
+          mkdir -p "experiments/$SESSION_ID"
+          timeout 480s python -m tavern_ai.canary --agent-id "$SESSION_ID" --policy baseline --seed 99651 --receipt "experiments/$SESSION_ID/001-baseline-99651.json"
+          python -m tavern_ai.validate_receipt "experiments/$SESSION_ID/001-baseline-99651.json"
+      - name: Download durable 1408 Release and independently validate actual bytes and CPU load
+        run: |
+          set -euo pipefail
+          mkdir -p restore
+          gh release download "$SOURCE_RELEASE" --repo "$GITHUB_REPOSITORY" --pattern model.zip --pattern model.metadata.json --dir restore
+          printf '%s  %s\n' "$SOURCE_SHA256" restore/model.zip | sha256sum -c -
+          python -m tavern_ai.model_readiness_s_7d32b871 --weights restore/model.zip --metadata restore/model.metadata.json --check-load > "reports/$SESSION_ID/001-fresh-release-verified.json"
+      - name: Raw released-model behavior on new paired seed without forced fallback
+        shell: bash
+        run: |
+          set -euo pipefail
+          if timeout 480s python -m tavern_ai.buy_opportunity_68099929 --agent-id "$SESSION_ID" --seed 99651 --policy model --model restore/model.zip --out "experiments/$SESSION_ID/001-model-99651.json"; then
+            python -m tavern_ai.validate_receipt "experiments/$SESSION_ID/001-model-99651.json"
+            echo 'raw model full game completed' > "reports/$SESSION_ID/001-model-trace-status.txt"
+          else
+            rm -f "experiments/$SESSION_ID/001-model-99651.json"
+            echo 'raw model full game failed; no result or rank can be claimed' > "reports/$SESSION_ID/001-model-trace-status.txt"
+          fi
+      - name: Exactly 128 PPO optimizer continuation steps as restore smoke, not promotion
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p smoke
+          timeout 1500s python -m tavern_ai.train --steps 128 --seed 99651 --resume restore/model.zip --out smoke/resumed.zip
+          python - <<'PY'
+          import hashlib, json, os
+          from pathlib import Path
+          source = hashlib.sha256(Path('restore/model.zip').read_bytes()).hexdigest()
+          assert source == os.environ['SOURCE_SHA256']
+          meta = json.loads(Path('smoke/resumed.metadata.json').read_text())
+          assert meta['total_timesteps'] == 1536, meta
+          digest = hashlib.sha256(Path('smoke/resumed.zip').read_bytes()).hexdigest()
+          assert digest != source
+          report = {
+              'source_release': os.environ['SOURCE_RELEASE'],
+              'source_sha256_verified': True,
+              'source_steps': 1408,
+              'new_ppo_steps': 128,
+              'resumed_steps': meta['total_timesteps'],
+              'new_checkpoint_sha256': digest,
+              'optimizer_resume_smoke_verified': True,
+              'full_new_model_competition_verified': False,
+              'new_release_published': False,
+              'champion_promoted': False,
+              'scope': 'bounded engineering resume smoke, not performance experiment',
+          }
+          Path('reports/' + os.environ['SESSION_ID'] + '/001-resume-smoke.json').write_text(json.dumps(report,indent=2)+'\n')
+          PY
+      - name: Commit own evidence only; no workflow push loop
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = 'agent/s-20261102-7d32b871/optimization-001'
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "experiments/$SESSION_ID" "reports/$SESSION_ID"
+          git diff --cached --quiet && exit 0
+          git commit -m 'evidence(7d32b871): actual release check, recovery smoke and real game receipts'
+          git pull --rebase origin "$GITHUB_REF_NAME"
+          git push origin "HEAD:$GITHUB_REF_NAME"
+      - name: Preserve failure and checkpoint evidence with bounded retention
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v5-readiness-s-7d32b871-${{ github.run_id }}
+          path: |
+            experiments/s-20261102-7d32b871/
+            reports/s-20261102-7d32b871/
+            smoke/resumed.zip
+            smoke/resumed.metadata.json
+          if-no-files-found: ignore
+          retention-days: 30
