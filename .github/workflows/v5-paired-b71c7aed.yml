@@ -47,6 +47,44 @@ jobs:
             --pattern 'model.zip' --pattern 'model.metadata.json' --dir checkpoints
           test -s checkpoints/model.zip
           test -s checkpoints/model.metadata.json
+      - name: Genuine own-session Baseline full game independent of failed candidate
+        run: |
+          python -m tavern_ai.canary --agent-id s-20261102-b71c7aed \
+            --seed 920021 --policy baseline \
+            --receipt outputs/owned-baseline-920021.json
+          python -m tavern_ai.validate_receipt outputs/owned-baseline-920021.json
+      - name: Bounded raw candidate loop diagnosis without fabricated full game
+        run: |
+          python - <<'PY'
+          import hashlib, json
+          from pathlib import Path
+          import torch
+          from sb3_contrib import MaskablePPO
+          from tavern_ai.behavior_audit_v5_880b8a71 import one_game
+          from tavern_ai.contract import verify_engine
+          torch.set_num_threads(1)
+          checkpoint = Path("checkpoints/model.zip")
+          digest = hashlib.sha256(checkpoint.read_bytes()).hexdigest()
+          model = MaskablePPO.load(str(checkpoint), device="cpu")
+          summary, receipt = one_game(920011, model, digest, verify_engine(), None, 320)
+          data = {
+              "schema": 1, "seed": 920011, "policy": "raw_unassisted_ppo",
+              "model_sha256": digest, "diagnosis": summary,
+              "complete_game_receipt_present": receipt is not None,
+              "promoted": False,
+          }
+          Path("outputs/raw-loop-diagnostic-920011.json").write_text(
+              json.dumps(data, ensure_ascii=False, indent=2) + "\n")
+          print(json.dumps({"completed": summary["completed"],
+              "stop_reason": summary["stop_reason"],
+              "own_actions": summary["raw_model_actions"],
+              "turn": summary["game_turn"],
+              "action_categories": summary["action_category_counts"],
+              "legal_buy_exposure": summary["legal_action_opportunities"],
+              "model_chosen_ends": summary["model_chosen_ends"],
+              "most_active_turns": sorted(summary["per_turn_decisions"].items(),
+                  key=lambda z: z[1], reverse=True)[:5]}))
+          PY
       - name: Check registered SHA, metadata, optimizer, CPU model and run raw paired games
         run: |
           python -m tavern_ai.paired_evidence_b71c7aed \
