@@ -2,7 +2,7 @@
   "schema": 1,
   "champion_id": null,
   "latest_resumable_id": null,
-  "notes": "V2 Challenger has verified Release checksum, pinned-engine CPU load and one masked legal action. Full PPO continuation, independent candidate game and competitive improvement remain unverified; Champion and Latest are null.",
+  "notes": "Scoped contribution to main registry #87; do not override models/registry.json. Source V2 independently SHA verified + legal CPU inference + 128 genuine PPO continuation, but no proven gameplay gain. The new 1408-step Release is archived, not Champion.",
   "entries": [
     {
       "model_id": "v2-learning-41413557445",
@@ -38,11 +38,60 @@
         "hash": true,
         "load": true,
         "inference": true,
+        "resume": true,
+        "full_game": false,
+        "independent_evaluation": false,
+        "resume_source_run": "https://github.com/sstxww/reinforcement-learning/actions/runs/41428821470",
+        "resumed_optimizer_steps": [
+          80,
+          88
+        ]
+      },
+      "verification_run_url": "https://github.com/sstxww/reinforcement-learning/actions/runs/41427457452"
+    },
+    {
+      "model_id": "s-20261102-decfc670-resume128-001",
+      "role": "challenger",
+      "release_url": "https://github.com/sstxww/reinforcement-learning/releases/download/s-20261102-decfc670-resume128-001/model.zip",
+      "metadata_url": "https://github.com/sstxww/reinforcement-learning/releases/download/s-20261102-decfc670-resume128-001/model.metadata.json",
+      "model_sha256": "2a2212a9abb400f844bc05c625c41f4f57db7d8227e1f37c44f8a7470b977754",
+      "engine_source_hash": "6d8712c93022ba11",
+      "engine_version": "1.1.0",
+      "algorithm": "MaskablePPO",
+      "training_steps": 1408,
+      "parent": "v2-learning-41413557445",
+      "training_run": "https://github.com/sstxww/reinforcement-learning/actions/runs/41428821470",
+      "optimizer_step_before": 80,
+      "optimizer_step_after": 88,
+      "verification": {
+        "hash": true,
+        "load": true,
+        "inference": true,
         "resume": false,
         "full_game": false,
         "independent_evaluation": false
       },
-      "verification_run_url": "https://github.com/sstxww/reinforcement-learning/actions/runs/41427457452"
+      "known_evaluation": {
+        "kind": "two_guarded_8seat_pairs",
+        "seeds": [
+          86271,
+          86272
+        ],
+        "old_placements": [
+          8,
+          8
+        ],
+        "resumed_placements": [
+          8,
+          8
+        ],
+        "actual_buys_old": 0,
+        "actual_buys_resumed": 0,
+        "forced_ends_old": 0,
+        "forced_ends_resumed": 0,
+        "conclusion": "no improvement; n=2 pairs only"
+      },
+      "note": "New Release hash equals SHA computed from locally saved post-training model. Direct independent re-download verification of this new release is not yet recorded. Two guarded but zero-forced complete games, not proof of unguarded capability or gain."
     }
   ]
 }
