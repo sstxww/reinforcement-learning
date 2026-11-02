@@ -14,3 +14,9 @@
 12. **Next exact action:** inspect open PR latest HEAD, confirm the full `CI - full-match gate` succeeded on exactly that SHA and read its genuine game receipt; then a designated serial integrator should review this narrow train.py/test diff and merge via head-locked PR API, immediately verifying new main SHA and its CI.
 
 Dedicated temporary push workflow existed in historical commit `8e5267ee142684f94197c485864d456f547c27b9` and completed successfully; it is removed from final diff to avoid redundant follow-on eight-seat runs.
+
+## Failure/retest update
+
+- PR [#196](https://github.com/sstxww/reinforcement-learning/pull/196) non-Draft, previous head `88dc041b5a7951679d861fef900cb1ec75404e0a` failed [CI 41513176363](https://github.com/sstxww/reinforcement-learning/actions/runs/41513176363) with **396 passed, 1 skipped, 1 historical fixture failure**. No engine full-game step was reached in this failed PR run.
+- Confirmed defect in synthetic step-counter test: lacked `schema=1`, so newly strict preflight rejected before its intended count-mismatch assertion. Updated only the fixture to be a valid schema-1 parent; production strict validation unchanged. Failure details `failures/001-legacy-step-count-fixture.md`.
+- New PR HEAD CI must be observed; **do not claim green or merged yet**.

@@ -11,3 +11,7 @@ Session `s-20261103-4aa529a2`, role REPAIRER, task `p1/schema2-prelearn-parent-v
 **Improvement gate:** latest-head PR CI and explicit integrator serialization are not proven at this stage; no merge claim. Since branch protection API returned 403, cannot infer permissions or bypass review.
 
 **Next:** PR ready only after latest-head CI and reviewer approval; serialized integrator verifies current main and merged code then postmerge main CI. If any regression fails, fix within 2 meaningful attempts or record it as blocked.
+
+## Actual first PR CI failure and fix
+
+[CI #41513176363](https://github.com/sstxww/reinforcement-learning/actions/runs/41513176363) failed with 396 passed/1 skipped/1 failed before engine setup. The legacy `test_refuse_wrong_step_count_after_load` fixture omitted `schema`, now strictly rejected before deserialization. Retained strict fail-closed production behavior; added schema-1 declaration to that synthetic fixture so the later saved-step mismatch remains tested. One meaningful fix attempt; next observe the new exact-head CI and full-match gate. No fake game receipt from the failed PR run.
