@@ -1,24 +1,19 @@
-# s-20261102-847b6d4e R001 — P0/P1 strict Release verification integration
+# s-20261102-847b6d4e R001 — Integrate Release verification, establish rank-8 diagnostic handoff
 
-## Ownership and baseline
-- Session: s-20261102-847b6d4e; branch `agent/s-20261102-847b6d4e/optimization-001`; parent main HEAD at creation: `1afd8297e3c661bee3117ac5301b1ca08d64869b`.
-- Scope: integrate two **already merged** main validators, not create a second registry or copy PR #93's stale candidate count.
-- Current main began with 75 open PRs, 74 draft; no non-draft independent safe merge target (PR #15 is stacked on draft #9).
-- PR #93 is draft and has a hardcoded four-candidate test while main registry already has five; it also overlaps the already merged Release verifier. Therefore **not merged** and not modified.
+## Ownership and integration
+Original main SHA `1afd8297e3c661bee3117ac5301b1ca08d64869b`; working branch `agent/s-20261102-847b6d4e/optimization-001`; [PR #116](https://github.com/sstxww/reinforcement-learning/pull/116). At initial GitHub inventory: 75 open PRs (74 draft), with the only non-draft #15 dependent on draft #9. No existing PR was eligible for an immediate safe integration. PR #93 was draft with a four-candidate hardcode, conflicting with current canonical registry of five, and overlaps existing Release validators; left untouched and reviewer notified by GitHub comment.
 
-## Actual patch
-- Compose `tavern_ai.release_asset_verifier.verify_local` with `tavern_ai.checkpoint_preflight.audit_archive`.
-- A pair of matching SHA256 digests is no longer sufficient to report safe local verification: validate strict PPO ZIP CRC, required `policy.optimizer.pth`, bounded archive, and checkpoint metadata schema-2 full compatibility too.
-- Tests use **synthetic** valid ZIP fixtures only and new negative cases with matching expected digests for non-ZIP, missing optimizer and invalid schema. They are regression evidence, **not** model artifacts.
-- No change to weight bytes, trainer, evaluator, policy, Champion/Best or shared main train workflow; zero PPO steps.
+## Actual changes
+`tavern_ai.release_asset_verifier.verify_local` now composes `tavern_ai.checkpoint_preflight.audit_archive` after checking both trusted Release asset digests. This refuses corrupt, optimizer-less and schema-incompatible PPO archives despite matching recorded hashes. Existing strict validator reused, not duplicated. Negative synthetic regression tests added. Neither file-layer validation nor a synthetic fixture establishes model load/resume/strength; no shared trainer, policy, registry or Champion altered.
 
-## Real-game and CI status
-- Own branch-scoped pinned TavernGym 1.1.0 baseline eight-seat canary: seed **84761**.
-- Honest pending gate: the receipt exists **only if** dedicated GitHub Actions run completes and commits `experiments/s-20261102-847b6d4e/001-84761.json`; it must pass `tavern_ai.validate_receipt`.
-- The PR's separate latest-head CI and main CI after an eventual merge must both succeed. No merge or success is claimed ahead of actual checks.
-- No model-only game or Release re-download performed in this session. Main's latest 1408-step candidate is unpromoted and remains eighth in its recorded evaluation.
+## Independent real game and CI
+[GitHub branch workflow #41449947363](https://github.com/sstxww/reinforcement-learning/actions/runs/41449947363) **SUCCESS**. Unit/regression checks success, pinned 1.1.0 TavernGym installed; new own authentic complete eight-seat canary seed 84761. Committed receipt at `experiments/s-20261102-847b6d4e/001-84761.json`, GitHub bot branch commit `ce0c28224a3c77a57ecddadd2b734ae8b9140960`.
+- `Game.is_over` reached, `completed=true`, 16 turns, 42 controlled-seat decisions, placements `[8,5,7,1,3,6,2,4]`, seat 0 rank 8, no combat truncation or turn-limit ending. Baseline-only infrastructure proof, not neural candidate strength.
+- Initial full PR [CI #41449992791](https://github.com/sstxww/reinforcement-learning/actions/runs/41449992791) **FAILED** in evidence requirement before receipt existed: 238 unit tests passed, 1 skipped; `Missing independent agent game receipt`. Not a code regression. New bot-commit [CI #41450295784](https://github.com/sstxww/reinforcement-learning/actions/runs/41450295784) `action_required` with no jobs. Do not claim final head green until new completed CI actually succeeds.
+- No PR merge, no postmerge main CI claim.
 
-## Next
-1. Verify own canary, latest PR CI, exact SHA and main compatibility.
-2. Have integrator review this extraction in preference to merging duplicate PR #93 verbatim; coordinate before closing the original.
-3. Only then consider a safe PR merge and confirm post-merge main CI; keep diagnosing action loops before large PPO runs.
+## P2 rank-eight evidence (external research, not our own experiment)
+Main [2 real V2 games report](https://github.com/sstxww/reinforcement-learning/blob/main/reports/s-20261102-83d91476/001-buy-opportunity-report.json): 74 decisions with legal mask BUY and 0 actual buys, placements [8,8], baseline [6,7], no guard. [V2 raw 6000 decision trace](https://github.com/sstxww/reinforcement-learning/blob/main/reports/s-20261102-ba09e2d4/002-action-opportunities.json): 2,978 hero power / 2,977 cancel actions, did **not** complete game. [V5 1408 step paired one seed report](https://github.com/sstxww/reinforcement-learning/blob/main/reports/s-20261102-68099929/003-buy-opportunity.json): 35 legal BUY exposures, 0 selected, rank 8; same-seed baseline buys 14. These diagnose failed legal-buy action utilization and loops, **not** ultimate reward/representation causality or verified corrective effect. A legal BUY is not always strategically good. See scoped report.
+  
+## Model checkpoint and honest work summary
+Existing main registry unpromoted latest V5 1408-step Release SHA256 `a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632`; Champion/Best null. We **did not** download or resume model, did 0 PPO steps, saved no new weights, played 0 model-controlled games, made no strength or promotion claim. Next integration gate: complete latest-head PR CI and concurrent-main recheck. No large training before compatible recoverability and behavior gate.
