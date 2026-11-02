@@ -113,6 +113,7 @@ def main():
     p = argparse.ArgumentParser()
     p.add_argument("--seed", type=int, required=True)
     p.add_argument("--agent-id", required=True)
+    p.add_argument("--policy", choices=["model"], default="model")
     p.add_argument("--model", type=Path, required=True)
     p.add_argument("--receipt", type=Path, required=True)
     a = p.parse_args()
