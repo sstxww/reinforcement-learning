@@ -3,10 +3,10 @@
 - Branch: agent/s-20261102-221336eb/optimization-002
 - Base SHA: 315b068bac5ab6d8403c3c9b18f8c101c0cded5d; executed SHA: 57518ca45244cce7a82b4079743bdce77e7f857b
 - Workflow: https://github.com/sstxww/reinforcement-learning/actions/runs/41417053292
-- Result: Candidate rank advantage not established; cap was exercised
+- Result: cap 3 reduces decisions 306 to 182 (40.5% fewer), but all six candidate games finished rank 8; competitive regression.
 - Candidate mean rank: 8, baseline: 6.666666666666667.
 - Illegal moves: 0. Truncation/turn-limit: 0 (receipt validation).
 - Model/checkpoint: none; strategy-only study; Best model not changed.
 - Evidence: experiments/s-20261102-221336eb/, research/sessions/s-20261102-221336eb/evaluation-002.json
-- PR: to be opened after job succeeds.
-- Remaining: independent confirmation, owner review, no model promotion.
+- PR: https://github.com/sstxww/reinforcement-learning/pull/53 (draft; depends on R001 https://github.com/sstxww/reinforcement-learning/pull/41).
+- Remaining: reject this cap for Best; investigate action-value quality over blunt action-count restriction.

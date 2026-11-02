@@ -23,6 +23,7 @@ cap interventions 36.
 Illegal actions 0; no combat truncation and no turn-limit endings (validated before save).
 Evidence: experiments/s-20261102-221336eb/002-<seed>.json and baseline-002-<seed>.json;
 metrics: research/sessions/s-20261102-221336eb/evaluation-002.json; run: https://github.com/sstxww/reinforcement-learning/actions/runs/41417053292.
-Failure/uncertainty: sample of six pairs, no superiority proven; Candidate rank advantage not established; cap was exercised.
+Failure/uncertainty: cap-3 triggered 36 times and saved 124 decisions (40.5%), but all 6 candidate games ranked last against baseline placements [8,8,6,5,7,6]. Avoid competitive promotion.
 Model status: no candidate weight, Best unchanged; artifact retention 30 days only.
-Next hypothesis: test alternative cap after independent sample expansion if interventions are material.
+Next hypothesis: avoid blunt low decision caps; instrument which actions are sacrificed and test value-aware decisions with independent seeds.
+PR (draft, depends on R001 PR #41): https://github.com/sstxww/reinforcement-learning/pull/53
