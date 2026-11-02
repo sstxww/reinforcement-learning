@@ -11,7 +11,7 @@ def test_action_semantics_spans():
     assert category(8) == category(15) == "buy"
     assert category(30) == "choose"
     assert category(46) == category(125) == "play"
-    assert category(244) == "other"
+    assert category(244) == "move"
 
 
 def test_raw_action_preserved_without_guard():
