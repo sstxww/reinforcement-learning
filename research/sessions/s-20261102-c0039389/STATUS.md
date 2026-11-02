@@ -1,16 +1,16 @@
 # Session s-20261102-c0039389 — STATUS
 
-- **Status:** experiment source and regression gates authored; full-game Actions evidence pending.
-- **Branch:** `agent/s-20261102-c0039389/optimization-001`.
-- **Main baseline:** `315b068bac5ab6d8403c3c9b18f8c101c0cded5d`.
-- **Hypothesis:** existing seat-0-only evaluation can conceal controlled-seat sensitivity; examine seat 0 versus seat 4 with exactly the same original BaselinePolicy and independent paired seeds.
-- **Scope:** only new `tavern_ai/seat_position_experiment.py`, `tests/test_seat_position_experiment.py`, this session's workflow, receipts/reports, session logs and knowledge proposal. Do not edit shared modules or another session.
-- **Engine:** pinned TavernGym 1.1.0, source fingerprint `6d8712c93022ba11`, observe2 [4017 float, 447 card, 245 actions]; must be verified at real runner startup.
-- **Research mode:** controlled-seat evaluation **engineering** study, not PPO training. Gradient steps: 0. Candidate policy: unchanged original baseline, not PPO.
-- **Planned own canary:** controlled seat 4, seed 45600; required receipt `experiments/s-20261102-c0039389/001-45600.json`.
-- **Planned held-out pairs:** seeds 45601, 45602, 45603, seat 0 and seat 4; only genuine Game.is_over() results qualify.
-- **Training/checkpoint:** no new weights, no model checkpoint; no Best/Latest promotion. Existing best model is not established by this experiment.
-- **Actions:** pending isolated branch-triggered run. Artifacts retention 30 days; the JSON evidence is committed separately when successful.
-- **PR:** create after a successful own candidate game and evidence commit. CI must pass on latest PR head; merging reserved to integrator.
-- **Known blockers:** none proven in this experiment yet. If workflow fails, inspect the real failed job and record root cause and repair.
-- **Next hypothesis:** if seat-dependent ranks diverge, independently quantify across more seed/seat combinations before any model comparison. No causal claims from three pairs.
+## Current state
+- **Research status:** `completed_for_review` for the isolated engineering experiment; PR and latest-head CI still to verify.
+- **Branch:** `agent/s-20261102-c0039389/optimization-001`, based on main `315b068bac5ab6d8403c3c9b18f8c101c0cded5d`.
+- **Evidence commit:** `f201284469f777a9dec0fe80f206a461c9dbb100` (bot-committed independent receipts and report).
+- **Successful Actions:** https://github.com/sstxww/reinforcement-learning/actions/runs/41416587540; triggered SHA `4f775d7edab7114a17a740f864d26777b308c72f`; all steps successful, including all repository unit tests, pinned engine bootstrap, 7 genuine full matches, evidence upload and evidence commit.
+- **Engine:** TavernGym `1.1.0`, source hash `6d8712c93022ba11`; observe2 4017 floats / 447 cards / 245 actions; real engine verification succeeded.
+- **Policy:** original unmodified V0 `BaselinePolicy`; SHA256 `e4722a44660f8a880c9eeb949c80e81ebb652926f43d71acd64f958762bd6bac`. No learned model, no PPO gradient steps (`0`), no checkpoint, no new Best/Latest promotion.
+- **Own independent full game:** seed `45600`, controlled seat `4`, rank `4`, 67 decisions, 17 turns; final placement vector `[3,1,8,6,4,2,5,7]`. `Game.is_over()==True`, no illegal actions, combat truncation or end-of-game safety guard. Receipt `experiments/s-20261102-c0039389/001-45600.json`.
+- **Held-out paired evaluation:** seeds `45601,45602,45603`; seat-0 original baseline ranks `[8,8,8]` (mean `8`, top4 `0/3`, first `0/3`); same baseline controlling seat-4 ranks `[7,7,4]` (mean `6`, top4 `1/3`, first `0/3`). 6 complete paired games; all seven game receipts have matching controlled seat/rank and eight-place permutations. Full data `reports/s-20261102-c0039389/seat-comparison.json`.
+- **Interpretation:** demonstrated sensitivity to controlled seat under these three seeds; seat changes hero allocations, opponent schedule and action order, so **not causal proof** of seat advantage and **not a policy improvement**. Larger stratified evaluation needed.
+- **Evidence retention:** full compact receipts and report committed on branch; workflow artifact `13127922958` expires at `2026-12-02T08:57:41Z` (30-day TTL); no model storage implied.
+- **Faults:** no failures in this run; no repair needed.
+- **PR:** pending creation and final-head CI; integrator-only merge.
+- **Next research direction:** quantify seat/hero interactions across all eight seats and more independent seeds, or implement seat-stratified metrics before Best promotion without changing shared modules.
