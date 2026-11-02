@@ -1,0 +1,15 @@
+{
+  "task_key": "integrate/serialized-reviewed-main-workflow",
+  "owner_session": "s-20261103-d3d410f5",
+  "status": "claimed_for_implementation_not_main_merge_lock",
+  "base_main_sha": "3a745c6f6a48c65528bcbeb81b8627b8db93f046",
+  "branch": "agent/s-20261103-d3d410f5/optimization-001",
+  "started_utc": "2026-11-02T19:36:29Z",
+  "lease_for_main": false,
+  "scope": [
+    "scripts/v7_serial_integrator.py",
+    "tests/test_v7_serial_integrator_d3d410f5.py",
+    ".github/workflows/v7-serialized-integrator.yml"
+  ],
+  "handoff": "Task claim is not globally exclusive merge authority. Release only after latest-head tests and PR review."
+}
