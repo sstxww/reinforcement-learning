@@ -32,3 +32,29 @@
 ## Deliverable status
 
 The own isolated run is live, but results are not yet certified in this document. Final-head CI/receipt status, new PPO step count, checkpoint hash/storage state and true model-only rank must be updated from actual evidence before any merge. Until then: **in_progress / not_promotable**.
+
+## Run results and audit resolution (from completed Actions)
+
+Actual run [41509213556](https://github.com/sstxww/reinforcement-learning/actions/runs/41509213556) fully **SUCCEEDED** on original trigger head `26168df0002e103689e471deb3eaba1732956eba`. Pinned TavernGym 1.1.0 source `6d8712c93022ba11`. Tests and engine install succeeded; registered V5 1408-step Release downloaded and passed checked SHA, ZIP/optimizer, metadata, CPU load, inference preflight.
+
+### Original receipts
+
+| Saved receipt | Seed | Policy | Controlled rank | Decisions | Turns | BUY / legal-BUY decisions | Complete |
+|---|---:|---|---:|---:|---:|---|---|
+| `experiments/s-20261103-4fd17801/001-baseline-97303.json` | 97303 | unassisted baseline | 5 | 49 | 16 | 18 / 25 | yes |
+| `experiments/s-20261103-4fd17801/002-source-model-97303.json` | 97303 | unassisted 1408-step PPO | 8 | 106 | 15 | 0 / 23 | yes |
+| `experiments/s-20261103-4fd17801/003-candidate-97304.json` | 97304 | unassisted 1536-step PPO | 8 | 120 | 14 | no category telemetry | yes |
+
+All three original JSONs have `completed:true`, zero combat truncation, `turn_limit_end:false`, policy provenance, source workflow SHA and their respective model digests. The original model's action report has 24 rerolls and 70 'other' decisions. The existing diagnostic source originally classified action ID 2 (FREEZE) as 'other'; the narrow patch corrects this category in **future reports only**. Do NOT retroactively claim all historical 70 'other' actions were FREEZE without the full raw action trace.
+
+### Actual continuation and storage
+
+- Trained **128** real extra MaskablePPO environment steps (1408→1536), training seed 97303. Rollout reported `ep_len_mean=92.1`, `ep_rew_mean=-0.981`; these are not competitive rank evidence.
+- Parent source digest `a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632` verified; new ZIP SHA `e9eb78bb100dd2398258d7f7797b7fc589bc3ef7abd0badca34c964823a04e13`, metadata matched the ZIP as separately downloaded from Artifact.
+- [Temporary 14-day Artifact 13171409075](https://github.com/sstxww/reinforcement-learning/actions/runs/41509213556/artifacts/13171409075) expires 2026-11-16 19:26:31 UTC; no durable new GitHub Release and no formal Champion/Best. Model index `models/sessions/s-20261103-4fd17801/1536-candidate.json`.
+- New model's unassisted real full game was rank **8**. No paired, seat-rotated candidate-vs-parent statistical advantage established. Do not increase training budget; further work should isolate economics/Freeze and action progress.
+
+### Exact targeted bug and integration gate
+
+- Verified `tavern_ai/buy_opportunity_68099929.classify(2)` used to fall to `other`, hiding FREEZE frequency in P2 summary. Fixed source-only action label with dedicated synthetic regression, no modification to PPO policy itself.
+- Own scoped CI still must pass against latest main before integration. Other agents' concurrent merges are not attributed to this session. No ranked Arena match.
