@@ -1,0 +1,60 @@
+{
+  "schema": 1,
+  "environment": "TavernGym",
+  "engine_version": "1.1.0",
+  "engine_source_hash": "6d8712c93022ba11",
+  "agent_id": "s-20261103-023cd77e",
+  "seed": 99711,
+  "completed": true,
+  "truncated_combats": 0,
+  "turn_limit_end": false,
+  "git_sha": "e60af17ac50e68300b2d08304c6f0199370ca005",
+  "model_guard_forced_end": 0,
+  "public_observation_only": true,
+  "timestamp": "2026-11-02T19:44:04.207439+00:00",
+  "policy": "model",
+  "model_sha256": "a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632",
+  "turns": 15,
+  "decisions": 119,
+  "placements": [
+    8,
+    6,
+    2,
+    4,
+    3,
+    1,
+    7,
+    5
+  ],
+  "opportunity_summary": {
+    "decisions": 119,
+    "by_action_family": {
+      "choose": 2,
+      "reroll": 39,
+      "buy_legal_decisions": 35,
+      "freeze": 70,
+      "end_turn": 7,
+      "all_end_turns": 7,
+      "upgrade": 1
+    },
+    "buy_legal_decisions": 35,
+    "distinct_turns_with_legal_buy": 7,
+    "unique_public_states_with_legal_buy": 35,
+    "end_while_buy_legal": 0,
+    "turns_with_end_while_buy_legal": 0,
+    "buy_chosen": 0,
+    "all_end_turns": 7,
+    "consecutive_identical_public_observation": 0,
+    "conditional_buy_rate_given_legal": 0,
+    "conditional_end_rate_given_legal_buy": 0,
+    "caveat": "Every masked BUY is legal; action-level opportunities are temporally dependent. Not all missed legal BUY actions are mistakes."
+  },
+  "evidence_projection": {
+    "original_receipt_sha256": "85c8ed45dc9e80ac3c9dd24a88440382ca390bff849f5582e33773754b087787",
+    "original_artifact_url": "https://github.com/sstxww/reinforcement-learning/actions/runs/41512162363/artifacts/13175145044",
+    "omitted_from_projection": [
+      "trace_first_32"
+    ],
+    "description": "Verified semantic projection of genuine Action receipt; original byte-for-byte JSON retained in linked 14-day Artifact."
+  }
+}
