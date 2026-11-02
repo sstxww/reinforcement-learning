@@ -1,0 +1,69 @@
+{
+  "schema": 1,
+  "champion": null,
+  "latest": null,
+  "models": [
+    {
+      "id": "v1-learning-9eada5801f99",
+      "role": "Challenger",
+      "parent": null,
+      "source_commit": "9eada5801f99c4f725d6503a6d603a9cb2a269e3",
+      "architecture": "MaskablePPO/MultiInputPolicy/TavernExtractor",
+      "total_timesteps": 256,
+      "engine": {
+        "version": "1.1.0",
+        "source_hash": "6d8712c93022ba11",
+        "features": 4017,
+        "cards": 447,
+        "actions": 245
+      },
+      "assets": {
+        "weights": {
+          "url": "https://github.com/sstxww/reinforcement-learning/releases/download/v1-learning-9eada5801f99/model.zip",
+          "sha256": "dc5195658995358e70c0d565a979b9cf05ccc5e47ae7adaa0a2f078f01cad917"
+        },
+        "metadata": {
+          "url": "https://github.com/sstxww/reinforcement-learning/releases/download/v1-learning-9eada5801f99/model.metadata.json",
+          "sha256": "74a6b25af97087a003d74a3b8e274ac9dbf95bf91fa409eb0fea1a5cc05e5ac6"
+        }
+      },
+      "download_verified": false,
+      "load_verified": false,
+      "resume_verified": false,
+      "full_match_verified": true,
+      "paired_improvement_verified": false,
+      "notes": "Release API hashes seen; real original model match reported in PR #9. No independent re-download, load or resume by this session."
+    },
+    {
+      "id": "v2-learning-41413557445",
+      "role": "Challenger",
+      "parent": "v1-learning-9eada5801f99",
+      "source_commit": null,
+      "architecture": "MaskablePPO/MultiInputPolicy/TavernExtractor",
+      "total_timesteps": 1280,
+      "engine": {
+        "version": "1.1.0",
+        "source_hash": "6d8712c93022ba11",
+        "features": 4017,
+        "cards": 447,
+        "actions": 245
+      },
+      "assets": {
+        "weights": {
+          "url": "https://github.com/sstxww/reinforcement-learning/releases/download/v2-learning-41413557445/model.zip",
+          "sha256": "73bde2666426cecce39f135980a897bb2cd4a7d70783ba04c9c0d29477a6664a"
+        },
+        "metadata": {
+          "url": "https://github.com/sstxww/reinforcement-learning/releases/download/v2-learning-41413557445/model.metadata.json",
+          "sha256": "6f0b433191a8242dcedc627f6be49d1551a82788ce7bfd8e60416ede8146acc0"
+        }
+      },
+      "download_verified": false,
+      "load_verified": false,
+      "resume_verified": false,
+      "full_match_verified": true,
+      "paired_improvement_verified": false,
+      "notes": "Release and reported 256-to-1280-step resume in PR #15, but no rank gain over old model. Re-download and optimizer state not independently rechecked here."
+    }
+  ]
+}
