@@ -61,5 +61,7 @@ jobs:
           git add research/sessions/s-20261102-1d9e7456/selected-policy.json
           if ! git diff --cached --quiet; then
             git commit -m "experiment: save verified real slot-ablation receipts"
+            git fetch origin "$GITHUB_REF_NAME"
+            git rebase "origin/$GITHUB_REF_NAME"
             git push origin "HEAD:refs/heads/$GITHUB_REF_NAME"
           fi
