@@ -1,0 +1,68 @@
+name: Isolated forced-discover slot ablation s-20261102-b34940b0
+on:
+  push:
+    branches:
+      - 'agent/s-20261102-b34940b0/optimization-001'
+    paths:
+      - 'tavern_ai/discover_slot_ablation_s_b34940b0.py'
+      - 'tests/test_discover_slot_s_b34940b0.py'
+      - '.github/workflows/discover-slot-s-20261102-b34940b0.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: 'discover-s-20261102-b34940b0-${{ github.ref }}'
+  cancel-in-progress: false
+
+jobs:
+  paired-real-eight-seat:
+    runs-on: ubuntu-latest
+    timeout-minutes: 70
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install test dependencies and exercise isolated tests
+        run: |
+          python -m pip install -e '.[test]'
+          python -m pytest tests/test_discover_slot_s_b34940b0.py tests/test_baseline.py
+      - name: Install actual pinned TavernGym
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Paired full-game ablation (4 seeds, 8 complete matches)
+        run: |
+          python -m tavern_ai.discover_slot_ablation_s_b34940b0 \
+            --seed 65201 --games 4 \
+            --output-dir experiments/s-20261102-b34940b0 \
+            --report research/sessions/s-20261102-b34940b0/metrics-001.json
+          for f in experiments/s-20261102-b34940b0/001-*.json; do
+            python -m tavern_ai.validate_receipt "$f"
+          done
+      - name: Commit only independent receipts and metrics
+        if: success()
+        run: |
+          test "$GITHUB_REF_NAME" = 'agent/s-20261102-b34940b0/optimization-001'
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add experiments/s-20261102-b34940b0/ research/sessions/s-20261102-b34940b0/metrics-001.json
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'results(s-20261102-b34940b0): real paired eight-seat match receipts'
+          git pull --rebase origin "$GITHUB_REF_NAME"
+          git push origin HEAD:"$GITHUB_REF_NAME"
+      - name: Preserve session-only experiment artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: discover-s-20261102-b34940b0-${{ github.run_id }}
+          path: |
+            experiments/s-20261102-b34940b0/**/*.json
+            research/sessions/s-20261102-b34940b0/metrics-001.json
+          if-no-files-found: ignore
+          retention-days: 30
