@@ -1,0 +1,68 @@
+{
+  "schema": 1,
+  "id": "v5-s-20261102-6e4b91ac-resume128",
+  "role": "candidate_unpromoted",
+  "promoted_to_best": false,
+  "champion_eligible": false,
+  "durable_storage": "github_release",
+  "release_url": "https://github.com/sstxww/reinforcement-learning/releases/tag/v5-s-20261102-6e4b91ac-resume128",
+  "release_tag": "v5-s-20261102-6e4b91ac-resume128",
+  "assets": {
+    "model": "model.zip",
+    "metadata": "model.metadata.json",
+    "genuine_model_game": "001-model-86403.json"
+  },
+  "model_sha256": "3e576d92459186a91a52940a59be0c782e8afa95fdd3323de015ab708c21db7a",
+  "metadata_sha256": "76ab43f0a50682dcdb6a76117d6342336d8a8ff6956490cb4b650faee448f64e",
+  "engine": {
+    "name": "TavernGym",
+    "version": "1.1.0",
+    "source_hash": "6d8712c93022ba11",
+    "observation": "observe2",
+    "features": 4017,
+    "cards": 447,
+    "actions": 245
+  },
+  "algorithm": "MaskablePPO",
+  "checkpoint_metadata_schema": 1,
+  "source": {
+    "release": "v5-s-20261102-68099929-1408-41428692617",
+    "model_sha256": "a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632",
+    "cumulative_timesteps": 1408
+  },
+  "added_train_steps": 128,
+  "cumulative_train_steps": 1536,
+  "own_model_game": {
+    "seed": 86403,
+    "controlled_placement": 8,
+    "completed": true,
+    "turns": 15,
+    "decisions": 122,
+    "truncated_combats": 0,
+    "turn_limit_end": false,
+    "raw_unmodified_model": true
+  },
+  "verification": {
+    "source_sha_and_cpu_load": true,
+    "optimizer_resumption_128_steps": true,
+    "new_model_sha_verified": true,
+    "full_raw_model_game": true,
+    "release_two_asset_download_roundtrip": true,
+    "release_repair_run": "https://github.com/sstxww/reinforcement-learning/actions/runs/41450741948",
+    "training_job": "https://github.com/sstxww/reinforcement-learning/actions/runs/41449706506",
+    "original_training_job_final_status": "failed_at_asset_filename_download_after_successful_training_and_game",
+    "note": "GitHub Release contains both canonical assets and original redundant 'resumed.*' assets; canonical assets' bytes were independently redownloaded and SHA256-verified"
+  },
+  "performance": {
+    "heldout_paired_n": 0,
+    "improvement_verified": false,
+    "top4_gain_verified": false,
+    "reason": "Independent heldout evaluation in separate gated workflow; one unguarded full game ranked 8 is not a promotion signal"
+  },
+  "limitations": [
+    "Not Champion or Best",
+    "Main registry latest pointer remains 1408 until separate reviewed integration",
+    "Original 128-step workflow failed during model asset naming; recovered without retraining",
+    "No official ranked Arena games"
+  ]
+}

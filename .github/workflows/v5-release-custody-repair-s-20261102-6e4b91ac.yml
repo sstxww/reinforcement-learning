@@ -1,0 +1,68 @@
+name: V5 correct durable Release asset names s-20261102-6e4b91ac
+
+on:
+  push:
+    branches:
+      - 'agent/s-20261102-6e4b91ac/optimization-001'
+    paths:
+      - '.github/workflows/v5-release-custody-repair-s-20261102-6e4b91ac.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: v5-release-custody-s-20261102-6e4b91ac
+  cancel-in-progress: false
+
+jobs:
+  correct-name-and-roundtrip:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      GH_TOKEN: ${{ github.token }}
+      MODEL_TAG: v5-s-20261102-6e4b91ac-resume128
+      EXPECTED_SHA256: 3e576d92459186a91a52940a59be0c782e8afa95fdd3323de015ab708c21db7a
+    steps:
+      - uses: actions/checkout@v4
+      - name: Retrieve existing authentic candidate (NEVER retrain or republish a new model)
+        run: |
+          mkdir -p rescued publish downloaded
+          gh release download "$MODEL_TAG" --repo "$GITHUB_REPOSITORY" \
+            --pattern 'resumed.*' --dir rescued
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib,json,shutil
+          model=Path('rescued/resumed.zip')
+          metadata=Path('rescued/resumed.metadata.json')
+          assert model.is_file() and metadata.is_file()
+          sha=hashlib.sha256(model.read_bytes()).hexdigest()
+          expected='3e576d92459186a91a52940a59be0c782e8afa95fdd3323de015ab708c21db7a'
+          info=json.loads(metadata.read_text(encoding='utf-8'))
+          assert sha==expected==info['checkpoint_sha256']
+          assert info['total_timesteps']==1536 and info['algorithm']=='MaskablePPO'
+          shutil.copyfile(model,'publish/model.zip')
+          shutil.copyfile(metadata,'publish/model.metadata.json')
+          print('Existing 1536-step checkpoint custody confirmed; no training rerun')
+          PY
+      - name: Add canonical asset names to existing unpromoted Release
+        run: |
+          gh release upload "$MODEL_TAG" --repo "$GITHUB_REPOSITORY" \
+            publish/model.zip publish/model.metadata.json --clobber
+      - name: Independently redownload and verify both canonical Release assets
+        run: |
+          gh release download "$MODEL_TAG" --repo "$GITHUB_REPOSITORY" \
+            --pattern 'model.*' --dir downloaded
+          python - <<'PY'
+          import hashlib,json
+          from pathlib import Path
+          for name in ('model.zip','model.metadata.json'):
+              source=Path('publish')/name
+              got=Path('downloaded')/name
+              assert got.is_file(),f'Missing durable Release asset: {name}'
+              assert hashlib.sha256(source.read_bytes()).digest()==hashlib.sha256(got.read_bytes()).digest(),name
+          meta=json.loads(Path('downloaded/model.metadata.json').read_text())
+          digest=hashlib.sha256(Path('downloaded/model.zip').read_bytes()).hexdigest()
+          assert digest=='3e576d92459186a91a52940a59be0c782e8afa95fdd3323de015ab708c21db7a'
+          assert meta['checkpoint_sha256']==digest and meta['total_timesteps']==1536
+          print('Canonical durable model.zip and model.metadata.json roundtrip verified')
+          PY

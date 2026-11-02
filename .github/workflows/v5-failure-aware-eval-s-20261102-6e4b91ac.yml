@@ -1,0 +1,69 @@
+name: V5 failure-aware heldout diagnostics s-20261102-6e4b91ac
+
+on:
+  push:
+    branches:
+      - 'agent/s-20261102-6e4b91ac/optimization-001'
+    paths:
+      - '.github/workflows/v5-failure-aware-eval-s-20261102-6e4b91ac.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: v5-failure-aware-s-20261102-6e4b91ac
+  cancel-in-progress: false
+
+jobs:
+  real-heldout-diagnostic:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      GH_TOKEN: ${{ github.token }}
+      RELEASE_TAG: v5-s-20261102-6e4b91ac-resume128
+      EXPECTED_SHA: 3e576d92459186a91a52940a59be0c782e8afa95fdd3323de015ab708c21db7a
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Isolated failure-accounting tests (no model or engine dependency)
+        run: |
+          python -m pip install -e '.[test]'
+          python -m pytest tests/test_paired_diagnostics_s_6e4b91ac.py
+      - name: Install pinned authentic TavernGym plus CPU inference dependencies
+        run: |
+          python -m pip install -e '.[train]'
+          bash scripts/bootstrap_engine.sh
+      - name: Re-download and verify the 1536-step durable candidate
+        run: |
+          mkdir -p checkpoints
+          gh release download "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" \
+            --pattern 'model.*' --dir checkpoints
+          python -m tavern_ai.checkpoint_preflight \
+            --model checkpoints/model.zip \
+            --metadata checkpoints/model.metadata.json \
+            --expected-sha256 "$EXPECTED_SHA" --probe-inference
+      - name: Diagnose failed and complete raw-model and baseline games separately
+        run: |
+          python -m tavern_ai.paired_diagnostics_s_6e4b91ac \
+            --model checkpoints/model.zip --expected-sha256 "$EXPECTED_SHA" \
+            --games 4 --start-seed 86410 \
+            --out reports/s-20261102-6e4b91ac/002-failure-aware-paired.json
+      - name: Publish genuine bounded diagnostics without fabricated match receipts
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add reports/s-20261102-6e4b91ac/002-failure-aware-paired.json
+          git commit -m 'evidence: separate real eight-seat completions from model safety limits [skip ci]'
+          git pull --rebase origin agent/s-20261102-6e4b91ac/optimization-001
+          git push origin HEAD:agent/s-20261102-6e4b91ac/optimization-001
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: failure-aware-heldout-s-20261102-6e4b91ac
+          path: reports/s-20261102-6e4b91ac/002-failure-aware-paired.json
+          if-no-files-found: ignore
+          retention-days: 14
