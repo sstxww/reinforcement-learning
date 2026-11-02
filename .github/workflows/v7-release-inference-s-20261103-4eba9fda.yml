@@ -1,0 +1,57 @@
+name: V7 real Release masked inference and own eight-seat smoke 4eba9fda
+on:
+  push:
+    branches:
+      - agent/s-20261103-4eba9fda/optimization-001
+    paths:
+      - .github/workflows/v7-release-inference-s-20261103-4eba9fda.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: v7-release-inference-s-20261103-4eba9fda
+  cancel-in-progress: false
+
+jobs:
+  verify-release-inference-and-game:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned project and masked PPO test dependencies
+        run: python -m pip install -e '.[train,test]'
+      - name: Test new masked inference and existing Release integrity
+        run: |
+          python -m pytest -q tests/test_release_masked_inference_s_20261103_4eba9fda.py tests/test_release_asset_verifier.py tests/test_release_restore_entry_fe461d0d.py
+      - name: Install and verify exact pinned TavernGym engine
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Actually restore registered Release and require one legal masked model action
+        run: |
+          set -euo pipefail
+          mkdir -p outputs
+          python -m tavern_ai.release_restore_entry --model-id latest --out-dir outputs/restored | tee outputs/restore.json
+          python -c 'import json; d=json.load(open("outputs/restore.json")); assert d["cpu_load_verified"] is True; assert d["optimizer_continuation_performed"] is False'
+      - name: Own genuine full eight-seat TavernGym baseline match
+        run: |
+          set -euo pipefail
+          python -m tavern_ai.canary --agent-id s-20261103-4eba9fda --policy baseline --seed 99657 --receipt outputs/001-99657.json
+          python -m tavern_ai.validate_receipt outputs/001-99657.json
+          python -c 'import json; from tavern_ai.receipt_integrity import validate_integrity; d=json.load(open("outputs/001-99657.json")); validate_integrity(d); assert d["policy"]=="baseline" and d["seed"]==99657'
+      - name: Preserve original smoke and restore proof without model weights
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v7-masked-inference-proof-4eba9fda-${{ github.run_id }}
+          path: |
+            outputs/restore.json
+            outputs/001-99657.json
+          if-no-files-found: ignore
+          retention-days: 30
