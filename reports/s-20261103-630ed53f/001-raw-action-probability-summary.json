@@ -1,0 +1,60 @@
+{
+  "schema": 1,
+  "session_id": "s-20261103-630ed53f",
+  "source_run": "https://github.com/sstxww/reinforcement-learning/actions/runs/41509301217",
+  "source_job": "https://github.com/sstxww/reinforcement-learning/actions/runs/41509301217/job/125496674174",
+  "source_commit": "64bf18b0a5ff2793c0365a9480f0aafeaa8843fd",
+  "source_artifact": "https://github.com/sstxww/reinforcement-learning/actions/runs/41509301217/artifacts/13172432172",
+  "source_model_release": "v5-s-20261102-68099929-1408-41428692617",
+  "model_sha256": "a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632",
+  "seed": 99631,
+  "policy": "raw_model_no_fallback",
+  "read_only_probe": {
+    "completed": true,
+    "model_rank": 8,
+    "actions": {
+      "choose": 5,
+      "dark_gift": 3,
+      "end_turn": 8,
+      "freeze": 80,
+      "play": 3,
+      "refresh": 46,
+      "sell": 3,
+      "upgrade": 1
+    },
+    "when_buy_legal": {
+      "decision_state_exposures": 48,
+      "selected_buy_count": 0,
+      "mean_buy_probability": 0.406067,
+      "mean_best_buy_probability": 0.159541,
+      "mean_refresh_freeze_probability": 0.338996,
+      "mean_end_turn_probability": 0.114613,
+      "mean_play_probability": 0.013314,
+      "mean_selected_action_probability": 0.189458,
+      "mean_top_action_probability": 0.189458,
+      "mean_masked_entropy_nats": 1.902398,
+      "mean_legal_buy_slots": 3.25,
+      "mean_legal_action_count": 7.125
+    }
+  },
+  "baseline": {
+    "policy": "baseline",
+    "completed": true,
+    "rank": 3,
+    "decisions": 57,
+    "receipt": "experiments/s-20261103-630ed53f/001-baseline-99631.json"
+  },
+  "model": {
+    "policy": "model",
+    "completed": true,
+    "rank": 8,
+    "decisions": 149,
+    "receipt": "experiments/s-20261103-630ed53f/001-model-99631.json"
+  },
+  "notes": [
+    "These counts and probabilities are parsed from genuine successful immutable GitHub Actions stdout; full detail remains in the original artifact.",
+    "Legal BUY exposures are correlated, not independent optimal buys.",
+    "Average BUY action family mass exceeds REFRESH+FREEZE combined mass, but deterministic argmax selected zero BUY: single-action multiplicity is a hypothesis, not a causal proof.",
+    "One paired seed is not evidence of general policy gain. No new PPO steps or Champion promotion."
+  ]
+}
