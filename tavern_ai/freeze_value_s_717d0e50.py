@@ -17,6 +17,16 @@ ARMS = ("baseline", "blind-freeze", "quality-freeze")
 BASE = BaselinePolicy()
 
 
+def verify_public_observation_layout(layout: dict) -> None:
+    """Check both public observation versions; observe2 is not V1's prefix layout."""
+    if (layout.get("OBS2_FLOATS"), layout.get("OBS2_CARDS"), layout.get("N_ACTIONS")) != (FEATURES, CARDS, ACTIONS):
+        raise RuntimeError(f"Unexpected observe2 contract: {layout}")
+    if (layout.get("OBS_FLOATS"), layout.get("OBS_CARDS"), layout.get("GLOBAL_F"),
+            layout.get("ITEM_F"), layout.get("MINION_F"), layout.get("N_SHOP"),
+            layout.get("N_HAND"), layout.get("N_BOARD")) != (3227, 124, 53, 40, 31, 8, 10, 7):
+        raise RuntimeError(f"Unexpected legacy public shop layout: {layout}")
+
+
 def shop_start(layout: dict) -> int:
     return (layout["GLOBAL_F"] + layout["N_QUESTS"] * layout["QUEST_F"]
             + layout["PENDING_KINDS"] + layout["N_BOARD"] * layout["MINION_F"]
@@ -83,7 +93,14 @@ def game_receipt(seed: int, arm: str, engine: dict, layout: dict) -> dict:
                 raise ValueError(f"observe2 shape mismatch at seed {seed}")
             if not np.isfinite(features).all() or not mask.any():
                 raise ValueError("Invalid features or empty action mask")
-            action = select_action(features, mask, turn, actions_used, froze_this_turn, arm, layout)
+            # observe2 is 4017 floats, but its flattened feature layout is not
+            # the 3227-float legacy layout. Read the *same seat's public* V1
+            # observation only for correct shop feature offsets.
+            public_bytes, _ = game.observe(0)
+            public_features = np.frombuffer(public_bytes, dtype="<f4").copy()
+            if public_features.shape != (layout["OBS_FLOATS"],) or not np.isfinite(public_features).all():
+                raise ValueError(f"Invalid legacy public shop observation, seed={seed}")
+            action = select_action(public_features, mask, turn, actions_used, froze_this_turn, arm, layout)
             if not mask[action]:
                 raise ValueError(f"Illegal action {action}, {arm}, seed {seed}, turn {turn}")
             game.step(0, action)
@@ -128,8 +145,7 @@ def main() -> None:
     engine = verify_engine()
     layout = dict(taverngym.layout())
     # Fail closed if the public observation layout changes unexpectedly.
-    if (layout["OBS_FLOATS"], layout["OBS_CARDS"], layout["N_ACTIONS"]) != (FEATURES, CARDS, ACTIONS):
-        raise RuntimeError(f"Unexpected upstream layout: {layout}")
+    verify_public_observation_layout(layout)
     if shop_start(layout) + layout["N_SHOP"] * layout["ITEM_F"] > FEATURES:
         raise RuntimeError("Shop offsets exceed observe2 bounds")
     path = Path("experiments") / SESSION_ID

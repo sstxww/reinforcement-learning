@@ -1,6 +1,6 @@
 import numpy as np
 import pytest
-from tavern_ai.freeze_value_s_717d0e50 import select_action, shop_start, shop_is_valuable
+from tavern_ai.freeze_value_s_717d0e50 import select_action, shop_start, shop_is_valuable, verify_public_observation_layout
 
 LAYOUT = {"GLOBAL_F": 60, "N_QUESTS": 3, "QUEST_F": 2, "PENDING_KINDS": 9,
           "N_BOARD": 7, "MINION_F": 19, "N_HAND": 10, "ITEM_F": 28, "N_SHOP": 8}
@@ -55,3 +55,17 @@ def test_guard_masks_and_pending_choices():
     assert select_action(f, mask(0, 2, 8), 6, 5, False, "quality-freeze", LAYOUT) == 8
     with pytest.raises(ValueError):
         select_action(f, m, 6, 5, False, "unknown", LAYOUT)
+
+
+def test_dual_observation_contract_and_shop_offsets():
+    """Patched TavernGym reports both 3227/124 V1 and 4017/447 V2 observations."""
+    layout = dict(LAYOUT, OBS_FLOATS=3227, OBS_CARDS=124,
+                  OBS2_FLOATS=4017, OBS2_CARDS=447, N_ACTIONS=245)
+    # The documented legacy observation has 3227 float features;
+    # the public shop starts after global, quests, pending, board and hand.
+    assert shop_start(layout) == 685
+    verify_public_observation_layout(layout)
+    with pytest.raises(RuntimeError, match="observe2"):
+        verify_public_observation_layout(dict(layout, OBS2_FLOATS=3227))
+    with pytest.raises(RuntimeError, match="legacy public shop"):
+        verify_public_observation_layout(dict(layout, OBS_FLOATS=4017))
