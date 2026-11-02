@@ -10,8 +10,8 @@ def obs(*legal):
     return {"action_mask": mask}
 
 
-def test_prioritize_scheduled_upgrade_over_buy():
-    assert select_action(obs(0, 3, 8), {"turn": 2, "actions_used": 0}, True) == 3
+def test_prioritize_scheduled_upgrade_over_play():
+    assert select_action(obs(0, 3, 8, 46), {"turn": 2, "actions_used": 0}, True) == 3
 
 
 def test_never_override_mandatory_discovery():
@@ -19,13 +19,13 @@ def test_never_override_mandatory_discovery():
 
 
 def test_not_upgrade_twice():
-    assert select_action(obs(0, 3, 8), {"turn": 2, "upgraded_this_turn": True}, True) == 8
+    assert select_action(obs(0, 3, 8, 46), {"turn": 2, "upgraded_this_turn": True}, True) == 46
 
 
 def test_unscheduled_turn_and_control_match_baseline():
     ctx = {"turn": 3}
-    assert select_action(obs(0, 3, 8), ctx, True) == 8
-    assert select_action(obs(0, 3, 8), {"turn": 2}, False) == 8
+    assert select_action(obs(0, 3, 8, 46), ctx, True) == 46
+    assert select_action(obs(0, 3, 8, 46), {"turn": 2}, False) == 46
 
 
 def test_end_turn_budget_same_for_both_arms():

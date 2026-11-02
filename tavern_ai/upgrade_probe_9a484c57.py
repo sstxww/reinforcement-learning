@@ -159,7 +159,7 @@ def main() -> None:
     a, b = records["baseline"], records["early-upgrade"]
     report = {
         "session_id": SESSION_ID,
-        "hypothesis": "Scheduled tavern upgrades before routine purchases can improve placement",
+        "hypothesis": "Upgrading before playing held cards on scheduled turns can improve placement",
         "environment": "TavernGym 1.1.0",
         "engine_source_hash": b[0]["engine_source_hash"],
         "git_sha": os.getenv("GITHUB_SHA", ""),
