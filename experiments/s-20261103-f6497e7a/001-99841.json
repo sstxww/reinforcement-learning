@@ -10,7 +10,16 @@
   "completed": true,
   "turns": 14,
   "decisions": 35,
-  "placements": [8, 7, 3, 6, 4, 5, 1, 2],
+  "placements": [
+    8,
+    7,
+    3,
+    6,
+    4,
+    5,
+    1,
+    2
+  ],
   "truncated_combats": 0,
   "turn_limit_end": false,
   "git_sha": "824a47a090fbab1bb3315a62441c3adaaba3a29e",
