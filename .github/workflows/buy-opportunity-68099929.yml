@@ -1,0 +1,97 @@
+name: V5 buy-opportunity trace s-20261102-68099929
+on:
+  push:
+    branches:
+      - agent/s-20261102-68099929/optimization-001
+    paths:
+      - 'tavern_ai/buy_opportunity_68099929.py'
+      - 'tests/test_buy_opportunity_68099929.py'
+      - '.github/workflows/buy-opportunity-68099929.yml'
+permissions:
+  contents: write
+  actions: read
+concurrency:
+  group: buy-opportunity-68099929
+  cancel-in-progress: false
+jobs:
+  diagnose:
+    if: github.repository == 'sstxww/reinforcement-learning' && github.ref == 'refs/heads/agent/s-20261102-68099929/optimization-001'
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    env:
+      GH_TOKEN: ${{ github.token }}
+      EXPECT_SHA: a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify opportunity-calculus tests and pinned simulator
+        run: |
+          set -euo pipefail
+          python -m pip install -e '.[train,test]'
+          python -m pytest
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Recover exact archived 1408-step PPO model
+        run: |
+          set -euo pipefail
+          mkdir -p restore
+          gh run download 41427963534 --repo "$GITHUB_REPOSITORY" --name v5-release-resume-audit-s-68099929 --dir restore
+          printf '%s  %s\n' "$EXPECT_SHA" restore/checkpoints/resumed/model.zip | sha256sum -c -
+      - name: One actual paired seed at seat zero with per-decision legal BUY opportunities
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p experiments/s-20261102-68099929 reports/s-20261102-68099929
+          timeout 360s python -m tavern_ai.buy_opportunity_68099929 --agent-id s-20261102-68099929 --seed 99128 --policy baseline --out experiments/s-20261102-68099929/003-baseline-99128.json
+          timeout 360s python -m tavern_ai.buy_opportunity_68099929 --agent-id s-20261102-68099929 --seed 99128 --policy model --model restore/checkpoints/resumed/model.zip --out experiments/s-20261102-68099929/003-model-99128.json
+          python -m tavern_ai.validate_receipt experiments/s-20261102-68099929/003-baseline-99128.json
+          python -m tavern_ai.validate_receipt experiments/s-20261102-68099929/003-model-99128.json
+      - name: Build evidence-only comparison
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          root=Path('experiments/s-20261102-68099929')
+          b=json.loads((root/'003-baseline-99128.json').read_text())
+          m=json.loads((root/'003-model-99128.json').read_text())
+          assert b['completed'] and m['completed'] and b['seed']==m['seed']==99128
+          assert m['model_sha256']=='a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632'
+          assert b['model_guard_forced_end']==m['model_guard_forced_end']==0
+          report={'schema':1,'experiment':'rank8_legal_buy_opportunity',
+                  'candidate_model_sha256':m['model_sha256'],'seed':99128,
+                  'seat':0,'games_per_arm':1,
+                  'baseline_placement':b['placements'][0],'model_placement':m['placements'][0],
+                  'baseline_opportunities':b['opportunity_summary'],
+                  'model_opportunities':m['opportunity_summary'],
+                  'model_guard_forced_end':0,
+                  'causal_root_status':'NOT_ESTABLISHED_FROM_ONE_PAIRED_GAME',
+                  'claim':'Genuine observational telemetry; not a policy repair or Champion promotion'}
+          path=Path('reports/s-20261102-68099929/003-buy-opportunity.json')
+          path.write_text(json.dumps(report,indent=2)+'\n')
+          print(json.dumps(report))
+          PY
+      - name: Preserve own real receipts and root-cause evidence
+        if: success()
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add experiments/s-20261102-68099929/003-*.json reports/s-20261102-68099929/003-*.json
+          git diff --cached --quiet && exit 0
+          git commit -m 'evidence(s-20261102-68099929): real legal-buy opportunity model trace'
+          git pull --rebase origin "$GITHUB_REF_NAME"
+          git push origin "HEAD:$GITHUB_REF_NAME"
+      - name: Preserve diagnostic output without pretending unfinished game completed
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: buy-opportunity-s-68099929-${{ github.run_id }}
+          path: |
+            experiments/s-20261102-68099929/003-*.json
+            reports/s-20261102-68099929/003-*.json
+          if-no-files-found: ignore
+          retention-days: 30
