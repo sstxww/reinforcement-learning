@@ -1,0 +1,27 @@
+{
+  "schema": 1,
+  "timestamp": "2026-11-02T13:20:29.026352+00:00",
+  "environment": "TavernGym",
+  "engine_source_hash": "6d8712c93022ba11",
+  "engine_version": "1.1.0",
+  "agent_id": "s-20261102-70d8074c",
+  "policy": "baseline",
+  "seed": 73021,
+  "completed": true,
+  "turns": 16,
+  "decisions": 61,
+  "placements": [
+    6,
+    1,
+    5,
+    8,
+    2,
+    7,
+    4,
+    3
+  ],
+  "truncated_combats": 0,
+  "turn_limit_end": false,
+  "git_sha": "beb8747b4fee1f1946e5056053c6d98a8282d985",
+  "model_sha256": null
+}
