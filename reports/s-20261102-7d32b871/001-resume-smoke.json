@@ -1,0 +1,13 @@
+{
+  "source_release": "v5-s-20261102-68099929-1408-41428692617",
+  "source_sha256_verified": true,
+  "source_steps": 1408,
+  "new_ppo_steps": 128,
+  "resumed_steps": 1536,
+  "new_checkpoint_sha256": "f8554c0e901651a1b0e394ca3df3b096b010d9f63d567b86d1df931a3ead389c",
+  "optimizer_resume_smoke_verified": true,
+  "full_new_model_competition_verified": false,
+  "new_release_published": false,
+  "champion_promoted": false,
+  "scope": "bounded engineering resume smoke, not performance experiment"
+}
