@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "task_key": "train/schema2-prelearn-validation",
+  "owner_session": "s-20261103-581c69c0",
+  "state": "released_for_integration",
+  "original_atomic_claim_head": "990acd21d598a34a554a80c50089a8f1a9423ac4",
+  "repair_branch": "agent/s-20261103-581c69c0/optimization-001",
+  "pr_url": "https://github.com/sstxww/reinforcement-learning/pull/187",
+  "pr_head_sha": "cb7249e47399f90a55fca5038ce4de4302490ba0",
+  "pr_draft": false,
+  "pr_latest_head_ci": "https://github.com/sstxww/reinforcement-learning/actions/runs/41515486403",
+  "pr_latest_head_ci_success": true,
+  "durable_rejected_release": "https://github.com/sstxww/reinforcement-learning/releases/tag/v7-rejected-s-20261103-581c69c0-r001-d6771d4439d1",
+  "main_at_handoff": "c1b828734527bae6141805581693d890cc3bff94",
+  "own_main_merge_performed": false,
+  "integration_lease_acquired": false,
+  "reason": "R001 repair finished and handed to qualified exclusive main integrator; no further code changes or task ownership claimed",
+  "reclaim": "Read this record and PR; a future claimant must use a real atomic compare-and-swap protocol on this claim ref, with a new owner/nonce and current main check; never assume this marked release grants main integration rights."
+}
