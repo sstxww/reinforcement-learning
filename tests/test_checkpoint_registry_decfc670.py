@@ -22,7 +22,8 @@ def test_real_release_inventory_is_pessimistic():
     assert data["entries"][0]["role"] == "challenger"
     assert data["entries"][0]["verification"]["hash"] is True
     assert data["entries"][0]["verification"]["inference"] is True
-    assert data["entries"][0]["verification"]["resume"] is False
+    assert data["entries"][0]["verification"]["resume"] is True
+    assert data["entries"][1]["verification"]["resume"] is False
 
 
 def test_rejects_duplicate_id_and_nonrelease_url():
@@ -44,7 +45,7 @@ def test_unverified_model_cannot_be_champion_or_latest():
     with pytest.raises(ValueError, match="verification"):
         validate_registry(data)
     data = inventory()
-    data["latest_resumable_id"] = model_id
+    data["latest_resumable_id"] = data["entries"][1]["model_id"]
     with pytest.raises(ValueError, match="not verified resumable"):
         validate_registry(data)
 
