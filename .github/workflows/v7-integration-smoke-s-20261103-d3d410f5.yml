@@ -4,6 +4,10 @@ on:
   push:
     branches:
       - agent/s-20261103-d3d410f5/optimization-001
+    paths:
+      - 'scripts/v7_serial_integrator.py'
+      - 'tests/test_v7_serial_integrator_d3d410f5.py'
+      - '.github/workflows/v7-integration-smoke-s-20261103-d3d410f5.yml'
   workflow_dispatch:
 
 permissions:
