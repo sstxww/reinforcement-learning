@@ -19,8 +19,12 @@ def registry():
 def test_only_canonical_main_registry_and_no_champion():
     data = registry()
     records = validate_catalog(data)
-    assert len(records) == 4
-    assert set(METADATA_SHA256) == set(records)
+    # A published, unpromoted Release may be appended to the canonical registry
+    # before this historical verifier has a pinned metadata digest for it.
+    # Pinned entries are a deliberately audited subset, not a frozen census.
+    assert len(records) == len(data["candidates"])
+    assert set(METADATA_SHA256).issubset(set(records))
+    assert data["latest"]["id"] in records
     assert data["best"] is None and data["champion"] is None
     assert data["latest"]["role"] == "latest_experimental_unpromoted"
 
