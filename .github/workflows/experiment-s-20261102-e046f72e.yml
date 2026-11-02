@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - 'agent/s-20261102-e046f72e/optimization-001'
+    paths:
+      - 'tavern_ai/compact_*.py'
+      - 'tests/test_compact_*.py'
 
 permissions:
   contents: write
