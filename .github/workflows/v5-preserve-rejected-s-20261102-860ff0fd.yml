@@ -1,0 +1,147 @@
+name: V5 preserve rejected checkpoint s-20261102-860ff0fd
+on:
+  push:
+    branches:
+      - 'agent/s-20261102-860ff0fd/optimization-001'
+    paths:
+      - '.github/workflows/v5-preserve-rejected-s-20261102-860ff0fd.yml'
+permissions:
+  contents: write
+  actions: read
+concurrency:
+  group: preserve-rejected-s-20261102-860ff0fd
+  cancel-in-progress: false
+jobs:
+  preserve-rejected:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      GH_TOKEN: ${{ github.token }}
+      SOURCE_RUN: '41449658176'
+      SOURCE_HEAD: '3bfd517b1a4eb84c96a3a887ebef60065540acf1'
+      FAILED_EVAL_RUN: '41450970156'
+      MODEL_SHA: '2a0aa260c08b087b1bd703a102af7b6a25a1785e17a2b11bbf854ea48f5b99eb'
+      RELEASE_TAG: 'v5-s-20261102-860ff0fd-1536-41449658176'
+      SESSION_ID: 's-20261102-860ff0fd'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Source run ownership and honest failed evaluation provenance
+        run: |
+          test "$(gh run view "$SOURCE_RUN" --repo "$GITHUB_REPOSITORY" --json conclusion -q '.conclusion')" = 'success'
+          test "$(gh run view "$SOURCE_RUN" --repo "$GITHUB_REPOSITORY" --json headSha -q '.headSha')" = "$SOURCE_HEAD"
+          test "$(gh run view "$FAILED_EVAL_RUN" --repo "$GITHUB_REPOSITORY" --json conclusion -q '.conclusion')" = 'failure'
+          mkdir -p recovered
+          gh run download "$SOURCE_RUN" --repo "$GITHUB_REPOSITORY" --name "v5-restore-smoke-$SESSION_ID-$SOURCE_RUN" --dir recovered
+      - name: Fail-closed actual checkpoint digest archive optimizer and receipt
+        run: |
+          python -m tavern_ai.checkpoint_preflight --model recovered/checkpoints/resumed.zip --metadata recovered/checkpoints/resumed.metadata.json --expected-sha256 "$MODEL_SHA"
+          python -m tavern_ai.validate_receipt "recovered/experiments/$SESSION_ID/001-93873.json"
+          python - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          archive=Path('recovered/checkpoints/resumed.zip')
+          meta=json.loads(Path('recovered/checkpoints/resumed.metadata.json').read_text())
+          receipt=json.loads(Path('recovered/experiments/'+os.environ['SESSION_ID']+'/001-93873.json').read_text())
+          assert hashlib.sha256(archive.read_bytes()).hexdigest()==os.environ['MODEL_SHA']
+          assert meta.get('algorithm')=='MaskablePPO' and meta.get('total_timesteps')==1536
+          assert meta.get('engine',{}).get('source_hash')=='6d8712c93022ba11'
+          assert (meta['engine']['features'],meta['engine']['cards'],meta['engine']['actions'])==(4017,447,245)
+          assert receipt['completed'] is True and receipt['policy']=='model' and receipt['seed']==93873
+          assert receipt['placements'][0]==8 and receipt['model_sha256']==os.environ['MODEL_SHA']
+          assert receipt['truncated_combats']==0 and receipt['turn_limit_end'] is False
+          assert receipt['git_sha']==os.environ['SOURCE_HEAD']
+          print(json.dumps({'model_steps':1536,'hash_passed':True,'one_model_game_completed':True,
+                            'heldout_seed_93874_incomplete':True,'champion_eligible':False}))
+          PY
+      - name: Prepare failed-evaluation provenance and immutable assets
+        run: |
+          mkdir -p publish "reports/$SESSION_ID"
+          cp recovered/checkpoints/resumed.zip publish/model.zip
+          cp recovered/checkpoints/resumed.metadata.json publish/model.metadata.json
+          cp "recovered/experiments/$SESSION_ID/001-93873.json" publish/model-match.json
+          python - <<'PY'
+          import json,os,hashlib
+          from pathlib import Path
+          error={
+            'schema':1,'status':'INCOMPLETE_HELDOUT_MODEL_SAFETY_LIMIT',
+            'failure_signature':'RuntimeError: Full-game safety limit exceeded',
+            'failed_evaluation_run':'https://github.com/'+os.environ['GITHUB_REPOSITORY']+'/actions/runs/'+os.environ['FAILED_EVAL_RUN'],
+            'first_heldout_seed':93874,'second_seed_not_checked':93875,
+            'attempted_paired_games':2,'completed_paired_games':0,
+            'reason':'Unmodified deterministic model failed its first independent heldout full-game before a valid paired score could be computed',
+            'source_successful_model_game_seed':93873,'source_model_game_rank':8,
+            'no_promotion':True,'not_a_benchmark_score':True,
+            'warning':'The previous source game completion does not establish general robustness or improvement.'
+          }
+          Path('publish/failed-heldout.json').write_text(json.dumps(error,indent=2)+'\n')
+          model=Path('publish/model.zip')
+          meta=Path('publish/model.metadata.json')
+          doc={
+            'schema':1,'status':'rejected_incomplete_heldout','champion':False,'eligible_for_promotion':False,
+            'release_tag':os.environ['RELEASE_TAG'],'source_run':int(os.environ['SOURCE_RUN']),
+            'failed_evaluation_run':int(os.environ['FAILED_EVAL_RUN']),
+            'source_head':os.environ['SOURCE_HEAD'],
+            'source_release':'v5-s-20261102-68099929-1408-41428692617',
+            'source_release_sha256':'a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632',
+            'source_steps':1408,'added_steps':128,'total_timesteps':1536,
+            'model_sha256':os.environ['MODEL_SHA'],
+            'metadata_sha256':hashlib.sha256(meta.read_bytes()).hexdigest(),
+            'full_game_seed':93873,'full_game_rank':8,'full_game_completed':True,
+            'failed_heldout_seed':93874,'paired_scores_available':False,
+            'digest_checked':True,'optimizer_state_zip_checked':True,
+            'source_load_and_optimizer_resume_run':int(os.environ['SOURCE_RUN']),
+            'independent_model_load_preflight_run':int(os.environ['FAILED_EVAL_RUN']),
+            'note':'Permanent rejected research checkpoint only; NOT latest, Best, Champion or verified improvement.'
+          }
+          Path('publish/lineage.json').write_text(json.dumps(doc,indent=2)+'\n')
+          Path('reports/'+os.environ['SESSION_ID']+'/003-heldout-failure.json').write_text(json.dumps(error,indent=2)+'\n')
+          PY
+      - name: Publish unique REJECTED unpromoted prerelease
+        run: |
+          if gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo 'Immutable rejected candidate tag already exists; refusing overwrite'; exit 1
+          fi
+          gh release create "$RELEASE_TAG" publish/model.zip publish/model.metadata.json publish/model-match.json publish/failed-heldout.json publish/lineage.json --repo "$GITHUB_REPOSITORY" --target "$SOURCE_HEAD" --prerelease --title "REJECTED V5 1536-step model $SESSION_ID" --notes "Research-only rejected model. Real MaskablePPO 1408-to-1536 continuation, source game 93873 completed rank 8; independent heldout seed 93874 failed the full-game safety limit. No paired score, no Champion, no Best. Retained for forensic loop diagnosis only."
+      - name: Verify published Release exact bytes, digest and manifest roundtrip
+        run: |
+          mkdir -p redownload
+          gh release download "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --dir redownload --pattern model.zip --pattern model.metadata.json --pattern lineage.json --pattern failed-heldout.json
+          cmp -s publish/model.zip redownload/model.zip
+          cmp -s publish/model.metadata.json redownload/model.metadata.json
+          test "$(sha256sum redownload/model.zip | cut -d' ' -f1)" = "$MODEL_SHA"
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          record=json.loads(Path('redownload/lineage.json').read_text())
+          error=json.loads(Path('redownload/failed-heldout.json').read_text())
+          assert record['model_sha256']==os.environ['MODEL_SHA'] and record['total_timesteps']==1536
+          assert record['champion'] is False and record['eligible_for_promotion'] is False
+          assert record['status']=='rejected_incomplete_heldout'
+          assert error['completed_paired_games']==0 and error['first_heldout_seed']==93874
+          Path('reports/'+os.environ['SESSION_ID']+'/004-rejected-release-custody.json').write_text(json.dumps({
+            'schema':1,'release_url':'https://github.com/'+os.environ['GITHUB_REPOSITORY']+'/releases/tag/'+os.environ['RELEASE_TAG'],
+            'model_sha256':os.environ['MODEL_SHA'],'total_timesteps':1536,'asset_roundtrip_verified':True,
+            'status':'rejected_incomplete_heldout','champion':False,
+            'source_run':int(os.environ['SOURCE_RUN']),'failed_evaluation_run':int(os.environ['FAILED_EVAL_RUN'])
+          },indent=2)+'\n')
+          PY
+      - name: Commit only own real failure and custody reports
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "reports/$SESSION_ID/003-heldout-failure.json" "reports/$SESSION_ID/004-rejected-release-custody.json"
+          git diff --cached --quiet || (git commit -m 'evidence: preserve rejected 1536-step model Release with failed heldout' && git push origin HEAD:"$GITHUB_REF_NAME")
+      - name: Keep machine-readable failure report on publication issues
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rejected-custody-s-20261102-860ff0fd-${{ github.run_id }}
+          path: |
+            publish/lineage.json
+            publish/failed-heldout.json
+            reports/s-20261102-860ff0fd/*.json
+          if-no-files-found: ignore
+          retention-days: 14
