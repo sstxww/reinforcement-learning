@@ -1,51 +1,66 @@
-"""Offline integrity checks. These are not a substitute for an actual PPO reload."""
+"""Existing main registry + independently checkable release archive preflight tests."""
 from __future__ import annotations
-
 import hashlib
 import json
 import zipfile
+from pathlib import Path
 
 import pytest
 
-from tavern_ai.contract import ACTIONS, CARDS, ENGINE_HASH, FEATURES
+from tavern_ai.contract import (
+    ACTIONS, CARDS, ENGINE_HASH, FEATURES,
+    CATALOG_SHA256, RULESET_ID, PATCH_SHA256, UPSTREAM_COMMIT,
+)
 from tavern_ai.model_registry import read_registry, verify_archive
 
 
-def fixture(tmp_path):
-    checkpoint = tmp_path / "checkpoint.zip"
+def fixture(tmp_path, schema=1):
+    checkpoint = tmp_path / "model.zip"
     with zipfile.ZipFile(checkpoint, "w") as archive:
         for name in ("data", "policy.pth", "policy.optimizer.pth"):
-            archive.writestr(name, b"test-only")
+            archive.writestr(name, b"offline-test-only")
+    sha = hashlib.sha256(checkpoint.read_bytes()).hexdigest()
     entry = {
-        "model_id": "test-1", "sha256": hashlib.sha256(checkpoint.read_bytes()).hexdigest(),
-        "status": "Unverified", "engine_source_hash": ENGINE_HASH,
-        "release_url": "https://github.com/sstxww/reinforcement-learning/releases/tag/test-1",
-        "training_steps": 128, "load_verified": False, "resume_verified": False,
-        "full_game_verified": False, "paired_eval_verified": False,
+        "id": "test-checkpoint", "checkpoint_sha256": sha, "training_steps": 128,
+        "role": "candidate_unpromoted",
+        "release_url": "https://github.com/sstxww/reinforcement-learning/releases/tag/test-checkpoint",
     }
-    metadata = tmp_path / "checkpoint.metadata.json"
-    metadata.write_text(json.dumps({"schema": 1, "algorithm": "MaskablePPO",
-        "total_timesteps": 128, "engine": {
-            "version": "1.1.0", "source_hash": ENGINE_HASH,
-            "features": FEATURES, "cards": CARDS, "actions": ACTIONS,
-        }}), encoding="utf-8")
+    metadata = tmp_path / "model.metadata.json"
+    engine = {
+        "version": "1.1.0", "source_hash": ENGINE_HASH,
+        "features": FEATURES, "cards": CARDS, "actions": ACTIONS,
+    }
+    payload = {"schema": schema, "algorithm": "MaskablePPO",
+               "total_timesteps": 128, "engine": engine}
+    if schema == 2:
+        payload["checkpoint_sha256"] = sha
+        payload["compatibility"] = {
+            "engine": engine, "catalog_sha256": CATALOG_SHA256,
+            "ruleset_id": RULESET_ID, "patch_sha256": PATCH_SHA256,
+            "upstream_commit": UPSTREAM_COMMIT,
+        }
+    metadata.write_text(json.dumps(payload), encoding="utf-8")
     return checkpoint, metadata, entry
 
 
-def test_real_registry_structure():
-    assert read_registry(__import__("pathlib").Path("models/registry.json"))["champion_id"] is None
+def test_reads_real_canonical_four_model_registry():
+    r = read_registry(Path("models/registry.json"))
+    assert r["champion"] is None and r["best"] is None
+    assert len(r["candidates"]) >= 4
+    assert r["latest"]["id"] == "v2-learning-41413557445"
 
 
-def test_preflight_accepts_valid_archive(tmp_path):
-    checkpoint, metadata, entry = fixture(tmp_path)
+@pytest.mark.parametrize("schema", [1, 2])
+def test_accepts_expected_structure_without_claiming_restore(tmp_path, schema):
+    checkpoint, metadata, entry = fixture(tmp_path, schema)
     result = verify_archive(entry, checkpoint, metadata)
-    assert result["optimizer_member_present"] is True
-    assert result["load_or_resume_verified"] is False
+    assert result["optimizer_member_present"]
+    assert not result["load_or_resume_verified_by_this_preflight"]
 
 
 def test_rejects_sha_mismatch(tmp_path):
     checkpoint, metadata, entry = fixture(tmp_path)
-    entry["sha256"] = "0" * 64
+    entry["checkpoint_sha256"] = "0" * 64
     with pytest.raises(ValueError, match="SHA256"):
         verify_archive(entry, checkpoint, metadata)
 
@@ -62,61 +77,44 @@ def test_rejects_incompatible_card_schema(tmp_path):
 def test_rejects_missing_optimizer(tmp_path):
     checkpoint, metadata, entry = fixture(tmp_path)
     with zipfile.ZipFile(checkpoint, "w") as archive:
-        archive.writestr("data", b"test-only")
-        archive.writestr("policy.pth", b"test-only")
-    entry["sha256"] = hashlib.sha256(checkpoint.read_bytes()).hexdigest()
+        archive.writestr("data", b"offline-test-only")
+        archive.writestr("policy.pth", b"offline-test-only")
+    entry["checkpoint_sha256"] = hashlib.sha256(checkpoint.read_bytes()).hexdigest()
     with pytest.raises(ValueError, match="optimizer"):
         verify_archive(entry, checkpoint, metadata)
 
 
-def test_never_invents_champion(tmp_path):
-    checkpoint, metadata, entry = fixture(tmp_path)
-    entry["status"] = "Champion"
+def test_rejects_champion_in_existing_registry(tmp_path):
+    data = read_registry(Path("models/registry.json"))
+    data["champion"] = data["latest"]["id"]
     path = tmp_path / "registry.json"
-    path.write_text(json.dumps({"schema": 1, "champion_id": "test-1", "models": [entry]}))
-    with pytest.raises(ValueError, match="gates"):
+    path.write_text(json.dumps(data))
+    with pytest.raises(ValueError, match="Champion"):
         read_registry(path)
 
 
-def test_duplicate_ids_are_rejected(tmp_path):
-    _, _, entry = fixture(tmp_path)
+def test_rejects_duplicate_existing_registry_ids(tmp_path):
+    data = read_registry(Path("models/registry.json"))
+    data["candidates"].append(dict(data["candidates"][0]))
     path = tmp_path / "registry.json"
-    path.write_text(json.dumps({"schema": 1, "champion_id": None,
-                                "models": [entry, dict(entry)]}))
+    path.write_text(json.dumps(data))
     with pytest.raises(ValueError, match="Duplicate"):
         read_registry(path)
 
 
-def test_schema2_actual_release_format(tmp_path):
-    checkpoint, metadata, entry = fixture(tmp_path)
+def test_schema2_catalog_fingerprint_must_match(tmp_path):
+    checkpoint, metadata, entry = fixture(tmp_path, 2)
     payload = json.loads(metadata.read_text())
-    from tavern_ai.contract import CATALOG_SHA256, RULESET_ID, PATCH_SHA256, UPSTREAM_COMMIT
-    payload["schema"] = 2
-    payload["checkpoint_sha256"] = entry["sha256"]
-    payload["compatibility"] = {
-        "engine": payload["engine"], "catalog_sha256": CATALOG_SHA256,
-        "ruleset_id": RULESET_ID, "patch_sha256": PATCH_SHA256,
-        "upstream_commit": UPSTREAM_COMMIT,
-    }
-    metadata.write_text(json.dumps(payload))
-    assert verify_archive(entry, checkpoint, metadata)["status"] == "integrity_preflight_passed"
     payload["compatibility"]["catalog_sha256"] = "incorrect"
     metadata.write_text(json.dumps(payload))
     with pytest.raises(ValueError, match="catalog"):
         verify_archive(entry, checkpoint, metadata)
 
 
-def test_schema2_embedded_sha_must_match_release(tmp_path):
-    checkpoint, metadata, entry = fixture(tmp_path)
+def test_schema2_embedded_checkpoint_hash_must_match(tmp_path):
+    checkpoint, metadata, entry = fixture(tmp_path, 2)
     payload = json.loads(metadata.read_text())
-    from tavern_ai.contract import CATALOG_SHA256, RULESET_ID, PATCH_SHA256, UPSTREAM_COMMIT
-    payload["schema"] = 2
     payload["checkpoint_sha256"] = "0" * 64
-    payload["compatibility"] = {
-        "engine": payload["engine"], "catalog_sha256": CATALOG_SHA256,
-        "ruleset_id": RULESET_ID, "patch_sha256": PATCH_SHA256,
-        "upstream_commit": UPSTREAM_COMMIT,
-    }
     metadata.write_text(json.dumps(payload))
     with pytest.raises(ValueError, match="Embedded"):
         verify_archive(entry, checkpoint, metadata)
