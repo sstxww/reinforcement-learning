@@ -6,6 +6,9 @@ ending the turn after a bounded number of actions improves reliability and tempo
 from __future__ import annotations
 import numpy as np
 
+UPGRADE_TURNS = frozenset({2, 4, 6, 8, 10})
+MAX_ACTIONS_PER_TURN = 32
+
 class BaselinePolicy:
     def __init__(self, max_actions_per_turn: int = 36):
         if max_actions_per_turn < 1:
