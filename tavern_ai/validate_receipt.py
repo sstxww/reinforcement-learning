@@ -11,6 +11,8 @@ def validate(p:dict):
     places=p.get("placements")
     if not isinstance(places,list) or len(places)!=8 or any(type(x)!=int or x<1 or x>8 for x in places):
         raise ValueError("Invalid eight-seat placement result")
+    if sorted(places)!=list(range(1,9)):
+        raise ValueError("Eight-seat placements must be a permutation of 1..8")
     if type(p.get("turns"))!=int or p["turns"]<=0 or type(p.get("decisions"))!=int or p["decisions"]<=0:
         raise ValueError("Missing real game decisions/turns")
     if p.get("truncated_combats",0) or p.get("turn_limit_end",False):

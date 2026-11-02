@@ -22,10 +22,11 @@ def test_authentic_shape_passes():
     assert validate_integrity(authentic_shape())
 
 
-def test_real_legacy_gap_duplicate_ranks():
+def test_base_and_strict_reject_duplicate_ranks():
     false_receipt = copy.deepcopy(authentic_shape())
     false_receipt["placements"] = [1, 1, 3, 4, 5, 6, 7, 8]
-    assert legacy_validate(false_receipt)
+    with pytest.raises(ValueError, match="permutation"):
+        legacy_validate(false_receipt)
     with pytest.raises(ValueError, match="permutation"):
         validate_integrity(false_receipt)
 
