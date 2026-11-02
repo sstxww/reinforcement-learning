@@ -1,0 +1,18 @@
+{
+  "schema": 1,
+  "session_id": "s-20261103-d494b86e",
+  "task_key": "coordination/atomic-claim-v1",
+  "claim_ref": "refs/heads/claims/v7/coordination-atomic-task-claim-v1",
+  "base_main_sha": "c5edec2e3261dacdf3908796ebfe0457fb76c02e",
+  "owned_paths": [
+    "scripts/v7_task_claim_d494b86e.py",
+    "tests/test_v7_task_claim_d494b86e.py",
+    ".github/workflows/v7-claim-s-20261103-d494b86e.yml",
+    "research/sessions/s-20261103-d494b86e/",
+    "research/knowledge/proposals/s-20261103-d494b86e-001.md"
+  ],
+  "work_branch": "agent/s-20261103-d494b86e/optimization-001",
+  "claim_scope": "one_task_only_not_integration_mutex",
+  "status": "claimed_and_working",
+  "expiry_policy": "no_automatic_takeover; explicit_handoff_required"
+}
