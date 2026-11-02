@@ -1,0 +1,35 @@
+{
+  "schema": 1,
+  "session": "s-20261102-704cec7b",
+  "experiment": "one-factor empty-board legal-buy intervention",
+  "policy_weights": "v2-learning-41413557445",
+  "engine_source_hash": "6d8712c93022ba11",
+  "seeded_pairs": [
+    {
+      "seed": 88301,
+      "reference_rank": 8,
+      "candidate_rank": 8,
+      "rank_delta_candidate_minus_reference": 0,
+      "reference_buys": 0,
+      "candidate_buys": 9,
+      "explicit_buy_overrides": 8,
+      "reference_forced_ends": 1,
+      "candidate_forced_ends": 6
+    },
+    {
+      "seed": 88302,
+      "reference_rank": 8,
+      "candidate_rank": 8,
+      "rank_delta_candidate_minus_reference": 0,
+      "reference_buys": 0,
+      "candidate_buys": 4,
+      "explicit_buy_overrides": 4,
+      "reference_forced_ends": 0,
+      "candidate_forced_ends": 2
+    }
+  ],
+  "games_total": 4,
+  "gradient_steps_new": 0,
+  "promotion_eligible": false,
+  "interpretation": "Tiny n=2, descriptive only. Guarded reference and intervened candidate are not raw-model results."
+}
