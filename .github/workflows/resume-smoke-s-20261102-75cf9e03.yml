@@ -1,10 +1,6 @@
 name: V5 bounded genuine Release resume probe s-20261102-75cf9e03
 on:
-  push:
-    branches:
-      - agent/s-20261102-75cf9e03/optimization-001
-    paths:
-      - .github/workflows/resume-smoke-s-20261102-75cf9e03.yml
+  workflow_dispatch:
 permissions:
   contents: write
 concurrency:
@@ -30,6 +26,7 @@ jobs:
           bash scripts/bootstrap_engine.sh
       - name: Independently download V2 Release weights and metadata
         run: |
+          set -euo pipefail
           mkdir -p checkpoints/source checkpoints/next reports/s-20261102-75cf9e03
           gh release download v2-learning-41413557445 --repo "$GITHUB_REPOSITORY" --pattern model.zip --dir checkpoints/source
           gh release download v2-learning-41413557445 --repo "$GITHUB_REPOSITORY" --pattern model.metadata.json --dir checkpoints/source

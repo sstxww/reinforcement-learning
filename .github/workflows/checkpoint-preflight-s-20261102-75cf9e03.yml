@@ -1,12 +1,6 @@
 name: Checkpoint preflight s-20261102-75cf9e03
 on:
-  push:
-    branches:
-      - agent/s-20261102-75cf9e03/optimization-001
-    paths:
-      - tavern_ai/checkpoint_preflight.py
-      - tests/test_checkpoint_preflight.py
-      - .github/workflows/checkpoint-preflight-s-20261102-75cf9e03.yml
+  workflow_dispatch:
 permissions:
   contents: write
 concurrency:
