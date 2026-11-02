@@ -1,0 +1,128 @@
+{
+  "session_id": "s-20261102-b34940b0",
+  "round": 2,
+  "base_main_sha": "315b068bac5ab6d8403c3c9b18f8c101c0cded5d",
+  "run_id": "41416720643",
+  "git_sha": "a0b692ed302093aadb77a1ad669465b259d02b29",
+  "engine_version": "1.1.0",
+  "engine_source_hash": "6d8712c93022ba11",
+  "actual_ppo_steps": 0,
+  "type": "isolated deterministic rule ablation",
+  "control": {
+    "games": 8,
+    "ranks": [
+      4,
+      8,
+      6,
+      5,
+      8,
+      6,
+      8,
+      8
+    ],
+    "mean_rank": 6.625,
+    "top4_rate": 0.125,
+    "first_rate": 0.0,
+    "seeds": [
+      65201,
+      65202,
+      65203,
+      65204,
+      65301,
+      65302,
+      65303,
+      65304
+    ],
+    "completed": true,
+    "truncated_combats": 0
+  },
+  "global_last": {
+    "games": 8,
+    "ranks": [
+      8,
+      8,
+      8,
+      8,
+      7,
+      8,
+      8,
+      8
+    ],
+    "mean_rank": 7.875,
+    "top4_rate": 0.0,
+    "first_rate": 0.0,
+    "seeds": [
+      65201,
+      65202,
+      65203,
+      65204,
+      65301,
+      65302,
+      65303,
+      65304
+    ],
+    "completed": true,
+    "truncated_combats": 0
+  },
+  "posthero_last": {
+    "games": 8,
+    "ranks": [
+      1,
+      8,
+      8,
+      8,
+      8,
+      7,
+      8,
+      8
+    ],
+    "mean_rank": 7,
+    "top4_rate": 0.125,
+    "first_rate": 0.125,
+    "seeds": [
+      65201,
+      65202,
+      65203,
+      65204,
+      65301,
+      65302,
+      65303,
+      65304
+    ],
+    "completed": true,
+    "truncated_combats": 0
+  },
+  "posthero_minus_global_rank_deltas": [
+    -7,
+    0,
+    0,
+    0,
+    1,
+    -1,
+    0,
+    0
+  ],
+  "posthero_minus_baseline_rank_deltas": [
+    -3,
+    0,
+    2,
+    3,
+    0,
+    1,
+    0,
+    0
+  ],
+  "global_minus_baseline_rank_deltas": [
+    4,
+    0,
+    2,
+    3,
+    -1,
+    2,
+    0,
+    0
+  ],
+  "posthero_generic_multi_choices": 39,
+  "global_generic_multi_choices": 67,
+  "interpretation": "Generic Choose 30..45 still includes Discover/target/trinket; turn 0 preserves HeroSelect, not a discovery-only experiment. Small matched-sample descriptive statistics only."
+}
