@@ -82,3 +82,16 @@ def test_registry_enforces_unique_ids_and_no_unverified_champion(tmp_path):
     file.write_text(json.dumps(data), encoding="utf-8")
     with pytest.raises(ValueError, match="Duplicate"):
         read_registry(file)
+
+def test_schema2_checkpoint_is_supported_and_hash_checked(tmp_path):
+    entry, archive, metadata = make_case(tmp_path)
+    obj = json.loads(metadata.read_text())
+    obj["schema"] = 2
+    obj["compatibility"] = {"engine": obj["engine"]}
+    obj["checkpoint_sha256"] = entry["sha256"]
+    metadata.write_text(json.dumps(obj), encoding="utf-8")
+    assert verify_local(entry, archive, metadata)["engine_metadata_verified"]
+    obj["checkpoint_sha256"] = "f" * 64
+    metadata.write_text(json.dumps(obj), encoding="utf-8")
+    with pytest.raises(ValueError, match="metadata SHA-256"):
+        verify_local(entry, archive, metadata)

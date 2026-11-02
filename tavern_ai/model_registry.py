@@ -92,7 +92,7 @@ def verify_local(model: dict, archive: Path, metadata: Path, *, load: bool = Fal
     except zipfile.BadZipFile as exc:
         raise ValueError("Invalid checkpoint ZIP") from exc
     meta = json.loads(metadata.read_text(encoding="utf-8"))
-    if not isinstance(meta, dict) or meta.get("schema") != 1:
+    if not isinstance(meta, dict) or meta.get("schema") not in (1, 2):
         raise ValueError("Invalid checkpoint metadata schema")
     engine = meta.get("engine")
     if not isinstance(engine, dict):
@@ -102,6 +102,12 @@ def verify_local(model: dict, archive: Path, metadata: Path, *, load: bool = Fal
     for k, expected_value in expected.items():
         if engine.get(k) != expected_value:
             raise ValueError(f"Incompatible checkpoint engine: {k}")
+    if meta.get("schema") == 2:
+        compatibility = meta.get("compatibility")
+        if not isinstance(compatibility, dict) or compatibility.get("engine") != engine:
+            raise ValueError("Incompatible V2 checkpoint compatibility object")
+    if meta.get("checkpoint_sha256") is not None and meta["checkpoint_sha256"] != actual:
+        raise ValueError("Checkpoint metadata SHA-256 mismatch")
     if meta.get("algorithm") != "MaskablePPO":
         raise ValueError("Unexpected checkpoint algorithm")
     if type(meta.get("total_timesteps")) is not int or meta["total_timesteps"] < 1:
@@ -126,7 +132,7 @@ def verify_local(model: dict, archive: Path, metadata: Path, *, load: bool = Fal
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--registry", type=Path, default=Path("models/registry.json"))
+    parser.add_argument("--registry", type=Path, default=Path("models/release_inventory_v5.json"))
     parser.add_argument("--model-id")
     parser.add_argument("--checkpoint", type=Path)
     parser.add_argument("--metadata", type=Path)

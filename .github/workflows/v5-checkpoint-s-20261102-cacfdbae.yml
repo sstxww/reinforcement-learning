@@ -5,7 +5,7 @@ on:
     branches: ['agent/s-20261102-cacfdbae/optimization-001']
     paths:
       - '.github/workflows/v5-checkpoint-s-20261102-cacfdbae.yml'
-      - 'models/registry.json'
+      - 'models/release_inventory_v5.json'
       - 'tavern_ai/model_registry.py'
       - 'tests/test_model_registry.py'
 
@@ -47,7 +47,7 @@ jobs:
         run: |
           mkdir -p checkpoints "reports/${AGENT_ID}"
           gh release download "$MODEL_ID" --repo "$GITHUB_REPOSITORY" --pattern 'model.*' --dir checkpoints
-          python -m tavern_ai.model_registry --model-id "$MODEL_ID" \
+          python -m tavern_ai.model_registry --registry models/release_inventory_v5.json --model-id "$MODEL_ID" \
             --checkpoint checkpoints/model.zip \
             --metadata checkpoints/model.metadata.json --load \
             | tee "reports/${AGENT_ID}/release-audit.json"
@@ -64,7 +64,9 @@ jobs:
         run: |
           python -m tavern_ai.train --resume checkpoints/model.zip \
             --steps 128 --seed 61102 --out checkpoints/resumed.zip \
-            | tee "reports/${AGENT_ID}/resume-training.json"
+            | tee /tmp/v5-resume-training.log
+          tail -n 1 /tmp/v5-resume-training.log > "reports/${AGENT_ID}/resume-training.json"
+          python -m json.tool "reports/${AGENT_ID}/resume-training.json" > /dev/null
           python - <<'PY'
           import json
           old=json.load(open('checkpoints/model.metadata.json'))
@@ -100,7 +102,7 @@ jobs:
             echo "Existing immutable session release found; do not overwrite it"
           else
             gh release create "$TAG" checkpoints/resumed.zip#model.zip checkpoints/resumed.metadata.json#model.metadata.json \
-              --repo "$GITHUB_REPOSITORY" --prerelease \
+              --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --prerelease \
               --title "Unpromoted V5 128-step resume smoke candidate s-20261102-cacfdbae" \
               --notes "Engineering-only smoke checkpoint. No reliable rank gain or Champion promotion. Source v2-learning-41413557445; verify SHA and own real-game receipts before use."
           fi
