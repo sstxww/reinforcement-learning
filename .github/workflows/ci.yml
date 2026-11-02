@@ -1,0 +1,51 @@
+name: CI - full-match gate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  tests-and-full-match:
+    runs-on: ubuntu-latest
+    timeout-minutes: 70
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install unit-test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[test]'
+      - name: Unit tests and PR evidence
+        env:
+          GITHUB_HEAD_REF: ${{ github.head_ref }}
+        run: |
+          python -m pytest
+          python scripts/check_pr_evidence.py
+      - name: Install pinned engine and verified patch
+        run: bash scripts/bootstrap_engine.sh
+      - name: Confirm engine layout
+        run: python -m tavern_ai.contract
+      - name: Real full eight-seat simulated match
+        shell: bash
+        env:
+          GITHUB_HEAD_REF: ${{ github.head_ref }}
+        run: |
+          AGENT_ID="ci-$(echo "${GITHUB_HEAD_REF:-main}" | tr '/' '_')"
+          python -m tavern_ai.canary --agent-id "$AGENT_ID" \
+            --seed 1001 --policy baseline --receipt outputs/ci-full-match.json
+          python -m tavern_ai.validate_receipt outputs/ci-full-match.json
+      - name: Preserve CI evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ci-full-match-${{ github.run_id }}
+          path: outputs/*.json
+          if-no-files-found: ignore
+          retention-days: 30
