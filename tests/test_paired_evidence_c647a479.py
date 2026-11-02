@@ -72,3 +72,11 @@ def test_controlled_seat_index_and_wilson_rate():
 def test_guard_variant_even_without_interventions():
     c=receipt(1,8);c['policy_variant']='hero_cancel_guard_v1'
     assert paired_report([c],[receipt(1,8,policy='baseline')])['candidate_kind']=='guarded_model'
+
+
+def test_real_legacy_model_guarded_label_never_looks_like_raw():
+    c=receipt(45111,8)
+    c['policy']='model_guarded'
+    c['guarded']=False
+    result=paired_report([c],[receipt(45111,6,policy='baseline')])
+    assert result['candidate_kind']=='guarded_model'
