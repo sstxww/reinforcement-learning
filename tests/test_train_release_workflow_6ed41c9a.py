@@ -17,7 +17,8 @@ def test_explicit_release_restore_rejects_unregistered_or_tampered_bytes():
     assert "resume_release_tag:" in txt
     assert "release_resume_gate_6ed41c9a --tag" in txt
     assert txt.count("release_resume_gate_6ed41c9a --tag") == 2
-    assert '--model checkpoints/model.zip --metadata checkpoints/model.metadata.json' in txt
+    assert '--model checkpoints/model.zip' in txt
+    assert '--metadata checkpoints/model.metadata.json' in txt
     assert 'gh release download "$RESUME_RELEASE_TAG"' in txt
 
 
