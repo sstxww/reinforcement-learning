@@ -3,6 +3,9 @@ on:
   push:
     branches:
       - agent/s-20261102-107cfc34/optimization-001
+    paths:
+      - tavern_ai/seat_balance_107cfc34.py
+      - tests/test_seat_balance_107cfc34.py
 permissions:
   contents: read
 concurrency:
