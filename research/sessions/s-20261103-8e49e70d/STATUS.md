@@ -1,7 +1,7 @@
 # AutoTavern V7 — s-20261103-8e49e70d
 
 - **TASK_KEY:** `ops/session-workflow-trigger-scope`
-- **ROUND:** 001; **role:** P0/P1 Actions budget REPAIRER / REVIEWER; **state:** independent evidence verified; PR exact-head gate pending; NOT integrated.
+- **ROUND:** 001; **role:** P0/P1 Actions budget REPAIRER / REVIEWER; **state:** independent evidence verified; **PR #230 non-Draft**, exact-head gate pending; NOT integrated.
 - **Atomic task claim:** `claims/v7/session-workflow-trigger-scope`, commit `2801199105c260aa7dea0716b1332fb45a4aeee0`. It grants only this task, **not** a main merge lock.
 - **Base main:** `c1b828734527bae6141805581693d890cc3bff94`; observed main CI **success** [41512315964](https://github.com/sstxww/reinforcement-learning/actions/runs/41512315964).
 - **Branch:** `agent/s-20261103-8e49e70d/optimization-001`; implementation pre-handoff commit `c468573aedc8d18997d9fe082de54e53a6a0a41b`.
@@ -14,4 +14,5 @@
 - **Reviewed PR:** #184, #185 for serial integration risk; no PR merged. Main is unprotected and no proven exclusive merge ownership, so **no main merge call**.
 - **Static scan result:** original `reports/s-20261103-8e49e70d/001-trigger-scope.json`, SHA256 `37fdb87f722dfb2524ac71d1ece762a20c9310cb984a2aac07a6b9d406f70dff`: 43 total workflows, 30 session-scoped, **0 findings** at run SHA. No actual billing savings claimed. Committed in `512515416a4e8541e092b1d26cb4161e15a84921`. Own one-shot workflow was removed in commit `4e1007a34b55fbd0aa8e7ef88f83e7d671c42767` so main does not accumulate another permanent session job.
 - **Remaining blocker:** latest exact-head PR CI, independent reviewer and proven globally exclusive main integration; no verified exclusive merge lease.
-- **Next executable action:** open non-Draft PR against current main, confirm exact PR head CI including independent seeded eight-seat game, review current main compatibility. Hand PR to exclusive integrator only when review/merge gates fulfilled. After merge confirm new main CI. No model training/Release in this bounded trigger scope task.
+- **PR:** [#230](https://github.com/sstxww/reinforcement-learning/pull/230), non-Draft, base `main@c1b828734527bae6141805581693d890cc3bff94`, head SHA before this handoff edit `8925fc55464a0c26ef51110f7808c4e8a8a634fd`; final HEAD/CI must be refreshed after this commit.
+- **Next executable action:** verify current exact PR HEAD CI including independent seeded eight-seat game, review current main compatibility. Hand PR to exclusive integrator only when review/merge gates fulfilled. After merge confirm new main CI. No model training/Release in this bounded trigger scope task.
