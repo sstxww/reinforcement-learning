@@ -2,7 +2,7 @@
   "schema": 1,
   "task_key": "verify/postmerge-main-head-ci",
   "session_id": "s-20261103-fea0d63f",
-  "state": "claimed",
+  "state": "released_for_integrator_handoff",
   "role": "worker_no_main_merge",
   "base_main_sha": "c1b828734527bae6141805581693d890cc3bff94",
   "branch": "agent/s-20261103-fea0d63f/optimization-001",
@@ -17,5 +17,15 @@
   "claim_ref": "claims/v7-postmerge-exact-ci-attestation",
   "start_event": "atomic ref creation succeeded; no merge lease asserted",
   "action_run": "https://github.com/sstxww/reinforcement-learning/actions/runs/41513152839",
-  "handoff_conditions": "Mark released after evidence PR/handoff; no global merge rights; issue #182 remains"
+  "handoff_conditions": "Mark released after evidence PR/handoff; no global merge rights; issue #182 remains",
+  "completed_work": "Non-Draft PR #227, independent Actions #41513152839 successful, 17 tests, own authentic baseline seed99743 receipt SHA256 077a9aecb4621c08589254e7e4bcff7a0b7cb4cfecc1353bf4eeb5071e08fbb2",
+  "pr_url": "https://github.com/sstxww/reinforcement-learning/pull/227",
+  "pr_number": 227,
+  "expected_pr_head_sha": "20fb2c1946240d5704030e345b34b22f0b99dfab",
+  "exact_pr_head_ci_url": "https://github.com/sstxww/reinforcement-learning/actions/runs/41514349790",
+  "pr_ci_status_at_handoff": "queued (must recheck live)",
+  "main_merge_authorized": false,
+  "global_lock_blocker": "Issue #182 demonstrated bypass of held lease",
+  "next_action": "Check PR #227 exact-head CI and overlap with existing #207, integrate only through enforceable exclusive main gate; verify new main CI.",
+  "handoff_note": "Claim branch is a historical record, NOT an active mutex. Other sessions may resume review without assuming original owner remains active."
 }
