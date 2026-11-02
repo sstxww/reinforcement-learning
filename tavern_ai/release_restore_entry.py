@@ -29,6 +29,33 @@ def choose_model(registry: dict, index: dict, requested: str = "latest") -> dict
     return matches[0]
 
 
+
+def _install_verified_pair(weights: Path, metadata: Path,
+                           target_model: Path, target_meta: Path) -> None:
+    """Install verified files without ever clobbering an existing checkpoint.
+
+    Staged files live on the target filesystem. Hard-link creation is exclusive:
+    two concurrent restorers cannot both claim the same destination. If the
+    second link fails, remove only the first link created by this call. A
+    process crash between links can still leave an orphan; subsequent restores
+    fail closed rather than silently replacing it.
+    """
+    installed: list[tuple[Path, Path]] = []
+    try:
+        for source, destination in ((weights, target_model), (metadata, target_meta)):
+            os.link(source, destination)
+            installed.append((source, destination))
+    except BaseException:
+        for source, destination in reversed(installed):
+            try:
+                # Do not unlink a path that another process replaced meanwhile.
+                if destination.samefile(source):
+                    destination.unlink()
+            except OSError:
+                pass
+        raise
+
+
 def restore(registry_path: Path, index_path: Path, output_dir: Path,
             requested: str = "latest", check_load: bool = True) -> dict:
     """Download both versioned Release assets and check them before installing."""
@@ -59,8 +86,7 @@ def restore(registry_path: Path, index_path: Path, output_dir: Path,
         if audited["total_timesteps"] != entry["training_steps"]:
             raise ValueError("Registered checkpoint timestep mismatch")
         # Both checks finish before either file is moved into the training path.
-        os.replace(weights, target_model)
-        os.replace(metadata, target_meta)
+        _install_verified_pair(weights, metadata, target_model, target_meta)
     return {"model_id": model_id, "release": entry["release_url"],
             "expected_sha256": entry["checkpoint_sha256"],
             "total_timesteps": entry["training_steps"],

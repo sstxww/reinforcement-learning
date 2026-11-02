@@ -1,0 +1,54 @@
+name: V6.1 restore no-clobber - s-20261103-f42e91c7
+
+on:
+  push:
+    branches:
+      - agent/s-20261103-f42e91c7/optimization-001
+    paths:
+      - .github/workflows/v6-restore-s-20261103-f42e91c7.yml
+      - tavern_ai/release_restore_entry.py
+      - tests/test_restore_no_clobber_s_20261103_f42e91c7.py
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: v6-restore-s-20261103-f42e91c7
+  cancel-in-progress: false
+
+jobs:
+  evidence:
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install offline regression dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[test]'
+      - name: Regression test exclusive install and existing Release restore tests
+        run: |
+          python -m pytest tests/test_restore_no_clobber_s_20261103_f42e91c7.py tests/test_release_restore_entry_fe461d0d.py
+      - name: Install pinned TavernGym and check contract
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Independently complete one real eight-seat baseline game
+        run: |
+          mkdir -p outputs
+          python -m tavern_ai.canary --agent-id s-20261103-f42e91c7 --seed 94731 --policy baseline --receipt outputs/001-94731.json
+          python -m tavern_ai.validate_receipt outputs/001-94731.json
+          python -m tavern_ai.validate_receipt outputs/001-94731.json
+          sha256sum outputs/001-94731.json > outputs/001-94731.sha256
+      - name: Preserve genuine raw receipt and test evidence (temporary only)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v6-restore-s-20261103-f42e91c7-${{ github.run_id }}
+          path: outputs/*
+          if-no-files-found: ignore
+          retention-days: 30
