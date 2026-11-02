@@ -1,0 +1,49 @@
+{
+  "policy": "baseline",
+  "games": 6,
+  "by_seat": {
+    "0": {
+      "games": 2,
+      "seeds": [
+        41021,
+        41022
+      ],
+      "placements": [
+        8,
+        8
+      ],
+      "mean_placement": 8,
+      "top4_rate": 0.0,
+      "first_place_rate": 0.0
+    },
+    "3": {
+      "games": 2,
+      "seeds": [
+        41021,
+        41022
+      ],
+      "placements": [
+        7,
+        7
+      ],
+      "mean_placement": 7,
+      "top4_rate": 0.0,
+      "first_place_rate": 0.0
+    },
+    "6": {
+      "games": 2,
+      "seeds": [
+        41021,
+        41022
+      ],
+      "placements": [
+        8,
+        8
+      ],
+      "mean_placement": 8,
+      "top4_rate": 0.0,
+      "first_place_rate": 0.0
+    }
+  },
+  "interpretation": "Descriptive only: seat assignments may change heroes/shop RNG and bot outcomes; small samples cannot establish seat advantage or policy improvement."
+}
