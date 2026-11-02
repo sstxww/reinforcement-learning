@@ -1,0 +1,66 @@
+name: Session s-20261102-7fd2e223 - independent hero-power heldout validation
+
+on:
+  push:
+    branches:
+      - agent/s-20261102-7fd2e223/optimization-001
+    paths:
+      - '.github/workflows/experiment-s-20261102-7fd2e223-heldout.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: experiment-s-20261102-7fd2e223
+  cancel-in-progress: false
+
+jobs:
+  heldout-real-games:
+    runs-on: ubuntu-latest
+    timeout-minutes: 65
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install test dependencies
+        run: python -m pip install -e '.[test]'
+      - name: Run all regressions
+        run: python -m pytest
+      - name: Verify real pinned TavernGym and observe2
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Evaluate eight additional never-before-used seeds (8 plus 8 games)
+        run: |
+          python -m tavern_ai.hero_power_probe_7fd2e223 \
+            --agent-id s-20261102-7fd2e223 --start-seed 73105 --games 8 \
+            --receipts experiments/s-20261102-7fd2e223 \
+            --report reports/s-20261102-7fd2e223/paired-heldout-001.json
+          for seed in 73105 73106 73107 73108 73109 73110 73111 73112; do
+            python -m tavern_ai.validate_receipt "experiments/s-20261102-7fd2e223/001-${seed}.json"
+            python -m tavern_ai.validate_receipt "experiments/s-20261102-7fd2e223/001-control-${seed}.json"
+          done
+      - name: Commit only independent real-game results
+        run: |
+          test "$GITHUB_REF_NAME" = "agent/s-20261102-7fd2e223/optimization-001"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add experiments/s-20261102-7fd2e223/ reports/s-20261102-7fd2e223/
+          git diff --cached --quiet && exit 0
+          git commit -m "results(s-20261102-7fd2e223): verify independent heldout seeds"
+          git pull --rebase origin "$GITHUB_REF_NAME"
+          git push origin HEAD:"$GITHUB_REF_NAME"
+      - name: Preserve short-lived heldout evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: s-20261102-7fd2e223-heldout-${{ github.run_id }}
+          path: |
+            experiments/s-20261102-7fd2e223/*.json
+            reports/s-20261102-7fd2e223/*.json
+          if-no-files-found: ignore
+          retention-days: 30

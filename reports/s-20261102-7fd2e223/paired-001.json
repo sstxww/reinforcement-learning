@@ -1,0 +1,53 @@
+{
+  "session_id": "s-20261102-7fd2e223",
+  "hypothesis": "One legal hero power only when baseline would EndTurn",
+  "engine_source_hash": "6d8712c93022ba11",
+  "baseline": {
+    "games": 4,
+    "mean_placement": 7.25,
+    "top4_rate": 0.0,
+    "first_place_rate": 0.0,
+    "placements": [
+      7,
+      7,
+      8,
+      7
+    ],
+    "seeds": [
+      73101,
+      73102,
+      73103,
+      73104
+    ],
+    "total_hero_power_uses": 0
+  },
+  "candidate": {
+    "games": 4,
+    "mean_placement": 5.25,
+    "top4_rate": 0.25,
+    "first_place_rate": 0.0,
+    "placements": [
+      4,
+      5,
+      5,
+      7
+    ],
+    "seeds": [
+      73101,
+      73102,
+      73103,
+      73104
+    ],
+    "total_hero_power_uses": 26
+  },
+  "paired_placement_deltas": [
+    -3,
+    -2,
+    -3,
+    0
+  ],
+  "mean_placement_delta": -2.0,
+  "claim": "Exploratory: not evidence of competitive improvement",
+  "model_checkpoint": null,
+  "training_steps": 0
+}

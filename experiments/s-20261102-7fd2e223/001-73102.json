@@ -1,0 +1,31 @@
+{
+  "schema": 1,
+  "timestamp": "2026-11-02T08:49:13.184246+00:00",
+  "environment": "TavernGym",
+  "engine_source_hash": "6d8712c93022ba11",
+  "engine_version": "1.1.0",
+  "agent_id": "s-20261102-7fd2e223",
+  "policy": "idle-hero-power",
+  "seed": 73102,
+  "completed": true,
+  "turns": 15,
+  "decisions": 87,
+  "placements": [
+    5,
+    4,
+    6,
+    1,
+    7,
+    8,
+    2,
+    3
+  ],
+  "truncated_combats": 0,
+  "turn_limit_end": false,
+  "illegal_actions": 0,
+  "hero_power_uses": 10,
+  "git_sha": "1051701249f6652605ab9a914c4f65e457961d7e",
+  "model_sha256": null,
+  "training_steps": 0,
+  "workflow_run_url": "https://github.com/sstxww/reinforcement-learning/actions/runs/41415621730"
+}
