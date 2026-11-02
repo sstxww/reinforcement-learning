@@ -1,0 +1,55 @@
+name: Buy-opportunity audit s-20261102-83d91476
+on:
+  push:
+    branches:
+      - agent/s-20261102-83d91476/optimization-001
+    paths:
+      - 'tavern_ai/buy_opportunities_83d91476.py'
+      - 'tests/test_buy_opportunities_83d91476.py'
+      - '.github/workflows/buy-opportunities-s-20261102-83d91476.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: buy-opportunities-s-20261102-83d91476
+  cancel-in-progress: false
+
+jobs:
+  opportunity-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 95
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install project with model and tests
+        run: |
+          python -m pip install -e '.[train,test]'
+          python -m pytest -q tests/test_buy_opportunities_83d91476.py
+      - name: Verify pinned real TavernGym
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Download immutable unpromoted V2 model and verify trusted digest
+        run: |
+          mkdir -p checkpoints
+          gh release download v2-learning-41413557445 --repo "$GITHUB_REPOSITORY" --pattern 'model.zip' --dir checkpoints
+          echo '73bde2666426cecce39f135980a897bb2cd4a7d70783ba04c9c0d29477a6664a  checkpoints/model.zip' | sha256sum -c -
+      - name: Real paired full eight-seat games (not ranked Arena)
+        run: |
+          python -m tavern_ai.buy_opportunities_83d91476 --model checkpoints/model.zip \
+            --expected-sha256 73bde2666426cecce39f135980a897bb2cd4a7d70783ba04c9c0d29477a6664a \
+            --seeds 45111 45112 --out outputs/opportunities.json
+      - name: Preserve machine-readable real-game diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: opportunity-audit-s-20261102-83d91476-${{ github.run_id }}
+          path: outputs/opportunities.json
+          if-no-files-found: ignore
+          retention-days: 30
