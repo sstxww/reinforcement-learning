@@ -2,7 +2,7 @@
 from __future__ import annotations
 import argparse,hashlib,json
 from pathlib import Path
-from .contract import verify_engine
+from .contract import verify_engine,CATALOG_SHA256,RULESET_ID,PATCH_SHA256,UPSTREAM_COMMIT
 from .env import TavernEnv
 
 def sha256(path:Path)->str:
@@ -11,15 +11,18 @@ def sha256(path:Path)->str:
 def run(steps:int,seed:int,model_out:Path,resume:Path|None=None):
     from sb3_contrib import MaskablePPO
     from .model import TavernExtractor
+    import torch
+    torch.set_num_threads(1)
     if steps<128:raise ValueError("steps must be >=128")
     engine=verify_engine()
+    compatibility={"engine":engine,"catalog_sha256":CATALOG_SHA256,"ruleset_id":RULESET_ID,"patch_sha256":PATCH_SHA256,"upstream_commit":UPSTREAM_COMMIT}
     env=TavernEnv(seed=seed)
     if resume is not None:
         if not resume.is_file():raise FileNotFoundError(resume)
         meta_path=resume.with_suffix(".metadata.json")
         if not meta_path.is_file():raise ValueError("Missing checkpoint compatibility metadata")
         prev=json.loads(meta_path.read_text(encoding="utf-8"))
-        if prev["engine"]!=engine:raise ValueError("Checkpoint engine or card vocabulary mismatch")
+        if prev.get("compatibility")!=compatibility:raise ValueError("Checkpoint engine or card vocabulary mismatch")
         if prev.get("checkpoint_sha256") and sha256(resume)!=prev["checkpoint_sha256"]:
             raise ValueError("Checkpoint hash mismatch; aborting unsafe resume")
         model=MaskablePPO.load(str(resume),env=env,device="cpu")
