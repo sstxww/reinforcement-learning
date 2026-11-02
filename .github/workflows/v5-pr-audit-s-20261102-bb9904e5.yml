@@ -1,0 +1,59 @@
+name: V5 read-only PR integration audit s-20261102-bb9904e5
+
+on:
+  push:
+    branches:
+      - 'agent/s-20261102-bb9904e5/optimization-001'
+    paths:
+      - 'scripts/v5_pr_gate_bb9904e5.py'
+      - 'tests/test_v5_pr_gate_bb9904e5.py'
+
+permissions:
+  contents: read
+  actions: read
+  pull-requests: read
+
+concurrency:
+  group: v5-pr-audit-s-20261102-bb9904e5
+  cancel-in-progress: false
+
+jobs:
+  integration-audit-and-real-canary:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install test dependencies
+        run: python -m pip install -e '.[test]'
+      - name: Validate conservative PR integration gate
+        run: python -m pytest tests/test_v5_pr_gate_bb9904e5.py
+      - name: Inspect every current open PR without mutating GitHub
+        run: |
+          python scripts/v5_pr_gate_bb9904e5.py \
+            --repo sstxww/reinforcement-learning --max-prs 100 \
+            --out reports/s-20261102-bb9904e5/001-pr-inventory.json
+      - name: Build verified TavernGym and run independent complete eight-seat match
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.canary \
+            --agent-id s-20261102-bb9904e5 --policy baseline --seed 92031 \
+            --receipt experiments/s-20261102-bb9904e5/001-92031.json
+          python -m tavern_ai.validate_receipt experiments/s-20261102-bb9904e5/001-92031.json
+          echo "BEGIN_OWN_CANARY_RECEIPT"
+          cat experiments/s-20261102-bb9904e5/001-92031.json
+          echo "END_OWN_CANARY_RECEIPT"
+      - name: Archive exact actual audit and match evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v5-pr-audit-s-20261102-bb9904e5
+          path: |
+            reports/s-20261102-bb9904e5/001-pr-inventory.json
+            experiments/s-20261102-bb9904e5/001-92031.json
+          if-no-files-found: warn
+          retention-days: 30
