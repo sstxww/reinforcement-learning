@@ -1,0 +1,93 @@
+name: "V5 pinned Release + heldout raw game s-20261103-a9d49781"
+
+on:
+  push:
+    branches:
+      - "agent/s-20261103-a9d49781/optimization-001"
+    paths:
+      - ".github/workflows/v5-evidence-s-20261103-a9d49781.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: "v5-heldout-s-20261103-a9d49781"
+  cancel-in-progress: false
+
+jobs:
+  verify-unpromoted-model-and-real-game:
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install project and strict integrity tests
+        run: |
+          python -m pip install -e '.[train,test]'
+          python -m pytest -q tests/test_release_asset_verifier.py tests/test_model_registry.py
+      - name: Install pinned 1.1.0 engine and verify contract
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Redownload published unpromoted 1408-step Release and verify exact bytes
+        run: |
+          mkdir -p checkpoints
+          gh release download v5-s-20261102-68099929-1408-41428692617 \
+            --repo "$GITHUB_REPOSITORY" \
+            --pattern model.zip --pattern model.metadata.json --dir checkpoints
+          echo 'a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632  checkpoints/model.zip' | sha256sum -c -
+          python -m tavern_ai.release_asset_verifier \
+            --model-id v5-s-20261102-68099929-1408-41428692617 \
+            --weights checkpoints/model.zip \
+            --metadata checkpoints/model.metadata.json --check-load
+      - name: Genuine heldout baseline eight-seat game with public BUY opportunities
+        run: |
+          mkdir -p experiments/s-20261103-a9d49781
+          timeout 600 python -m tavern_ai.buy_opportunity_68099929 \
+            --policy baseline --seed 99361 --agent-id s-20261103-a9d49781 \
+            --out experiments/s-20261103-a9d49781/001-baseline-99361.json
+          python -m tavern_ai.validate_receipt experiments/s-20261103-a9d49781/001-baseline-99361.json
+      - name: Genuine heldout UNASSISTED PPO eight-seat game with BUY opportunities
+        id: model_game
+        shell: bash
+        run: |
+          set +e
+          timeout 600 python -m tavern_ai.buy_opportunity_68099929 \
+            --policy model --seed 99361 --agent-id s-20261103-a9d49781 \
+            --model checkpoints/model.zip \
+            --out experiments/s-20261103-a9d49781/001-model-99361.json
+          CODE=$?
+          set -e
+          if [ "$CODE" -ne 0 ]; then
+            printf 'model_probe_exit_code=%s\ncompleted_model_receipt=false\n' "$CODE" > experiments/s-20261103-a9d49781/001-model-attempt-failed.txt
+            echo "::warning::Raw PPO did not complete a valid eight-seat game (exit $CODE); do not claim model strength."
+          else
+            python -m tavern_ai.validate_receipt experiments/s-20261103-a9d49781/001-model-99361.json
+          fi
+      - name: Preserve only genuine own-session evidence and diagnostic status
+        if: always()
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add experiments/s-20261103-a9d49781/
+          if ! git diff --cached --quiet; then
+            git commit -m "test(v5): archive own authentic heldout baseline/model observations"
+            git push origin HEAD:refs/heads/agent/s-20261103-a9d49781/optimization-001
+          fi
+      - name: Upload small observation evidence, never model weights
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v5-heldout-s-20261103-a9d49781
+          path: experiments/s-20261103-a9d49781/
+          retention-days: 30
+          if-no-files-found: warn
+      - name: Fail closed when raw PPO full game did not complete
+        run: |
+          test -f experiments/s-20261103-a9d49781/001-baseline-99361.json
+          test -f experiments/s-20261103-a9d49781/001-model-99361.json
