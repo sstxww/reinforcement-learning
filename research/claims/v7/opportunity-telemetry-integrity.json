@@ -3,7 +3,7 @@
   "session_id": "s-20261103-8d23519f",
   "task_key": "audit/opportunity-telemetry-receipts",
   "round": 1,
-  "status": "running",
+  "status": "released_for_independent_review",
   "owner": "sstxww independent ChatGPT session",
   "base_main_sha": "3a745c6f6a48c65528bcbeb81b8627b8db93f046",
   "branch": "agent/s-20261103-8d23519f/optimization-001",
@@ -17,5 +17,11 @@
   ],
   "no_merge_lease": true,
   "created_at": "2026-11-02T19:40:46.449Z",
-  "handoff": "Atomic task claim only; not a main-merge lease; do not overwrite other sessions."
+  "handoff": "Atomic task claim only; not a main-merge lease; do not overwrite other sessions.",
+  "pr": "https://github.com/sstxww/reinforcement-learning/pull/191",
+  "last_known_head": "0d0de34586e91c36c6a5e97358a7e9b28257930d",
+  "evidence_run": "https://github.com/sstxww/reinforcement-learning/actions/runs/41511856113",
+  "next_action": "Review latest PR head and CI, check main compatibility and integration lease. Another task session may take over; do not assume global merge ownership.",
+  "claim_lease_active": false,
+  "updated_at": "2026-11-02T19:45:51.075Z"
 }
