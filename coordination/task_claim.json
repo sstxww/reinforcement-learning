@@ -1,0 +1,25 @@
+{
+  "task_key": "eval/raw-v5-model-seat1-paired-seed-992310",
+  "session_id": "s-20261103-6f28c1b9",
+  "round": 1,
+  "owner": "sstxww",
+  "claim_kind": "atomic-branch-create",
+  "base_main_sha": "c1b828734527bae6141805581693d890cc3bff94",
+  "work_branch": "agent/s-20261103-6f28c1b9/optimization-001",
+  "file_scope": [
+    "tavern_ai/model_seat1_s_6f28c1b9.py",
+    "tests/test_model_seat1_s_6f28c1b9.py",
+    ".github/workflows/v7-model-seat1-s-6f28c1b9.yml",
+    "research/sessions/s-20261103-6f28c1b9/*",
+    "experiments/s-20261103-6f28c1b9/*",
+    "reports/s-20261103-6f28c1b9/*"
+  ],
+  "budget": {
+    "real_games_max": 2,
+    "new_ppo_steps": 0,
+    "timeout_minutes": 65
+  },
+  "status": "claimed",
+  "scope": "task-claim only; does not provide main merge lease",
+  "handoff": "claim survives until PR reaches terminal integration; owner will mark released or handoff"
+}
