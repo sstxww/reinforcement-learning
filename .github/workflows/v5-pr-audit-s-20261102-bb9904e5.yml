@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - 'agent/s-20261102-bb9904e5/optimization-001'
+    paths:
+      - 'scripts/v5_pr_gate_bb9904e5.py'
+      - 'tests/test_v5_pr_gate_bb9904e5.py'
 
 permissions:
   contents: read
