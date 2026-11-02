@@ -15,5 +15,7 @@
 - Receipts: experiments/s-20261102-bd90a20b/{001,control}-{48101,48102,48103}.json (filenames without braces)
 - Checkpoints: none; Best/Candidate/Latest do not apply. No model SHA256 / resume possible.
 - 30-day Artifact: https://github.com/sstxww/reinforcement-learning/actions/runs/41415948794/artifacts/13127686579, expiry 2026-12-02. Committed source/JSON remain in Git.
+- PR: https://github.com/sstxww/reinforcement-learning/pull/39 (draft; owner/integrator review required)
+- Independent PR CI: https://github.com/sstxww/reinforcement-learning/actions/runs/41416471826 (validate against PR latest head; no success claim until completed)
 - Pending: inspect PR head-specific independent CI before calling the PR fully CI-validated. Never merge without integrator review.
 - Next: connect recurrence diagnostics to a properly model-controlled bounded real game in a separate hypothesis, coordinating only through GitHub PR review.
