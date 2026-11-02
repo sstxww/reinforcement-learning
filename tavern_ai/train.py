@@ -1,22 +1,25 @@
 """Incremental mask-aware PPO training and compatible checkpoint resume."""
 from __future__ import annotations
-import argparse,json
+import argparse,hashlib,json
 from pathlib import Path
 from .contract import verify_engine
 from .env import TavernEnv
+from .continuation_gate import inspect_continuation
 
 def run(steps:int,seed:int,model_out:Path,resume:Path|None=None):
     from sb3_contrib import MaskablePPO
     from .model import TavernExtractor
     if steps<128:raise ValueError("steps must be >=128")
     engine=verify_engine()
-    env=TavernEnv(seed=seed)
+    source_digest=None
     if resume is not None:
-        if not resume.is_file():raise FileNotFoundError(resume)
         meta_path=resume.with_suffix(".metadata.json")
-        if not meta_path.is_file():raise ValueError("Missing checkpoint compatibility metadata")
+        checked=inspect_continuation(resume,meta_path)
+        source_digest=checked["checkpoint_sha256"]
         prev=json.loads(meta_path.read_text(encoding="utf-8"))
         if prev["engine"]!=engine:raise ValueError("Checkpoint engine or card vocabulary mismatch")
+    env=TavernEnv(seed=seed)
+    if resume is not None:
         model=MaskablePPO.load(str(resume),env=env,device="cpu")
     else:
         model=MaskablePPO("MultiInputPolicy",env,device="cpu",verbose=1,seed=seed,
@@ -31,6 +34,8 @@ def run(steps:int,seed:int,model_out:Path,resume:Path|None=None):
         model.save(str(model_out))
         meta={"schema":1,"engine":engine,"total_timesteps":int(model.num_timesteps),
               "training_seed":seed,"algorithm":"MaskablePPO",
+              "checkpoint_sha256":hashlib.sha256(model_out.read_bytes()).hexdigest(),
+              "parent_checkpoint_sha256":source_digest,"increment_timesteps":steps,
               "notes":"V1 CPU single-seat vs seven scripted bots"}
         model_out.with_suffix(".metadata.json").write_text(json.dumps(meta,indent=2),encoding="utf-8")
         return meta
