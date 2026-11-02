@@ -1,0 +1,64 @@
+{
+  "schema": 1,
+  "session_id": "s-20261102-e599fa38",
+  "base_commit": "315b068bac5ab6d8403c3c9b18f8c101c0cded5d",
+  "experiment_commit": "0e4724e59ff0916f85fdcf2643cfa38dd22328f5",
+  "workflow_run": "https://github.com/sstxww/reinforcement-learning/actions/runs/41415158420",
+  "workflow_conclusion": "success",
+  "engine": "TavernGym 1.1.0",
+  "engine_hash": "6d8712c93022ba11",
+  "training_seed": 71879,
+  "training_steps_actual": 128,
+  "model_sha256": "5b66d29acccb4ecefb302f28a86d40aaa981e121fb830bfe1e752923fc602fcb",
+  "model_artifact": "https://github.com/sstxww/reinforcement-learning/actions/runs/41415158420/artifacts/13128035277",
+  "raw_model": {
+    "seed": 31071,
+    "exit_code": 1,
+    "error": "RuntimeError: Full-game safety limit exceeded",
+    "full_game": false
+  },
+  "guarded": {
+    "policy": "model_guarded",
+    "cap": 32,
+    "games": 2,
+    "seeds": [
+      31071,
+      31072
+    ],
+    "placements": [
+      8,
+      8
+    ],
+    "mean_placement": 8,
+    "first_place_rate": 0,
+    "top4_rate": 0,
+    "decisions": [
+      141,
+      108
+    ],
+    "interventions": [
+      2,
+      0
+    ],
+    "all_completed": true
+  },
+  "baseline": {
+    "policy": "baseline",
+    "games": 2,
+    "seeds": [
+      31071,
+      31072
+    ],
+    "placements": [
+      8,
+      6
+    ],
+    "mean_placement": 7,
+    "first_place_rate": 0,
+    "top4_rate": 0
+  },
+  "paired_mean_placement_delta_guarded_minus_baseline": 1,
+  "claim": "termination evidence for seed 31071; no competitive gain demonstrated",
+  "checkpoint_is_permanent": false,
+  "artifact_expires_at": "2026-12-02T08:47:27Z"
+}
