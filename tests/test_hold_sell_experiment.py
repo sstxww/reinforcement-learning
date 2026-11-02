@@ -34,7 +34,8 @@ def test_play_and_upgrade_schedule_preserved():
 
 
 def test_per_turn_safety_end():
-    assert AvoidMagnetizePolicy().act(obs(0, 8), {"actions_used": 61}) == 0
+    assert AvoidMagnetizePolicy().act(obs(0, 8), {"actions_used": 86}) == 0
+    assert AvoidMagnetizePolicy().act(obs(0, 8), {"actions_used": 61}) == 8
 
 
 def test_forced_fallback_remains_legal():
@@ -62,3 +63,27 @@ def test_action_layout_regression_from_pinned_upstream():
     assert tuple(MAGNETIZE_ACTIONS) == tuple(range(126, 196))
     assert 126 not in SELL_ACTIONS
     assert 16 not in MAGNETIZE_ACTIONS
+
+def test_non_magnetize_fallback_upgrade_matches_baseline():
+    state = obs(0, 3)
+    context = {"turn": 3, "actions_used": 1}
+    assert BaselinePolicy().act(state, context) == 3
+    assert AvoidMagnetizePolicy().act(state, context) == 3
+
+
+def test_only_magnetize_priority_differs_on_representative_masks():
+    policy = AvoidMagnetizePolicy()
+    control = BaselinePolicy()
+    for actions, turn, used in [
+        ((0,), 3, 0),
+        ((0, 8, 3), 3, 0),
+        ((0, 8, 46, 126), 3, 0),
+        ((0, 30, 126), 2, 95),
+        ((0, 126), 3, 0),
+        ((0, 1, 3), 3, 0),
+        ((0, 8), 2, 86),
+    ]:
+        state = obs(*actions)
+        ctxt = {"turn": turn, "actions_used": used}
+        lhs, rhs = policy.act(state, ctxt), control.act(state, ctxt)
+        assert lhs == rhs or rhs in MAGNETIZE_ACTIONS

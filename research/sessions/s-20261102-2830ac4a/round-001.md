@@ -53,3 +53,8 @@ The exact result must be read from the real workflow and committed receipts. Unt
 Source: https://github.com/MCG-NJU/AutoTavern/blob/fb61201a557ddd36a411cf44aac51ce4d9b606ce/crates/taverngym/src/actions.rs
 
 Original run 41415008425 still proves 7 real complete games, but **does not test whether selling less improves placement**. Its descriptive equality of [7,8,8] vs [7,8,8] should be understood only as a misnamed magnetize-avoidance pilot. The corrected version adds action-level shadow disagreement and legal magnetization exposure counts, plus checks the engine's action names. Corrected run and updated policy hash must replace the old hypothesis as the authoritative finding; never combine versions as independent evidence.
+
+## Follow-up isolation diagnosis
+The corrected first rerun https://github.com/sstxww/reinforcement-learning/actions/runs/41416193318 passed engine action-name verification and all seven games. However, its diagnostic data showed shadow baseline disagreements outside magnetization: seed 34200 had 1 disagreement with 0 legal magnetize states, and seed 34202 had 1 disagreement with 0 legal magnetize states. Seed 34203 had 3 baseline magnetizations omitted, with unchanged final rank 8.
+
+**Confounding factor:** the candidate did not preserve the baseline's late fallback Tavern Upgrade, and its per-turn cap was 60 rather than baseline 85. These are now restored in the second targeted correction. A strict real-game assertion requires every divergence to be a skipped magnetization. The earlier rerun is a successful action-encoding validation, **not a clean single-factor ablation**; the next successful run, if any, is the isolation-quality result.

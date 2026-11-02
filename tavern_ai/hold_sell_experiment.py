@@ -52,7 +52,7 @@ class AvoidMagnetizePolicy:
         mandatory = first(30, 46)
         if mandatory is not None:
             return mandatory
-        if used >= 60 and mask[0]:
+        if used >= 85 and mask[0]:
             return 0
         play = first(46, 126)
         if play is not None:
@@ -62,7 +62,10 @@ class AvoidMagnetizePolicy:
         buy = first(8, 16)
         if buy is not None:
             return buy
-        # Prefer ending the turn to optional magnetization after buy/level.
+        # Preserve the baseline's non-scheduled fallback upgrade order.
+        if mask[3]:
+            return 3
+        # Only magnetize priority differs; end-turn follows the original baseline.
         if mask[0]:
             return 0
         return int(np.flatnonzero(mask)[0])
@@ -128,6 +131,10 @@ def run_candidate(seed: int, agent_id: str) -> dict:
             raise RuntimeError("Game stalled")
     if not game.is_over():
         raise RuntimeError("Candidate full-game safety limit exceeded")
+    if shadow_disagreements != skipped_baseline_magnetizations:
+        raise AssertionError(
+            "Policy isolation violated: disagreement not caused by magnetize"
+        )
     receipt = {
         "schema": 1,
         "timestamp": datetime.now(timezone.utc).isoformat(),

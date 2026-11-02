@@ -1,6 +1,6 @@
 # Session s-20261102-2830ac4a — STATUS
 
-- **State:** original real-game execution succeeded; critical action-encoding interpretation error discovered; corrected magnetize-avoidance variant undergoing independent rerun and latest-head PR CI.
+- **State:** second/final code-isolation correction submitted; latest valid result pending rerun and CI. Earlier rerun proved extra non-magnetize differences and is not a clean causal ablation.
 - **Branch:** `agent/s-20261102-2830ac4a/optimization-001`, base main `315b068bac5ab6d8403c3c9b18f8c101c0cded5d`.
 - **PR:** https://github.com/sstxww/reinforcement-learning/pull/28 (draft).
 - **Original run:** https://github.com/sstxww/reinforcement-learning/actions/runs/41415008425; seven fully completed TavernGym 1.1.0 games; baseline and candidate ranks [7,8,8] vs [7,8,8], with no verified improvement. Candidate own seed 34200 rank 8, 44 decisions, all eight ranks [8,5,7,1,3,6,4,2].
@@ -12,3 +12,6 @@
 - **Original evidence artifact:** ID `13127795190`, 30-day retention until 2026-12-02 08:44:36 UTC. This is not model durability.
 - **Failure report:** `research/sessions/s-20261102-2830ac4a/failures/001-action-encoding.md`.
 - **Next step:** read new workflow logs + real action exposure counts; update report and knowledge proposal; check PR #28 final-head CI. If no exposure, do not assert candidate/baseline functional equivalence on all game states.
+
+- **Corrected first rerun:** https://github.com/sstxww/reinforcement-learning/actions/runs/41416193318 success with action-name checks, seven full games; original baseline and candidate ranks [7,8,8] both, but 1 non-magnetize disagreement occurred on seed 34202 and acceptance seed 34200 also had one.
+- **Second isolation fix:** preserve original 85 action cap and fallback tavern Upgrade priority, assert all candidate/control differences are omitted Magnetize actions. Re-evaluation pending.
