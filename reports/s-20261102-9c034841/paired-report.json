@@ -1,0 +1,78 @@
+{
+  "baseline_first_rate": 0,
+  "baseline_mean_placement": 7.75,
+  "baseline_placements": [
+    7,
+    8,
+    8,
+    8
+  ],
+  "baseline_top4_rate": 0,
+  "branch": "agent/s-20261102-9c034841/optimization-001",
+  "candidate_first_rate": 0,
+  "candidate_mean_placement": 7.25,
+  "candidate_placements": [
+    8,
+    7,
+    8,
+    6
+  ],
+  "candidate_top4_rate": 0,
+  "commit": "fea0eb39e6880b732bc2896ca1a47d126fe79de7",
+  "engine_source_hash": "6d8712c93022ba11",
+  "engine_version": "1.1.0",
+  "eval_seeds": [
+    49111,
+    49112,
+    49113,
+    49114
+  ],
+  "experiment_type": "rule-policy-tuning, no PPO weights",
+  "model_checkpoint": null,
+  "paired_candidate_minus_baseline": [
+    1,
+    -1,
+    0,
+    -2
+  ],
+  "paired_delta_sample_sd": 1.2909944487358056,
+  "paired_mean_delta": -0.5,
+  "policy": "planned-turn-buy-before-upgrade-v1",
+  "session_id": "s-20261102-9c034841",
+  "training_steps": 0,
+  "uncertainty": "Descriptive, small sample; no strength improvement claimed",
+  "mandatory_game": {
+    "agent_id": "s-20261102-9c034841",
+    "comparison_arm": "upgrade-first",
+    "completed": true,
+    "decisions": 45,
+    "engine_source_hash": "6d8712c93022ba11",
+    "engine_version": "1.1.0",
+    "environment": "TavernGym",
+    "git_sha": "fea0eb39e6880b732bc2896ca1a47d126fe79de7",
+    "model_sha256": null,
+    "placements": [
+      7,
+      8,
+      4,
+      3,
+      2,
+      6,
+      5,
+      1
+    ],
+    "policy": "planned-turn-buy-before-upgrade-v1",
+    "policy_source": "tavern_ai/upgrade_priority_s_20261102_9c034841.py",
+    "schema": 1,
+    "seed": 49101,
+    "timestamp": "2026-11-02T08:45:34.771722+00:00",
+    "truncated_combats": 0,
+    "turn_limit_end": false,
+    "turns": 17
+  },
+  "run_url": "https://github.com/sstxww/reinforcement-learning/actions/runs/41415146112",
+  "job_url": "https://github.com/sstxww/reinforcement-learning/actions/runs/41415146112/job/125177071614",
+  "artifact_id": 13126913557,
+  "artifact_expires_at": "2026-12-02T08:45:35Z",
+  "validation": "24 tests; 9 complete real TavernGym matches"
+}

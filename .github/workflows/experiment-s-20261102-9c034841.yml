@@ -1,0 +1,43 @@
+name: Isolated upgrade priority s-20261102-9c034841
+on:
+  push:
+    branches:
+      - 'agent/s-20261102-9c034841/optimization-001'
+    paths:
+      - 'tavern_ai/upgrade_priority_s_20261102_9c034841.py'
+      - 'tests/test_upgrade_priority_s_20261102_9c034841.py'
+permissions:
+  contents: read
+concurrency:
+  group: upgrade-priority-s-20261102-9c034841
+  cancel-in-progress: false
+jobs:
+  paired-real-engine:
+    runs-on: ubuntu-latest
+    timeout-minutes: 70
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install test dependency
+        run: |
+          python -m pip install -e '.[test]'
+      - name: Real policy unit and repository regression suite
+        run: python -m pytest
+      - name: Install pinned real TavernGym engine
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: One own model-free candidate game and four seed-paired evaluations
+        run: |
+          python -m tavern_ai.upgrade_priority_s_20261102_9c034841 --seed 49101 --eval-seeds 49111 49112 49113 49114 --out "outputs/s-20261102-9c034841"
+          python -m tavern_ai.validate_receipt "outputs/s-20261102-9c034841/001-49101.json"
+      - name: Upload actual bounded experiment evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: "s-20261102-9c034841-upgrade-priority-evidence"
+          path: "outputs/s-20261102-9c034841/*.json"
+          if-no-files-found: ignore
+          retention-days: 30
