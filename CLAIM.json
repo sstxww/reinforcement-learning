@@ -1,0 +1,18 @@
+{
+  "schema": 1,
+  "session_id": "s-20261103-8e49e70d",
+  "task_key": "ops/session-workflow-trigger-scope",
+  "round": "001",
+  "base_main_sha": "c1b828734527bae6141805581693d890cc3bff94",
+  "work_branch": "agent/s-20261103-8e49e70d/optimization-001",
+  "scope": [
+    "scripts/v7_workflow_trigger_scope_8e49e70d.py",
+    "tests/test_v7_workflow_trigger_scope_8e49e70d.py",
+    ".github/workflows/trigger-scope-s-20261103-8e49e70d.yml",
+    "research/sessions/s-20261103-8e49e70d/**",
+    "research/knowledge/proposals/s-20261103-8e49e70d-001.md"
+  ],
+  "state": "claimed",
+  "main_merge_lock": false,
+  "note": "Deterministic claim ref was atomically created. This is only task exclusivity, not authority to merge main."
+}
