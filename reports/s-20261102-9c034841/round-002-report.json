@@ -1,0 +1,140 @@
+{
+  "commit": "40e8b269998a34ee22eb1957aa8a27a70ff18aaa",
+  "comparison": "genuine TavernGym games, not Arena; original baseline vs once-vs-three overrides",
+  "engine_source_hash": "6d8712c93022ba11",
+  "engine_version": "1.1.0",
+  "eval_seeds": [
+    49211,
+    49212,
+    49213,
+    49214
+  ],
+  "model_checkpoint": null,
+  "once_minus_three_placement": [
+    0,
+    0,
+    -2,
+    1
+  ],
+  "paired_mean_delta_once_minus_three": -0.25,
+  "paired_sample_sd": 1.2583057392117916,
+  "round": 2,
+  "session_id": "s-20261102-9c034841",
+  "stats": {
+    "baseline": {
+      "decisions": [
+        49,
+        33,
+        45,
+        69
+      ],
+      "first_rate": 0,
+      "games": 4,
+      "mean_decisions": 49,
+      "mean_placement": 7.75,
+      "overrides": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "ranks": [
+        7,
+        8,
+        8,
+        8
+      ],
+      "top4_rate": 0,
+      "total_overrides": 0
+    },
+    "once": {
+      "decisions": [
+        56,
+        45,
+        53,
+        69
+      ],
+      "first_rate": 0,
+      "games": 4,
+      "mean_decisions": 55.75,
+      "mean_placement": 7.25,
+      "overrides": [
+        2,
+        3,
+        3,
+        0
+      ],
+      "ranks": [
+        7,
+        8,
+        6,
+        8
+      ],
+      "top4_rate": 0,
+      "total_overrides": 8
+    },
+    "three": {
+      "decisions": [
+        56,
+        41,
+        51,
+        72
+      ],
+      "first_rate": 0,
+      "games": 4,
+      "mean_decisions": 55,
+      "mean_placement": 7.5,
+      "overrides": [
+        3,
+        5,
+        5,
+        4
+      ],
+      "ranks": [
+        7,
+        8,
+        8,
+        7
+      ],
+      "top4_rate": 0,
+      "total_overrides": 17
+    }
+  },
+  "training_steps": 0,
+  "uncertainty": "n=4 descriptive; do not claim a verified gain",
+  "own_game": {
+    "agent_id": "s-20261102-9c034841",
+    "comparison_arm": "once",
+    "completed": true,
+    "decisions": 41,
+    "engine_source_hash": "6d8712c93022ba11",
+    "engine_version": "1.1.0",
+    "environment": "TavernGym",
+    "git_sha": "40e8b269998a34ee22eb1957aa8a27a70ff18aaa",
+    "model_sha256": null,
+    "placements": [
+      8,
+      5,
+      1,
+      4,
+      2,
+      7,
+      6,
+      3
+    ],
+    "policy": "planned-buy-first-decision-r002",
+    "policy_source": "tavern_ai/upgrade_frequency_s_20261102_9c034841.py",
+    "schema": 1,
+    "seed": 49201,
+    "timestamp": "2026-11-02T08:57:59.371082+00:00",
+    "truncated_combats": 0,
+    "turn_limit_end": false,
+    "turns": 15,
+    "upgrade_to_buy_overrides": 3
+  },
+  "run_url": "https://github.com/sstxww/reinforcement-learning/actions/runs/41416603661",
+  "job_url": "https://github.com/sstxww/reinforcement-learning/actions/runs/41416603661/job/125181867163",
+  "artifact_id": 13127557959,
+  "artifact_expires_at": "2026-12-02T08:57:59Z",
+  "verified_regression": "29 passed; 13 real complete games"
+}

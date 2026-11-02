@@ -1,0 +1,30 @@
+{
+  "agent_id": "s-20261102-9c034841",
+  "comparison_arm": "three",
+  "completed": true,
+  "decisions": 41,
+  "engine_source_hash": "6d8712c93022ba11",
+  "engine_version": "1.1.0",
+  "environment": "TavernGym",
+  "git_sha": "40e8b269998a34ee22eb1957aa8a27a70ff18aaa",
+  "model_sha256": null,
+  "placements": [
+    8,
+    5,
+    2,
+    6,
+    3,
+    7,
+    4,
+    1
+  ],
+  "policy": "planned-buy-first-three-decisions-r001-replay",
+  "policy_source": "tavern_ai/upgrade_frequency_s_20261102_9c034841.py",
+  "schema": 1,
+  "seed": 49212,
+  "timestamp": "2026-11-02T08:57:59.404962+00:00",
+  "truncated_combats": 0,
+  "turn_limit_end": false,
+  "turns": 14,
+  "upgrade_to_buy_overrides": 5
+}
