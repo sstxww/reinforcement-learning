@@ -1,0 +1,52 @@
+{
+  "schema": 1,
+  "timestamp": "2026-11-02T08:52:05.308482+00:00",
+  "environment": "TavernGym",
+  "engine_source_hash": "6d8712c93022ba11",
+  "engine_version": "1.1.0",
+  "agent_id": "s-20261102-bd90a20b",
+  "policy": "baseline",
+  "seed": 48103,
+  "completed": true,
+  "turns": 14,
+  "decisions": 49,
+  "placements": [
+    5,
+    3,
+    8,
+    1,
+    4,
+    2,
+    7,
+    6
+  ],
+  "truncated_combats": 0,
+  "turn_limit_end": false,
+  "git_sha": "2e09a49ec75cfb85e085f3a05b8936ef93a0c435",
+  "model_sha256": null,
+  "trace": {
+    "mask_checks": 49,
+    "minimum_legal_actions": 2,
+    "maximum_legal_actions": 61,
+    "mean_legal_actions": 33.08163265306123,
+    "revisited_observations": 0,
+    "max_identical_observation_visits": 1,
+    "max_own_decisions_in_turn": 7,
+    "action_buckets": {
+      "000-007": 17,
+      "008-015": 18,
+      "030-045": 5,
+      "046-125": 9
+    },
+    "action_ids": {
+      "0": 12,
+      "10": 1,
+      "11": 1,
+      "3": 5,
+      "30": 5,
+      "46": 8,
+      "8": 16,
+      "86": 1
+    }
+  }
+}
