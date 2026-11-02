@@ -1,0 +1,166 @@
+{
+  "schema": 1,
+  "experiment": "potential-based shaping vs sparse terminal reward",
+  "session_id": "s-20261102-bf8e1710",
+  "created_at": "2026-11-02T08:40:21.202934+00:00",
+  "branch": "agent/s-20261102-bf8e1710/optimization-001",
+  "training_git_sha": "a1658e2fc8fd64e8c5220970b4d9f0c19000546f",
+  "engine": {
+    "version": "1.1.0",
+    "source_hash": "6d8712c93022ba11",
+    "features": 4017,
+    "cards": 447,
+    "actions": 245,
+    "n_cards": 3984
+  },
+  "upstream_commit": "fb61201a557ddd36a411cf44aac51ce4d9b606ce",
+  "patch_sha256": "1e48a071cad63c284debbf917cb012595a405a4ef5ab66180eb2918e205aaac0",
+  "observation": {
+    "features": 4017,
+    "cards": 447,
+    "action_mask": 245
+  },
+  "same_seed_paired_arms": true,
+  "training_seed": 33123,
+  "training_steps_per_arm": 256,
+  "training_steps_total": 512,
+  "config": {
+    "algorithm": "MaskablePPO",
+    "n_steps": 128,
+    "batch_size": 64,
+    "n_epochs": 4,
+    "gamma": 0.99,
+    "gae_lambda": 0.95,
+    "learning_rate": 0.0003,
+    "ent_coef": 0.01,
+    "potential_strength": 1.0
+  },
+  "arms": {
+    "control": {
+      "model_path": "checkpoints/s-20261102-bf8e1710/control/model.zip",
+      "model_sha256": "ee15b86eb0b38756f7a9220fe01792b2b09cd57e69f9cd7583944bdf4f3fb10a",
+      "trained_steps": 256,
+      "training_seed": 33123,
+      "ppo_metrics": {
+        "train/learning_rate": 0.0003,
+        "train/entropy_loss": -2.122782975435257,
+        "train/policy_gradient_loss": -0.010608196374960244,
+        "train/value_loss": 0.04309473466128111,
+        "train/clip_fraction": 0.0,
+        "train/loss": -0.03486144542694092,
+        "train/explained_variance": -1.6577298641204834,
+        "train/n_updates": 8.0,
+        "train/clip_range": 0.2
+      }
+    },
+    "potential": {
+      "model_path": "checkpoints/s-20261102-bf8e1710/potential/model.zip",
+      "model_sha256": "58c6c924f49b86ef97d13712b8a97c1d7b80bcede632d885ce316edb9a3611e5",
+      "trained_steps": 256,
+      "training_seed": 33123,
+      "ppo_metrics": {
+        "train/learning_rate": 0.0003,
+        "train/entropy_loss": -2.1228156685829163,
+        "train/policy_gradient_loss": -0.010463612154126167,
+        "train/value_loss": 0.04569964448455721,
+        "train/clip_fraction": 0.0,
+        "train/loss": -0.035307370126247406,
+        "train/explained_variance": -1.4346797466278076,
+        "train/n_updates": 8.0,
+        "train/clip_range": 0.2
+      }
+    }
+  },
+  "held_out_evaluation": {
+    "control": {
+      "games": 3,
+      "seeds": [
+        33011,
+        33012,
+        33013
+      ],
+      "placements": [
+        8,
+        7,
+        8
+      ],
+      "mean_rank": 7.666666666666667,
+      "top4_rate": 0.0,
+      "first_rate": 0.0,
+      "illegal_actions": 0,
+      "guard_truncations": 0,
+      "turn_limit_ends": 0,
+      "decisions": [
+        308,
+        406,
+        371
+      ],
+      "model_safety_overrides": [
+        6,
+        8,
+        7
+      ]
+    },
+    "potential": {
+      "games": 3,
+      "seeds": [
+        33011,
+        33012,
+        33013
+      ],
+      "placements": [
+        8,
+        7,
+        8
+      ],
+      "mean_rank": 7.666666666666667,
+      "top4_rate": 0.0,
+      "first_rate": 0.0,
+      "illegal_actions": 0,
+      "guard_truncations": 0,
+      "turn_limit_ends": 0,
+      "decisions": [
+        308,
+        406,
+        287
+      ],
+      "model_safety_overrides": [
+        6,
+        8,
+        5
+      ]
+    }
+  },
+  "observed_mean_rank_delta_potential_minus_control": 0.0,
+  "independent_full_match": {
+    "schema": 1,
+    "timestamp": "2026-11-02T08:40:21.189535+00:00",
+    "environment": "TavernGym",
+    "engine_source_hash": "6d8712c93022ba11",
+    "engine_version": "1.1.0",
+    "agent_id": "s-20261102-bf8e1710",
+    "policy": "model-bounded",
+    "model_safety_limit": 48,
+    "model_safety_overrides": 7,
+    "seed": 33001,
+    "completed": true,
+    "turns": 15,
+    "decisions": 359,
+    "placements": [
+      8,
+      4,
+      2,
+      6,
+      1,
+      7,
+      5,
+      3
+    ],
+    "truncated_combats": 0,
+    "turn_limit_end": false,
+    "git_sha": "a1658e2fc8fd64e8c5220970b4d9f0c19000546f",
+    "model_sha256": "58c6c924f49b86ef97d13712b8a97c1d7b80bcede632d885ce316edb9a3611e5"
+  },
+  "conclusion": "Exploratory only; 3 seeded games per arm cannot establish a strength improvement.",
+  "checkpoint_storage": "GitHub Actions artifact (90-day retention; NOT permanent)"
+}
