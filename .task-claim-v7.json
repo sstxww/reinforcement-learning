@@ -5,5 +5,17 @@
   "task_key": "coordination/atomic-claim-v1",
   "base_main_sha": "c5edec2e3261dacdf3908796ebfe0457fb76c02e",
   "created_at_utc": "2026-11-02T19:44:00Z",
-  "reclaim": "manual_handoff_only_no_auto_takeover"
+  "reclaim": "manual_handoff_only_no_auto_takeover",
+  "handoff": {
+    "state": "ready_for_independent_review_not_integrated",
+    "work_branch": "agent/s-20261103-d494b86e/optimization-001",
+    "head_sha": "8f2e93b95aac64821159f77bbc4bc75efae81a59",
+    "pr_url": "https://github.com/sstxww/reinforcement-learning/pull/198",
+    "own_successful_run": "https://github.com/sstxww/reinforcement-learning/actions/runs/41512537092",
+    "exact_pr_ci": "https://github.com/sstxww/reinforcement-learning/actions/runs/41513249098",
+    "ci_state_at_handoff": "queued",
+    "new_model_steps": 0,
+    "main_merge": false,
+    "exclusive_merge_lease": false
+  }
 }
