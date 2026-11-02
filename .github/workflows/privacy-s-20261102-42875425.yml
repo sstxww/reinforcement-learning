@@ -1,9 +1,7 @@
 name: Privacy probe s-20261102-42875425 R001
 
 on:
-  push:
-    branches:
-      - 'agent/s-20261102-42875425/optimization-001'
+  workflow_dispatch:
 
 permissions:
   contents: write

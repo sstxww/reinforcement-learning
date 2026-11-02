@@ -25,4 +25,8 @@ Pinned upstream commit fb61201a557ddd36a411cf44aac51ce4d9b606ce; version 1.1.0, 
 Main has baseline and masked PPO with seeded full-game evaluation. GitHub releases exist, but a verified high-level champion is not established. Numerous competing draft PRs cover policy action priority, PPO hyperparameters, BC and seat effects. Earlier full-game model loop failures and release 403 are documented in CLOSED_LOOP.md.
 
 ## Live results
-Pending bounded workflow; no successful test or full-game claim yet.
+Verified using completed GitHub Actions run https://github.com/sstxww/reinforcement-learning/actions/runs/41421935030 ; source commit 07c79259779499f3436b8cf8058769c4050fe7e6. Full test flow succeeded: initial pytest, pinned engine installation/hash, real-engine pytest, and six additional metamorphic cases across seeds 83011/83012. Hidden seat-1 hand and unobserved board stat perturbations preserved all bytes of seat-0 features/cards/mask in 4/4 cases; own seat-0 hand perturbations visibly changed features in both 2/2 positive controls. Total 6/6 passed. The probe's recorded SHA256s and limitations are in reports/s-20261102-42875425/001-observation-privacy.json.
+
+Verified full game: baseline seat 0 vs seven simulator bots, seed 83031, 16 turns, 49 decisions, rank 8 (placements [8,7,1,3,5,6,4,2]), Game.is_over true, no truncated combats, no turn-limit termination. See experiments/s-20261102-42875425/001-83031.json. Not a learned policy or competitive gain. Training steps 0, no checkpoint.
+
+Status: ENGINEERING_VALIDATED_REVIEW. No global privacy proof, no model promotion, no improvement claim. The one-shot workflow is retained as a manual dispatch after this run to avoid repeated push-triggered Actions on report/document changes.
