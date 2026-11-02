@@ -23,3 +23,13 @@
 - If model is rank 8 despite many legal buys and ends with buy still legal, target early end-turn behavior or action-probability defect, not more PPO steps.
 - If buy was rarely legal, inspect engine state/economy and action-mask semantics before proposing any loss change.
 - Never enter official ranked arena; never modify upstream.
+
+## Verified Actions results (after original R001 draft)
+
+- Actual branch-specific run: [#41428098018](https://github.com/sstxww/reinforcement-learning/actions/runs/41428098018) **SUCCESS**, pinned engine 1.1.0 / hash `6d8712c93022ba11`; V2 Release SHA256 verification **passed**; artifact [#13132408776](https://github.com/sstxww/reinforcement-learning/actions/runs/41428098018/artifacts/13132408776).
+- Original PR CI [#41428144058](https://github.com/sstxww/reinforcement-learning/actions/runs/41428144058): 83 tests passed, 1 skipped; it failed only because independent receipt was not yet committed. This follow-up adds compact authentic model/baseline receipts from the downloaded artifact.
+- V2 model finished 2 authentic matches on held-out seeds 45111,45112 with ranks **[8,8]**, no forced ends, **0 BUY** despite **74 legal BUY decision exposures**. The baseline ranked **[6,7]**, with **33 BUY** across 48 legal BUY exposures.
+- Model actions overwhelmingly ID 1/2 (**222/248**), no guard. Raw action categories / state-delta semantics still need source and trajectory verification. No model update, no inference rescue, no new PPO training.
+- These data **refute** the narrow hypothesis that no purchases occurred *because no buy was legal*. They do **not** establish model probabilities, exact economy loss or a causal fix.
+- Permanent compact report: `reports/s-20261102-83d91476/001-buy-opportunity-report.json`; full diagnostic report in finite-retention Action artifact, source SHA recorded. Each compact receipt preserves genuine game fields; it is a derived subset, not a fabricated game.
+- Next: audit ID 1/2 engine semantics, instrument state progression and illegal mask/opportunity, then a one-variable correction; do not scale training yet.
