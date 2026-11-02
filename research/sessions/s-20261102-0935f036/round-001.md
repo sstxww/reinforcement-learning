@@ -10,3 +10,12 @@
 - Training steps in this session: **0**. New model releases: **0**. New Champion: **none**. No large-scale training until evidence/recovery issues close.
 - Own real-game gate: branch-isolated GitHub Actions workflow. Receipt pending run; no game or CI success claimed in this initial commit.
 - Next: inspect action, preserve actual receipt and exact workflow run; open review PR; do not promote poor PPO.
+
+## Verified own-session CI and match
+
+- [GitHub Actions #41449918161](https://github.com/sstxww/reinforcement-learning/actions/runs/41449918161): **completed / success** for initial commit `9994e83991b27d6082dfb94970734e171b486d07`; synthetic regression tests, pinned engine bootstrap and real eight-seat baseline canary all passed.
+- Downloaded [artifact #13144182554](https://github.com/sstxww/reinforcement-learning/actions/runs/41449918161/artifacts/13144182554) and verified the JSON receipt payload; committed `experiments/s-20261102-0935f036/001-831202.json`.
+- Real match: seed `831202`, TavernGym `1.1.0` (`6d8712c93022ba11`), baseline (not model), `completed=true`, `turns=15`, `decisions=46`, seat 0 placement **8**, truncated combats 0, turn_limit_end false.
+- This is an **engineering baseline game**; not a model-game or PPO improvement.
+- Actual own-session PPO training steps: **0**; no candidate checkpoint, no Championship promotion.
+- PR CI after adding this receipt remains a separate independent gate (not claimed complete here).
