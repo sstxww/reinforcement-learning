@@ -35,3 +35,22 @@
 - Own real completed games: **not yet verified at this document creation**. Do not invent receipts; inspect Actions and repository commits. Candidate-policy games with guard interventions must be labeled guarded.
 - Engineering / model quality are separate. Test-only CI cannot assert competitive rank gain. P0 is not fully resolved; P1 resume/optimizer checkpoints overlap work owned by other sessions. Do NOT launch a large PPO batch on a known model that cannot consistently buy, play or progress.
 - Next: read actual job status/step logs, remedy errors with at most two meaningful fixes; check complete genuine game receipts, isolate loop failure by action category and observation delta; preserve evidence, open a reviewable Draft PR, and only then plan one small controlled model intervention on a separate round.
+
+## Verified execution results (source-generated; updated after the full Actions run)
+
+- [GitHub Actions run 41450019646](https://github.com/sstxww/reinforcement-learning/actions/runs/41450019646): **completed SUCCESS**, including the regression tests, pinned TavernGym bootstrap, V2 Release download + exact SHA256/1,280-step metadata preflight, and two genuine completed eight-seat games with verified receipts.
+- Both true games used diagnostic seed **87311**, TavernGym **1.1.0** source hash `6d8712c93022ba11`. Full receipts were *generated and committed by the isolated Actions job*, not invented for this document:
+  - [Baseline receipt](https://github.com/sstxww/reinforcement-learning/blob/agent/s-20261102-3c1ad8f4/optimization-001/experiments/s-20261102-3c1ad8f4/001-baseline-87311.json): 16 turns, 41 seat-0 decisions, rank **8**, `completed=true`, zero combat truncations, zero guard-forced END.
+  - [V2 receipt](https://github.com/sstxww/reinforcement-learning/blob/agent/s-20261102-3c1ad8f4/optimization-001/experiments/s-20261102-3c1ad8f4/001-model-87311.json): 16 turns, 193 seat-0 decisions, rank **8**, `completed=true`, **one guard-forced END**. Thus classify result as `model_guarded`, not raw pure PPO model.
+- [Paired summary](https://github.com/sstxww/reinforcement-learning/blob/agent/s-20261102-3c1ad8f4/optimization-001/reports/s-20261102-3c1ad8f4/001-paired-summary.json):
+  - Baseline had 15 BUY-mask-legal decision exposures, 8 actual BUYS, 9 PLAYS, 3 UPGRADES, no refresh/freeze.
+  - V2 had **46 BUY-mask-legal exposures, 1 actual BUY**, 40 REFRESH, **70 FREEZE**, 33 PLAY, 1 UPGRADE, 1 explicit guard intervention.
+  - Among 70 same-turn FREEZE transitions, **all 70 altered some visible float features** (430 changed float slots total) but **none changed observable card IDs**. This does *not* show that freeze was productive or an internal no-op; a repeated toggle may change the same public freeze bits back and forth.
+  - 40 REFRESH transitions each had a changed public projection, with 157 total card-slot changes.
+- Interpretation: earlier 0-BUY results were seed-specific; this new sample confirms **rare** rather than universally absent buying. The ratio of action categories and safety guard suggests a nonproductive oscillation hypothesis requiring further state/sequence-specific checks. **Both participants rank eighth in this one seed: no evidence of a new policy gain**, no causal inference from one paired observation. Production model untouched.
+- New training steps **0**, new model/checkpoint **none**, Champion promotion **none**. Persisted diagnostic logs are not substitutes for model weights.
+
+## Verification / integration disposition
+
+- P0 safety gates continue to block direct merge of stacked PR #15 and conflicting Draft #8.
+- This session's new probe occupies unique module/test/workflow paths and has a genuine complete-game receipt plus successful isolated Actions tests. Subject to latest-head PR CI, dependency/security review, and concurrent main integrity checks, it is suitable for conservative **engineering-only** review — not automatic model promotion or merger.
