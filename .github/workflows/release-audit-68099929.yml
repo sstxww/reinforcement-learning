@@ -1,0 +1,131 @@
+name: V5 release-resume audit s-20261102-68099929
+on:
+  push:
+    branches:
+      - agent/s-20261102-68099929/optimization-001
+    paths:
+      - 'models/registry.json'
+      - 'tavern_ai/checkpoint_registry_68099929.py'
+      - 'tests/test_checkpoint_registry_68099929.py'
+      - '.github/workflows/release-audit-68099929.yml'
+permissions:
+  contents: write
+concurrency:
+  group: release-audit-s-20261102-68099929
+  cancel-in-progress: false
+jobs:
+  release-audit:
+    if: github.ref == 'refs/heads/agent/s-20261102-68099929/optimization-001'
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      GH_TOKEN: ${{ github.token }}
+      RELEASE_TAG: v2-learning-41413557445
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Test registry + all regression tests
+        run: |
+          python -m pip install -e '.[train,test]'
+          python -m pytest
+          python -m tavern_ai.checkpoint_registry_68099929
+      - name: Pin actual TavernGym engine
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Download six-listed latest experimental Release and verify bytes
+        run: |
+          set -euo pipefail
+          mkdir -p checkpoints/source
+          gh release download "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --pattern model.zip --pattern model.metadata.json --dir checkpoints/source
+          python -m tavern_ai.checkpoint_registry_68099929 --release-tag "$RELEASE_TAG" --model checkpoints/source/model.zip --metadata checkpoints/source/model.metadata.json --out reports/s-20261102-68099929/001-release-audit.json
+      - name: Load existing checkpoint and smoke-continue exactly 128 actual PPO steps
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import torch
+          from sb3_contrib import MaskablePPO
+          torch.set_num_threads(1)
+          model=MaskablePPO.load('checkpoints/source/model.zip', device='cpu')
+          print('model_load_verified', type(model).__name__, 'timesteps', model.num_timesteps)
+          assert model.num_timesteps == 1280
+          PY
+          python -m tavern_ai.train --steps 128 --seed 68099929 --resume checkpoints/source/model.zip --out checkpoints/resumed/model.zip
+          python - <<'PY'
+          import json, hashlib
+          from pathlib import Path
+          source=json.loads(Path('checkpoints/source/model.metadata.json').read_text())
+          meta=json.loads(Path('checkpoints/resumed/model.metadata.json').read_text())
+          assert source['total_timesteps']==1280
+          assert meta['total_timesteps']==1408
+          digest=hashlib.sha256(Path('checkpoints/resumed/model.zip').read_bytes()).hexdigest()
+          report=Path('reports/s-20261102-68099929/001-release-audit.json')
+          r=json.loads(report.read_text())
+          r.update(model_load_tested=True, resume_training_tested=True,
+                   resumed_total_steps=1408, resumed_checkpoint_sha256=digest,
+                   resumed_checkpoint_storage='temporary_actions_artifact_only',
+                   full_game_tested=False, champion_promoted=False)
+          report.write_text(json.dumps(r,indent=2)+'\n')
+          print('actual_resume_verified', digest)
+          PY
+      - name: Independent true eight-seat baseline canary (engineering receipt)
+        run: |
+          set -euo pipefail
+          python -m tavern_ai.canary --agent-id s-20261102-68099929 --seed 99123 --policy baseline --receipt experiments/s-20261102-68099929/001-99123.json
+          python -m tavern_ai.validate_receipt experiments/s-20261102-68099929/001-99123.json
+      - name: Attempt one candidate-controlled complete match for diagnostics, never fake success
+        shell: bash
+        run: |
+          mkdir -p reports/s-20261102-68099929
+          if timeout 360s python -m tavern_ai.canary --agent-id s-20261102-68099929 --seed 99124 --policy model --model checkpoints/resumed/model.zip --receipt experiments/s-20261102-68099929/001-model-99124.json > reports/s-20261102-68099929/model-game-log.txt 2>&1; then
+            echo "model_full_game=true" >> "$GITHUB_ENV"
+            python -m tavern_ai.validate_receipt experiments/s-20261102-68099929/001-model-99124.json
+          else
+            code=$?
+            echo "model_full_game=false" >> "$GITHUB_ENV"
+            echo "Model-controlled match failed or timed out (exit $code); DO NOT count as a completed game" >> reports/s-20261102-68099929/model-game-log.txt
+          fi
+      - name: Write truthful provenance and commit only owned evidence
+        if: success()
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          path=Path('reports/s-20261102-68099929/001-release-audit.json')
+          report=json.loads(path.read_text())
+          complete=os.environ.get('model_full_game')=='true'
+          report['full_game_tested']=complete
+          report['model_full_game_completed']=complete
+          report['model_match_seed']=99124
+          report['completed_baseline_engine_game_seed']=99123
+          report['source_release']='v2-learning-41413557445'
+          report['source_git_head']=os.environ['GITHUB_SHA']
+          report['claim']='Release bytes/load/resume validated; model full-game status separate; not a promoted model'
+          path.write_text(json.dumps(report, indent=2)+'\n')
+          PY
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add experiments/s-20261102-68099929/*.json reports/s-20261102-68099929/001-release-audit.json
+          git diff --cached --quiet && exit 0
+          git commit -m "evidence(s-20261102-68099929): verified Release bytes/resume and real game results"
+          git pull --rebase origin "$GITHUB_REF_NAME"
+          git push origin "HEAD:$GITHUB_REF_NAME"
+      - name: Preserve diagnostic model and logs without claiming durable Release
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v5-release-resume-audit-s-68099929
+          path: |
+            checkpoints/resumed/model.zip
+            checkpoints/resumed/model.metadata.json
+            experiments/s-20261102-68099929/*.json
+            reports/s-20261102-68099929/*
+          if-no-files-found: ignore
+          retention-days: 30
