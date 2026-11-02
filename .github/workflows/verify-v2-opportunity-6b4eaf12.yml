@@ -65,14 +65,29 @@ jobs:
           finally:
               env.close()
           PY
-      - name: Raw PPO authentic eight-seat match with legal-opportunity instrumentation
+      - name: Report original raw PPO loop without fabricated match completion
         run: |
           python -m tavern_ai.opportunity_6b4eaf12 --seed 88132 \
             --model checkpoints/v2/model.zip \
-            --receipt experiments/s-20261102-6b4eaf12/002-v2-88132.json \
-            --report reports/s-20261102-6b4eaf12/002-opportunity.json
+            --report reports/s-20261102-6b4eaf12/002-raw-loop.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          t=json.loads(Path("reports/s-20261102-6b4eaf12/002-raw-loop.json").read_text())
+          assert t["completed"] is False
+          assert t["placement"] is None
+          assert t["guard_forced_ends"] == 0
+          assert "action loop" in t["failure"]
+          print("Verified raw model did NOT finish; no fake match receipt")
+          PY
+      - name: Separately labelled guarded PPO real full-match diagnostic
+        run: |
+          python -m tavern_ai.opportunity_6b4eaf12 --seed 88132 \
+            --model checkpoints/v2/model.zip --guard-budget 30 \
+            --receipt experiments/s-20261102-6b4eaf12/002-v2-guarded-88132.json \
+            --report reports/s-20261102-6b4eaf12/002-guarded-opportunity.json
           python -m tavern_ai.validate_receipt \
-            experiments/s-20261102-6b4eaf12/002-v2-88132.json
+            experiments/s-20261102-6b4eaf12/002-v2-guarded-88132.json
       - name: Paired original baseline complete game on the same fresh seed
         run: |
           python -m tavern_ai.canary --agent-id s-20261102-6b4eaf12 \
@@ -84,15 +99,15 @@ jobs:
           import json
           from pathlib import Path
           root=Path("experiments/s-20261102-6b4eaf12")
-          model=json.loads((root/"002-v2-88132.json").read_text())
+          model=json.loads((root/"002-v2-guarded-88132.json").read_text())
           base=json.loads((root/"002-baseline-88132.json").read_text())
           assert model["seed"]==base["seed"]==88132
           report={"schema":1,"seed":88132,"n_per_arm":1,
                   "v2_rank":model["placements"][0],
                   "baseline_rank":base["placements"][0],
                   "delta_v2_minus_baseline":model["placements"][0]-base["placements"][0],
-                  "new_ppo_steps":0,"v2_raw_no_fallback":True,
-                  "evidence_level":"single-seed exploratory, not a strength claim"}
+                  "new_ppo_steps":0,"v2_guarded":True,"v2_raw_no_fallback":False,
+                  "evidence_level":"single-seed GUARDED policy only; raw model aborted"}
           dest=Path("reports/s-20261102-6b4eaf12/002-paired.json")
           dest.parent.mkdir(parents=True,exist_ok=True)
           dest.write_text(json.dumps(report,indent=2)+"\n")
