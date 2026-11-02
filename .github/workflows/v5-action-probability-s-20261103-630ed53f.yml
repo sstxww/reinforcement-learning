@@ -1,0 +1,75 @@
+name: V5 raw model masked BUY-probability evidence s-20261103-630ed53f
+
+on:
+  push:
+    branches:
+      - 'agent/s-20261103-630ed53f/optimization-001'
+    paths:
+      - '.github/workflows/v5-action-probability-s-20261103-630ed53f.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: v5-action-probability-s630ed53f
+  cancel-in-progress: false
+
+jobs:
+  synthetic-tests-and-authentic-games:
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install bounded test and PPO dependencies
+        run: python -m pip install -e '.[train,test]'
+      - name: Offline synthetic distribution regressions
+        run: python -m pytest -q tests/test_action_probability_s630ed53f.py
+      - name: Install pinned actual TavernGym 1.1.0 engine
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Download immutable unpromoted published PPO candidate
+        run: |
+          set -euo pipefail
+          mkdir -p inputs outputs
+          curl --fail --location --silent --show-error --retry 2 --max-time 180 \
+            -o inputs/model.zip 'https://github.com/sstxww/reinforcement-learning/releases/download/v5-s-20261102-68099929-1408-41428692617/model.zip'
+          curl --fail --location --silent --show-error --retry 2 --max-time 180 \
+            -o inputs/model.metadata.json 'https://github.com/sstxww/reinforcement-learning/releases/download/v5-s-20261102-68099929-1408-41428692617/model.metadata.json'
+          echo 'a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632  inputs/model.zip' | sha256sum -c -
+          python -m tavern_ai.checkpoint_preflight \
+            --model inputs/model.zip \
+            --metadata inputs/model.metadata.json \
+            --expected-sha256 a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632 \
+            --probe-inference > outputs/checkpoint-preflight.json
+      - name: Authentic independent eight-seat baseline
+        run: |
+          timeout 900 python -m tavern_ai.canary \
+            --agent-id s-20261103-630ed53f --seed 99631 --policy baseline \
+            --receipt outputs/001-baseline-99631.json
+          python -m tavern_ai.validate_receipt outputs/001-baseline-99631.json
+      - name: Read-only raw model action distribution on real eight-seat TavernGym
+        run: |
+          timeout 900 python -m tavern_ai.action_probability_s630ed53f \
+            --model inputs/model.zip \
+            --expected-sha256 a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632 \
+            --seed 99631 --max-decisions 1200 \
+            --out outputs/001-raw-action-probability-99631.json
+      - name: Independent authentic raw-model eight-seat official canary (no fallback)
+        run: |
+          timeout 900 python -m tavern_ai.canary \
+            --agent-id s-20261103-630ed53f --seed 99631 \
+            --policy model --model inputs/model.zip \
+            --receipt outputs/001-model-99631.json
+          python -m tavern_ai.validate_receipt outputs/001-model-99631.json
+      - name: Preserve real evidence and diagnostics whether successful or failed
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v5-raw-probs-s630ed53f
+          path: outputs/*.json
+          if-no-files-found: warn
+          retention-days: 30
