@@ -1,0 +1,148 @@
+{
+  "arms": {
+    "turn11-first": {
+      "arm": [
+        11,
+        "first"
+      ],
+      "result": {
+        "decisions": 86,
+        "first_rate": 0.0,
+        "games": 2,
+        "mean_rank": 7,
+        "ranks": [
+          7,
+          7
+        ],
+        "sales": 0,
+        "top4_rate": 0.0,
+        "unpaired_sales": 0
+      }
+    },
+    "turn11-last": {
+      "arm": [
+        11,
+        "last"
+      ],
+      "result": {
+        "decisions": 86,
+        "first_rate": 0.0,
+        "games": 2,
+        "mean_rank": 7,
+        "ranks": [
+          7,
+          7
+        ],
+        "sales": 0,
+        "top4_rate": 0.0,
+        "unpaired_sales": 0
+      }
+    },
+    "turn7-first": {
+      "arm": [
+        7,
+        "first"
+      ],
+      "result": {
+        "decisions": 96,
+        "first_rate": 0.0,
+        "games": 2,
+        "mean_rank": 7,
+        "ranks": [
+          7,
+          7
+        ],
+        "sales": 3,
+        "top4_rate": 0.0,
+        "unpaired_sales": 0
+      }
+    },
+    "turn7-last": {
+      "arm": [
+        7,
+        "last"
+      ],
+      "result": {
+        "decisions": 105,
+        "first_rate": 0.0,
+        "games": 2,
+        "mean_rank": 7.5,
+        "ranks": [
+          7,
+          8
+        ],
+        "sales": 4,
+        "top4_rate": 0.0,
+        "unpaired_sales": 0
+      }
+    }
+  },
+  "conclusion": "Exploratory; four heldout seeds cannot establish rank gain",
+  "engine_source_hash": "6d8712c93022ba11",
+  "heldout_baseline": {
+    "decisions": 191,
+    "first_rate": 0.0,
+    "games": 4,
+    "mean_rank": 7.5,
+    "ranks": [
+      8,
+      7,
+      8,
+      7
+    ],
+    "sales": 0,
+    "top4_rate": 0.0,
+    "unpaired_sales": 0
+  },
+  "heldout_candidate": {
+    "decisions": 222,
+    "first_rate": 0.0,
+    "games": 4,
+    "mean_rank": 7.25,
+    "ranks": [
+      8,
+      7,
+      8,
+      6
+    ],
+    "sales": 10,
+    "top4_rate": 0.0,
+    "unpaired_sales": 0
+  },
+  "heldout_seeds": [
+    59131,
+    59132,
+    59133,
+    59134
+  ],
+  "mean_delta": -0.25,
+  "neural_gradient_steps": 0,
+  "paired_rank_delta_candidate_minus_baseline": [
+    0,
+    0,
+    0,
+    -1
+  ],
+  "selected": "turn7-first",
+  "session_id": "s-20261102-1692601b",
+  "source_commit": "f0458b0bc357c83ee10306f798a2667cf91a6bca",
+  "train_baseline": {
+    "decisions": 86,
+    "first_rate": 0.0,
+    "games": 2,
+    "mean_rank": 7,
+    "ranks": [
+      7,
+      7
+    ],
+    "sales": 0,
+    "top4_rate": 0.0,
+    "unpaired_sales": 0
+  },
+  "train_seeds": [
+    49131,
+    49132
+  ],
+  "training_games": 10,
+  "training_method": "finite real-game selection of 4 sale-swap parameter arms"
+}
