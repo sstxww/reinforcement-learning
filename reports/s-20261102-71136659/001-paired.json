@@ -1,0 +1,26 @@
+{
+  "schema": 1,
+  "type": "descriptive_paired_full_game_screen",
+  "games_per_arm": 1,
+  "pairs": [
+    {
+      "seed": 99373,
+      "seat": 0,
+      "model_rank": 8,
+      "baseline_rank": 5
+    }
+  ],
+  "model_sha256": "8ab19be62d6f43bce92148c08cb975d355f506fab821b77ed96c2b748705e588",
+  "model_mean_placement": 8,
+  "baseline_mean_placement": 5,
+  "paired_mean_placement_delta": 3,
+  "paired_bootstrap_95_interval": null,
+  "model_top4_rate": 0,
+  "baseline_top4_rate": 0,
+  "model_first_place_rate": 0,
+  "baseline_first_place_rate": 0,
+  "fallback_disclosure_complete": false,
+  "statistical_screen_passed_for_human_review": false,
+  "champion_promoted": false,
+  "caveat": "Exploratory percentile bootstrap; seeds and seats must be paired. No strength or Champion claim from this summary."
+}
