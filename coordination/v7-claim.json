@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "task_key": "p2/raw-play-cancel-public-state-cycle",
+  "session_id": "s-20261103-c5d8b870",
+  "round": "001",
+  "role": "EVALUATOR",
+  "state": "claimed",
+  "issued_at": "2026-11-02T19:48:45.135Z",
+  "expires_at": "2026-11-02T20:13:45.135Z",
+  "base_main_sha": "c1b828734527bae6141805581693d890cc3bff94",
+  "branch": "agent/s-20261103-c5d8b870/optimization-001",
+  "scope": [
+    "tavern_ai/play_cancel_cycle_c5d8b870.py",
+    "tests/test_play_cancel_cycle_c5d8b870.py",
+    ".github/workflows/v7-cycle-c5d8b870.yml",
+    "research/sessions/s-20261103-c5d8b870/",
+    "reports/s-20261103-c5d8b870/"
+  ],
+  "integration_lock": false,
+  "note": "Atomic task-claim ref only; not a permission to merge main; will release/expire after handoff."
+}
