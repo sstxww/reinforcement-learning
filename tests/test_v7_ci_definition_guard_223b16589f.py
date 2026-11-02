@@ -14,7 +14,9 @@ REPO = "sstxww/reinforcement-learning"
 
 
 def row(path, **kwargs):
-    return {"filename": path, "status": "modified", **kwargs}
+    item = {"filename": path, "status": "modified"}
+    item.update(kwargs)
+    return item
 
 
 @pytest.mark.parametrize("critical", sorted(guard.CRITICAL))
