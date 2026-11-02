@@ -19,5 +19,5 @@
 - Persistence: JSON receipts committed in Git; temporary 30-day Actions Artifact is not permanent model storage.
 - Failure status: no session-owned errors; another session's upgrade tests failed and were not modified here.
 - Knowledge proposal: research/knowledge/proposals/s-20261102-9c463177-001.md.
-- PR: pending creation against main; remain draft until independent PR CI success and integration review.
+- PR: https://github.com/sstxww/reinforcement-learning/pull/34 (draft; independent PR-head CI queued, integration pending).
 - Next: probe semantic choice utility; use >=30 independently seeded paired matches before claims of playing-strength gain.
