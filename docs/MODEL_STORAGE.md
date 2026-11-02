@@ -14,13 +14,13 @@ A durable prerelease checkpoint exists in **this repository only**:
 
 A prior model in run 41412048034 failed the game safety limit. Its separate checkpoint is only a diagnostic artifact. Do **not** confuse its hash with the later valid candidate. A failed release attempt in infrastructure run 41412807456 returned GitHub 403; the above learning Release is the actually published checkpoint.
 
-The GitHub release asset digest matches the successful game receipt. **Independent download/load/resume verification has not yet been demonstrated**, and neither `best` nor a supported automatic `latest` pointer is established. Full automated recovery after Artifact expiry is **not yet guaranteed**.
+The original 256-step GitHub Release model was **independently downloaded, SHA-256 verified, loaded, and continued for 128 real PPO steps** by [Actions run 41413508653](https://github.com/sstxww/reinforcement-learning/actions/runs/41413508653). That resumed model reached 384 steps and completed a full eight-seat game (seed 23001, rank 8, 263 decisions) and three held-out matches (all rank 8). The verification and receipt-writing steps passed; the workflow's final attempt to publish the new 384-step weight to a Release **failed with HTTP 404**. Consequently the 384-step checkpoint is **not a proven durable Latest**. The original 256-step Release remains reliable. Automatic main-workflow restoration after Artifact expiry is still **not configured and verified**.
 
 ## Workflow and retention
 
 The proposed main `.github/workflows/train.yml` runs weekly (Monday 04:13 UTC) or manually, bounded to 128–20,000 steps and a 180-minute runner timeout. Once reviewed and merged, its successful run also attempts a versioned candidate GitHub Release. The old recent-run restore path still depends on 90-day Actions Artifacts: **Release-based fallback has not been implemented in the latest compatible workflow**. Failed training or model games must not claim successful candidate promotion.
 
-The branch-specific learning workflow already produced the Release above. Do not delete it or all previous models based solely on a more recent model existing.
+A separate successful [Learning V2 run 41413557445](https://github.com/sstxww/reinforcement-learning/actions/runs/41413557445) resumed 256 steps for **1,024 additional steps** (1,280 total), played a model-controlled complete game (seed 23002, rank 8), independently evaluated seeds 24000–24003 (placements [8,8,8,8]), and published durable [Release v2-learning-41413557445](https://github.com/sstxww/reinforcement-learning/releases/tag/v2-learning-41413557445), SHA256 `73bde2666426cecce39f135980a897bb2cd4a7d70783ba04c9c0d29477a6664a`. This is currently the **latest saved experimental candidate**, not Best. Its exact Release-based restart has not separately been verified. Baseline on the same four seeds ranked [7,6,8,8], so no model improvement is supported. Preserve both releases with their hashes until a verified promotion and retention decision.
 
 ## Safe manual cloud restore from the confirmed Release
 
@@ -32,9 +32,9 @@ printf '%s  %s\n' dc5195658995358e70c0d565a979b9cf05ccc5e47ae7adaa0a2f078f01cad9
 python -m tavern_ai.train --steps 128 --seed 42 --resume checkpoints/model.zip --out checkpoints/resumed.zip
 ```
 
-Run on a compatible GitHub runner using the **learning branch code** that understands schema-2 metadata and the exact pinned TavernGym engine; do not run that model on the older main `train.py` without merging the compatibility changes. This is a **proposed restore procedure**, not a claim that the above sequence passed as an independent run.
+Run on a compatible GitHub runner using the **learning branch code** that understands schema-2 metadata and the exact pinned TavernGym engine; do not silently use the older main `train.py` without compatibility changes. The same download, checksum and 128-step resume sequence **did execute successfully** in Actions run 41413508653; its later extra Release upload failed, as documented above.
 
-`models/registry.json` lists releases and evidence. Candidate means experimental and unpromoted; Latest means **tested for resume**; Best needs a reliable independent paired-seed improvement. No single match or three bottom-place finishes justify promotion.
+`models/registry.json` lists releases and evidence. Candidate means experimental and unpromoted; Latest is the **newest durable checkpoint**, not proof that its own Release-based resume was tested; Best needs a reliable independent paired-seed improvement. No single match or three bottom-place finishes justify promotion.
 
 ## Automatic cleanup
 
