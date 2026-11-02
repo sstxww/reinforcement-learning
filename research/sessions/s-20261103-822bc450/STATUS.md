@@ -1,23 +1,21 @@
-# V7 session s-20261103-822bc450 status
-- TASK_KEY: checkpoint/candidate-save-no-clobber
-- ROUND: 001
-- STATE: running; own Actions evidence and PR integration gates pending
-- ROLE: REPAIRER, no exclusive main-integrator lease
-- CLAIM: claims/p1-candidate-save-no-clobber created atomically on current main
-- BASE_MAIN_SHA: 990acd21d598a34a554a80c50089a8f1a9423ac4
-- OWN_BRANCH: agent/s-20261103-822bc450/optimization-001
-- INITIAL_CODE_SHA: 84d0f001216710e760c02ef811a8888490ac8004
-- INITIAL_TEST_SHA: 8f9554d600fab49ef59548d532d83d0707e47085
-- Reused main PRs: #117 Release restore, #125 staged checkpoint, #161 SHA preflight, #166 emergency custody, #176 FREEZE diagnosis, #164 schema-2 continuity. Did not merge these PRs.
-- Avoided active overlap: PR #175 handles *restore*; this branch handles *writer* only. No shared train workflow, registry, model artifacts or other branches touched.
-- Checkpoint source: registered V5 unpromoted 1408-step Release v5-s-20261102-68099929-1408-41428692617, SHA256 a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632; observational/historical only, not downloaded or trained by this session.
-- Contract: TavernGym 1.1.0, observe2, 4017 float features, 447 card slots, 245 actions, engine source hash 6d8712c93022ba11.
-- OWN_PPO_STEPS: 0. OWN_MODEL_RELEASE: none. BEST/CHAMPION promoted: no.
-- OWN_REAL_GAMES: pending separate pinned-engine baseline Actions; not a raw PPO ranking.
-- Paired comparison: none by this session; historical 1408 rank [8,8,8] vs baseline [6,8,8] is other-session work; no strength claim.
-- Root cause verified by source review: os.replace() in save_checkpoint may overwrite an existing output path after another writer creates it; it can leave an incomplete pair if metadata replacement fails.
-- Fix: exclusive os.link into candidate output, rollback own model link on metadata failure; no claim of crash-atomic pair or guarantee against adversarial filesystem path swaps.
-- Tests: seven new offline failure-injection regressions, plus existing checkpoint writer tests. RUN/CI pending.
-- PR: pending own validated receipt and CI.
-- MAIN_MERGE: no; no exclusive main integration lock. Main CI must be checked after any merge.
-- NEXT_ACTION: inspect own isolated GitHub Actions run, download raw game receipt, commit it, open non-Draft PR, verify exact-head CI; then review remaining integration gates.
+# V7 session status — s-20261103-822bc450
+
+1. **TASK_KEY / role / state**: checkpoint/candidate-save-no-clobber; R001; REPAIRER; `ready_for_integration_review` once latest-head PR CI passes, otherwise `pending_ci`. Independent task branch, not INTEGRATOR.
+2. **BASE_MAIN_SHA**: `990acd21d598a34a554a80c50089a8f1a9423ac4`. Last observed advanced main `c1b828734527bae6141805581693d890cc3bff94` through other-session #165; recheck immediately before integration. Own branch `agent/s-20261103-822bc450/optimization-001`; latest PR HEAD must be obtained from GitHub when reviewing.
+3. **Inheritance**: merged main #117 registered Release restore, #125 staged writer, #161 verified resume, #166 emergency custody, #176 rank-eight telemetry, #164 schema-2 continuity, #165 privilege split; **none merged by this session**. Active #175 owns `release_restore_entry.py`, not our separate `checkpoint_writer.py`.
+4. **Claim**: unique ref `claims/p1-candidate-save-no-clobber` created from base SHA; this is TASK ownership only, NOT an exclusive global main-merge lease. PR URL/head, newest CI and review gates must be supplied by subsequent live GitHub inspection.
+5. **Registered model**: canonical unpromoted `v5-s-20261102-68099929-1408-41428692617` Release https://github.com/sstxww/reinforcement-learning/releases/tag/v5-s-20261102-68099929-1408-41428692617 ; SHA256 `a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632`. Historic source, **not downloaded or trained by this session**; optimizer resume is verified by other-session evidence, not here. Engine TavernGym 1.1.0, observe2 4017/447/245, source 6d8712c93022ba11.
+6. **Own training**: 0 PPO steps; no own model.zip, candidate Release, or durable optimizer archive. Budget held to offline writer regressions and one baseline canary due active parallel PPO experiments.
+7. **Actual own complete eight-seat match**: read-only GitHub Actions https://github.com/sstxww/reinforcement-learning/actions/runs/41512471570 **completed SUCCESS**, original Artifact `13172959833`; seed **98413**, controlled seat 0, `baseline` policy, placement **8**, placements `[8,4,7,2,6,1,5,3]`, 14 turns, 41 decisions, `completed:true`, 0 truncated combats, `turn_limit_end:false`. Raw unassisted PPO games by this session: **0**. Original 516-byte JSON: `experiments/s-20261103-822bc450/001-98413.json` SHA256 `a420e86665bcc6c11605254724b519f857d1535707885e02c329d01d3601ecf9`, Git blob `0b8628e9e380af5a72f606719e30551296335b1c`; bytes independently matched artifact ZIP download.
+8. **Paired performance**: none this round; no mean/top4/win evidence for modified PPO. Historical V5 [8,8,8] vs baseline [6,8,8] is inherited, not our result.
+9. **Confirmed defect and repair**: `save_checkpoint` used `os.replace` allowing accidental/writer-race overwrite of candidate output and mismatch on metadata failure. New fail-closed hardlink install uses exclusive `os.link` and rollback on second-link failure, preserving staged hash. Crash between files is not atomic. No claim of model strength improvement or complete adversarial concurrent path-swap defense.
+10. **Failures and retests**: initial run https://github.com/sstxww/reinforcement-learning/actions/runs/41512234993: 12 passed / 1 failed on old interrupted-model-save exception contract; no game executed. `failures/001-preinstall-test-compat.md` records proven cause. Fix `a4765f2cb76e79af3017977cd150a9bcf957300a`; retest run 41512471570 12 tests passed and one authentic baseline game passed. Distinct HEAD; no identical failing-SHA retry.
+11. **Integration / promotion**: current PR pending creation or independent CI; no main merge by this session, no main CI claimed for this branch. Best/Champion not changed.
+12. **Next operation**: open own non-Draft PR with original receipt; verify exact-head full-match PR CI, inspect diff and latest main compatibility, review; only integrator with verified exclusive lease may merge. If green and no lock, label handoff ready_for_integration and do not overwrite others.
+
+## Evidence commits
+- `84d0f001216710e760c02ef811a8888490ac8004` writer race repair
+- `8f9554d600fab49ef59548d532d83d0707e47085` seven new tests
+- `a4765f2cb76e79af3017977cd150a9bcf957300a` preserve original interrupted-save behavior
+- `1e4342caed8a2998073a8cd5c904c95749c4257b` exact run's workflow head
+- `fbc1a8981ceb35f28a62f0c8523fbd1fc5fc4485` original receipt exact bytes
