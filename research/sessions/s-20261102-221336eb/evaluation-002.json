@@ -1,0 +1,76 @@
+{
+  "session_id": "s-20261102-221336eb",
+  "baseline_commit": "315b068bac5ab6d8403c3c9b18f8c101c0cded5d",
+  "round_parent_commit": "9437d569f2097beb383fb116b9998485bb6559bd",
+  "running_commit": "57518ca45244cce7a82b4079743bdce77e7f857b",
+  "run_url": "https://github.com/sstxww/reinforcement-learning/actions/runs/41417053292",
+  "upstream_commit": "fb61201a557ddd36a411cf44aac51ce4d9b606ce",
+  "patch_sha256": "1e48a071cad63c284debbf917cb012595a405a4ef5ab66180eb2918e205aaac0",
+  "engine_version": "1.1.0",
+  "engine_source_hash": "6d8712c93022ba11",
+  "policy_sha256": "b744d6a7c60f83dec5058af5d0a87ee60becee9cf4da1b02e178a349c4184949",
+  "hypothesis": "Cap at three decisions per turn may reduce seat-0 actions despite first-round failure",
+  "max_decisions_per_turn": 3,
+  "baseline": {
+    "games": 6,
+    "seeds": [
+      73201,
+      73202,
+      73203,
+      73204,
+      73205,
+      73206
+    ],
+    "placements": [
+      8,
+      8,
+      6,
+      5,
+      7,
+      6
+    ],
+    "mean_placement": 6.666666666666667,
+    "first_place_rate": 0.0,
+    "top4_rate": 0.0,
+    "mean_decisions": 51,
+    "total_decisions": 306,
+    "budget_interventions": 0
+  },
+  "candidate": {
+    "games": 6,
+    "seeds": [
+      73201,
+      73202,
+      73203,
+      73204,
+      73205,
+      73206
+    ],
+    "placements": [
+      8,
+      8,
+      8,
+      8,
+      8,
+      8
+    ],
+    "mean_placement": 8,
+    "first_place_rate": 0.0,
+    "top4_rate": 0.0,
+    "mean_decisions": 30.333333333333332,
+    "total_decisions": 182,
+    "budget_interventions": 36
+  },
+  "paired_rank_differences_candidate_minus_baseline": [
+    0,
+    0,
+    2,
+    3,
+    1,
+    2
+  ],
+  "paired_mean_rank_delta": 1.3333333333333333,
+  "training_steps": 0,
+  "candidate_is_best": false,
+  "inference": "Exploratory 6 paired games; no superiority claim; independent confirmatory runs needed"
+}

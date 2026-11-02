@@ -1,0 +1,64 @@
+name: Budgeted baseline real-game ablation s-20261102-221336eb
+
+on:
+  push:
+    branches:
+      - 'agent/s-20261102-221336eb/optimization-001'
+    paths:
+      - '.github/workflows/experiment-s-20261102-221336eb.yml'
+      - 'research/sessions/s-20261102-221336eb/budget_experiment.py'
+      - 'tests/test_budget_221336eb.py'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: experiment-s-20261102-221336eb
+  cancel-in-progress: false
+
+jobs:
+  paired-six-seed-ablation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 70
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install isolated test dependencies
+        run: |
+          python -m pip install -e '.[test]'
+      - name: Run real unit regressions
+        run: python -m pytest
+      - name: Install checksum-verified TavernGym 1.1.0
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Run 12 actual paired eight-seat games and produce receipts
+        run: |
+          python research/sessions/s-20261102-221336eb/budget_experiment.py
+          python -m tavern_ai.validate_receipt experiments/s-20261102-221336eb/001-73101.json
+          python scripts/check_pr_evidence.py
+      - name: Preserve source-verified results on this branch only
+        shell: bash
+        run: |
+          test "$GITHUB_REF_NAME" = 'agent/s-20261102-221336eb/optimization-001'
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add experiments/s-20261102-221336eb/ research/sessions/s-20261102-221336eb/ research/knowledge/proposals/s-20261102-221336eb-001.md
+          git diff --cached --quiet && exit 0
+          git commit -m 'results(s-20261102-221336eb): record real paired eight-seat matches'
+          git push origin HEAD:agent/s-20261102-221336eb/optimization-001
+      - name: Retain independent evidence snapshot
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: budget-s-20261102-221336eb-evidence
+          path: |
+            experiments/s-20261102-221336eb/*.json
+            research/sessions/s-20261102-221336eb/*.json
+            research/sessions/s-20261102-221336eb/*.md
+          if-no-files-found: ignore
+          retention-days: 30

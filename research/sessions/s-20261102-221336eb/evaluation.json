@@ -1,0 +1,75 @@
+{
+  "session_id": "s-20261102-221336eb",
+  "baseline_commit": "315b068bac5ab6d8403c3c9b18f8c101c0cded5d",
+  "running_commit": "ef310bfec9e9a7638f0bb0a65b1b08891c6d70b3",
+  "run_url": "https://github.com/sstxww/reinforcement-learning/actions/runs/41416453477",
+  "upstream_commit": "fb61201a557ddd36a411cf44aac51ce4d9b606ce",
+  "patch_sha256": "1e48a071cad63c284debbf917cb012595a405a4ef5ab66180eb2918e205aaac0",
+  "engine_version": "1.1.0",
+  "engine_source_hash": "6d8712c93022ba11",
+  "policy_sha256": "b6c36fde66042bd15d2af97e1c9fb822c70028c26e02f58aaf06cd56add85db2",
+  "hypothesis": "Cap at six decisions per turn may save CPU decisions with little rank penalty",
+  "max_decisions_per_turn": 6,
+  "baseline": {
+    "games": 6,
+    "seeds": [
+      73101,
+      73102,
+      73103,
+      73104,
+      73105,
+      73106
+    ],
+    "placements": [
+      7,
+      7,
+      8,
+      7,
+      7,
+      7
+    ],
+    "mean_placement": 7.166666666666667,
+    "first_place_rate": 0.0,
+    "top4_rate": 0.0,
+    "mean_decisions": 45,
+    "total_decisions": 270,
+    "budget_interventions": 0
+  },
+  "candidate": {
+    "games": 6,
+    "seeds": [
+      73101,
+      73102,
+      73103,
+      73104,
+      73105,
+      73106
+    ],
+    "placements": [
+      5,
+      7,
+      8,
+      7,
+      8,
+      7
+    ],
+    "mean_placement": 7,
+    "first_place_rate": 0.0,
+    "top4_rate": 0.0,
+    "mean_decisions": 45.833333333333336,
+    "total_decisions": 275,
+    "budget_interventions": 12
+  },
+  "paired_rank_differences_candidate_minus_baseline": [
+    -2,
+    0,
+    0,
+    0,
+    1,
+    0
+  ],
+  "paired_mean_rank_delta": -0.16666666666666666,
+  "training_steps": 0,
+  "candidate_is_best": false,
+  "inference": "Exploratory 6 paired games; no superiority claim; independent confirmatory runs needed"
+}
