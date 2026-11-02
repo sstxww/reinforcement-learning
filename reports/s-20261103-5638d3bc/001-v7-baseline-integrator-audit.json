@@ -1,0 +1,67 @@
+{
+  "schema": 1,
+  "session_id": "s-20261103-5638d3bc",
+  "round": 1,
+  "task_key": "eval/v7/raw-v5-1408-seed-1256380",
+  "snapshot_main_sha": "c1b828734527bae6141805581693d890cc3bff94",
+  "snapshot_complete": false,
+  "truth_boundary": "Snapshot at collection; continuously recheck live GitHub before merge or claims",
+  "main_ci": {
+    "url": "https://github.com/sstxww/reinforcement-learning/actions/runs/41512315964",
+    "status": "completed",
+    "conclusion": "success",
+    "sha": "c1b828734527bae6141805581693d890cc3bff94",
+    "eight_seat_baseline_step": "success"
+  },
+  "integration": {
+    "global_exclusive_lease_acquired": false,
+    "main_merge_authorized": false,
+    "repository_rulesets_observed": [],
+    "branch_protection_read": "403 Resource not accessible by integration (unknown protection status)",
+    "serial_gateway_pr": 185,
+    "serial_gateway_head": "a07bd90d2ce886f9cdf54263ed44b81a2d28b212",
+    "gateway_ci_run": "https://github.com/sstxww/reinforcement-learning/actions/runs/41512690022",
+    "gateway_ci_conclusion": "failure",
+    "gateway_ci_issue": "unit/receipt job failure: missing own complete game receipt; full-match step skipped",
+    "our_v7_review": "https://github.com/sstxww/reinforcement-learning/pull/185#issuecomment-6586858030",
+    "review_issue": "CI must match exact current main merge base; do not trust stale PR run rerun"
+  },
+  "model": {
+    "role": "candidate_unpromoted",
+    "release_tag": "v5-s-20261102-68099929-1408-41428692617",
+    "release_url": "https://github.com/sstxww/reinforcement-learning/releases/tag/v5-s-20261102-68099929-1408-41428692617",
+    "total_timesteps": 1408,
+    "checkpoint_sha256": "a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632",
+    "metadata_sha256": "51a651c3a1921447e7bc06c301a52e85331411e75d61b35b5330c43a55aeba9c",
+    "release_zip_bytes": 17525156,
+    "new_timesteps_this_session": 0,
+    "new_checkpoint_or_release_created": false,
+    "champion_or_best_promoted": false
+  },
+  "paired_probe": {
+    "seed": 1256380,
+    "seat": 0,
+    "opponents": "seven TavernGym scripted bots",
+    "arms": [
+      "baseline",
+      "raw unassisted 1408-step model"
+    ],
+    "workflow_run": "https://github.com/sstxww/reinforcement-learning/actions/runs/41513735245",
+    "workflow_source_commit": "59d821ece38ddf1312ffa5473ba7c24bfda692a5",
+    "state_at_snapshot": "queued",
+    "new_completed_games_verified": 0,
+    "rank_result": null,
+    "artifact_id": null,
+    "no_outcome_inferred": true,
+    "retention_days_if_success": 30
+  },
+  "historical_comparison": {
+    "pull_request": "https://github.com/sstxww/reinforcement-learning/pull/168",
+    "seed": 99385,
+    "baseline_rank": 7,
+    "raw_model_rank": 8,
+    "pairs": 1,
+    "statistically_supported_gain": false
+  },
+  "next_action": "Read own Actions #41513735245 actual jobs and logs. If completed, download original raw Artifact, validate unmodified receipts/hashes, commit own experiments + summary, open non-Draft PR and verify latest-head CI; on failure, write failure root-cause log and bounded repair. Do NOT merge without true exclusive lock, independent review and current main+head CI."
+}
