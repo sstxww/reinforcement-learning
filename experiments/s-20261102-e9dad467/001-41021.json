@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "timestamp": "2026-11-02T08:58:06.561434+00:00",
+  "environment": "TavernGym",
+  "engine_source_hash": "6d8712c93022ba11",
+  "engine_version": "1.1.0",
+  "agent_id": "s-20261102-e9dad467",
+  "policy": "baseline",
+  "evaluation_method": "seat-rotation-v1",
+  "seat": 0,
+  "agent_placement": 8,
+  "seed": 41021,
+  "completed": true,
+  "turns": 16,
+  "decisions": 51,
+  "placements": [
+    8,
+    2,
+    7,
+    1,
+    5,
+    3,
+    6,
+    4
+  ],
+  "truncated_combats": 0,
+  "turn_limit_end": false,
+  "git_sha": "a29d5ecef78e058334a8ea03adaf7c73fd3966e2",
+  "policy_sha256": "e4722a44660f8a880c9eeb949c80e81ebb652926f43d71acd64f958762bd6bac",
+  "model_sha256": null,
+  "workflow_run_url": "https://github.com/sstxww/reinforcement-learning/actions/runs/41416644671"
+}
