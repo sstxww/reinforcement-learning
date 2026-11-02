@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "timestamp": "2026-11-02T08:36:55.328765+00:00",
+  "environment": "TavernGym",
+  "engine_source_hash": "6d8712c93022ba11",
+  "engine_version": "1.1.0",
+  "agent_id": "s-20261102-6d2f9a71",
+  "policy": "maskable_ppo_with_40_action_turn_budget",
+  "seed": 61002,
+  "completed": true,
+  "turns": 16,
+  "decisions": 178,
+  "placements": [
+    8,
+    3,
+    1,
+    4,
+    6,
+    2,
+    7,
+    5
+  ],
+  "truncated_combats": 0,
+  "turn_limit_end": false,
+  "per_turn_action_cap": 40,
+  "forced_end_turns": 2,
+  "mandatory_fallback_choices": 0,
+  "git_sha": "332fe14c252d97fc3f7fa75a2e8ffaa0c666a9da",
+  "model_sha256": "4d0c4107a45522d298c9404c6e22b38ff6254fe76d64a5bb5c5fb14bbadc944e"
+}
