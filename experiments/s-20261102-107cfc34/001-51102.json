@@ -1,0 +1,30 @@
+{
+  "agent_id": "s-20261102-107cfc34",
+  "completed": true,
+  "controlled_placement": 8,
+  "controlled_seat": 0,
+  "decisions": 40,
+  "engine_source_hash": "6d8712c93022ba11",
+  "engine_version": "1.1.0",
+  "environment": "TavernGym",
+  "git_sha": "d9cb67f56ac19b5226b9771553cb5025c9c7b9b5",
+  "model_sha256": null,
+  "placements": [
+    8,
+    3,
+    2,
+    6,
+    1,
+    4,
+    5,
+    7
+  ],
+  "policy": "baseline-seat-probe",
+  "policy_sha256": "41fa37e1f0567d2575cbb2320f723f96eca1915c07f7e5b4992e70f178e0f29b",
+  "schema": 1,
+  "seed": 51102,
+  "timestamp": "2026-11-02T08:57:40.332272+00:00",
+  "truncated_combats": 0,
+  "turn_limit_end": false,
+  "turns": 14
+}
