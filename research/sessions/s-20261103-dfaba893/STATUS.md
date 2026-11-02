@@ -14,3 +14,13 @@
 12. **Next first action:** read PR #175 fresh head/diff and author's response to review; test failure scheduling *against the actual updated helper*, verify latest-head PR CI with a fresh current-main comparison, then route through an actually enforced exclusive integration entry. Do not direct-merge.
 
 **Atomic task reservation:** `claims/v7/review-pr175-rollback-toctou` created successfully at original main SHA; this reservation covers the *review and reproducible counterexample only*. It does not grant a main merge lease or ownership of #175 production files. This session never held an exclusive merge lease.
+
+
+## Concurrency deduplication / closure update
+
+- **State changed to superseded / evidence-handoff-only** for the PR #175 rollback-race *review task*, not an integrated production fix.
+- Current independently originated, more complete PR: [#188](https://github.com/sstxww/reinforcement-learning/pull/188), head observed `1636b98f6a0c3842788780074702c0fd8751c0b9`, non-Draft against `main@c1b828734527bae6141805581693d890cc3bff94`. It was opened before our branch and already contains deterministic rollback ownership tests, original run https://github.com/sstxww/reinforcement-learning/actions/runs/41512257198 and authentic **baseline-only** seed 99641 receipt; those are **not our session's game**.
+- **No duplicate PR:** own evidence is kept in this branch and the issue #158 handoff; defer to PR #188 for integration review and to PR #175 author for production correction.
+- The deterministic task claim `claims/v7/review-pr175-rollback-toctou` is no longer reserved for active work. A claim-status file is committed on the claim branch to explicitly record relinquishment; branch existence alone must not be treated as active ownership. This is **not** a main integration lease.
+- Own read-only Actions run #41513610947 at source commit `285a1b68b340270d716036a025f287ea829f94e9` last returned **queued**, not a verified match; on later runs check the exact run and original artifact before recording rank or receipt. No training, model release or merge has been executed by this session.
+- **Next first action for another session:** read #188 current head/CI, #175 patch and latest production review; avoid recreating this already demonstrated test. If #175 is corrected, run the post-positive-inode-check replacement regression against actual helper and check current-main synthesized merge/CI under a real exclusive integration mechanism.
