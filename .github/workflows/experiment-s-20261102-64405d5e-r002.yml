@@ -1,0 +1,81 @@
+name: Held-out purchase-before-play R002 s-20261102-64405d5e
+on:
+  push:
+    branches:
+      - 'agent/s-20261102-64405d5e/optimization-002'
+    paths:
+      - 'tavern_ai/confirm_buy_s64405d5e.py'
+      - 'tests/test_confirm_buy_s64405d5e.py'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: heldout-buy-s-20261102-64405d5e-r002
+  cancel-in-progress: false
+
+jobs:
+  heldout-evaluation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 65
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install regression dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[test]'
+      - name: Unit tests
+        run: python -m pytest
+      - name: Bootstrap verified TavernGym environment
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Run 20 held-out seed pairs plus own full candidate game
+        run: |
+          python -m tavern_ai.confirm_buy_s64405d5e --seed 41100 --paired-seed 41101 --pairs 20
+          python -m tavern_ai.validate_receipt experiments/s-20261102-64405d5e/002-41100.json
+          python - <<'PY'
+          from pathlib import Path
+          import json
+          from tavern_ai.validate_receipt import validate
+          paths = sorted(Path('experiments/s-20261102-64405d5e').rglob('002-*.json'))
+          assert len(paths) == 41, len(paths)
+          for p in paths:
+              d = json.loads(p.read_text())
+              validate(d)
+              assert sorted(d['placements']) == list(range(1, 9))
+              assert not d['truncated_combats']
+          report = json.loads(Path('reports/s-20261102-64405d5e/paired-002.json').read_text())
+          assert report['pairs'] == 20
+          assert report['primary_completed']
+          print('Verified', len(paths), 'real completed full eight-seat R002 games')
+          PY
+      - name: Commit only R002 real receipts and compact metrics
+        run: |
+          test "$GITHUB_REF_NAME" = "agent/s-20261102-64405d5e/optimization-002"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add experiments/s-20261102-64405d5e/002-*.json experiments/s-20261102-64405d5e/controls/002-*.json reports/s-20261102-64405d5e/paired-002.json
+          if ! git diff --cached --quiet; then
+            git commit -m "results(s-20261102-64405d5e): round 002 held-out real game receipts"
+            git pull --rebase origin "$GITHUB_REF_NAME"
+            git push origin HEAD:"$GITHUB_REF_NAME"
+          fi
+      - name: Upload 30-day R002 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: s-20261102-64405d5e-r002-heldout
+          path: |
+            experiments/s-20261102-64405d5e/002-*.json
+            experiments/s-20261102-64405d5e/controls/002-*.json
+            reports/s-20261102-64405d5e/paired-002.json
+          retention-days: 30
+          if-no-files-found: ignore
