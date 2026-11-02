@@ -1,0 +1,88 @@
+name: V7 isolated seat1 raw PPO probe s-20261103-6d43ab93
+
+on:
+  push:
+    branches:
+      - agent/s-20261103-6d43ab93/optimization-001
+    paths:
+      - scripts/v7_seat_probe_6d43ab93.py
+      - tests/test_v7_seat_probe_6d43ab93.py
+      - .github/workflows/v7-seat-probe-6d43ab93.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: v7-seat1-raw1408-s-20261103-6d43ab93
+  cancel-in-progress: false
+
+jobs:
+  genuine-seat1-games:
+    runs-on: ubuntu-latest
+    timeout-minutes: 70
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install bounded probe/test and PPO dependencies
+        run: |
+          python -m pip install -e '.[train,test]'
+      - name: Synthetic provenance and seat tests (not match evidence)
+        run: python -m pytest -q tests/test_v7_seat_probe_6d43ab93.py
+      - name: Install and verify pinned real TavernGym
+        run: bash scripts/bootstrap_engine.sh
+      - name: Genuine eight-seat scripted-baseline game, controlled seat one
+        run: |
+          python scripts/v7_seat_probe_6d43ab93.py \
+            --seed 99741 --seat 1 --policy baseline --max-actions 6000 \
+            --out outputs/v7-baseline-seat1-99741.json
+          python - <<'PY'
+          import json
+          from tavern_ai.receipt_integrity import validate_integrity
+          r=json.load(open("outputs/v7-baseline-seat1-99741.json"))
+          assert validate_integrity(r) and r["seat"]==1
+          assert r["agent_placement"]==r["placements"][1]
+          assert r["policy"]=="baseline"
+          PY
+      - name: Registered Release restore (no silent model reset)
+        run: |
+          python -m tavern_ai.release_restore_entry \
+            --model-id v5-s-20261102-68099929-1408-41428692617 \
+            --out-dir checkpoints
+          echo 'a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632  checkpoints/model.zip' | sha256sum -c -
+      - name: Raw PPO seat-one genuine game or explicit incomplete diagnosis
+        shell: bash
+        run: |
+          set +e
+          python scripts/v7_seat_probe_6d43ab93.py \
+            --seed 99741 --seat 1 --policy model \
+            --model checkpoints/model.zip --max-actions 6000 \
+            --out outputs/v7-model-seat1-99741.json
+          status=$?
+          set -e
+          echo "Raw seat1 model probe exit code: $status (2 means incomplete, no rank)"
+          test -s outputs/v7-model-seat1-99741.json
+          python - <<'PY'
+          import json
+          from tavern_ai.receipt_integrity import validate_integrity
+          p=json.load(open("outputs/v7-model-seat1-99741.json"))
+          if p.get("completed") is True:
+              assert validate_integrity(p)
+              assert p["seat"] == 1 and p["agent_placement"] == p["placements"][1]
+              assert p["model_sha256"] == "a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632"
+              print("Complete, unassisted PPO rank:", p["agent_placement"])
+          else:
+              assert p.get("failure") and "agent_placement" not in p
+              print("Incomplete PPO diagnostic, no placement:", p["failure"])
+          PY
+      - name: Preserve original outputs as temporary diagnostic artifacts only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v7-seat1-s-20261103-6d43ab93-${{ github.run_id }}
+          path: outputs/*.json
+          if-no-files-found: warn
+          retention-days: 30
