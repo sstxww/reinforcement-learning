@@ -1,0 +1,128 @@
+name: Experiment s-20261102-cbc3c4927c card bottleneck
+
+on:
+  push:
+    branches:
+      - agent/s-20261102-cbc3c4927c/optimization-001
+    paths:
+      - .github/workflows/experiment-s-20261102-cbc3c4927c.yml
+      - tavern_ai/model.py
+      - tests/test_model_bottleneck.py
+      - scripts/benchmark_card_encoder.py
+  workflow_dispatch:
+
+# Contents write is used ONLY to append genuine receipts to this unique
+# session branch. No main/other branch is eligible.
+permissions:
+  contents: write
+
+concurrency:
+  group: experiment-s-20261102-cbc3c4927c
+  cancel-in-progress: false
+
+jobs:
+  run-experiment:
+    if: github.ref == 'refs/heads/agent/s-20261102-cbc3c4927c/optimization-001'
+    runs-on: ubuntu-latest
+    timeout-minutes: 65
+    env:
+      SESSION_ID: s-20261102-cbc3c4927c
+      SESSION_BRANCH: agent/s-20261102-cbc3c4927c/optimization-001
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install isolated research dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[train,test]'
+      - name: Engine verification
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Unit tests and encoder benchmark
+        run: |
+          python -m pytest
+          python scripts/benchmark_card_encoder.py --out experiments/$SESSION_ID/001-encoder-benchmark.json
+      - name: Independent full eight-seat baseline game
+        run: |
+          timeout 1000s python -m tavern_ai.canary --agent-id "$SESSION_ID" \
+            --seed 22022 --policy baseline \
+            --receipt "experiments/$SESSION_ID/001-baseline-22022.json"
+          python -m tavern_ai.validate_receipt "experiments/$SESSION_ID/001-baseline-22022.json"
+      - name: Commit baseline receipt immediately
+        run: |
+          test "$GITHUB_REF_NAME" = "$SESSION_BRANCH"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
+          git add "experiments/$SESSION_ID/001-baseline-22022.json" \
+            "experiments/$SESSION_ID/001-encoder-benchmark.json"
+          git commit -m "experiment($SESSION_ID): record real baseline match and encoder benchmark"
+          git push origin "HEAD:refs/heads/$SESSION_BRANCH"
+      - name: Train 128 genuine MaskablePPO timesteps
+        run: |
+          mkdir -p checkpoints/$SESSION_ID
+          start="$(date +%s)"
+          timeout 1200s python -m tavern_ai.train --steps 128 --seed 22021 \
+            --out "checkpoints/$SESSION_ID/model.zip"
+          end="$(date +%s)"
+          echo "$((end-start))" > "checkpoints/$SESSION_ID/train-seconds.txt"
+          sha256sum "checkpoints/$SESSION_ID/model.zip" > "checkpoints/$SESSION_ID/model.sha256"
+      - name: Candidate PPO controls one seat in full game
+        run: |
+          timeout 1000s python -m tavern_ai.canary --agent-id "$SESSION_ID" \
+            --seed 22022 --policy model \
+            --model "checkpoints/$SESSION_ID/model.zip" \
+            --receipt "experiments/$SESSION_ID/001-22022.json"
+          python -m tavern_ai.validate_receipt "experiments/$SESSION_ID/001-22022.json"
+      - name: Write compact metrics and commit own branch only
+        shell: bash
+        run: |
+          python - <<'PY'
+          import hashlib,json,os,pathlib
+          s=os.environ["SESSION_ID"]
+          root=pathlib.Path("experiments")/s
+          trained=json.loads((root/"001-22022.json").read_text())
+          baseline=json.loads((root/"001-baseline-22022.json").read_text())
+          bench=json.loads((root/"001-encoder-benchmark.json").read_text())
+          model=pathlib.Path("checkpoints")/s/"model.zip"
+          metadata=json.loads(model.with_suffix(".metadata.json").read_text())
+          sec=int((model.parent/"train-seconds.txt").read_text().strip())
+          result={
+              "session_id":s,"base_commit":"6ac59235b8238196a0e6462de77b72413c829372",
+              "engine":metadata["engine"],"seed_train":22021,
+              "seed_match":22022,"ppo_training_steps":metadata["total_timesteps"],
+              "train_wall_seconds":sec,
+              "model_checkpoint_sha256":hashlib.sha256(model.read_bytes()).hexdigest(),
+              "checkpoint_status":"GitHub Actions artifact; retention 90 days, NOT permanent",
+              "candidate_rank":trained["placements"][0],"candidate_placements":trained["placements"],
+              "candidate_decisions":trained["decisions"],
+              "baseline_rank":baseline["placements"][0],"baseline_placements":baseline["placements"],
+              "baseline_decisions":baseline["decisions"],
+              "candidate_truncated_combats":trained["truncated_combats"],
+              "candidate_turn_limit_end":trained["turn_limit_end"],
+              "illegal_actions":"none observed (illegal actions raise in canary)",
+              "benchmark":bench,
+              "statistical_conclusion":"One paired seed; no demonstration of playing strength improvement",
+          }
+          (root/"001-summary.json").write_text(json.dumps(result,indent=2),encoding="utf-8")
+          print(json.dumps(result,indent=2))
+          PY
+          test "$GITHUB_REF_NAME" = "$SESSION_BRANCH"
+          git add "experiments/$SESSION_ID/001-22022.json" \
+            "experiments/$SESSION_ID/001-summary.json"
+          git commit -m "experiment($SESSION_ID): record trained model full-game receipt"
+          git push origin "HEAD:refs/heads/$SESSION_BRANCH"
+      - name: Preserve isolated checkpoint and run evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: checkpoint-s-20261102-cbc3c4927c
+          path: |
+            checkpoints/s-20261102-cbc3c4927c/
+            experiments/s-20261102-cbc3c4927c/
+          if-no-files-found: warn
+          retention-days: 90
