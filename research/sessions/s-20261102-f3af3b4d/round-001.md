@@ -59,3 +59,12 @@ Upstream `config.rs` default game config: initial 3 gold, +1 natural refill per 
 ### Limitations and next falsifiable hypothesis
 
 Catalog `implemented` and `scripted` fields are engine-reported **metadata**, not verified cards' trigger schedules or synergy outcomes. The 667-to-666 pool/reachable/implemented distinction warrants a targeted inspection for the excluded card. Next follow-up should select several source-linked card effects (e.g. Battlecry, Deathrattle, Magnetize, triple) and compare actual state transitions in controlled TavernGym instances, then perform separate teacher-imitation and full-game held-out evaluation. Do not promote any model based on this baseline rank-8 game.
+
+## PR gate verification and isolated-path repair
+
+- Draft PR: [#75](https://github.com/sstxww/reinforcement-learning/pull/75); never auto-merged.
+- Original PR CI [41422952917](https://github.com/sstxww/reinforcement-learning/actions/runs/41422952917) **failed** after unit tests: `scripts/check_pr_evidence.py` validates every `experiments/<session>/*.json` as a game receipt, so our static card catalog and diagnostic summary could not live at the root.
+- Fixed by moving both **unchanged blob hashes** under `experiments/s-20261102-f3af3b4d/metadata/` while keeping only `001-real-eight-seat.json` at the root; modified our own source to regenerate the same layout. No shared PR validator changes.
+- Follow-up independent [experiment 41423142798](https://github.com/sstxww/reinforcement-learning/actions/runs/41423142798) **success**; latest input SHA `bbdb765f90f163cf34d9bba219768e4328f7ba7b`, same real baseline game seed 78103 rank 8, turn 15, 46 decisions. Artifact commit `6e9ee72b85d3a96f4be1c75c7dca1a85e15834ba` updated only session-specific files, specifically the timestamped receipt.
+- PR independent [full-match CI 41423152290](https://github.com/sstxww/reinforcement-learning/actions/runs/41423152290) **passed** on `bbdb765f90f163cf34d9bba219768e4328f7ba7b`. However GitHub reported `action_required` for the later bot-generated receipt commit `6e9ee72b85d3a96f4be1c75c7dca1a85e15834ba`, so this documentation-only commit is intended to obtain independently verifiable latest-head PR CI. Never represent the former successful check as a latest-head check.
+- No trained weights or policy-quality claim; this PR remains DRAFT.
