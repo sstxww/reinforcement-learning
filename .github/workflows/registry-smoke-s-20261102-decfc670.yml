@@ -35,7 +35,7 @@ jobs:
       - name: Registry invariants and existing unit tests
         run: |
           python -m pytest
-          python -m tavern_ai.checkpoint_registry --registry models/registry.json
+          python -m tavern_ai.checkpoint_registry --registry models/sessions/s-20261102-decfc670/registry.json
       - name: Bootstrap pinned real TavernGym
         run: bash scripts/bootstrap_engine.sh
       - name: Our own complete eight-seat baseline match
@@ -56,7 +56,7 @@ jobs:
       - name: Independently verify Release bytes, metadata and CPU masked action
         run: |
           python -m tavern_ai.checkpoint_registry \
-            --registry models/registry.json \
+            --registry models/sessions/s-20261102-decfc670/registry.json \
             --model-id v2-learning-41413557445 \
             --model outputs/s-20261102-decfc670/model.zip \
             --metadata outputs/s-20261102-decfc670/model.metadata.json \
