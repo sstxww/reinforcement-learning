@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "timestamp": "2026-11-02T10:36:26.172290+00:00",
+  "environment": "TavernGym",
+  "engine_version": "1.1.0",
+  "engine_source_hash": "6d8712c93022ba11",
+  "agent_id": "s-20261102-83d91476",
+  "policy": "baseline",
+  "seed": 45116,
+  "completed": true,
+  "turns": 15,
+  "decisions": 35,
+  "placements": [
+    8,
+    5,
+    2,
+    7,
+    1,
+    4,
+    6,
+    3
+  ],
+  "truncated_combats": 0,
+  "turn_limit_end": false,
+  "git_sha": "6690f89c00de3a78b8c9a03f94a788f3276e4e4a",
+  "model_sha256": null,
+  "guarded": false,
+  "manual_interventions": 0,
+  "not_pure_model": false,
+  "opportunity_counts": {
+    "buy_legal_exposures": 17,
+    "buys": 9,
+    "guard_forced_end": 0,
+    "policy_chosen_end": 7,
+    "hand_play_band": 11,
+    "tavern_upgrade": 3
+  },
+  "source_run": "https://github.com/sstxww/reinforcement-learning/actions/runs/41429513258",
+  "source_artifact": "https://github.com/sstxww/reinforcement-learning/actions/runs/41429513258/artifacts/13133189224",
+  "provenance_note": "Compact verbatim-derived real match fields from original workflow artifact. Full per-turn diagnostics and model proposals remain inside GitHub Action artifact."
+}

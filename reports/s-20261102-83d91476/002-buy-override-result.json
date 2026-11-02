@@ -1,0 +1,196 @@
+{
+  "schema": 1,
+  "session_id": "s-20261102-83d91476",
+  "round": 2,
+  "workflow_run_id": 41429513258,
+  "workflow_url": "https://github.com/sstxww/reinforcement-learning/actions/runs/41429513258",
+  "artifact_id": 13133189224,
+  "artifact_url": "https://github.com/sstxww/reinforcement-learning/actions/runs/41429513258/artifacts/13133189224",
+  "workflow_conclusion": "success",
+  "source_code_commit": "6690f89c00de3a78b8c9a03f94a788f3276e4e4a",
+  "engine": {
+    "version": "1.1.0",
+    "source_hash": "6d8712c93022ba11",
+    "features": 4017,
+    "cards": 447,
+    "actions": 245
+  },
+  "source_model": {
+    "tag": "v2-learning-41413557445",
+    "sha256": "73bde2666426cecce39f135980a897bb2cd4a7d70783ba04c9c0d29477a6664a",
+    "registered_best": false,
+    "changed_weights": false,
+    "added_ppo_steps": 0
+  },
+  "seeds": [
+    45113,
+    45114,
+    45115,
+    45116
+  ],
+  "per_seed": {
+    "45113": {
+      "raw_v2": {
+        "placement": 8,
+        "buys": 0,
+        "forced_ends": 8,
+        "hand_play_band": 338,
+        "overrides": 0,
+        "guarded": true
+      },
+      "buy_override": {
+        "placement": 8,
+        "buys": 4,
+        "forced_ends": 7,
+        "hand_play_band": 297,
+        "overrides": 4,
+        "guarded": true
+      },
+      "baseline": {
+        "placement": 7,
+        "buys": 16,
+        "forced_ends": 0,
+        "hand_play_band": 18,
+        "overrides": 0,
+        "guarded": false
+      }
+    },
+    "45114": {
+      "raw_v2": {
+        "placement": 8,
+        "buys": 0,
+        "forced_ends": 0,
+        "hand_play_band": 0,
+        "overrides": 0,
+        "guarded": false
+      },
+      "buy_override": {
+        "placement": 8,
+        "buys": 10,
+        "forced_ends": 7,
+        "hand_play_band": 292,
+        "overrides": 10,
+        "guarded": true
+      },
+      "baseline": {
+        "placement": 8,
+        "buys": 16,
+        "forced_ends": 0,
+        "hand_play_band": 17,
+        "overrides": 0,
+        "guarded": false
+      }
+    },
+    "45115": {
+      "raw_v2": {
+        "placement": 8,
+        "buys": 0,
+        "forced_ends": 2,
+        "hand_play_band": 87,
+        "overrides": 0,
+        "guarded": true
+      },
+      "buy_override": {
+        "placement": 8,
+        "buys": 11,
+        "forced_ends": 7,
+        "hand_play_band": 292,
+        "overrides": 11,
+        "guarded": true
+      },
+      "baseline": {
+        "placement": 8,
+        "buys": 13,
+        "forced_ends": 0,
+        "hand_play_band": 10,
+        "overrides": 0,
+        "guarded": false
+      }
+    },
+    "45116": {
+      "raw_v2": {
+        "placement": 8,
+        "buys": 0,
+        "forced_ends": 0,
+        "hand_play_band": 5,
+        "overrides": 0,
+        "guarded": false
+      },
+      "buy_override": {
+        "placement": 8,
+        "buys": 6,
+        "forced_ends": 6,
+        "hand_play_band": 255,
+        "overrides": 6,
+        "guarded": true
+      },
+      "baseline": {
+        "placement": 8,
+        "buys": 9,
+        "forced_ends": 0,
+        "hand_play_band": 11,
+        "overrides": 0,
+        "guarded": false
+      }
+    }
+  },
+  "summary": {
+    "raw_v2": {
+      "ranks": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "buy_legal_exposures": 523,
+      "buy_actions": 0,
+      "forced_end_turns": 10,
+      "guarded_games": 2,
+      "pure_model_completed_games": 2
+    },
+    "model_with_buy_override": {
+      "ranks": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "buy_legal_exposures": 834,
+      "buy_actions": 31,
+      "manual_buy_overrides": 31,
+      "replaced_refresh": 31,
+      "replaced_freeze": 0,
+      "forced_end_turns": 27,
+      "guarded_games": 4,
+      "pure_model_completed_games": 0
+    },
+    "baseline": {
+      "ranks": [
+        7,
+        8,
+        8,
+        8
+      ],
+      "buys": 54,
+      "forced_end_turns": 0
+    },
+    "paired_delta_override_minus_raw": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  "findings": [
+    "Intervention increased actual purchases from zero to 31 across four matches, but did NOT change any model seat-0 placement (all rank 8).",
+    "All 31 interventions replaced Refresh action 1, never Freeze action 2, on these seeds.",
+    "Raw model required forced END_TURN in two games; overridden model required them in all four, 27 total. Do not confuse guarded results with pure PPO skill.",
+    "Hundreds of hand-play-band actions appear in guarded games. Further test state/action progress, hand counts, and action-loop attractors before additional PPO."
+  ],
+  "conclusions": {
+    "strength_improvement": false,
+    "champion_promoted": false,
+    "formal_arena_used": false,
+    "next_hypothesis": "Instrument repeated Play action legal transitions, hand slot/card changes, gold, shop stock and mask; avoid further unbounded training or broad heuristic overrides until stuck-loop mechanism isolated."
+  }
+}
