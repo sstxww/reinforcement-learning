@@ -1,0 +1,78 @@
+name: V6.1 guard-alias integrity and honest paired-game canary 5ac92b95
+
+on:
+  push:
+    branches:
+      - agent/s-20261103-5ac92b95/optimization-001
+    paths:
+      - .github/workflows/v61-guard-alias-5ac92b95.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: v61-guard-alias-5ac92b95
+  cancel-in-progress: false
+
+jobs:
+  integrity-and-real-game:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      GH_TOKEN: ${{ github.token }}
+      MODEL_TAG: v5-s-20261102-68099929-1408-41428692617
+      MODEL_SHA256: a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install fixed dependencies
+        run: python -m pip install -e '.[train,test]'
+      - name: Test alias rejection and full offline suite
+        run: |
+          python -m pytest -q tests/test_paired_guard_alias_s_20261103_5ac92b95.py
+          python -m pytest -q
+      - name: Bootstrap pinned public TavernGym
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Independent real baseline eight-seat game (no guard)
+        run: |
+          mkdir -p outputs inputs
+          timeout 600 python -m tavern_ai.canary --agent-id s-20261103-5ac92b95 --seed 99753 --policy baseline --receipt outputs/001-baseline-99753.json
+          python -m tavern_ai.validate_receipt outputs/001-baseline-99753.json
+          cat outputs/001-baseline-99753.json
+      - name: Verify registered unpromoted Release bytes
+        run: |
+          set -euo pipefail
+          gh release download "$MODEL_TAG" --repo "$GITHUB_REPOSITORY" --pattern model.zip --pattern model.metadata.json --dir inputs
+          echo "$MODEL_SHA256  inputs/model.zip" | sha256sum -c -
+          python -m tavern_ai.checkpoint_preflight --model inputs/model.zip --metadata inputs/model.metadata.json --expected-sha256 "$MODEL_SHA256" --probe-inference > outputs/release-preflight.json
+      - name: Raw unassisted model full eight-seat game (honest failure on stall)
+        run: |
+          timeout 600 python -m tavern_ai.canary --agent-id s-20261103-5ac92b95 --seed 99753 --policy model --model inputs/model.zip --receipt outputs/001-model-99753.json
+          python -m tavern_ai.validate_receipt outputs/001-model-99753.json
+          cat outputs/001-model-99753.json
+      - name: Verify paired receipt is descriptive only
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from tavern_ai.paired_receipt_gate_v5 import compare
+          base=json.loads(Path("outputs/001-baseline-99753.json").read_text())
+          model=json.loads(Path("outputs/001-model-99753.json").read_text())
+          result=compare([model],[base])
+          assert result["pure_model_candidate_games"] == 1
+          assert result["model_promotion_authorized"] is False
+          Path("outputs/001-paired-descriptive.json").write_text(json.dumps(result,indent=2))
+          print(json.dumps(result))
+          PY
+      - name: Upload genuine raw evidence or failure diagnostics (temporary)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v61-guard-alias-5ac92b95-${{ github.run_id }}
+          path: outputs/
+          if-no-files-found: ignore
+          retention-days: 14
