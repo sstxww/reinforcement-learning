@@ -6,7 +6,7 @@
 - Pull Request: https://github.com/sstxww/reinforcement-learning/pull/17 (draft; **no self-merge**). Check final-head PR CI before integration.
 - Actual learning: **512 PPO steps** (256 per variant, seed 71002), real full games: **6**, evaluation seeds: 32001–32003.
 - Best verified mean seat-0 placement: **8.00/8** (both models, n=3 each), top-4 rate **0%**; no strength improvement.
-- Required own full-game receipt: `experiments/s-20261102-1b82df52/001-32001.json`, placement **8**, decisions **107**, candidate six/eight-seat evidence in `comparison.json`.
+- Required own full-game receipt: `experiments/s-20261102-1b82df52/001-32001.json`, placement **8**, decisions **107**, candidate six/eight-seat evidence in `research/sessions/s-20261102-1b82df52/comparison.json`.
 - Environment: TavernGym 1.1.0 / source `6d8712c93022ba11`, 4017/447/245 contract.
 - Successful run: https://github.com/sstxww/reinforcement-learning/actions/runs/41413617114 ; earlier failed run: https://github.com/sstxww/reinforcement-learning/actions/runs/41412975503 .
 - Model storage: GitHub Actions artifact `logscale-s-20261102-1b82df52-41413617114` (artifact ID 13126299055, expires **2027-01-01**); **NOT permanent**.

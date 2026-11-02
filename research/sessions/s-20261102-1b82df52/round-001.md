@@ -22,7 +22,7 @@ Could an odd monotonic signed-log compression of large numerical inputs improve 
 - `MaskablePPO` / MultiInputPolicy, CPU, deterministic evaluation, 128 rollout steps, batch 64, 2 epochs, LR 3e-4, gamma 0.99, GAE 0.95, entropy 0.01, pi/vf [128], extractor dim 256.
 - PPO training seed: 71002 **for each arm**; requested and actual steps 256 + 256 = **512**. Independent evaluation seeds: 32001, 32002, 32003, with 7 simulator rule bots for each controlled seat.
 - Reproduction from this branch on a Linux runner: install `.[train,test]`, `bash scripts/bootstrap_engine.sh`, then `python -m tavern_ai.experiment_logscale --session-id s-20261102-1b82df52 --steps 256 --train-seed 71002 --eval-seed-start 32001 --games 3`. Run in an isolated working directory with a fixed resource timeout. CI workflow uses an 80-minute job timeout and a 55-minute experiment timeout.
-- Successful run: https://github.com/sstxww/reinforcement-learning/actions/runs/41413617114 ; compact, source-generated metrics in `experiments/s-20261102-1b82df52/comparison.json`.
+- Successful run: https://github.com/sstxww/reinforcement-learning/actions/runs/41413617114 ; compact, source-generated metrics in `research/sessions/s-20261102-1b82df52/comparison.json`.
 
 ## One failed iteration and the correction
 - First run https://github.com/sstxww/reinforcement-learning/actions/runs/41412975503 installed the engine, passed tests and began real training, but the newly initialized raw-policy model repeatedly acted without ending turns. The genuine `canary.run` terminated with `RuntimeError: Full-game safety limit exceeded`. **No successful match was claimed for this run.**
@@ -40,7 +40,7 @@ Could an odd monotonic signed-log compression of large numerical inputs improve 
 - Raw control placements: seed 32001 [8,7,4,5,2,1,6,3], seed 32002 [8,1,5,4,2,7,3,6], seed 32003 [8,2,3,7,6,5,1,4].
 - Candidate turns: 16, 13, 16. Candidate forced legal end-turn actions: 2, 4, 4. Control forced end-turn actions: 2, 1, 1. These counts are part of actual receipt JSON.
 - **6/6** full `Game.is_over()` matches, **zero illegal actions** (fail-closed legal-mask assertion), **zero combat truncations**, and `turn_limit_end=false` in all six verified receipts.
-- The mandatory own candidate match is `experiments/s-20261102-1b82df52/001-32001.json`. Source-generated controls and matches are in the same session directory.
+- The mandatory own candidate match is `experiments/s-20261102-1b82df52/001-32001.json`. Source-generated controls and matches are in the session's experiments directory.
 - Mean placement: raw **8.00**, signed-log **8.00**. Top-4 rate **0/3** in each, first-place rate **0/3** in each. Paired rank deltas (signed-log minus raw) **[0,0,0]**.
 - This pilot does **not** establish improved performance or compare with the V0 rule baseline as a trained-policy win criterion. The tiny training budget is a major limitation, and 3 paired games cannot establish statistical significance. All three 8th-place finishes suggest both policies are extremely weak.
 
