@@ -1,0 +1,31 @@
+{
+  "policy": "model",
+  "candidate": {
+    "games": 1,
+    "mean_placement": 8,
+    "top4_rate": 0.0,
+    "first_place_rate": 0.0,
+    "placements": [
+      8
+    ],
+    "seeds": [
+      52614
+    ]
+  },
+  "seed_start": 52614,
+  "comparison": "seven scripted TavernGym bots, not Arena Elo",
+  "inference": "Descriptive results only; small samples do not establish improvement",
+  "baseline": {
+    "games": 1,
+    "mean_placement": 8,
+    "top4_rate": 0.0,
+    "first_place_rate": 0.0,
+    "placements": [
+      8
+    ],
+    "seeds": [
+      52614
+    ]
+  },
+  "paired_mean_placement_delta": 0
+}
