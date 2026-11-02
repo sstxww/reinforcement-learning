@@ -20,4 +20,12 @@
 - Artifacts: compact receipts + comparison.json committed; no model or checkpoint created; temporary engine build and pip caches excluded from Git.
 - Failure modes: changing only insertion position may not fix weak card valuation and economy; composition-dependent effects are unmodeled. No actual TavernArena ranked games.
 - Next step: validate on 30+ fresh paired seeds with bootstrap confidence intervals; if promising, condition insertion on board state or minion stats rather than universal rightmost.
-- PR: to be added after experiment commit; do not merge without CI.
+- PR: https://github.com/sstxww/reinforcement-learning/pull/11 (draft). CI run 41413542460 succeeded on earlier head; re-check final head after this documentation commit.
+
+## Pre-registered pilot versus fresh extension
+
+- **Pilot** seeds 31001–31004 (observed before expansion): control mean 8.0000, candidate mean 6.2500, candidate-minus-control -1.7500. One seed with a seven-rank gain drove this result.
+- **Unseen extension** seeds 31005–31020 (16 new paired seeds, no strategy changes): control mean 6.9375, candidate mean 7.2500, candidate-minus-control **+0.3125**. Positive means worse placement for the candidate.
+- **All 20 pairs:** control mean 7.1500, candidate mean 7.0500, delta -0.1000. This near-zero aggregate does not support a robust performance improvement.
+- Methodological lesson: never select a strategy from a four-game apparent breakthrough. Report fresh seed performance separately from the exploratory seed set. Do not merge this ablation into the shared baseline.
+- First Action run failed from a mistaken test expectation (second hand's rightmost legal slot is action 61, not 55). The test was corrected in commit `d856106f338ee14e75c020cde9c7296b50035ae8`; later unit tests, TavernGym bootstrap, all full matches and receipt persistence passed.
