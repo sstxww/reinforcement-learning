@@ -1,0 +1,53 @@
+name: V7 unassisted PR evidence proof - 296565b1
+
+on:
+  push:
+    branches:
+      - agent/s-20261103-296565b1/optimization-001
+    paths:
+      - .github/workflows/v7-pr-evidence-296565b1.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: v7-evidence-296565b1
+  cancel-in-progress: false
+
+jobs:
+  regression-and-real-baseline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[test]'
+      - name: Focused PR evidence regressions
+        run: |
+          python -m pytest -q tests/test_v7_pr_evidence_296565b1.py tests/test_receipt_integrity.py
+      - name: Install pinned public TavernGym
+        run: bash scripts/bootstrap_engine.sh
+      - name: Confirm real engine contract
+        run: python -m tavern_ai.contract
+      - name: Independent full eight-seat baseline game
+        run: |
+          mkdir -p outputs
+          python -m tavern_ai.canary \
+            --agent-id s-20261103-296565b1 \
+            --seed 94773 --policy baseline \
+            --receipt outputs/001-94773.json
+          python -m tavern_ai.validate_receipt outputs/001-94773.json
+          python -c 'import json; from tavern_ai.receipt_integrity import validate_integrity; from scripts.check_pr_evidence import require_unassisted; p=json.load(open("outputs/001-94773.json")); validate_integrity(p); require_unassisted(p); print("OWN_FULL_MATCH_VALIDATED")'
+      - name: Preserve original generated receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v7-evidence-s-20261103-296565b1-${{ github.run_id }}
+          path: outputs/001-94773.json
+          if-no-files-found: ignore
+          retention-days: 30
