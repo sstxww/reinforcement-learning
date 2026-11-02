@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "timestamp": "2026-11-02T10:20:14.275905+00:00",
+  "timestamp": "2026-11-02T10:26:50.607214+00:00",
   "environment": "TavernGym",
   "engine_source_hash": "6d8712c93022ba11",
   "engine_version": "1.1.0",
@@ -22,6 +22,6 @@
   ],
   "truncated_combats": 0,
   "turn_limit_end": false,
-  "git_sha": "c2eb34d1f8f62eb2600ec55619a09cc5bb7532b6",
+  "git_sha": "9632d6b471298c8f669587a7e93381b28895892c",
   "model_sha256": null
 }
