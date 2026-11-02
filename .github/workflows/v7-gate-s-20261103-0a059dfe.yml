@@ -1,0 +1,48 @@
+name: V7 isolated integration-head gate s-20261103-0a059dfe
+
+on:
+  push:
+    branches:
+      - agent/s-20261103-0a059dfe/optimization-001
+    paths:
+      - .github/workflows/v7-gate-s-20261103-0a059dfe.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: v7-gate-s-20261103-0a059dfe
+  cancel-in-progress: false
+
+jobs:
+  verified-review-and-game:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install lightweight test dependencies
+        run: python -m pip install -e '.[test]'
+      - name: Verify strict merge preflight regression
+        run: python -m pytest tests/test_v7_pr_gate_s_20261103_0a059dfe.py
+      - name: Install and verify pinned TavernGym
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Own genuine complete eight-seat baseline smoke
+        run: |
+          mkdir -p outputs
+          python -m tavern_ai.canary --agent-id s-20261103-0a059dfe --seed 96031 --policy baseline --receipt outputs/001-96031.json
+          python -m tavern_ai.validate_receipt outputs/001-96031.json
+          sha256sum outputs/001-96031.json > outputs/001-96031.sha256
+      - name: Preserve independent match evidence (temporary Artifact only)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v7-gate-s-20261103-0a059dfe
+          path: outputs/*
+          retention-days: 30
+          if-no-files-found: ignore
