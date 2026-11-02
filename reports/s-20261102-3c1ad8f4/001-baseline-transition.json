@@ -1,0 +1,103 @@
+{
+  "schema": 1,
+  "seed": 87311,
+  "policy": "baseline",
+  "release_source": null,
+  "model_sha256": null,
+  "model_rank": 8,
+  "engine": {
+    "version": "1.1.0",
+    "source_hash": "6d8712c93022ba11",
+    "features": 4017,
+    "cards": 447,
+    "actions": 245,
+    "n_cards": 3984
+  },
+  "telemetry": {
+    "decisions": 41,
+    "guard_forced_ends": 0,
+    "action_families": {
+      "buy": {
+        "cards_changed_total": 43,
+        "decisions": 8,
+        "features_changed_total": 324,
+        "public_observation_changed": 8,
+        "same_turn_comparisons": 8
+      },
+      "end": {
+        "decisions": 7,
+        "not_comparable_after_action": 7
+      },
+      "other": {
+        "cards_changed_total": 65,
+        "decisions": 14,
+        "features_changed_total": 342,
+        "not_comparable_after_action": 1,
+        "public_observation_changed": 13,
+        "same_turn_comparisons": 13
+      },
+      "play": {
+        "cards_changed_total": 61,
+        "decisions": 9,
+        "features_changed_total": 441,
+        "public_observation_changed": 9,
+        "same_turn_comparisons": 9
+      },
+      "upgrade": {
+        "cards_changed_total": 0,
+        "decisions": 3,
+        "features_changed_total": 22,
+        "public_observation_changed": 3,
+        "same_turn_comparisons": 3
+      }
+    },
+    "turns": {
+      "0": {
+        "buy_legal_exposures": 0,
+        "decisions": 1
+      },
+      "1": {
+        "buy_legal_exposures": 1,
+        "buys": 1,
+        "decisions": 4
+      },
+      "2": {
+        "buy_legal_exposures": 1,
+        "decisions": 3
+      },
+      "3": {
+        "buy_legal_exposures": 1,
+        "buys": 1,
+        "decisions": 5
+      },
+      "4": {
+        "buy_legal_exposures": 3,
+        "buys": 2,
+        "decisions": 6
+      },
+      "5": {
+        "buy_legal_exposures": 2,
+        "buys": 1,
+        "decisions": 5
+      },
+      "6": {
+        "buy_legal_exposures": 4,
+        "buys": 2,
+        "decisions": 10
+      },
+      "7": {
+        "buy_legal_exposures": 3,
+        "buys": 1,
+        "decisions": 7
+      }
+    },
+    "examples": [],
+    "limitations": [
+      "A same-turn identical observe2 projection DOES NOT prove that internal game state was unchanged.",
+      "BUY mask-legal exposures can repeat within a turn and are not independent offers or proof of a good purchase.",
+      "Model games with any forced END_TURN are guarded, not raw policy results."
+    ]
+  },
+  "training_steps_this_run": 0,
+  "competitive_gain_claim": false
+}

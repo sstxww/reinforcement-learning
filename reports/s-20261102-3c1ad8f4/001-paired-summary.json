@@ -1,0 +1,59 @@
+{
+  "schema": 1,
+  "analysis": "public-observation-only transition audit",
+  "seed": 87311,
+  "games": 2,
+  "training_steps_this_run": 0,
+  "source_release": "v2-learning-41413557445",
+  "source_model_sha256": "73bde2666426cecce39f135980a897bb2cd4a7d70783ba04c9c0d29477a6664a",
+  "baseline_rank": 8,
+  "candidate_rank": 8,
+  "baseline": {
+    "refresh": {},
+    "freeze": {},
+    "move": {},
+    "buy": {
+      "cards_changed_total": 43,
+      "decisions": 8,
+      "features_changed_total": 324,
+      "public_observation_changed": 8,
+      "same_turn_comparisons": 8
+    },
+    "end": {
+      "decisions": 7,
+      "not_comparable_after_action": 7
+    }
+  },
+  "candidate": {
+    "refresh": {
+      "cards_changed_total": 157,
+      "decisions": 40,
+      "features_changed_total": 834,
+      "public_observation_changed": 40,
+      "same_turn_comparisons": 40
+    },
+    "freeze": {
+      "cards_changed_total": 0,
+      "decisions": 70,
+      "features_changed_total": 430,
+      "public_observation_changed": 70,
+      "same_turn_comparisons": 70
+    },
+    "move": {},
+    "buy": {
+      "cards_changed_total": 6,
+      "decisions": 1,
+      "features_changed_total": 41,
+      "public_observation_changed": 1,
+      "same_turn_comparisons": 1
+    },
+    "end": {
+      "decisions": 7,
+      "guard_forced": 1,
+      "not_comparable_after_action": 7
+    }
+  },
+  "model_guard_forced_ends": 1,
+  "promotion_allowed": false,
+  "interpretation": "One paired seed is a diagnosis only. Public observe2 equality is not internal state equality; guarded results are not raw policy results."
+}
