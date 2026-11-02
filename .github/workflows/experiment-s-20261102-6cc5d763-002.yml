@@ -1,0 +1,70 @@
+name: "Prebuy-refresh Round 002 s-20261102-6cc5d763"
+on:
+  push:
+    branches:
+      - "agent/s-20261102-6cc5d763/optimization-002"
+    paths:
+      - ".github/workflows/experiment-s-20261102-6cc5d763-002.yml"
+      - "tavern_ai/prebuy_refresh.py"
+      - "tests/test_prebuy_refresh.py"
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: "prebuy-refresh-s-20261102-6cc5d763-r002"
+  cancel-in-progress: false
+jobs:
+  real-matches:
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install and execute unit tests
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[test]'
+          python -m pytest
+      - name: Install and verify pinned official TavernGym
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: One new-policy canary plus four genuine paired full-game matches
+        run: |
+          python -m tavern_ai.prebuy_refresh --seed 36511 --start-seed 36512 --games 4
+          python -m tavern_ai.validate_receipt experiments/s-20261102-6cc5d763/002-36511.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=json.loads(Path("reports/s-20261102-6cc5d763/round-002.json").read_text())
+          assert p["mandatory"]["completed"] and p["intervention_valid"]
+          assert p["baseline"]["games"] == p["candidate"]["games"] == 4
+          assert p["ppo_training_steps"] == 0
+          print("VERIFIED_FULL_GAMES", 1 + 2 * p["candidate"]["games"])
+          print("ACTUAL_REFRESH_INTERVENTIONS", p["total_candidate_refreshes"])
+          PY
+      - name: Commit own real receipts only, never shared data
+        if: success()
+        shell: bash
+        run: |
+          test "$GITHUB_REF_NAME" = "agent/s-20261102-6cc5d763/optimization-002"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "experiments/s-20261102-6cc5d763" "reports/s-20261102-6cc5d763"
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "results(s-20261102-6cc5d763): persist R002 real nine-match intervention test"
+          git pull --rebase origin "$GITHUB_REF_NAME"
+          git push origin "HEAD:$GITHUB_REF_NAME"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: "prebuy-s-20261102-6cc5d763-${{ github.run_id }}"
+          path: |
+            experiments/s-20261102-6cc5d763/*.json
+            reports/s-20261102-6cc5d763/*.json
+          retention-days: 30
+          if-no-files-found: ignore

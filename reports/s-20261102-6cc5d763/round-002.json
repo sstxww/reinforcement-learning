@@ -1,0 +1,73 @@
+{
+  "session_id": "s-20261102-6cc5d763",
+  "round": 2,
+  "base_main": "315b068bac5ab6d8403c3c9b18f8c101c0cded5d",
+  "engine_version": "1.1.0",
+  "engine_source_hash": "6d8712c93022ba11",
+  "policy": "prebuy-refresh-v1",
+  "policy_sha256": "8af4b69abc82f6c7edc415352f23a73a7a502725cdaa1bbd7129b8b2527fd010",
+  "ppo_training_steps": 0,
+  "checkpoint": null,
+  "mandatory": {
+    "seed": 36511,
+    "rank": 8,
+    "decisions": 43,
+    "turns": 14,
+    "refreshes_chosen": 5,
+    "completed": true,
+    "receipt": "experiments/s-20261102-6cc5d763/002-36511.json"
+  },
+  "baseline": {
+    "games": 4,
+    "seeds": [
+      36512,
+      36513,
+      36514,
+      36515
+    ],
+    "ranks": [
+      5,
+      8,
+      7,
+      8
+    ],
+    "mean_rank": 7.0,
+    "first_place_rate": 0.0,
+    "top4_rate": 0.0
+  },
+  "candidate": {
+    "games": 4,
+    "seeds": [
+      36512,
+      36513,
+      36514,
+      36515
+    ],
+    "ranks": [
+      7,
+      8,
+      2,
+      8
+    ],
+    "mean_rank": 6.25,
+    "first_place_rate": 0.0,
+    "top4_rate": 0.25
+  },
+  "paired_rank_delta": [
+    2,
+    0,
+    -5,
+    0
+  ],
+  "mean_rank_delta": -0.75,
+  "refreshes_per_candidate_game": [
+    5,
+    5,
+    6,
+    9,
+    7
+  ],
+  "total_candidate_refreshes": 32,
+  "intervention_valid": true,
+  "interpretation": "Small descriptive pilot; not evidence of strength improvement"
+}
