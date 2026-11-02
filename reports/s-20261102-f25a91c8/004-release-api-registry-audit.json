@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "session_id": "s-20261102-f25a91c8",
+  "scope": "GitHub Release API and tracked index consistency only",
+  "checked_at_utc": "2026-11-02T13:14:22.761Z",
+  "source_release_api": "https://api.github.com/repos/sstxww/reinforcement-learning/releases/tags/v5-s-20261102-68099929-1408-41428692617",
+  "registry_path": "models/registry.json",
+  "asset_index_path": "models/release_asset_digests.json",
+  "model_id": "v5-s-20261102-68099929-1408-41428692617",
+  "model_role": "candidate_unpromoted",
+  "release_exists": true,
+  "release_draft": false,
+  "release_prerelease": true,
+  "assets": {
+    "model": {
+      "filename": "model.zip",
+      "size_bytes": 17525156,
+      "api_sha256": "a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632"
+    },
+    "metadata": {
+      "filename": "model.metadata.json",
+      "size_bytes": 968,
+      "api_sha256": "51a651c3a1921447e7bc06c301a52e85331411e75d61b35b5330c43a55aeba9c"
+    }
+  },
+  "api_digest_matches_canonical_registry": true,
+  "api_digest_matches_tracked_asset_index": true,
+  "reported_total_timesteps": 1408,
+  "reported_heldout_placements": [
+    8,
+    8,
+    8
+  ],
+  "reported_baseline_placements": [
+    6,
+    8,
+    8
+  ],
+  "verified_by_this_session": {
+    "release_get": true,
+    "asset_presence": true,
+    "hash_consistency_of_api_and_index": true,
+    "actual_downloaded_zip_bytes": false,
+    "actual_downloaded_metadata_bytes": false,
+    "cpu_load": false,
+    "optimizer_resume": false,
+    "new_full_match": false,
+    "new_training": false
+  },
+  "champion": null,
+  "approved_for_champion": false,
+  "note": "GitHub Release API SHA256 digest is source metadata; independent byte download + SHA256, SB3 load, and optimizer resume are separate gates. This session did not download binary assets or save a new model."
+}
