@@ -107,7 +107,7 @@ def classify(pr: dict, ci: dict) -> tuple[str, list[str]]:
     ]
 
 
-def audit(repo: str, max_prs: int = 100) -> dict:
+def audit(repo: str, max_prs: int = 250) -> dict:
     base = repo_path(repo)
     main_sha = api_get(base + "/branches/main")["commit"]["sha"]
     listings = all_open_prs(base)
@@ -149,7 +149,7 @@ def audit(repo: str, max_prs: int = 100) -> dict:
 def main() -> None:
     p = argparse.ArgumentParser()
     p.add_argument("--repo", default="sstxww/reinforcement-learning")
-    p.add_argument("--max-prs", type=int, default=100)
+    p.add_argument("--max-prs", type=int, default=250)
     p.add_argument("--out", type=Path, required=True)
     args = p.parse_args()
     result = audit(args.repo, args.max_prs)
