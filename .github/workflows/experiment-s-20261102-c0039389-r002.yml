@@ -1,0 +1,99 @@
+name: "All-seat sweep R002 s-20261102-c0039389"
+
+on:
+  push:
+    branches:
+      - agent/s-20261102-c0039389/optimization-002
+    paths:
+      - tavern_ai/seat_sweep_experiment.py
+      - tests/test_seat_sweep_experiment.py
+      - .github/workflows/experiment-s-20261102-c0039389-r002.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: experiment-s-20261102-c0039389-r002
+  cancel-in-progress: false
+
+jobs:
+  all-eight-seat-real-simulation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 80
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install all test dependencies
+        run: python -m pip install -e '.[test]'
+      - name: Unit and regression tests
+        run: python -m pytest
+      - name: Bootstrap verified pinned TavernGym
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Run 33 complete true eight-seat matches on held-out seeds
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m tavern_ai.seat_sweep_experiment \
+            --agent-id s-20261102-c0039389 \
+            --canary-seed 45720 \
+            --seeds 45721 45722 45723 45724 \
+            --out-dir experiments/s-20261102-c0039389 \
+            --report reports/s-20261102-c0039389/seat-sweep-r002.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from tavern_ai.seat_position_experiment import verify_controlled_receipt
+          root = Path("experiments/s-20261102-c0039389")
+          canary = root / "002-45720.json"
+          assert canary.exists(), "Missing independent R002 controlled-seat canary"
+          r = json.loads(canary.read_text())
+          assert verify_controlled_receipt(r)
+          assert r["seed"] == 45720 and r["controlled_seat"] == 7
+          files = sorted(root.glob("sweep-*.json"))
+          assert len(files) == 32, f"Expected 32 new genuine sweep games, got {len(files)}"
+          observed=set()
+          for file in files:
+              r=json.loads(file.read_text())
+              assert verify_controlled_receipt(r)
+              assert r["completed"] and r["truncated_combats"]==0 and not r["turn_limit_end"]
+              observed.add((r["seed"],r["controlled_seat"]))
+          expected={(seed,seat) for seed in [45721,45722,45723,45724] for seat in range(8)}
+          assert observed == expected, f"Missing or duplicated seat-seed experiments: {expected ^ observed}"
+          print("Validated real R002 canary and 32 fresh held-out seat games")
+          PY
+      - name: Preserve real Round 002 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: seat-sweep-s-20261102-c0039389-${{ github.run_id }}
+          path: |
+            experiments/s-20261102-c0039389/002-45720.json
+            experiments/s-20261102-c0039389/sweep-*.json
+            reports/s-20261102-c0039389/seat-sweep-r002.json
+          if-no-files-found: ignore
+          retention-days: 30
+      - name: Commit only our own new R002 verified records
+        if: success()
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = 'agent/s-20261102-c0039389/optimization-002'
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add experiments/s-20261102-c0039389/002-45720.json
+          git add experiments/s-20261102-c0039389/sweep-*.json
+          git add reports/s-20261102-c0039389/seat-sweep-r002.json
+          if git diff --cached --quiet; then
+            echo "No new verified records to commit"
+            exit 0
+          fi
+          git commit -m "results(s-20261102-c0039389): round 002 true all-seat TavernGym sweep"
+          git pull --rebase origin "$GITHUB_REF_NAME"
+          git push origin HEAD:"$GITHUB_REF_NAME"
