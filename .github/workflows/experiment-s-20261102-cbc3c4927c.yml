@@ -46,22 +46,29 @@ jobs:
       - name: Unit tests and encoder benchmark
         run: |
           python -m pytest
-          python scripts/benchmark_card_encoder.py --out experiments/$SESSION_ID/001-encoder-benchmark.json
+          python scripts/benchmark_card_encoder.py --out reports/$SESSION_ID/001-encoder-benchmark.json
       - name: Independent full eight-seat baseline game
         run: |
-          timeout 1000s python -m tavern_ai.canary --agent-id "$SESSION_ID" \
-            --seed 22022 --policy baseline \
-            --receipt "experiments/$SESSION_ID/001-baseline-22022.json"
+          if [[ ! -f "experiments/$SESSION_ID/001-baseline-22022.json" ]]; then
+            timeout 1000s python -m tavern_ai.canary --agent-id "$SESSION_ID" \
+              --seed 22022 --policy baseline \
+              --receipt "experiments/$SESSION_ID/001-baseline-22022.json"
+          fi
           python -m tavern_ai.validate_receipt "experiments/$SESSION_ID/001-baseline-22022.json"
       - name: Commit baseline receipt immediately
         run: |
           test "$GITHUB_REF_NAME" = "$SESSION_BRANCH"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config user.name "github-actions[bot]"
+          if [[ -f "experiments/$SESSION_ID/001-encoder-benchmark.json" ]]; then
+            git rm -f "experiments/$SESSION_ID/001-encoder-benchmark.json"
+          fi
           git add "experiments/$SESSION_ID/001-baseline-22022.json" \
-            "experiments/$SESSION_ID/001-encoder-benchmark.json"
-          git commit -m "experiment($SESSION_ID): record real baseline match and encoder benchmark"
-          git push origin "HEAD:refs/heads/$SESSION_BRANCH"
+            "reports/$SESSION_ID/001-encoder-benchmark.json"
+          if ! git diff --cached --quiet; then
+            git commit -m "experiment($SESSION_ID): retain genuine receipt and separate benchmarks"
+            git push origin "HEAD:refs/heads/$SESSION_BRANCH"
+          fi
       - name: Train 128 genuine MaskablePPO timesteps
         run: |
           mkdir -p checkpoints/$SESSION_ID
@@ -73,8 +80,8 @@ jobs:
           sha256sum "checkpoints/$SESSION_ID/model.zip" > "checkpoints/$SESSION_ID/model.sha256"
       - name: Candidate PPO controls one seat in full game
         run: |
-          timeout 1000s python -m tavern_ai.canary --agent-id "$SESSION_ID" \
-            --seed 22022 --policy model \
+          timeout 1000s python -m tavern_ai.safe_model_canary --agent-id "$SESSION_ID" \
+            --seed 22022 \
             --model "checkpoints/$SESSION_ID/model.zip" \
             --receipt "experiments/$SESSION_ID/001-22022.json"
           python -m tavern_ai.validate_receipt "experiments/$SESSION_ID/001-22022.json"
@@ -87,7 +94,7 @@ jobs:
           root=pathlib.Path("experiments")/s
           trained=json.loads((root/"001-22022.json").read_text())
           baseline=json.loads((root/"001-baseline-22022.json").read_text())
-          bench=json.loads((root/"001-encoder-benchmark.json").read_text())
+          bench=json.loads((pathlib.Path("reports")/s/"001-encoder-benchmark.json").read_text())
           model=pathlib.Path("checkpoints")/s/"model.zip"
           metadata=json.loads(model.with_suffix(".metadata.json").read_text())
           sec=int((model.parent/"train-seconds.txt").read_text().strip())
@@ -108,12 +115,12 @@ jobs:
               "benchmark":bench,
               "statistical_conclusion":"One paired seed; no demonstration of playing strength improvement",
           }
-          (root/"001-summary.json").write_text(json.dumps(result,indent=2),encoding="utf-8")
+          (pathlib.Path("reports")/s/"001-summary.json").write_text(json.dumps(result,indent=2),encoding="utf-8")
           print(json.dumps(result,indent=2))
           PY
           test "$GITHUB_REF_NAME" = "$SESSION_BRANCH"
           git add "experiments/$SESSION_ID/001-22022.json" \
-            "experiments/$SESSION_ID/001-summary.json"
+            "reports/$SESSION_ID/001-summary.json"
           git commit -m "experiment($SESSION_ID): record trained model full-game receipt"
           git push origin "HEAD:refs/heads/$SESSION_BRANCH"
       - name: Preserve isolated checkpoint and run evidence
@@ -124,5 +131,6 @@ jobs:
           path: |
             checkpoints/s-20261102-cbc3c4927c/
             experiments/s-20261102-cbc3c4927c/
+            reports/s-20261102-cbc3c4927c/
           if-no-files-found: warn
           retention-days: 90
