@@ -3,8 +3,8 @@
   "task_key": "eval/active-checkpoint-receipt-sha",
   "session_id": "s-20261103-24c1fb65",
   "round_id": "R001",
-  "claim_scope": "task-only; NOT a global integration/merge lease",
-  "status": "running",
+  "claim_scope": "historical task claim only; not held exclusive now; never a main merge lease",
+  "status": "handoff_pending_exact_head_ci",
   "base_main_sha": "c1b828734527bae6141805581693d890cc3bff94",
   "branch": "agent/s-20261103-24c1fb65/optimization-001",
   "commit_sha": "2ce49034691909ace685dab5e534e588bdcdbabc",
@@ -16,5 +16,11 @@
     "research/knowledge/proposals/s-20261103-24c1fb65-001.md"
   ],
   "action_run": "https://github.com/sstxww/reinforcement-learning/actions/runs/41513100032",
-  "handoff": "If the session terminates, inspect linked PR and CI; do not assume ownership or successful completion. Global integration owner is separate."
+  "handoff": "If the session terminates, inspect linked PR and CI; do not assume ownership or successful completion. Global integration owner is separate.",
+  "latest_pr": "https://github.com/sstxww/reinforcement-learning/pull/226",
+  "head_sha": "591bb91853e39fdd959b360781fe006b31fa0c56",
+  "exact_head_pr_ci_run": "https://github.com/sstxww/reinforcement-learning/actions/runs/41514542460",
+  "actual_run_success": "https://github.com/sstxww/reinforcement-learning/actions/runs/41513100032",
+  "original_receipt": "experiments/s-20261103-24c1fb65/001-97551-baseline.json",
+  "next": "Check exact PR head CI and Draft #148 overlap. Do NOT merge without enforced exclusive main integration path (issue #182). No action required from former session for task ownership."
 }
