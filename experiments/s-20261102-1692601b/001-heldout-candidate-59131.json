@@ -1,0 +1,43 @@
+{
+  "action_histogram": {
+    "buy": 14,
+    "end_turn": 8,
+    "other": 4,
+    "play_magnetize": 11,
+    "sell": 2,
+    "upgrade": 3
+  },
+  "agent_id": "s-20261102-1692601b",
+  "completed": true,
+  "decisions": 42,
+  "engine_source_hash": "6d8712c93022ba11",
+  "engine_version": "1.1.0",
+  "environment": "TavernGym",
+  "followup_buys": 2,
+  "git_sha": "f0458b0bc357c83ee10306f798a2667cf91a6bca",
+  "model_sha256": null,
+  "placements": [
+    8,
+    3,
+    7,
+    2,
+    5,
+    6,
+    1,
+    4
+  ],
+  "policy": "sell_swap",
+  "policy_config": [
+    7,
+    "first"
+  ],
+  "safety_override_count": 0,
+  "sales_interventions": 2,
+  "schema": 1,
+  "seed": 59131,
+  "timestamp": "2026-11-02T09:39:22.443291+00:00",
+  "truncated_combats": 0,
+  "turn_limit_end": false,
+  "turns": 15,
+  "unpaired_sales": 0
+}

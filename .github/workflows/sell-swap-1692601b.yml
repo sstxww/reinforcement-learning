@@ -1,0 +1,55 @@
+name: Sell-swap calibration s-20261102-1692601b
+on:
+  push:
+    branches: ['agent/s-20261102-1692601b/optimization-001']
+    paths:
+      - 'tavern_ai/sell_swap_1692601b.py'
+      - 'tests/test_sell_swap_1692601b.py'
+      - '.github/workflows/sell-swap-1692601b.yml'
+permissions:
+  contents: write
+concurrency:
+  group: sell-swap-1692601b
+  cancel-in-progress: false
+jobs:
+  calibration:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Unit tests
+        run: |
+          python -m pip install -e '.[test]'
+          python -m pytest
+      - name: Fixed official rules engine
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Run 18 true full eight-player games
+        run: |
+          python -m tavern_ai.sell_swap_1692601b --out-dir experiments/s-20261102-1692601b --metrics research/sessions/s-20261102-1692601b/metrics.json
+          for f in experiments/s-20261102-1692601b/*.json; do python -m tavern_ai.validate_receipt "$f"; done
+      - name: Save independently generated receipts
+        run: |
+          test "$GITHUB_REF_NAME" = "agent/s-20261102-1692601b/optimization-001"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add experiments/s-20261102-1692601b research/sessions/s-20261102-1692601b/metrics.json
+          if ! git diff --cached --quiet; then
+            git commit -m "evidence: sell-swap real games [skip ci]"
+            git push origin HEAD:"$GITHUB_REF_NAME"
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: sell-swap-1692601b-evidence
+          path: |
+            experiments/s-20261102-1692601b/*.json
+            research/sessions/s-20261102-1692601b/metrics.json
+          if-no-files-found: ignore
+          retention-days: 30

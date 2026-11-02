@@ -1,0 +1,37 @@
+{
+  "agent_id": "s-20261102-1692601b",
+  "completed": true,
+  "controlled_placement": 8,
+  "controlled_seat": 2,
+  "decisions": 46,
+  "engine_source_hash": "6d8712c93022ba11",
+  "engine_version": "1.1.0",
+  "environment": "TavernGym",
+  "followup_buys": 1,
+  "git_sha": "bbc64f699160c0bde2cabdfed810f88b5e205852",
+  "model_sha256": null,
+  "placements": [
+    7,
+    4,
+    8,
+    1,
+    5,
+    6,
+    3,
+    2
+  ],
+  "policy": "sell_swap",
+  "policy_config": [
+    7,
+    "first"
+  ],
+  "safety_override_count": 0,
+  "sales_interventions": 1,
+  "schema": 1,
+  "seed": 69141,
+  "timestamp": "2026-11-02T09:46:34.978081+00:00",
+  "truncated_combats": 0,
+  "turn_limit_end": false,
+  "turns": 20,
+  "unpaired_sales": 0
+}
