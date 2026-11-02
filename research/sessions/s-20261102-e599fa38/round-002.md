@@ -2,7 +2,7 @@
 
 - Session: `s-20261102-e599fa38`. Branch: `agent/s-20261102-e599fa38/optimization-002`.
 - Initial main: `315b068bac5ab6d8403c3c9b18f8c101c0cded5d`. Based on own R001 validated head `9887e95afc579ab47e6ae2b3b5c1d1faf6b3d9f2`.
-- Experiment source: `1f8d60ff9e764f94374493c1bb86c61229f5ec35`.
+- Experiment source: `1f8d60ff9e764f94374493c1bb86c61229f5ec35`. Draft PR: https://github.com/sstxww/reinforcement-learning/pull/54; depends on PR #31.
 - Actual run: https://github.com/sstxww/reinforcement-learning/actions/runs/41416658875 (**success**); artifact: https://github.com/sstxww/reinforcement-learning/actions/runs/41416658875/artifacts/13127314081 (expires **2026-12-02 09:00 UTC**, not permanent).
 - Prior evidence: our R001 raw model seed 31071 exceeded 30,000-loop game safety bound. R001 candidate with 32-action legal mask guard finished. Other open PRs #12/#17/#18 used caps 48/45/65 on other experimental models.
 - Hypothesis: reducing legal action-0 end-turn cap from 32 to 16 can reduce non-progress inference decisions while retaining complete-game validity. **Not a presumed performance improvement.**
