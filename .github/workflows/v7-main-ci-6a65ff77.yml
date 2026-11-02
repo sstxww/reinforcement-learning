@@ -1,0 +1,79 @@
+name: V7 exact-current-main audit + own full eight-seat baseline s-20261103-6a65ff77
+
+on:
+  push:
+    branches:
+      - agent/s-20261103-6a65ff77/optimization-001
+    paths:
+      - scripts/v7_main_ci_verify.py
+      - tests/test_v7_main_ci_verify_6a65ff77.py
+      - .github/workflows/v7-main-ci-6a65ff77.yml
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: v7-main-ci-6a65ff77
+  cancel-in-progress: false
+
+jobs:
+  audit-and-canary:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install bounded test dependencies
+        run: python -m pip install -e '.[test]'
+      - name: Test exact-current-main postmerge evidence guard
+        run: python -m pytest -q tests/test_v7_main_ci_verify_6a65ff77.py
+      - name: Audit real LIVE main CI snapshot, allowing honest blocked result
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts reports/s-20261103-6a65ff77
+          gh api "repos/$GITHUB_REPOSITORY/branches/main" > artifacts/main.json
+          main_sha="$(jq -r '.commit.sha' artifacts/main.json)"
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs?branch=main&per_page=50" > artifacts/main-runs.json
+          run_id="$(jq -r --arg sha "$main_sha" '[.workflow_runs[] | select(.head_sha == $sha and .name == "CI - full-match gate")] | .[0].id // empty' artifacts/main-runs.json)"
+          if [[ "$run_id" =~ ^[0-9]+$ ]]; then
+            gh api "repos/$GITHUB_REPOSITORY/actions/runs/$run_id" > artifacts/run.json
+            gh api "repos/$GITHUB_REPOSITORY/actions/runs/$run_id/jobs?per_page=100" > artifacts/jobs.json
+            gh api "repos/$GITHUB_REPOSITORY/actions/runs/$run_id/artifacts?per_page=100" > artifacts/artifacts.json
+          else
+            printf '{}\n' > artifacts/run.json
+            printf '{}\n' > artifacts/jobs.json
+            printf '{}\n' > artifacts/artifacts.json
+          fi
+          set +e
+          python scripts/v7_main_ci_verify.py \
+            --main artifacts/main.json --run artifacts/run.json \
+            --jobs artifacts/jobs.json --artifacts artifacts/artifacts.json \
+            --out reports/s-20261103-6a65ff77/001-live-main-ci.json
+          code=$?
+          set -e
+          if (( code != 0 && code != 2 )); then exit "$code"; fi
+      - name: Install verified pinned TavernGym
+        run: bash scripts/bootstrap_engine.sh
+      - name: Produce original complete eight-seat baseline receipt
+        run: |
+          python -m tavern_ai.canary \
+            --agent-id s-20261103-6a65ff77 \
+            --policy baseline --seed 99731 \
+            --receipt experiments/s-20261103-6a65ff77/001-99731.json
+          python -m tavern_ai.validate_receipt experiments/s-20261103-6a65ff77/001-99731.json
+      - name: Preserve own real evidence as expiring Artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v7-postmerge-audit-s-20261103-6a65ff77-${{ github.run_id }}
+          path: |
+            reports/s-20261103-6a65ff77/*.json
+            experiments/s-20261103-6a65ff77/*.json
+          if-no-files-found: ignore
+          retention-days: 30
