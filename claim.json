@@ -1,0 +1,16 @@
+{
+  "schema": 1,
+  "task_key": "integration/v7-serialized-pr-merge-entry",
+  "owner_session": "s-20261103-2ef2eeca",
+  "role": "REPAIRER",
+  "claimed_at": "2026-11-02T19:39:44Z",
+  "expires_at": "2026-11-02T20:39:44Z",
+  "base_main_sha": "990acd21d598a34a554a80c50089a8f1a9423ac4",
+  "branch": "agent/s-20261103-2ef2eeca/optimization-001",
+  "scope": [
+    "scripts/v7_integrate.py",
+    "tests/test_v7_integrate_s_20261103_2ef2eeca.py",
+    ".github/workflows/v7-serialized-integration.yml"
+  ],
+  "note": "This is an atomic TASK claim ref, NOT a main merge lease. No PR merge is authorized by owning this branch."
+}
