@@ -1,0 +1,132 @@
+name: V5 isolated verified Release resume s-20261102-99372431
+
+on:
+  push:
+    branches: ['agent/s-20261102-99372431/optimization-001']
+    paths: ['research/sessions/s-20261102-99372431/RUN_REQUEST.txt']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: v5-s-20261102-99372431-resume
+  cancel-in-progress: false
+
+jobs:
+  verify-resume-and-real-matches:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install test and bounded training dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[train,test]'
+      - name: Offline schema and hash regression gates
+        run: |
+          python -m pytest tests/test_verified_resume_s_20261102_99372431.py tests/test_checkpoint_preflight.py
+          python -m pytest
+      - name: Install and verify pinned TavernGym
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Independent real baseline eight-seat match
+        run: |
+          mkdir -p experiments/s-20261102-99372431 reports/s-20261102-99372431 checkpoints/source checkpoints/candidate
+          python -m tavern_ai.canary --agent-id s-20261102-99372431 --seed 99372431 \
+            --policy baseline --receipt experiments/s-20261102-99372431/001-baseline-99372431.json
+          python -m tavern_ai.validate_receipt experiments/s-20261102-99372431/001-baseline-99372431.json
+      - name: Download exact trusted latest experimental Release and preflight
+        shell: bash
+        run: |
+          set -euo pipefail
+          TAG=$(python -c 'import json; print(json.load(open("models/registry.json"))["latest"]["release_tag"])')
+          EXPECTED=$(python -c 'import json; print(json.load(open("models/registry.json"))["latest"]["checkpoint_sha256"])')
+          gh release download "$TAG" --repo "$GITHUB_REPOSITORY" \
+            --pattern model.zip --pattern model.metadata.json --dir checkpoints/source
+          python -m tavern_ai.checkpoint_preflight \
+            --model checkpoints/source/model.zip \
+            --metadata checkpoints/source/model.metadata.json \
+            --expected-sha256 "$EXPECTED" --probe-inference \
+            | tee reports/s-20261102-99372431/001-source-preflight.json
+      - name: Perform bounded real MaskablePPO 128-step continuation
+        id: resume
+        run: |
+          python scripts/verified_resume_s_20261102_99372431.py \
+            --registry models/registry.json \
+            --source checkpoints/source/model.zip \
+            --source-metadata checkpoints/source/model.metadata.json \
+            --out checkpoints/candidate/model.zip --steps 128 --seed 99372431 \
+            --report reports/s-20261102-99372431/001-resume-audit.json
+          EXPECTED=$(python -c 'import json; print(json.load(open("reports/s-20261102-99372431/001-resume-audit.json"))["new_sha256"])')
+          python -m tavern_ai.checkpoint_preflight --model checkpoints/candidate/model.zip \
+            --metadata checkpoints/candidate/model.metadata.json --expected-sha256 "$EXPECTED" --probe-inference
+      - name: New candidate controls complete real eight-seat TavernGym match
+        id: modelgame
+        continue-on-error: true
+        run: |
+          python -m tavern_ai.canary --agent-id s-20261102-99372431 \
+            --seed 99372432 --policy model --model checkpoints/candidate/model.zip \
+            --receipt experiments/s-20261102-99372431/001-candidate-99372432.json
+          python -m tavern_ai.validate_receipt experiments/s-20261102-99372431/001-candidate-99372432.json
+      - name: Publish immutable clearly unpromoted checkpoint
+        if: always() && steps.resume.outcome == 'success'
+        shell: bash
+        env:
+          MODEL_GAME_OUTCOME: ${{ steps.modelgame.outcome }}
+        run: |
+          set -euo pipefail
+          TAG="v5-resume-s-20261102-99372431-${GITHUB_RUN_ID}"
+          NOTE="128 genuine MaskablePPO steps after trusted latest Release; schema-2 provenance preserved. Model-game step outcome: ${MODEL_GAME_OUTCOME}. This is experimental/unpromoted, not Champion. No competitive improvement is claimed."
+          gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --prerelease \
+            --title "V5 isolated resume audit - unpromoted $TAG" --notes "$NOTE" \
+            checkpoints/candidate/model.zip checkpoints/candidate/model.metadata.json \
+            reports/s-20261102-99372431/001-resume-audit.json
+          # Publish is not complete until a fresh Release download and digest/load pass.
+          mkdir -p checkpoints/release-readback
+          gh release download "$TAG" --repo "$GITHUB_REPOSITORY" \
+            --pattern model.zip --pattern model.metadata.json --dir checkpoints/release-readback
+          EXPECTED=$(python -c 'import json; print(json.load(open("reports/s-20261102-99372431/001-resume-audit.json"))["new_sha256"])')
+          python -m tavern_ai.checkpoint_preflight \
+            --model checkpoints/release-readback/model.zip \
+            --metadata checkpoints/release-readback/model.metadata.json \
+            --expected-sha256 "$EXPECTED" --probe-inference
+      - name: Commit genuine evidence only on this isolated branch
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A experiments/s-20261102-99372431 reports/s-20261102-99372431 || true
+          if ! git diff --cached --quiet; then
+            git commit -m "results(v5): preserve isolated real match and resume diagnostics"
+            test "$GITHUB_REF_NAME" = "agent/s-20261102-99372431/optimization-001"
+            git pull --rebase origin "$GITHUB_REF_NAME"
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi
+      - name: Archive available evidence even after failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v5-s-20261102-99372431-${{ github.run_id }}
+          path: |
+            experiments/s-20261102-99372431/*.json
+            reports/s-20261102-99372431/*.json
+            checkpoints/candidate/model.zip
+            checkpoints/candidate/model.metadata.json
+          if-no-files-found: ignore
+          retention-days: 30
+      - name: Fail gate when real candidate full game did not complete
+        if: always() && steps.resume.outcome == 'success' && steps.modelgame.outcome != 'success'
+        run: |
+          echo "FAIL: model-specific full eight-seat game incomplete. Keep model unpromoted."
+          exit 1

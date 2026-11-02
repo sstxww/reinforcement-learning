@@ -1,0 +1,16 @@
+{
+  "added_timesteps": 128,
+  "competitive_improvement_verified": false,
+  "full_match_verified": false,
+  "new_archive_preflight": "passed",
+  "new_schema": 2,
+  "new_sha256": "0f2c9705fb1078815f3c74d511aa3a770550b2348d1528072920f1bec02539f8",
+  "optimizer_state_present": true,
+  "previous_timesteps": 1408,
+  "promotion_allowed": false,
+  "source_id": "v5-s-20261102-68099929-1408-41428692617",
+  "source_preflight": "passed",
+  "source_schema": 1,
+  "source_sha256": "a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632",
+  "total_timesteps": 1536
+}
