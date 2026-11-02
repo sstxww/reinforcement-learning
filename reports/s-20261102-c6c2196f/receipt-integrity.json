@@ -1,0 +1,113 @@
+{
+  "schema": 1,
+  "agent_id": "s-20261102-c6c2196f",
+  "experiment": "receipt_integrity",
+  "policy": "baseline",
+  "ppo_training_steps": 0,
+  "games": 3,
+  "seeds": [
+    36001,
+    36002,
+    36003
+  ],
+  "mean_placement": 7.666666666666667,
+  "first_place_rate": 0.0,
+  "top4_rate": 0.0,
+  "results": [
+    {
+      "seed": 36001,
+      "receipt": "experiments/s-20261102-c6c2196f/001-36001.json",
+      "rank": 8,
+      "placements": [
+        8,
+        4,
+        7,
+        1,
+        6,
+        2,
+        5,
+        3
+      ],
+      "decisions": 47,
+      "turns": 14,
+      "completed": true,
+      "truncated_combats": 0,
+      "turn_limit_end": false
+    },
+    {
+      "seed": 36002,
+      "receipt": "experiments/s-20261102-c6c2196f/001-36002.json",
+      "rank": 8,
+      "placements": [
+        8,
+        4,
+        1,
+        6,
+        5,
+        2,
+        3,
+        7
+      ],
+      "decisions": 43,
+      "turns": 15,
+      "completed": true,
+      "truncated_combats": 0,
+      "turn_limit_end": false
+    },
+    {
+      "seed": 36003,
+      "receipt": "experiments/s-20261102-c6c2196f/001-36003.json",
+      "rank": 7,
+      "placements": [
+        7,
+        3,
+        2,
+        6,
+        4,
+        5,
+        1,
+        8
+      ],
+      "decisions": 52,
+      "turns": 18,
+      "completed": true,
+      "truncated_combats": 0,
+      "turn_limit_end": false
+    }
+  ],
+  "negative_mutation_tests": [
+    {
+      "case": "duplicate_placements",
+      "legacy_accepted": true,
+      "strict_accepted": false
+    },
+    {
+      "case": "incorrect_engine_hash",
+      "legacy_accepted": true,
+      "strict_accepted": false
+    },
+    {
+      "case": "incorrect_engine_version",
+      "legacy_accepted": true,
+      "strict_accepted": false
+    },
+    {
+      "case": "negative_seed",
+      "legacy_accepted": true,
+      "strict_accepted": false
+    },
+    {
+      "case": "unhashed_model_claim",
+      "legacy_accepted": true,
+      "strict_accepted": false
+    },
+    {
+      "case": "unsupported_policy",
+      "legacy_accepted": true,
+      "strict_accepted": false
+    }
+  ],
+  "legacy_false_acceptances": 6,
+  "strict_false_acceptances": 0,
+  "interpretation": "Engineering evidence only; no gameplay-strength claim."
+}
