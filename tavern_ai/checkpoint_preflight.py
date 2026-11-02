@@ -45,7 +45,8 @@ def audit_archive(archive: Path, metadata: Path, expected_sha256: str) -> dict:
         raise ValueError("Checkpoint metadata is invalid JSON") from exc
     if not isinstance(meta, dict):
         raise ValueError("Checkpoint metadata must be an object")
-    if type(meta.get("schema")) is not int or meta["schema"] != 1:
+    schema = meta.get("schema")
+    if type(schema) is not int or schema not in (1, 2):
         raise ValueError("Unsupported checkpoint metadata schema")
     if meta.get("algorithm") != "MaskablePPO":
         raise ValueError("Unsupported checkpoint algorithm")
@@ -64,6 +65,22 @@ def audit_archive(archive: Path, metadata: Path, expected_sha256: str) -> dict:
         raise ValueError("Checkpoint engine/observation/action contract mismatch")
     if type(engine.get("n_cards")) is not int or engine["n_cards"] <= 0:
         raise ValueError("Missing card vocabulary size")
+    if schema == 2:
+        # Durable V1/V2 Releases used a schema-2 full compatibility contract.
+        # Never downgrade its provenance checks to the weaker schema-1 subset.
+        if meta.get("checkpoint_sha256") != actual:
+            raise ValueError("Schema-2 internal checkpoint digest mismatch")
+        from .contract import CATALOG_SHA256, PATCH_SHA256, RULESET_ID, UPSTREAM_COMMIT
+        expected_compatibility = {
+            "engine": engine, "catalog_sha256": CATALOG_SHA256,
+            "ruleset_id": RULESET_ID, "patch_sha256": PATCH_SHA256,
+            "upstream_commit": UPSTREAM_COMMIT,
+        }
+        if meta.get("compatibility") != expected_compatibility:
+            raise ValueError("Schema-2 engine/catalog/patch compatibility mismatch")
+        inc = meta.get("increment_timesteps")
+        if type(inc) is not int or not 0 < inc <= steps:
+            raise ValueError("Schema-2 incremental timesteps are invalid")
     try:
         with zipfile.ZipFile(archive) as zf:
             entries = zf.infolist()
@@ -81,7 +98,7 @@ def audit_archive(archive: Path, metadata: Path, expected_sha256: str) -> dict:
     except (zipfile.BadZipFile, EOFError, OSError) as exc:
         raise ValueError("Corrupt checkpoint ZIP") from exc
     return {
-        "schema": 1, "sha256": actual, "algorithm": "MaskablePPO",
+        "schema": 1, "checkpoint_metadata_schema": schema, "sha256": actual, "algorithm": "MaskablePPO",
         "total_timesteps": steps, "engine": contract,
         "archive_integrity": "passed", "model_load": "not_tested",
         "optimizer_resume": "not_tested", "complete_match": "not_tested",

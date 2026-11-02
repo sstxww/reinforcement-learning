@@ -1,0 +1,105 @@
+name: Verify and archive rejected PPO diagnostic s-20261102-75cf9e03
+on:
+  push:
+    branches:
+      - agent/s-20261102-75cf9e03/optimization-001
+    paths:
+      - .github/workflows/diagnose-rejected-s-20261102-75cf9e03.yml
+permissions:
+  contents: write
+  actions: read
+concurrency:
+  group: diagnostic-rejected-s-20261102-75cf9e03
+  cancel-in-progress: false
+jobs:
+  validate-and-archive:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      GH_TOKEN: ${{ github.token }}
+      EXPECTED_SHA: 7eac498b502a233f7ca04b351200429f2ea8142dbec47c421f7b8f3544646a8b
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install and test, including schema-2 Release metadata regression
+        run: |
+          set -euo pipefail
+          python -m pip install -e '.[train,test]'
+          python -m pytest tests/test_checkpoint_preflight.py tests/test_action_opportunity_probe_75cf9e03.py
+          bash scripts/bootstrap_engine.sh
+      - name: Recover exact 1408-step checkpoint from original failed-run evidence
+        run: |
+          set -euo pipefail
+          mkdir -p recovered reports/s-20261102-75cf9e03
+          gh run download 41428024110 --repo "$GITHUB_REPOSITORY" --name resume-smoke-s-20261102-75cf9e03-41428024110 --dir recovered
+          test -s recovered/checkpoints/next/model.zip
+          test -s recovered/checkpoints/next/model.metadata.json
+      - name: Fail closed on genuine weights, optimizer and masked inference
+        run: |
+          set -euo pipefail
+          python -m tavern_ai.checkpoint_preflight \
+            --model recovered/checkpoints/next/model.zip \
+            --metadata recovered/checkpoints/next/model.metadata.json \
+            --expected-sha256 "$EXPECTED_SHA" \
+            --probe-inference | tee reports/s-20261102-75cf9e03/003-verified-rejected.json
+      - name: Genuine guarded TavernGym action-opportunity diagnosis
+        run: |
+          set -euo pipefail
+          python -m tavern_ai.action_opportunity_probe_75cf9e03 \
+            --model recovered/checkpoints/next/model.zip \
+            --seed 65811 --max-per-turn 40 \
+            --report reports/s-20261102-75cf9e03/003-guarded-opportunities.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('reports/s-20261102-75cf9e03/003-guarded-opportunities.json')
+          r=json.loads(p.read_text())
+          if not r['completed'] or r['model_sha256']!='7eac498b502a233f7ca04b351200429f2ea8142dbec47c421f7b8f3544646a8b':
+              raise SystemExit('Missing genuine completed diagnostic or wrong model digest')
+          print('GUARDED_DIAGNOSTIC_ONLY',r['guard_forced_ends'],r['legal_buy_opportunity_decisions'])
+          PY
+      - name: Publish permanent REJECTED diagnostic Release (never Champion)
+        run: |
+          set -euo pipefail
+          TAG="v5-rejected-s-20261102-75cf9e03-${GITHUB_RUN_ID}"
+          gh release create "$TAG" \
+            recovered/checkpoints/next/model.zip \
+            recovered/checkpoints/next/model.metadata.json \
+            reports/s-20261102-75cf9e03/003-verified-rejected.json \
+            reports/s-20261102-75cf9e03/003-guarded-opportunities.json \
+            --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --prerelease \
+            --title "Rejected 1408-step PPO: strict game limit exceeded" \
+            --notes "DIAGNOSTIC ONLY. Genuine V2 1280→1408 resume completed in run 41428024110; strict model-only 8-seat game failed full-game safety limit. This Release preserves failed weights (SHA256 $EXPECTED_SHA) and a separately labeled guarded behavior trace. NEVER promote without real unguarded success and paired evaluation."
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          p=Path('reports/s-20261102-75cf9e03/003-verified-rejected.json')
+          data=json.loads(p.read_text())
+          data['release_tag']='v5-rejected-s-20261102-75cf9e03-'+os.environ['GITHUB_RUN_ID']
+          data['classification']='rejected_diagnostic_only'
+          data['prior_model_only_match']='failed_safety_limit'
+          p.write_text(json.dumps(data,indent=2)+'\n')
+          PY
+      - name: Commit verified evidence only, not model weights
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add reports/s-20261102-75cf9e03/003-*.json
+          git diff --cached --quiet && exit 0
+          git commit -m "evidence(s-20261102-75cf9e03): failed PPO recovery diagnosis"
+          git pull --rebase origin "$GITHUB_REF_NAME"
+          git push origin "HEAD:$GITHUB_REF_NAME"
+      - name: Preserve diagnostics if verification or Release publish fails
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: guarded-diagnostic-s-20261102-75cf9e03-${{ github.run_id }}
+          path: |
+            reports/s-20261102-75cf9e03/003-*.json
+          if-no-files-found: ignore
+          retention-days: 30

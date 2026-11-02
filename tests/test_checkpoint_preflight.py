@@ -86,3 +86,28 @@ def test_rejects_non_zip_even_with_correct_digest(tmp_path):
     digest = hashlib.sha256(model.read_bytes()).hexdigest()
     with pytest.raises(ValueError, match="ZIP"):
         audit_archive(model, meta, digest)
+
+
+def test_synthetic_schema2_release_compatibility(tmp_path):
+    """Regression for genuine V2 Release schema shape, without fake weights."""
+    from tavern_ai.contract import CATALOG_SHA256, PATCH_SHA256, RULESET_ID, UPSTREAM_COMMIT
+    model, metadata, digest = make_fixture(tmp_path)
+    item = json.loads(metadata.read_text(encoding="utf-8"))
+    item.update(schema=2, checkpoint_sha256=digest, increment_timesteps=1024,
+                total_timesteps=1280)
+    item["compatibility"] = {
+        "engine": item["engine"], "catalog_sha256": CATALOG_SHA256,
+        "patch_sha256": PATCH_SHA256, "ruleset_id": RULESET_ID,
+        "upstream_commit": UPSTREAM_COMMIT,
+    }
+    metadata.write_text(json.dumps(item), encoding="utf-8")
+    assert audit_archive(model, metadata, digest)["checkpoint_metadata_schema"] == 2
+    item["compatibility"]["catalog_sha256"] = "tampered"
+    metadata.write_text(json.dumps(item), encoding="utf-8")
+    with pytest.raises(ValueError, match="compatibility"):
+        audit_archive(model, metadata, digest)
+    item["compatibility"]["catalog_sha256"] = CATALOG_SHA256
+    item["checkpoint_sha256"] = "0" * 64
+    metadata.write_text(json.dumps(item), encoding="utf-8")
+    with pytest.raises(ValueError, match="internal checkpoint digest"):
+        audit_archive(model, metadata, digest)
