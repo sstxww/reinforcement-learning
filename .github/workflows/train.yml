@@ -30,8 +30,8 @@ jobs:
     env:
       GH_TOKEN: ${{ github.token }}
     steps:
-      - uses: actions/checkout$v4
-      - uses: actions/setup-python$v5
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
       - name: Install Python training dependencies
@@ -79,7 +79,7 @@ jobs:
           if [[ -f checkpoints/model.zip ]]; then
             args+=(--resume checkpoints/model.zip)
           fi
-          python -m tavern_ai.train "${args[$]}"
+          python -m tavern_ai.train "${args[@]}"
       - name: Model plays a real full eight-seat game
         run: |
           python -m tavern_ai.canary --agent-id training-v1 \
@@ -113,7 +113,7 @@ jobs:
           echo "Persistent candidate release: $tag"
       - name: Preserve resumable artifact and evidence
         if: always()
-        uses: actions/upload-artifact$v4
+        uses: actions/upload-artifact@v4
         with:
           name: v1-model
           path: |
