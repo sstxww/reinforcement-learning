@@ -1,0 +1,61 @@
+name: Reload verified LR Artifact s-20261102-24728f13
+
+on:
+  push:
+    branches: ['agent/s-20261102-24728f13/optimization-001']
+    paths:
+      - '.github/workflows/recover-s-20261102-24728f13.yml'
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: write
+
+concurrency:
+  group: isolated-lr-recovery-s-20261102-24728f13
+  cancel-in-progress: false
+
+jobs:
+  prove-checkpoint-recovery:
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install train/test requirements
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[train,test]'
+      - name: Install and verify pinned real TavernGym
+        run: bash scripts/bootstrap_engine.sh
+      - name: Download immutable first-run checkpoint Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: lr-study-s-20261102-24728f13-41416467100
+          run-id: 41416467100
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: .
+      - name: Validate both SHA256s, reload CPU models, and predict legal TavernGym actions
+        run: python scripts/verify_lr_checkpoint_24728f13.py
+      - name: Commit only current-session compact recovery evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = 'agent/s-20261102-24728f13/optimization-001'
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add reports/s-20261102-24728f13/001-checkpoint-recovery.json
+          git commit -m 'results(s-20261102-24728f13): verify own saved checkpoints and legal masked inference'
+          git push origin HEAD:"$GITHUB_REF_NAME"
+      - name: Upload compact independent reload evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lr-recovery-s-20261102-24728f13-${{ github.run_id }}
+          path: reports/s-20261102-24728f13/001-checkpoint-recovery.json
+          retention-days: 30
+          if-no-files-found: ignore

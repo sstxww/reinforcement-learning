@@ -1,0 +1,32 @@
+{
+  "agent_id": "s-20261102-24728f13",
+  "arm": "candidate",
+  "completed": true,
+  "decisions": 24,
+  "engine_source_hash": "6d8712c93022ba11",
+  "engine_version": "1.1.0",
+  "environment": "TavernGym",
+  "git_sha": "ff2f28b76d6a484e248437bb27c868f3550827d1",
+  "guard_forced_ends": 0,
+  "illegal_actions": 0,
+  "model_actions": 24,
+  "model_sha256": "802c65e7da2ba42e26e2f2efb55859b91428f1b792428031947484ce95f42f18",
+  "placements": [
+    8,
+    3,
+    4,
+    7,
+    5,
+    2,
+    1,
+    6
+  ],
+  "policy": "guarded_model",
+  "schema": 1,
+  "seed": 42172,
+  "timestamp": "2026-11-02T08:58:03.636695+00:00",
+  "truncated_combats": 0,
+  "turn_action_budget": 40,
+  "turn_limit_end": false,
+  "turns": 17
+}

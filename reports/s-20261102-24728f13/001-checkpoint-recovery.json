@@ -1,0 +1,32 @@
+{
+  "checkpoint_origin_run_id": 41416467100,
+  "checkpoints": {
+    "candidate": {
+      "checkpoint_load_success": true,
+      "inference_action": 30,
+      "legal_masked_inference": true,
+      "model_timesteps": 256,
+      "sha256": "802c65e7da2ba42e26e2f2efb55859b91428f1b792428031947484ce95f42f18"
+    },
+    "reference": {
+      "checkpoint_load_success": true,
+      "inference_action": 31,
+      "legal_masked_inference": true,
+      "model_timesteps": 256,
+      "sha256": "8450905bdd1d78e6be68175f9943b16ac840fc9ce2882da4e32791ddb078ad0c"
+    }
+  },
+  "engine": {
+    "actions": 245,
+    "cards": 447,
+    "features": 4017,
+    "n_cards": 3984,
+    "source_hash": "6d8712c93022ba11",
+    "version": "1.1.0"
+  },
+  "model_state": "Candidate only, not Best; source Artifact expires 2026-12-02.",
+  "session_id": "s-20261102-24728f13",
+  "status": "validated_hash_reload_and_legal_inference",
+  "verification_commit": "84138024737c0fe7dc49893bbbe878f8535fdd36",
+  "verification_run_id": "41417110915"
+}
