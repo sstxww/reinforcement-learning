@@ -13,11 +13,11 @@ ROOT = Path(__file__).resolve().parents[1]
 def test_real_registry_is_conservative_and_has_complete_api_inventory():
     r = load_registry(ROOT / "models/registry.json")
     assert r["best"] is None
-    assert r["latest"]["release_tag"] == "v2-learning-41413557445"
-    assert r["latest"]["training_steps"] == 1280
-    assert len(r["github_release_asset_inventory"]) == 6
-    assert all(x["binary_download_hash_checked_in_this_integration"] is False
-               for x in r["github_release_asset_inventory"])
+    assert r["latest"]["release_tag"] == "v5-s-20261102-68099929-1408-41428692617"
+    assert r["latest"]["training_steps"] == 1408
+    assert len(r["github_release_asset_inventory"]) == 7
+    assert sum(x["binary_download_hash_checked_in_this_integration"] is True
+               for x in r["github_release_asset_inventory"]) == 1
 
 
 def fixture_files(tmp_path):
