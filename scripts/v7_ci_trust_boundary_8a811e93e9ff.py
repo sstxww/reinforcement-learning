@@ -55,6 +55,7 @@ def audit_changed_files(files: list[dict], expected_count: int) -> dict:
             len(files) != expected_count):
         raise TrustBoundaryError("Incomplete or invalid PR file-list coverage")
     changes: set[str] = set()
+    filenames: set[str] = set()
     for entry in files:
         if not isinstance(entry, dict):
             raise TrustBoundaryError("Malformed PR file record")
@@ -65,10 +66,11 @@ def audit_changed_files(files: list[dict], expected_count: int) -> dict:
         }:
             raise TrustBoundaryError("Unknown PR file status")
         changed = checked_path(entry.get("filename"))
+        filenames.add(changed)
         changes.add(changed)
         if status == "renamed":
             changes.add(checked_path(entry.get("previous_filename")))
-    if len(changes) != expected_count:
+    if len(filenames) != expected_count:
         raise TrustBoundaryError("Duplicate or missing PR file paths")
     forbidden = sorted(changes & TRUSTED_EVIDENCE_PATHS)
     if forbidden:
