@@ -20,3 +20,9 @@ FINAL TASK HANDOFF (V7 R001):
 - Source PR #175 still blocked by check-then-unlink ownership race, independent evidence: https://github.com/sstxww/reinforcement-learning/pull/175#issuecomment-6586652843.
 - Permission boundary: no main merge/force/other branch edits. This claim has no reusable active lock; task status completed, no renewal. Anyone adopting task must check current head and claim status.
 - Own training 0, new Release 0, raw PPO games 0, no model promotions.
+
+FINAL EXACT-HEAD CI VERIFICATION:
+- PR #188 latest head 1636b98f6a0c3842788780074702c0fd8751c0b9.
+- PR CI run https://github.com/sstxww/reinforcement-learning/actions/runs/41512857655 COMPLETED SUCCESS at that exact SHA, including real complete eight-seat baseline CI gate.
+- GitHub PR API observed draft=false, mergeable_state=clean, base main c1b828734527bae6141805581693d890cc3bff94.
+- Still NOT merged: no proven exclusive integration lease and no independent approval; main head and required gates must be rechecked by actual integrator.
