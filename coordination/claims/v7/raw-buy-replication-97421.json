@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "session_id": "s-20261103-21a7d8bc",
+  "task_key": "eval/v7-raw-buy-replication-97421",
+  "state": "completed_handoff",
+  "ownership": "only own scoped experiment",
+  "owner": "s-20261103-21a7d8bc",
+  "round": "R001",
+  "task_branch": "agent/s-20261103-21a7d8bc/optimization-001",
+  "pr_url": "https://github.com/sstxww/reinforcement-learning/pull/232",
+  "latest_pr_head": "268b04274cfa25aac8330984da6189be6d11f06e",
+  "latest_head_ci_url": "https://github.com/sstxww/reinforcement-learning/actions/runs/41516124716",
+  "latest_head_ci_status": "in_progress_at_handoff",
+  "true_train_steps_added": 128,
+  "real_full_games": 3,
+  "original_game_run": "https://github.com/sstxww/reinforcement-learning/actions/runs/41512015082",
+  "model_release": "https://github.com/sstxww/reinforcement-learning/releases/tag/v7-s-20261103-21a7d8bc-1536-41512015082",
+  "model_status": "unpromoted_rank8",
+  "main_merged": false,
+  "exclusive_main_integration_lease": false,
+  "expires_at": null,
+  "next": "Verify latest exact-head CI; enforce a genuinely global exclusive merge gate before integrating PR #232."
+}
