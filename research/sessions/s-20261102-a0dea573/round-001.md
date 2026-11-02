@@ -21,14 +21,23 @@ Branch: `agent/s-20261102-a0dea573/optimization-001`
 
 ## Execution truth
 - PPO training steps in this session: **0**.
-- New complete true games: **0**, pending independent GitHub Actions result.
+- New true complete games: **2** (one Baseline, one unassisted published V5 PPO), independently executed in Actions #41450329264. Same seed 99231, both rank 8, baseline 60 decisions / model 122 decisions. Per-game authentic receipts committed at experiments/s-20261102-a0dea573/001-baseline-99231.json and 001-model-99231.json.
 - Candidate promotion: **none**. No policy gain claimed.
 - Release upload: **none**. Weights are not committed.
-- CI status on this branch: pending when this file was written; update after run.
+- Dedicated Actions #41450329264 finished success at workflow commit b33e97e5c05342ee61b3323ea31aedb83ce07e68. Artifact 13144398717 retrieved and inspected. Baseline and model completed; model 42 REFRESH / 70 FREEZE / 0 BUY across 38 BUY-legal exposures. Official Release SHA256 and one-action CPU inference validated; optimizer resume from published Release not run. Final HEAD PR CI still pending.
 
 ## Concurrent integration correction
 - PR #138 (another session) independently implemented a stronger Champion evidence gate including unassisted games and fallback attribution. To avoid duplicate code/PRs, the Champion gate addition and duplicate tests on *this branch* were reverted. The retained unique code fix rejects stale/duplicated population and rejected model IDs. No modification was made to PR #138 or its branch.
 - Initial isolated Actions run may reference the earlier commit with Champion changes. Its result must not be represented as CI on this branch's latest HEAD; a fresh PR CI is required once actual own-session game evidence is committed.
+
+## Verified own-session cloud execution (post-initial snapshot)
+- Workflow: https://github.com/sstxww/reinforcement-learning/actions/runs/41450329264 — **success**. It ran at commit b33e97e5c05342ee61b3323ea31aedb83ce07e68, before the latest branch documents and Champion deduplication.
+- Artifact: https://github.com/sstxww/reinforcement-learning/actions/runs/41450329264/artifacts/13144398717 — downloaded and its three JSON documents plus preflight log inspected.
+- Seed 99231 original baseline: place 8, 14 turns, 60 decisions, complete, true game; source receipt experiments/s-20261102-a0dea573/001-baseline-99231.json.
+- Same seed original V5 model: place 8, 15 turns, 122 decisions, complete, *unassisted*, true game; source receipt experiments/s-20261102-a0dea573/001-model-99231.json.
+- Model weights SHA256 a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632; Release bytes downloaded and verified; archive passed preflight, actual CPU-load and single public action inference passed. The published Release's optimizer continuation **has not been validated in this session**, and no new weights were created.
+- Pure model chose REFRESH 42, FREEZE 70, BUY 0 despite 38 BUY-mask-legal decision exposures. Model/Baseline same seed both rank8; no strength claim. Permanent distilled report reports/s-20261102-a0dea573/001-published-v5-raw-99231.json.
+- The initial dedicated Action passed its own tests, but the current branch HEAD has evolved: require fresh exact-head PR CI before merge. No direct main write.
 
 ## Handoff
 Only after the independent workflow and actual receipt exist should this PR be considered for integration. Never synthesize a canary receipt; if workflow is blocked, leave Draft and record the run error. Audit the branch's actual head and main CI before merge.
