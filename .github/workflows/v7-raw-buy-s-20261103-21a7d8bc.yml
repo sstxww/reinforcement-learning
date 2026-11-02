@@ -1,0 +1,67 @@
+name: V7 independent raw BUY replication s-20261103-21a7d8bc
+
+# One finite, uniquely owned proof run. Nothing writes main or a Release.
+on:
+  push:
+    branches: [agent/s-20261103-21a7d8bc/optimization-001]
+    paths:
+      - .github/workflows/v7-raw-buy-s-20261103-21a7d8bc.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: v7-raw-buy-s-20261103-21a7d8bc
+  cancel-in-progress: false
+
+jobs:
+  bounded-evidence:
+    runs-on: ubuntu-latest
+    timeout-minutes: 85
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned dependencies and run independent audit tests
+        run: |
+          python -m pip install -e '.[train,test]'
+          python -m pytest -q tests/test_v7_buy_pair_s_20261103_21a7d8bc.py
+      - name: Install pinned TavernGym and validate public contract
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Restore trusted registered 1408-step Release, fail closed
+        run: |
+          python -m tavern_ai.release_restore_entry --model-id latest --out-dir checkpoints
+          echo "Expected SHA256 a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632"
+          sha256sum checkpoints/model.zip
+      - name: New matched-seed real complete eight-seat baseline vs unassisted PPO
+        run: |
+          mkdir -p experiments/s-20261103-21a7d8bc reports/s-20261103-21a7d8bc
+          python -m tavern_ai.buy_opportunity_68099929 --agent-id s-20261103-21a7d8bc --seed 97421 --policy baseline --out experiments/s-20261103-21a7d8bc/001-baseline-97421.json
+          python -m tavern_ai.buy_opportunity_68099929 --agent-id s-20261103-21a7d8bc --seed 97421 --policy model --model checkpoints/model.zip --out experiments/s-20261103-21a7d8bc/002-raw-1408-97421.json
+          python scripts/v7_buy_pair_s_20261103_21a7d8bc.py --baseline experiments/s-20261103-21a7d8bc/001-baseline-97421.json --raw-model experiments/s-20261103-21a7d8bc/002-raw-1408-97421.json --agent-id s-20261103-21a7d8bc --expected-sha256 a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632 --out reports/s-20261103-21a7d8bc/001-matched-buy-97421.json
+      - name: Bounded genuine additional 128 PPO steps from same verified parent
+        run: |
+          python -m tavern_ai.train --steps 128 --seed 97421 --resume checkpoints/model.zip --out checkpoints/candidate.zip
+          sha256sum checkpoints/candidate.zip
+          cat checkpoints/candidate.metadata.json
+      - name: Pure candidate plays genuine complete eight-seat game
+        run: |
+          python -m tavern_ai.canary --agent-id s-20261103-21a7d8bc --seed 97422 --policy model --model checkpoints/candidate.zip --receipt experiments/s-20261103-21a7d8bc/003-candidate-97422.json
+          python -m tavern_ai.validate_receipt experiments/s-20261103-21a7d8bc/003-candidate-97422.json
+      - name: Preserve raw evidence and transient model (NOT permanent Release)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v7-buy-s-20261103-21a7d8bc-${{ github.run_id }}
+          path: |
+            experiments/s-20261103-21a7d8bc/*.json
+            reports/s-20261103-21a7d8bc/*.json
+            checkpoints/candidate.zip
+            checkpoints/candidate.metadata.json
+          if-no-files-found: ignore
+          retention-days: 14
