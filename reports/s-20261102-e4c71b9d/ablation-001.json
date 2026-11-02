@@ -1,0 +1,96 @@
+{
+  "session": "s-20261102-e4c71b9d",
+  "engine": {
+    "version": "1.1.0",
+    "source_hash": "6d8712c93022ba11",
+    "features": 4017,
+    "cards": 447,
+    "actions": 245,
+    "n_cards": 3984
+  },
+  "upstream_commit": "fb61201a557ddd36a411cf44aac51ce4d9b606ce",
+  "patch_sha256": "1e48a071cad63c284debbf917cb012595a405a4ef5ab66180eb2918e205aaac0",
+  "algorithm": "MaskablePPO",
+  "training": {
+    "control": {
+      "model": "control",
+      "seed": 32000,
+      "steps_requested": 128,
+      "steps_actual": 128,
+      "elapsed_seconds": 1.71,
+      "sha256": "439e3a830978cb0a911e0985109fad2b5619a08e69bcbd436ca2ad83c8314ffa",
+      "model_path": "checkpoints/s-20261102-e4c71b9d/control.zip",
+      "engine": {
+        "version": "1.1.0",
+        "source_hash": "6d8712c93022ba11",
+        "features": 4017,
+        "cards": 447,
+        "actions": 245,
+        "n_cards": 3984
+      },
+      "upstream_commit": "fb61201a557ddd36a411cf44aac51ce4d9b606ce",
+      "patch_sha256": "1e48a071cad63c284debbf917cb012595a405a4ef5ab66180eb2918e205aaac0",
+      "n_steps": 128,
+      "batch_size": 64,
+      "n_epochs": 2,
+      "learning_rate": 0.0003
+    },
+    "pooled": {
+      "model": "pooled",
+      "seed": 32000,
+      "steps_requested": 128,
+      "steps_actual": 128,
+      "elapsed_seconds": 0.25,
+      "sha256": "1ab6a4beefe060a38f5152dcdbb0e0473a26be87d058f0a41b571a645282ec2c",
+      "model_path": "checkpoints/s-20261102-e4c71b9d/pooled.zip",
+      "engine": {
+        "version": "1.1.0",
+        "source_hash": "6d8712c93022ba11",
+        "features": 4017,
+        "cards": 447,
+        "actions": 245,
+        "n_cards": 3984
+      },
+      "upstream_commit": "fb61201a557ddd36a411cf44aac51ce4d9b606ce",
+      "patch_sha256": "1e48a071cad63c284debbf917cb012595a405a4ef5ab66180eb2918e205aaac0",
+      "n_steps": 128,
+      "batch_size": 64,
+      "n_epochs": 2,
+      "learning_rate": 0.0003
+    }
+  },
+  "control": {
+    "games": 2,
+    "seeds": [
+      32011,
+      32012
+    ],
+    "ranks": [
+      8,
+      8
+    ],
+    "mean_rank": 8,
+    "top4_rate": 0.0,
+    "first_rate": 0.0,
+    "illegal_actions": 0,
+    "forced_end_turns": 8
+  },
+  "pooled": {
+    "games": 2,
+    "seeds": [
+      32011,
+      32012
+    ],
+    "ranks": [
+      8,
+      8
+    ],
+    "mean_rank": 8,
+    "top4_rate": 0.0,
+    "first_rate": 0.0,
+    "illegal_actions": 0,
+    "forced_end_turns": 11
+  },
+  "mean_rank_delta": 0,
+  "claim": "Exploratory only; two seeds cannot prove skill improvement"
+}
