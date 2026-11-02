@@ -51,7 +51,10 @@
     "artifact_retention_days": 7,
     "durable_release_target": "v5-s-20261102-aaee3a59-1536-41450695383",
     "durable_release_published_confirmed": false,
-    "release_workflow": "https://github.com/sstxww/reinforcement-learning/actions/runs/41451915674"
+    "release_workflow": "https://github.com/sstxww/reinforcement-learning/actions/runs/41451915674",
+    "release_attempt_status": "failed",
+    "release_failure": "HTTP 403 Resource not accessible by integration on POST /repos/sstxww/reinforcement-learning/releases; no tag/assets created",
+    "release_recovery_requirement": "Owner authorized GitHub Release contents-write credential or approved main-only Release publisher; no repeated GH_TOKEN attempt"
   },
   "note": "Research-only unpromoted challenger. No fresh paired strength comparison, no Arena Elo; do not update canonical Champion/Best."
 }
