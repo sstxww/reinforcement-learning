@@ -1,0 +1,13 @@
+{
+  "blockers": [
+    "Main is not protected; direct alternate merges are not excluded",
+    "Branch protection is not enabled",
+    "Required CI checks not enforced",
+    "No active main-scoped Merge Queue rule demonstrated",
+    "All concurrent merge writers have not proven exclusive routing"
+  ],
+  "eligible_for_exclusive_merge": false,
+  "notice": "Diagnostic only; never invoke merge API from this report.",
+  "observed_main_sha": "c1b828734527bae6141805581693d890cc3bff94",
+  "schema": 1
+}
