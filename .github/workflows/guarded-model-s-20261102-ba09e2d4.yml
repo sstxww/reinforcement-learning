@@ -1,0 +1,94 @@
+name: V5 isolated model hero-cancel guard - s-20261102-ba09e2d4
+on:
+  push:
+    branches: ['agent/s-20261102-ba09e2d4/optimization-002']
+    paths:
+      - 'tavern_ai/hero_cancel_guard_ba09e2d4.py'
+      - 'tavern_ai/behavior_probe_ba09e2d4.py'
+      - '.github/workflows/guarded-model-s-20261102-ba09e2d4.yml'
+permissions:
+  contents: write
+concurrency:
+  group: v5-guard-s-20261102-ba09e2d4
+  cancel-in-progress: false
+jobs:
+  model-guarded:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 100
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Tests and real PPO dependencies
+        run: |
+          python -m pip install -e '.[train,test]'
+          python -m pytest
+      - name: Pinned TavernGym engine
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Download immutable unpromoted V2 candidate
+        run: |
+          mkdir -p checkpoints
+          gh release download v2-learning-41413557445 --repo "${GITHUB_REPOSITORY}" --pattern model.zip --pattern model.metadata.json --dir checkpoints
+      - name: Verify canonical main model registry, ZIP hash, metadata compatibility
+        run: |
+          python -m tavern_ai.registry_integrity --checkpoint checkpoints/model.zip --model-id v2-learning-41413557445
+          python - <<'PY'
+          import hashlib,json
+          from pathlib import Path
+          from tavern_ai.contract import CATALOG_SHA256,RULESET_ID,PATCH_SHA256,UPSTREAM_COMMIT,verify_engine
+          meta=json.loads(Path("checkpoints/model.metadata.json").read_text())
+          digest=hashlib.sha256(Path("checkpoints/model.zip").read_bytes()).hexdigest()
+          expected=dict(engine=verify_engine(),catalog_sha256=CATALOG_SHA256,ruleset_id=RULESET_ID,patch_sha256=PATCH_SHA256,upstream_commit=UPSTREAM_COMMIT)
+          assert meta["schema"] == 2 and meta["checkpoint_sha256"] == digest
+          assert meta["compatibility"] == expected and meta["total_timesteps"] == 1280
+          print("Real V2 candidate SHA and optimizer-era metadata verified")
+          PY
+      - name: Guarded model game seed 87102 previous failure replay
+        continue-on-error: true
+        run: |
+          python -m tavern_ai.behavior_probe_ba09e2d4 --oscillation-guard --agent-id s-20261102-ba09e2d4 --seed 87102 --model checkpoints/model.zip --receipt experiments/s-20261102-ba09e2d4/003-87102-guarded.json --metrics reports/s-20261102-ba09e2d4/003-87102-guard-metrics.json
+      - name: Guarded model game seed 87103 heldout
+        continue-on-error: true
+        run: |
+          python -m tavern_ai.behavior_probe_ba09e2d4 --oscillation-guard --agent-id s-20261102-ba09e2d4 --seed 87103 --model checkpoints/model.zip --receipt experiments/s-20261102-ba09e2d4/004-87103-guarded.json --metrics reports/s-20261102-ba09e2d4/004-87103-guard-metrics.json
+      - name: Heldout same-seed unguarded-rule baseline
+        run: |
+          python -m tavern_ai.canary --agent-id s-20261102-ba09e2d4 --policy baseline --seed 87103 --receipt experiments/s-20261102-ba09e2d4/004-87103-baseline.json
+          python -m tavern_ai.validate_receipt experiments/s-20261102-ba09e2d4/004-87103-baseline.json
+      - name: Preserve real own-receipts and unsuccessful-game telemetry
+        if: always()
+        run: |
+          test "${GITHUB_REF_NAME}" = 'agent/s-20261102-ba09e2d4/optimization-002'
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A -- experiments/s-20261102-ba09e2d4/ reports/s-20261102-ba09e2d4/
+          if ! git diff --cached --quiet; then
+            git commit -m 'results(s-20261102-ba09e2d4): real guarded PPO game and mask evidence'
+            git pull --rebase origin 'agent/s-20261102-ba09e2d4/optimization-002'
+            git push origin HEAD:'agent/s-20261102-ba09e2d4/optimization-002'
+          fi
+      - name: Archive compact experiment output
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: guarded-model-s-20261102-ba09e2d4-${{ github.run_id }}
+          path: |
+            experiments/s-20261102-ba09e2d4/00[34]-*.json
+            reports/s-20261102-ba09e2d4/00[34]-*.json
+          if-no-files-found: ignore
+          retention-days: 30
+      - name: Require genuine completed model-controlled matches
+        if: always()
+        run: |
+          test -f experiments/s-20261102-ba09e2d4/003-87102-guarded.json
+          test -f experiments/s-20261102-ba09e2d4/004-87103-guarded.json
+          python -m tavern_ai.validate_receipt experiments/s-20261102-ba09e2d4/003-87102-guarded.json
+          python -m tavern_ai.validate_receipt experiments/s-20261102-ba09e2d4/004-87103-guarded.json
