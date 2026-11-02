@@ -1,0 +1,116 @@
+name: V7 one-shot verified original receipt archive s-20261103-6d43ab93
+
+on:
+  push:
+    branches:
+      - agent/s-20261103-6d43ab93/optimization-001
+    paths:
+      - .github/workflows/v7-evidence-archive-6d43ab93.yml
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: v7-evidence-archive-s-20261103-6d43ab93
+  cancel-in-progress: false
+
+jobs:
+  archive-pinned-original-receipts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Fetch only completed provenance-pinned source Artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs/41512471789" \
+             --jq '.status + " " + (.conclusion // "") + " " + .head_sha' \
+             | grep -Fx "completed success 2c434ad543b876a2335decd957a6b14b374a8199"
+          gh run download 41512471789 --repo "$GITHUB_REPOSITORY" \
+            --name v7-seat1-s-20261103-6d43ab93-41512471789 \
+            --dir original
+          printf '%s  %s\n' \
+            '9f4d4fd099526ebcf8a9081078db87c56ca3e684739f805dce9944a55285af64' \
+            original/v7-baseline-seat1-99741.json \
+            | sha256sum -c -
+          printf '%s  %s\n' \
+            '7036e1efeb695febee419a9bc5919bb73d79eabfd1f730ddfb378f5ae4ded6f1' \
+            original/v7-model-seat1-99741.json \
+            | sha256sum -c -
+      - name: Validate genuine complete, unassisted paired eight-seat evidence
+        run: |
+          python - <<'PY'
+          import json, pathlib
+          base=pathlib.Path('original')
+          data=[json.loads((base / f'v7-{p}-seat1-99741.json').read_bytes())
+                for p in ('baseline','model')]
+          for p, r in zip(('baseline','model'),data):
+              assert r['completed'] is True and r['environment']=='TavernGym'
+              assert r['agent_id']=='s-20261103-6d43ab93'
+              assert r['engine_version']=='1.1.0' and r['engine_source_hash']=='6d8712c93022ba11'
+              assert r['seed']==99741 and r['seat']==1 and r['policy']==p
+              assert r['git_sha']=='2c434ad543b876a2335decd957a6b14b374a8199'
+              assert sorted(r['placements'])==list(range(1,9))
+              assert r['agent_placement']==r['placements'][1]
+              assert r['truncated_combats']==0 and r['turn_limit_end'] is False
+              assert r['guard_forced_ends']==0 and r['fallback_actions']==0
+              assert r['decisions']>0 and r['turns']>0
+          assert data[0]['model_sha256'] is None
+          assert data[1]['model_sha256']=='a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632'
+          assert data[0]['agent_placement']==1 and data[1]['agent_placement']==8
+          assert data[0]['decisions']==80 and data[1]['decisions']==123
+          print('Verified original independent completed paired eight-seat games; baseline seat1 rank1; raw PPO seat1 rank8. n=1; NOT a statistically proven model advantage.')
+          PY
+      - name: Commit original bytes and strictly attributed failure-of-strategy report
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p experiments/s-20261103-6d43ab93 reports/s-20261103-6d43ab93
+          cp original/v7-baseline-seat1-99741.json experiments/s-20261103-6d43ab93/001-99741-baseline.json
+          cp original/v7-model-seat1-99741.json experiments/s-20261103-6d43ab93/001-99741-model.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          base=json.loads(Path('original/v7-baseline-seat1-99741.json').read_text())
+          model=json.loads(Path('original/v7-model-seat1-99741.json').read_text())
+          out={
+            'schema':1,'session_id':'s-20261103-6d43ab93','round':1,
+            'source_run':'https://github.com/sstxww/reinforcement-learning/actions/runs/41512471789',
+            'source_job_id':125507531960,'source_head_sha':'2c434ad543b876a2335decd957a6b14b374a8199',
+            'source_artifact_id':13173857201,
+            'source_artifact_sha256':'2cf43be88140094385ca4038aa5bb843a0132b9e350b735d9b6ba00d1528316a',
+            'baseline_receipt_sha256':'9f4d4fd099526ebcf8a9081078db87c56ca3e684739f805dce9944a55285af64',
+            'model_receipt_sha256':'7036e1efeb695febee419a9bc5919bb73d79eabfd1f730ddfb378f5ae4ded6f1',
+            'policy_checkpoint_id':'v5-s-20261102-68099929-1408-41428692617',
+            'checkpoint_sha256':model['model_sha256'],
+            'source_trained_steps':1408,'new_training_steps_this_session':0,
+            'restore_and_cpu_load_verified_in_source_action':True,
+            'optimizer_continuation_this_session':False,'new_checkpoint_release':None,
+            'engine_version':'1.1.0','engine_source_hash':'6d8712c93022ba11',
+            'seed':99741,'controlled_seat':1,'real_eight_seat_games_per_arm':1,
+            'baseline_completed':True,'raw_model_completed':True,
+            'baseline_placement':base['agent_placement'],
+            'raw_model_placement':model['agent_placement'],
+            'baseline_decisions':base['decisions'],'raw_model_decisions':model['decisions'],
+            'baseline_raw_action_histogram':base['raw_action_diagnostics']['raw_action_histogram'],
+            'model_raw_action_histogram':model['raw_action_diagnostics']['raw_action_histogram'],
+            'paired_raw_minus_baseline_placement_delta':model['agent_placement']-base['agent_placement'],
+            'raw_policy_fallback_actions':0,'raw_policy_guard_forced_ends':0,
+            'sample_size_warning':'one matched seed only; no causal inference, model improvement, seat generalization or statistical certainty',
+            'model_promoted':False,'new_training_performance_gain_verified':False,
+            'next_hypothesis':'verify exact action1/action2 categories against pinned game engine and quantify state-changing refresh/freeze vs BUY opportunities with more held-out seat rotation',
+          }
+          Path('reports/s-20261103-6d43ab93/001-seat1-raw-ppo-summary.json').write_text(
+              json.dumps(out,indent=2,ensure_ascii=False)+'\n',encoding='utf-8')
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add experiments/s-20261103-6d43ab93 reports/s-20261103-6d43ab93
+          git diff --cached --exit-code && { echo 'No new original evidence to archive'; exit 0; } || test $? -eq 1
+          git commit -m 'evidence(v7): archive authenticated real seat1 baseline and raw PPO matches'
+          git push origin HEAD:refs/heads/agent/s-20261103-6d43ab93/optimization-001
