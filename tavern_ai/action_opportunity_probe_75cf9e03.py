@@ -16,11 +16,10 @@ from .contract import ACTIONS, CARDS, FEATURES, verify_engine
 
 
 def trace(seed: int, model_path: Path, max_per_turn: int = 40) -> dict:
-    import taverngym
-    from sb3_contrib import MaskablePPO
-
     if not 1 <= max_per_turn <= 100:
         raise ValueError("max_per_turn must be 1..100")
+    import taverngym
+    from sb3_contrib import MaskablePPO
     engine = verify_engine()
     model_path = Path(model_path)
     if not model_path.is_file():
