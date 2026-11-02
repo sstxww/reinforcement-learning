@@ -12,3 +12,11 @@
 - Fixed seeds: smoke seed 99631 is *not* heldout PPO strength evidence and not a training seed. Ranking claim: none.
 - Safety: read-only Actions token, one bounded CPU smoke, no Arena.
 - Integration instructions: only appointed INTEGRATOR should reconcile this small canonical patch against subsequent main and #144/#145/#148, review latest-head full-game CI, and decide merge.
+
+## Verified execution update (2026-11-02 19:29 UTC)
+
+- Exact source-head isolated [Actions #41510061335](https://github.com/sstxww/reinforcement-learning/actions/runs/41510061335) **completed successfully**: focused original + new regression tests, pinned-engine bootstrap, engine contract, independently executed full eight-seat baseline canary and receipt upload. This is not a trained PPO match.
+- Genuine receipt `experiments/s-20261103-6b83cecd/001-99631.json` ([source receipt commit](https://github.com/sstxww/reinforcement-learning/commit/ebc77f5589046731846f65ebf5b7a7263c98116c)): seed 99631, baseline seat 0 **rank 3**, complete ranks [3,4,8,6,5,2,1,7], 13 turns, 57 decisions, no simulator guard; source workflow SHA `250869ead9c7850a6d8e117f25dce133aad3ed71`.
+- Machine-readable verification: `reports/s-20261103-6b83cecd/001-guard-alias-regression-and-baseline.json`.
+- NEW PPO steps **0**, NEW model Release **none**, Champion/Best not changed. This fix closes an evidence-label integrity hole, not a model-strength problem. Large-scale training remains gated by raw rank-eight behavior and INTEGRATOR budget.
+- Latest PR head CI must be checked independently after Draft PR creation; never misreport this older workflow-source success as final PR-head CI.
