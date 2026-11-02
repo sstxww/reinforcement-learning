@@ -1,0 +1,26 @@
+{
+  "baseline_placement": 7,
+  "champion_promoted": false,
+  "controlled_seat": 0,
+  "games_completed": 2,
+  "inference": "Descriptive pilot only; no causal or strength conclusion",
+  "kind": "single_seed_descriptive_paired_real_game",
+  "model_minus_baseline_placement": 1,
+  "model_placement": 8,
+  "original_receipts": [
+    "reports/s-20261103-e71c4f92/001-99385-baseline.json",
+    "reports/s-20261103-e71c4f92/001-99385-model.json"
+  ],
+  "policy_mode": "raw_unassisted_no_guard_no_fallback",
+  "registered_model_sha256": "a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632",
+  "registered_release": "v5-s-20261102-68099929-1408-41428692617",
+  "sample_n_per_policy": 1,
+  "seed": 99385,
+  "session_id": "s-20261103-e71c4f92",
+  "training_new_steps": 0,
+  "authentic_run": "https://github.com/sstxww/reinforcement-learning/actions/runs/41510089011",
+  "job_url": "https://github.com/sstxww/reinforcement-learning/actions/runs/41510089011/job/125499379988",
+  "original_artifact": "https://github.com/sstxww/reinforcement-learning/actions/runs/41510089011/artifacts/13172728337",
+  "original_artifact_zip_sha256": "16ed7ee4eea8bb4720377ce1c32d98da195ddaa24d1181f3e3e2395cd89d5ef6",
+  "source_head_sha": "1cec734c47358e9ed865daa8620736050799444f"
+}
