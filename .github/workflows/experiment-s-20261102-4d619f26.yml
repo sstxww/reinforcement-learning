@@ -1,0 +1,64 @@
+name: Teacher imitation R001 s-20261102-4d619f26
+on:
+  push:
+    branches:
+      - agent/s-20261102-4d619f26/optimization-001
+    paths:
+      - tavern_ai/teacher_clone_s4d619f26.py
+      - tests/test_teacher_clone_s4d619f26.py
+      - .github/workflows/experiment-s-20261102-4d619f26.yml
+permissions:
+  contents: write
+concurrency:
+  group: teacher-clone-s-20261102-4d619f26
+  cancel-in-progress: false
+jobs:
+  genuine-teacher-imitation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned training dependencies
+        run: |
+          python -m pip install -e '.[train,test]'
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Run mechanism/unit tests
+        run: python -m pytest
+      - name: Collect actual teacher games, train, restore, six genuine independent matches
+        run: |
+          python -m tavern_ai.teacher_clone_s4d619f26 \
+            --out-dir experiments/s-20261102-4d619f26 \
+            --report-dir reports/s-20261102-4d619f26
+          for f in experiments/s-20261102-4d619f26/*.json; do
+            python -m tavern_ai.validate_receipt "$f"
+          done
+      - name: Preserve raw evidence and recoverable short-lived checkpoint
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: teacher-clone-s-20261102-4d619f26
+          path: |
+            experiments/s-20261102-4d619f26/
+            reports/s-20261102-4d619f26/
+            research/sessions/s-20261102-4d619f26/
+            research/knowledge/proposals/s-20261102-4d619f26-001.md
+          if-no-files-found: warn
+          retention-days: 30
+      - name: Commit only own verified evidence, not model weights
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add experiments/s-20261102-4d619f26/ \
+            reports/s-20261102-4d619f26/001-summary.json \
+            research/sessions/s-20261102-4d619f26/ \
+            research/knowledge/proposals/s-20261102-4d619f26-001.md
+          git diff --cached --quiet && exit 0
+          git commit -m "results(s-20261102-4d619f26): actual teacher cloning and paired match receipts"
+          test "$GITHUB_REF_NAME" = "agent/s-20261102-4d619f26/optimization-001"
+          git push origin "HEAD:$GITHUB_REF_NAME"
