@@ -1,0 +1,21 @@
+# V5 P2 eighth-place failure dossier — source-backed, not causal overclaim
+
+Session: `s-20261102-3e715bca`; reviewed on 2026-11-02. **This is independent evidence review of other agents' authentic receipts, not a new model-controlled game in this session.** Every named V2 model result is guarded, not unassisted raw PPO; no claims of policy improvement.
+
+## Model and evidence custody
+
+- TavernGym 1.1.0, source hash `6d8712c93022ba11`, observe2 4017 floats / 447 card IDs / 245 discrete actions.
+- V2 published model `v2-learning-41413557445`: 1,280 PPO training steps, SHA256 `73bde2666426cecce39f135980a897bb2cd4a7d70783ba04c9c0d29477a6664a`. The cited experiments themselves say release-hash verified. This session **did not download, load, or retrain those model bytes**.
+- Independent authentic games in [PR #103](https://github.com/sstxww/reinforcement-learning/pull/103), [first aggregate](https://github.com/sstxww/reinforcement-learning/blob/agent/s-20261102-90e24c7b/optimization-001/reports/s-20261102-90e24c7b/001-opportunities.json) at blob `5fc0999a2118405e536241cf4210faaaeac42e8e`: 3 paired seeds 89101–89103; V2 guarded [8,8,8], baseline [6,8,8]. The guarded model had **0 BUY choices across 521 states whose mask allowed some BUY**, out of 1,087 decisions; **12 forced EndTurns**, across 22 turns with a legal BUY state. Baseline performed 41 BUY over 73 BUY-legal decision states. The 521 repeated decision states are **not** 521 independent opportunities.
+- [Actual seed 89101 receipt](https://github.com/sstxww/reinforcement-learning/blob/agent/s-20261102-90e24c7b/optimization-001/experiments/s-20261102-90e24c7b/001-model-89101.json), blob `4b177c97dcb05678978d0b9c9b87a28a4cb9562b`: 310 decisions, 141 BUY-legal decision states, **zero BUY**, 114 PLAY and 110 CANCEL, 50 FREEZE and 25 REFRESH, 3 forced guard EndTurns. For rounds 1–7, recorded `board_before_end = 0` in the supplied per-turn own-view where present; first recorded positive board value appeared at round 8. This directly documents lack of early board development in this particular game.
+- Follow-up [PR #107](https://github.com/sstxww/reinforcement-learning/pull/107) aggregate `reports/s-20261102-90e24c7b/002-buy-ablation.json` (blob `7e4f06c7eb70d524f6cefd2142e6f8c2ecec96de`) records 9 full games on 3 new paired seeds 89111–89113. Baseline [8,8,8] with 40 BUY; original V2 guarded [8,8,8] with 0 BUY and 1 forced EndTurn; explicit *frozen-model, first-legal-BUY override* [8,8,8] with **46 real BUY and 18 forced EndTurns**. Override was not trained PPO, and **forcing purchases did not repair placements** on these seeds. Candidate underwent 1,425 decisions versus 415 guarded-model decisions across three games. No models were promoted.
+
+## What is established, what is not
+
+**Established:** In those completed and guard-labelled games V2 repeatedly chose non-BUY despite mask-legal BUY options. Excessive PLAY ↔ CANCEL and other low-value action churn correlates with rank eight and weak board growth. A naive legal-BUY override causes more buys without any observed placement improvement.
+
+**Not established:** precise counterfactual causal share of BUY omission, whether every legal BUY had enough gold and strategic merit, whether loop is primarily action-mask bug, action embedding, reward, policy collapse, mandatory target semantics, or environment shift; the three distinct paired seeds per ablation are too few to prove broad policy equivalence. Repeated decisions are correlated.
+
+## Next falsifiable experiment and stop rules
+
+On fresh paired seeds and seat rotation, record `(turn, gold, own_board_size, hand_size, legal mask classes, selected raw action, resulting own observable hash)` around PLAY/CANCEL and pending-choice transitions. Compare raw unassisted model (bounded diagnostic probe, explicitly allow incomplete), equally guarded V2, guard-only intervention and baseline. Test whether legal PLAY/CANCEL cycling returns to identical public observation, and whether a legal mandatory choice exists when END_TURN mask is false. A one-factor guard/mandatory-target rule may be tested, but label it assisted inference, not PPO learning. Require full 8-player receipts, no illegal action, no truncation, paired confidence uncertainty; stop if no real effect. **No bulk PPO or Champion promotion yet.**
