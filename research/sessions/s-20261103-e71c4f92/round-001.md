@@ -1,17 +1,14 @@
-# Round 001 — read-only same-seed real-game control experiment
+# Round 001 — executed V6.1 single-seed full-game control
 
-Session s-20261103-e71c4f92; ROLE=WORKER; TASK_KEY=evaluation/paired-raw-v5-1408-seed-99385.
-
-## P0 and priority
-Main `3602f64b798bb51dcf69ef5964fe0b4c4cd39495` already integrates canonical Release restore #117, staged resumable save #125, rank integrity #152, and Champion gates #138; those are OTHER sessions' contributions. The only ready #15 is stacked on Draft #9. Do not merge or create another canonical trainer. Concurrent #161/#164/#165 already cover SHA-bound resume, schema-2 metadata and Release token scope.
-
-## Falsifiable experiment
-The existing 1408-step registered raw V5 PPO scored eighth in held-out games and showed repeated REFRESH/FREEZE and zero buys in prior real-game diagnostics (#162 and #161). Seed 99385 has not appeared in the PR search at start. This independent P3 probe compares raw 1408-step weights and baseline on SAME public simulator seed, seat zero, seven scripted bots. A paired one-seed result is descriptive, NOT statistically significant and not an architecture diagnosis.
-
-The job retrieves immutable Release assets via existing verified `release_restore_entry`, checks known SHA256, executes each entire eight-seat match, stores only `game.is_over()` complete receipts, checks the full placement permutation, verifies seed/strategy/SHA, and uploads original JSON. Any incomplete match produces failure evidence without a fake rank. It does not use guard, fallback, forced purchasing, training, Arena, or shared files.
-
-## Run / review gates
-Workflow: `.github/workflows/v61-paired-s-20261103-e71c4f92.yml`, triggered once per branch update; `reports/s-20261103-e71c4f92/` artifact on every result, max 65 minutes CPU, read-only token. Exact Actions URL, results, authentic receipt hashes and validation must be appended **after** successful execution; do not claim before proof. A PR without committed authentic receipt remains Draft/blocked.
-
-## Real costs and outcome at commit
-Own PPO steps: **0**. Own completed model games at commit: **0**. Own finished baseline games at commit: **0**. Stored new models: **0**; unpromoted Release source reused read-only. No claim of rank or performance gain. This file is an exact starting ledger, not a fabricated success report.
+- Session: s-20261103-e71c4f92; WORKER; TASK_KEY=evaluation/paired-raw-v5-1408-seed-99385.
+- Source main: `3602f64b798bb51dcf69ef5964fe0b4c4cd39495` (advanced independently after branch to `70c411b64034c8f66618811ff7a98914395735a5`); original branch code SHA `1cec734c47358e9ed865daa8620736050799444f`.
+- P0 reuse: merged-by-OTHERS Release restore #117, archive integrity #116, checkpoint stage #125, receipt integrity #152, Champion gate #138, paired eval gate #140, registry #154, SHA-less resume guard #161, raw evidence #162. Never claim ownership/merge. PR #15 is stacked on Draft #9. #164 review filed as comment [6586449985](https://github.com/sstxww/reinforcement-learning/pull/164#issuecomment-6586449985).
+- Model: unpromoted 1408-step V5 Release `v5-s-20261102-68099929-1408-41428692617`, weight SHA256 `a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632`, engine TavernGym 1.1.0/observe2 4017/447/245, hash `6d8712c93022ba11`.
+- Executed exact branch [GitHub Actions run 41510089011](https://github.com/sstxww/reinforcement-learning/actions/runs/41510089011) SUCCESS (all steps), [artifact 13172728337](https://github.com/sstxww/reinforcement-learning/actions/runs/41510089011/artifacts/13172728337), uploaded ZIP SHA256 `16ed7ee4eea8bb4720377ce1c32d98da195ddaa24d1181f3e3e2395cd89d5ef6`. Unit suite passed, pinned engine bootstrap and Release SHA/load checked; no training performed.
+- Both games are actual completed unguarded eight-seat TavernGym games, controlled seat 0, SAME seed 99385; raw model has no guard/assisted policy. Full original structures copied from authenticated run stdout into this session's `experiments/` only after exact SHA/seed/rank permutation validation.
+- Baseline: 53 decisions, turn 16, rank 7, placements [7,2,6,4,5,8,1,3].
+- Raw PPO: 126 decisions, turn 19, rank 8, placements [8,1,6,5,4,2,3,7]. No truncated combats or turn-limit completion for either.
+- Paired descriptive delta (PPO rank - baseline rank) = +1, n=1 each; statistically inconclusive; no strength/promotion claim. The result adds independent same-seed evidence of poor raw performance, consistent with but not independently diagnosing prior zero-BUY/freezing observations.
+- First PR CI [41510142950](https://github.com/sstxww/reinforcement-learning/actions/runs/41510142950) proved 337 pytest passes, 1 skip; evidence checker failed due to receipt not yet in repo. This failure was accurately logged and is corrected by committing two authentic receipts; next CI must actually pass before PR is ready.
+- Train/new steps: 0; no own checkpoint, optimizer update, durable new Release or Champion. Cost: a single 65-minute-bound CPU run (actual job elapsed ~3 min), no extra GPU, no formal Arena.
+- Next hypothesis: freeze/refresh raw selection conditional on affordable valid BUY opportunities and state-hash/no-op transitions explains failure better than just adding PPO steps. Require separate action-level evidence and paired seeds.
