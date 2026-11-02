@@ -1,0 +1,55 @@
+{
+  "schema": 1,
+  "session_id": "s-20261102-a881710a",
+  "engine": {
+    "version": "1.1.0",
+    "source_hash": "6d8712c93022ba11",
+    "features": 4017,
+    "cards": 447,
+    "actions": 245,
+    "n_cards": 3984
+  },
+  "upstream_commit": "fb61201a557ddd36a411cf44aac51ce4d9b606ce",
+  "cards": 3983,
+  "actions": 245,
+  "static_width": 66,
+  "counts": {
+    "card_kinds": {
+      "minion": 2596,
+      "spell": 297,
+      "hero": 143,
+      "hero_power": 176,
+      "quest": 23,
+      "quest_reward": 73,
+      "tavern_spell": 208,
+      "trinket_lesser": 201,
+      "trinket_greater": 219,
+      "dark_gift": 47
+    },
+    "printed_mechanics": {
+      "DEATHRATTLE": 428,
+      "BATTLECRY": 359,
+      "RALLY": 146,
+      "END_OF_TURN": 234,
+      "AURA": 170,
+      "START_OF_COMBAT": 183,
+      "DISCOVER": 31,
+      "AVENGE": 122,
+      "MAGNETIC": 55,
+      "CHOOSE_ONE": 36,
+      "ACTIVATE": 50
+    },
+    "keywords": {
+      "TAUNT": 193,
+      "WINDFURY": 33,
+      "DIVINE_SHIELD": 127,
+      "VENOMOUS": 29,
+      "REBORN": 58,
+      "MAGNETIC": 55,
+      "STEALTH": 21,
+      "POISONOUS": 8
+    }
+  },
+  "mechanics_not_verified": true,
+  "catalog_output_sha256": "440fcd5f03efdce56efc49699a468f0f7cf5a4bd8f6282e9e3c2a6c8adcab654"
+}

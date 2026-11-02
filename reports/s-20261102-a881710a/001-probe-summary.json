@@ -1,0 +1,32 @@
+{
+  "seed": 27861,
+  "completed": true,
+  "turns": 15,
+  "decisions": 54,
+  "seat0_placement": 1,
+  "truncated_combats": 0,
+  "turn_limit_end": false,
+  "selected_families": {
+    "choose": 4,
+    "buy": 19,
+    "play": 11,
+    "end_turn": 15,
+    "upgrade": 5
+  },
+  "legal_family_occurrences": {
+    "choose": 17,
+    "end_turn": 50,
+    "refresh": 37,
+    "freeze": 50,
+    "hero_power": 47,
+    "buy": 112,
+    "play": 32,
+    "sell": 251,
+    "upgrade": 10,
+    "dark_gift": 21,
+    "move": 1300,
+    "activate": 22,
+    "cancel": 1
+  },
+  "policy": "unchanged_baseline_instrumented_not_strength_candidate"
+}
