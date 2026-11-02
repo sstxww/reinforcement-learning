@@ -1,0 +1,40 @@
+{
+  "schema": 1,
+  "source": "paired full eight-seat TavernGym receipts",
+  "seed_seat_pairs": [
+    {
+      "seed": 99541,
+      "seat": 0
+    }
+  ],
+  "games_per_arm": 1,
+  "candidate_placements": [
+    8
+  ],
+  "baseline_placements": [
+    8
+  ],
+  "candidate_mean_placement": 8.0,
+  "baseline_mean_placement": 8.0,
+  "candidate_top4_rate": 0.0,
+  "candidate_first_place_rate": 0.0,
+  "paired_differences_candidate_minus_baseline": [
+    0
+  ],
+  "paired_mean_placement_delta": 0.0,
+  "paired_bootstrap_95pct_interval": null,
+  "guarded_candidate_games": 0,
+  "pure_model_candidate_games": 1,
+  "model_promotion_authorized": false,
+  "evidence_status": "insufficient_evidence",
+  "limitations": "No training/heldout seed overlap test; bootstrap measures paired seed variation only, not causality. Guarded games never prove raw policy strength.",
+  "session_id": "s-20261103-ff75e61a",
+  "model_release_tag": "v5-s-20261102-68099929-1408-41428692617",
+  "checkpoint_sha256": "a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632",
+  "new_ppo_steps": 0,
+  "owned_seed": 99541,
+  "raw_model_only": true,
+  "n_per_arm": 1,
+  "claim_of_improvement": false,
+  "model_promotion": "none"
+}

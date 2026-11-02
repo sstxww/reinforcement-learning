@@ -1,0 +1,91 @@
+name: V7 isolated actual raw-V5 vs baseline paired seed-99541 s-20261103-ff75e61a
+
+on:
+  push:
+    branches:
+      - 'agent/s-20261103-ff75e61a/optimization-001'
+    paths:
+      - '.github/workflows/v7-paired-raw-s-20261103-ff75e61a.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: v7-s-20261103-ff75e61a-raw-99541
+  cancel-in-progress: false
+
+jobs:
+  pinned-raw-game-and-baseline:
+    if: github.repository == 'sstxww/reinforcement-learning'
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install inference and test dependencies
+        run: python -m pip install -e '.[train,test]'
+      - name: Verify existing paired-game validator against synthetic regressions
+        run: python -m pytest -q tests/test_paired_receipt_gate_v5_15ac04d0.py tests/test_receipt_integrity.py
+      - name: Verify and install pinned TavernGym 1.1.0
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Run one original complete eight-seat baseline at seed 99541
+        run: |
+          mkdir -p experiments/s-20261103-ff75e61a reports/s-20261103-ff75e61a checkpoints
+          timeout 480s python -m tavern_ai.canary --agent-id s-20261103-ff75e61a --seed 99541 --policy baseline --receipt experiments/s-20261103-ff75e61a/001-99541-baseline.json
+          python -m tavern_ai.validate_receipt experiments/s-20261103-ff75e61a/001-99541-baseline.json
+      - name: Download immutable registered 1408-step V5 checkpoint and verify exact SHA256
+        run: |
+          gh release download v5-s-20261102-68099929-1408-41428692617 --repo "$GITHUB_REPOSITORY" --pattern model.zip --pattern model.metadata.json --dir checkpoints
+          echo 'a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632  checkpoints/model.zip' | sha256sum -c -
+      - name: Bounded unassisted raw PPO full eight-seat game (NEVER baseline fallback)
+        run: |
+          set +e
+          timeout 720s python -m tavern_ai.canary --agent-id s-20261103-ff75e61a --seed 99541 --policy model --model checkpoints/model.zip --receipt experiments/s-20261103-ff75e61a/001-99541-raw-model.json > reports/s-20261103-ff75e61a/001-99541-raw-stdout.log 2> reports/s-20261103-ff75e61a/001-99541-raw-stderr.log
+          rc=$?
+          set -e
+          cat reports/s-20261103-ff75e61a/001-99541-raw-stdout.log
+          if [ "$rc" -ne 0 ]; then
+            printf '{"schema":1,"session_id":"s-20261103-ff75e61a","seed":99541,"policy":"model","completed":false,"failure_class":"unassisted_raw_model_failed_or_timed_out","exit_code":%s,"placement":null,"no_baseline_substitution":true}\n' "$rc" > reports/s-20261103-ff75e61a/001-99541-raw-failure.json
+            cat reports/s-20261103-ff75e61a/001-99541-raw-stderr.log
+            exit "$rc"
+          fi
+          python -m tavern_ai.validate_receipt experiments/s-20261103-ff75e61a/001-99541-raw-model.json
+      - name: Strict original raw/baseline pair with one-sample descriptive report only
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from tavern_ai.paired_receipt_gate_v5 import compare
+          sid='s-20261103-ff75e61a'; seed=99541
+          p=Path('experiments')/sid
+          candidate=json.loads((p/f'001-{seed}-raw-model.json').read_text())
+          baseline=json.loads((p/f'001-{seed}-baseline.json').read_text())
+          assert candidate['model_sha256']=='a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632'
+          assert candidate['policy']=='model' and baseline['policy']=='baseline'
+          assert candidate['agent_id']==baseline['agent_id']==sid
+          result=compare([candidate],[baseline])
+          result.update({'session_id':sid,'model_release_tag':'v5-s-20261102-68099929-1408-41428692617',
+                         'checkpoint_sha256':candidate['model_sha256'],'new_ppo_steps':0,
+                         'owned_seed':seed,'raw_model_only':True,'n_per_arm':1,
+                         'claim_of_improvement':False,'model_promotion':'none'})
+          out=Path('reports')/sid/'001-99541-paired.json'
+          out.write_text(json.dumps(result,indent=2,ensure_ascii=False)+'\n')
+          print(out.read_text())
+          PY
+      - name: Preserve source receipts, descriptive statistics and explicit failed-game evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v7-s-20261103-ff75e61a-original-evidence-${{ github.run_id }}
+          path: |
+            experiments/s-20261103-ff75e61a/*.json
+            reports/s-20261103-ff75e61a/*.json
+            reports/s-20261103-ff75e61a/*.log
+          if-no-files-found: ignore
+          retention-days: 30
