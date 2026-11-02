@@ -1,27 +1,33 @@
-# Round 001 — independently validate rank-eight BUY telemetry and receipt provenance
+# V7 round 001 — verified raw PPO rank-eight recurrence on new held-out seed
 
-## Observed inherited evidence (not produced by this session)
+**Session:** `s-20261103-023cd77e` | **Base main:** `3a745c6f6a48c65528bcbeb81b8627b8db93f046` | **New code:** `tavern_ai/paired_buy_gate_023cd77e.py` + `tests/test_paired_buy_gate_023cd77e.py` + isolated read-only workflow.
 
-- Current main at session creation `3a745c6f6a48c65528bcbeb81b8627b8db93f046` includes merge of [#176](https://github.com/sstxww/reinforcement-learning/pull/176), plus [main parent CI evidence](https://github.com/sstxww/reinforcement-learning/actions/runs/41510729988) on PR head; do not treat head CI as main postmerge gate.
-- Original matched seed **97303** TavernGym games are recorded in `experiments/s-20261103-4fd17801/`: baseline rank 5, BUY 18/25 mask-legal decision exposures; original 1408-step model rank 8, BUY 0/23 mask-legal exposures. The model-controlled game is raw, no guard-forced ending; the 1536-step candidate rank 8 on *different* seed 97304 and was temporarily archived only. These observations show a specific mismatch, not a causal policy fix.
-- Other sessions are concurrently handling canonical trainer, persistent Release publishing, action mapping and shared CI; this session changes only unique gate/test/workflow/report paths.
+## Actual run and identities
+- Genuine [Actions #41512162363](https://github.com/sstxww/reinforcement-learning/actions/runs/41512162363), completed/success, source HEAD `e60af17ac50e68300b2d08304c6f0199370ca005`.
+- Engine verified pinned TavernGym 1.1.0, source `6d8712c93022ba11`, observe2 4017 floats/447 card slots/245 legal masked actions.
+- Registered 1408-step unpromoted Release model restored and SHA256 verified `a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632`; tokenless CPU load verified. **0 new training steps.** Source original optimzier archive structurally preflighted; no fresh PPO optimizer continuation claimed.
+- Original per-game complete JSONs / trace-first32 / gate report downloaded in [Artifact #13175145044](https://github.com/sstxww/reinforcement-learning/actions/runs/41512162363/artifacts/13175145044), archive digest `331af5aece180a071ef96f8063cce0cdd344d2961383cbbd6bef081caa86c0ca`, expires 2026-11-16 19:44:05 UTC. Originals SHA256 baseline `9879a81449cd93a93656d9095ed3651f7a95df2e9f0713d53c440e9429f59e73`, raw model `85c8ed45dc9e80ac3c9dd24a88440382ca390bff849f5582e33773754b087787`, paired report `46004fe134401d25aad4d6ddc92a242874302eb8b37ff5473c4904724c68d9df`.
+- **Archived projection warning:** `experiments/s-20261103-023cd77e/*.json` reproduces all top-level game identity, placement and action-summary fields directly from the original verified receipt, but omits `trace_first_32`; its `evidence_projection.original_receipt_sha256` binds the original, which must be downloaded before artifact expiry if full trace is required.
 
-## Falsifiable question and bounded execution
+## Same seed 99711, seat0, seven scripted bots
 
-Can the **original registered 1408-step raw model**, on new independent seed 99711 under exactly the same pinned engine and seat as baseline, (a) complete a genuine eight-player game without fallback; and (b) reconcile reported action-family histogram / legally masked BUY exposures with actual decision count and model SHA? The one-seed result is descriptive only and must not be used for promotion or broad causal conclusions.
+| Metric | Real baseline | Raw 1408-step PPO |
+|---|---:|---:|
+| Completed unassisted eight-player match | yes | yes |
+| Controlled seat final rank | 7 | 8 |
+| Decisions | 38 | 119 |
+| BUY chosen / mask-legal exposures | 13 / 20 | 0 / 35 |
+| FREEZE | 0 | 70 |
+| REROLL | 0 | 39 |
+| Turn/combat truncated | no | no |
 
-Own code `tavern_ai/paired_buy_gate_023cd77e.py` verifies two authentic complete receipts with matching engine, seed, policy and exact registered model digest, rejects assisted/fallback counters, checks placement permutations through canonical validator, and verifies opportunity summary internal arithmetic and action-family histogram. Synthetic mutation tests cover wrong identity, manipulated BUY rates, fake ranks and assisted results.
+The ranks are **not confidence intervals** (n=1). Buying 0 across 35 BUY-mask-legal decision exposures is a model behavior observation, **not** proof every state allowed an affordable or beneficial purchase, nor proof a changed reward/lr would fix behavior. Controlled model used no guard/rescue. The original engine's raw action2 is now correctly attributed FREEZE, not ambiguous OTHER.
 
-## Budget / custody / failure semantics
+## Tests / CI / corrective action
+- New fail-closed comparator rejects wrong registered SHA, seed/engine mismatch, assisted counters, fake placement, impossible buy opportunities, misreported percentages and non-permutation eight-seat ranks.
+- [Initial PR CI #41512327500](https://github.com/sstxww/reinforcement-learning/actions/runs/41512327500) had **395 tests passed, one skipped**, but PR evidence gate failed with "Missing independent agent game receipt", because run had not finished when Draft PR created. The defect was missing true receipt, *not a red unit test*. Recovered original Artifact and committed truthful game projections. Re-run must be checked on exact new head.
+- No new Release and no Best/Champion promotion. No formal TavernArena. This result is **research evidence**, not a successful policy enhancement.
+- The present branch is **not integrated**. No exclusive main merge lock acquired; only reviewer/integrator may merge after latest-head checks.
 
-One new seed, one raw model, one baseline, **0 PPO training steps** to avoid duplicating known unproductive continuations across 10–20 active sessions. Read-only workflow; 70-minute timeout; no automatic code push; source model only downloaded/read, no Release publish and no registry changes. Store the complete source-run receipts as short-lived Action Artifact until the exact bytes can be independently inspected and committed. A nonterminating raw model records a separate failure diagnostic and never a fabricated placement. Unpromoted parent checkpoint stays immutable.
-
-## Pending verified results
-
-- Workflow run: pending creation and observation.
-- Actual own completed game receipts and raw model result: pending.
-- Unit tests and exact-head CI: pending.
-- Independent model strength or optimizer improvement: not claimed.
-- Main merge: not authorized without exclusive serial integration mechanism, current-main compatibility and required CI/reviews.
-
-Next operator must inspect the Actions job and artifact first, preserve original bytes, then decide if the gate and evidence qualify for non-Draft PR and integrator handoff.
+## Next controlled hypothesis
+Separate raw action decoding from actual economic affordability and post-action state transitions; log publicly visible gold and shop/board before and after BUY-legal decisions. Compare candidate and baseline at matched seed/seat; do not retrain blindly from the same rank8 candidate.

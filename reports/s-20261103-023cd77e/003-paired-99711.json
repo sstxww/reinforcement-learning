@@ -1,0 +1,44 @@
+{
+  "schema": 1,
+  "sample_size": 1,
+  "seed": 99711,
+  "controlled_seat": 0,
+  "engine_source_hash": "6d8712c93022ba11",
+  "source_model_sha256": "a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632",
+  "baseline": {
+    "rank": 7,
+    "decisions": 38,
+    "buy_legal_decisions": 20,
+    "buy_chosen": 13,
+    "buy_rate_per_legal_decision": 0.65,
+    "end_while_buy_legal": 0,
+    "freeze": 0,
+    "reroll": 0,
+    "other": 1
+  },
+  "raw_model": {
+    "rank": 8,
+    "decisions": 119,
+    "buy_legal_decisions": 35,
+    "buy_chosen": 0,
+    "buy_rate_per_legal_decision": 0,
+    "end_while_buy_legal": 0,
+    "freeze": 70,
+    "reroll": 39,
+    "other": 0
+  },
+  "mean_placement_delta_model_minus_baseline": 1,
+  "result": "descriptive_single_seed_only_no_performance_claim",
+  "caveat": "BUY-legal decision exposures are temporally dependent and do not establish affordable independent purchase opportunities.",
+  "source": {
+    "run_url": "https://github.com/sstxww/reinforcement-learning/actions/runs/41512162363",
+    "run_head_sha": "e60af17ac50e68300b2d08304c6f0199370ca005",
+    "result": "completed/success",
+    "original_artifact_url": "https://github.com/sstxww/reinforcement-learning/actions/runs/41512162363/artifacts/13175145044",
+    "artifact_sha256": "331af5aece180a071ef96f8063cce0cdd344d2961383cbbd6bef081caa86c0ca",
+    "artifact_retention_until": "2026-11-16T19:44:05Z",
+    "original_baseline_sha256": "9879a81449cd93a93656d9095ed3651f7a95df2e9f0713d53c440e9429f59e73",
+    "original_model_sha256": "85c8ed45dc9e80ac3c9dd24a88440382ca390bff849f5582e33773754b087787",
+    "original_paired_report_sha256": "46004fe134401d25aad4d6ddc92a242874302eb8b37ff5473c4904724c68d9df"
+  }
+}
