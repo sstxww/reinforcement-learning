@@ -3,7 +3,7 @@ name: V5 isolated verified Release resume s-20261102-99372431
 on:
   push:
     branches: ['agent/s-20261102-99372431/optimization-001']
-    paths: ['.github/workflows/v5-verified-resume-s-20261102-99372431.yml']
+    paths: ['research/sessions/s-20261102-99372431/RUN_REQUEST.txt']
   workflow_dispatch:
 
 permissions:
@@ -90,6 +90,15 @@ jobs:
             --title "V5 isolated resume audit - unpromoted $TAG" --notes "$NOTE" \
             checkpoints/candidate/model.zip checkpoints/candidate/model.metadata.json \
             reports/s-20261102-99372431/001-resume-audit.json
+          # Publish is not complete until a fresh Release download and digest/load pass.
+          mkdir -p checkpoints/release-readback
+          gh release download "$TAG" --repo "$GITHUB_REPOSITORY" \
+            --pattern model.zip --pattern model.metadata.json --dir checkpoints/release-readback
+          EXPECTED=$(python -c 'import json; print(json.load(open("reports/s-20261102-99372431/001-resume-audit.json"))["new_sha256"])')
+          python -m tavern_ai.checkpoint_preflight \
+            --model checkpoints/release-readback/model.zip \
+            --metadata checkpoints/release-readback/model.metadata.json \
+            --expected-sha256 "$EXPECTED" --probe-inference
       - name: Commit genuine evidence only on this isolated branch
         if: always()
         shell: bash
@@ -101,6 +110,7 @@ jobs:
           if ! git diff --cached --quiet; then
             git commit -m "results(v5): preserve isolated real match and resume diagnostics"
             test "$GITHUB_REF_NAME" = "agent/s-20261102-99372431/optimization-001"
+            git pull --rebase origin "$GITHUB_REF_NAME"
             git push origin "HEAD:${GITHUB_REF_NAME}"
           fi
       - name: Archive available evidence even after failure
