@@ -1,0 +1,18 @@
+{
+  "schema": 1,
+  "session_id": "s-20261102-2b9660fa",
+  "source_release": "v2-learning-41413557445",
+  "source_checkpoint_sha256": "73bde2666426cecce39f135980a897bb2cd4a7d70783ba04c9c0d29477a6664a",
+  "source_steps": 1280,
+  "new_steps": 128,
+  "total_steps": 1408,
+  "new_checkpoint_sha256": "cbfd107dde8f01561a0524d216d38e98f021bdedbe6139b81f5680cf060bf05e",
+  "model_full_game_verified": true,
+  "champion_promoted": false,
+  "game_status": "complete",
+  "durable_release_status": "published_and_byte_rechecked_unpromoted",
+  "game_seed": 85623,
+  "game_place": 8,
+  "game_decisions": 142,
+  "release_tag": "v5-smoke-s-20261102-2b9660fa-41451557222"
+}
