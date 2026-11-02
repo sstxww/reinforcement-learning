@@ -1,7 +1,7 @@
 """Staged checkpoint writes and checksum-bound resume for incremental PPO.
 
 Saving a ZIP and its metadata is not a single filesystem transaction. If a
-crash occurs between replacements, the next verified resume fails closed.
+crash occurs between exclusive hard links, the next verified resume fails closed.
 Legacy checkpoint metadata without a digest must be preflighted independently.
 """
 from __future__ import annotations
@@ -36,6 +36,33 @@ def verify_resume_digest(path: Path, metadata: dict) -> bool:
     return True
 
 
+
+def _install_new_pair(staged_zip: Path, staged_meta: Path,
+                      final_zip: Path, final_meta: Path) -> None:
+    """Install a NEW candidate without replacing an existing model or metadata.
+
+    Both staged files are created in the final directory, so hard links are
+    same-filesystem and os.link fails atomically when a target already exists.
+    This is not crash-atomic across two files: an interrupted process may leave
+    an orphan which the next attempt must refuse to overwrite.
+    """
+    installed: list[tuple[Path, Path]] = []
+    try:
+        for source, destination in ((staged_zip, final_zip),
+                                    (staged_meta, final_meta)):
+            os.link(source, destination)
+            installed.append((source, destination))
+    except BaseException:
+        for source, destination in reversed(installed):
+            try:
+                # Avoid removing a pathname subsequently replaced by a writer.
+                if destination.samefile(source):
+                    destination.unlink()
+            except OSError:
+                pass
+        raise
+
+
 def save_checkpoint(model: object, model_path: Path, metadata: dict) -> dict:
     """Stage checkpoint and bound metadata; never write the target mid-save."""
     model_path = Path(model_path)
@@ -43,6 +70,8 @@ def save_checkpoint(model: object, model_path: Path, metadata: dict) -> dict:
         raise ValueError("Checkpoint path must have a .zip suffix")
     model_path.parent.mkdir(parents=True, exist_ok=True)
     metadata_path = model_path.with_suffix(".metadata.json")
+    if os.path.lexists(model_path) or os.path.lexists(metadata_path):
+        raise FileExistsError("Refusing to replace an existing checkpoint or metadata")
     fd, tmp_zip = tempfile.mkstemp(prefix=".checkpoint-", suffix=".zip", dir=model_path.parent)
     os.close(fd)
     fd, tmp_meta = tempfile.mkstemp(prefix=".checkpoint-", suffix=".json", dir=model_path.parent)
@@ -53,10 +82,9 @@ def save_checkpoint(model: object, model_path: Path, metadata: dict) -> dict:
             raise ValueError("Training library wrote an empty checkpoint")
         saved = {**metadata, "checkpoint_sha256": sha256_file(Path(tmp_zip))}
         Path(tmp_meta).write_text(json.dumps(saved, indent=2, ensure_ascii=False), encoding="utf-8")
-        # Committing ZIP first leaves a detectably mismatched old metadata
-        # if power fails before the second replace. A later resume refuses.
-        os.replace(tmp_zip, model_path)
-        os.replace(tmp_meta, metadata_path)
+        # Exclusive installation also protects against a writer that appears
+        # AFTER the initial existence check. A crash between links fails closed.
+        _install_new_pair(Path(tmp_zip), Path(tmp_meta), model_path, metadata_path)
         return saved
     finally:
         Path(tmp_zip).unlink(missing_ok=True)
