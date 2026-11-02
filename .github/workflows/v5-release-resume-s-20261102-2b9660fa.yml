@@ -94,11 +94,12 @@ jobs:
         run: |
           set -euo pipefail
           TAG="v5-smoke-s-20261102-2b9660fa-${GITHUB_RUN_ID}"
-          cp checkpoints/next/model.zip checkpoints/next/released-model.zip
-          cp checkpoints/next/model.metadata.json checkpoints/next/released-model.metadata.json
+          mkdir -p checkpoints/publish
+          cp checkpoints/next/model.zip checkpoints/publish/model.zip
+          cp checkpoints/next/model.metadata.json checkpoints/publish/model.metadata.json
           gh release create "$TAG" \
-            "checkpoints/next/released-model.zip#model.zip" \
-            "checkpoints/next/released-model.metadata.json#model.metadata.json" \
+            checkpoints/publish/model.zip \
+            checkpoints/publish/model.metadata.json \
             experiments/s-20261102-2b9660fa/002-85623-model.json \
             --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --prerelease \
             --title "UNPROMOTED 128-step continuation s-20261102-2b9660fa" \
