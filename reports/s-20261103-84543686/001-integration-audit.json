@@ -1,0 +1,50 @@
+{
+  "schema": 1,
+  "kind": "worker_p0_live_integration_audit",
+  "session_id": "s-20261103-84543686",
+  "task_key": "p0/p1-pr161-pr164-integration-review-and-p2-seed99407",
+  "base_main_sha": "3602f64b798bb51dcf69ef5964fe0b4c4cd39495",
+  "role": "WORKER",
+  "mail_received_at": "2026-11-02T19:21:22Z",
+  "attachment_name": "AutoTavern-AI-V6.1-多会话并发闭环自训练完整提示词.txt",
+  "attachment_bytes": 22229,
+  "reviewed_prs": [
+    {
+      "number": 161,
+      "head_sha": "97163b8ba0bb68f04dbe6bf21f1b322a6a0ae899",
+      "draft": true,
+      "review_url": "https://github.com/sstxww/reinforcement-learning/pull/161#pullrequestreview-5742124665",
+      "finding": "Current main train.run ignores a false SHA-less digest result. Proposed fail-closed safety gate is narrow; wait for final-head CI/rebase."
+    },
+    {
+      "number": 164,
+      "head_sha": "4e60584d142460a1e3d659064ad272f03172f0ba",
+      "draft": true,
+      "review_url": "https://github.com/sstxww/reinforcement-learning/pull/164#pullrequestreview-5742125132",
+      "finding": "Current main downgrades schema-2 parent checkpoint metadata on save; proposed preservation conflicts in train.py with #161 and must be integrated serially."
+    }
+  ],
+  "main_ci_observed": {
+    "url": "https://github.com/sstxww/reinforcement-learning/actions/runs/41509414897",
+    "status_at_observation": "in_progress"
+  },
+  "main_best": null,
+  "latest_model": {
+    "release": "https://github.com/sstxww/reinforcement-learning/releases/tag/v5-s-20261102-68099929-1408-41428692617",
+    "sha256": "a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632",
+    "training_steps": 1408,
+    "heldout_placements": [
+      8,
+      8,
+      8
+    ],
+    "promoted": false
+  },
+  "own_training_steps": 0,
+  "own_raw_game_results": null,
+  "own_baseline_game_results": null,
+  "model_release_published": false,
+  "workflow": "one-shot branch-specific same-seed 99407 baseline/ungarded-model full-game",
+  "warning": "All own game results are pending actual Actions run and original receipt; this JSON is P0 review metadata, not a game receipt.",
+  "next_gate": "Inspect original Actions logs and artifacts; keep PR Draft until receipt committed and current-head CI passes."
+}
