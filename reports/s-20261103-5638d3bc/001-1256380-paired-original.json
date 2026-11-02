@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "session": "s-20261103-5638d3bc",
+  "seed": 1256380,
+  "seat": 0,
+  "games_per_arm": 1,
+  "policy": "raw unassisted model",
+  "parent_model_sha256": "a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632",
+  "parent_trained_steps": 1408,
+  "new_training_steps": 0,
+  "baseline_rank": 6,
+  "model_rank": 8,
+  "paired_delta_model_minus_baseline": 2,
+  "improvement_established": false,
+  "best_or_champion_promoted": false,
+  "note": "Single matched seed cannot establish rank or statistical improvement."
+}
