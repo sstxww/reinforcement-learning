@@ -12,5 +12,15 @@
   ],
   "shared_files_touched": [],
   "claim_scope": "task only, NOT main merge lease",
-  "handoff": "release claim at end; do not interpret this ref as a global merge lock"
+  "handoff": "release claim at end; do not interpret this ref as a global merge lock",
+  "status": "released_handoff",
+  "claim_exclusive_for_main_merge": false,
+  "pr_url": "https://github.com/sstxww/reinforcement-learning/pull/218",
+  "last_implementation_commit": "3be8071619706bbc53c224d7cd18b134d3ea9a4d",
+  "last_handoff_commit": "72cebb9dbcfe1aacd2adf310aefe7ff6b3faa530",
+  "game_run": "https://github.com/sstxww/reinforcement-learning/actions/runs/41513547274",
+  "game_status_at_release": "queued",
+  "pr_ci": "https://github.com/sstxww/reinforcement-learning/actions/runs/41513849788",
+  "pr_ci_status_at_release": "queued",
+  "next_step": "Check actual game run and retrieve its authentic receipt; add to own PR branch only with new claim/ownership check; verify latest PR head CI. Do not merge without enforced exclusive entry."
 }
