@@ -12,7 +12,7 @@ Base `main`: `6ac59235b8238196a0e6462de77b72413c829372`.
 Reviewed `README.md`, `AGENTS.md`, `docs/PROJECT_BACKGROUND.md`, `docs/SESSION_PROTOCOL.md`, `research/knowledge/README.md` and `research/sessions/` (main contained only `.gitkeep`). Shared curated knowledge contained no validated optimization results.
 Open competing PRs at start: #6 strategy, #7 evaluation, #8 infrastructure, #9 PPO/checkpoints. These are unmerged research leads; this session avoids their code paths (`baseline.py`, `evaluate.py`, `train.py`, `canary.py`, shared workflows).
 
-Session branch: `agent/s-20261102-2b0d8089/optimization-001`. Do not merge without integrator review.
+Session branch: `agent/s-20261102-2b0d8089/optimization-001`. Review PR: [#21](https://github.com/sstxww/reinforcement-learning/pull/21) (draft). Do not merge without integrator review.
 
 ## Exact game / training contract
 
