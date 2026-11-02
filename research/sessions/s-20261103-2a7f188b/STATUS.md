@@ -28,3 +28,11 @@
 - Current known main `c1b828734527bae6141805581693d890cc3bff94`, same-SHA [main CI #41512315964](https://github.com/sstxww/reinforcement-learning/actions/runs/41512315964) SUCCESS. Refresh before any integration.
 - This session has no global exclusive integration lease: no direct merge. Ready to open a **non-Draft** single-purpose PR with authentic receipt, then require latest-head PR CI and independent review. Branch/PR SHA needs refresh after last handoff commit.
 - Next owner first action: check exact HEAD CI and review for this PR; compare optional helper with any newer shared gate and, under real serial integration lock only, merge if all checks pass. Preserve raw failure as an uncompleted game rather than ranking.
+
+## PR submission checkpoint
+
+- Non-Draft PR **[#208](https://github.com/sstxww/reinforcement-learning/pull/208)** was actually opened against main after committing the authentic baseline receipt and exact PPO failure records.
+- Initial PR HEAD: `36b498bc69aaea1c7870434527f6e13b052879b5`; initial independent full-match check [Actions #41513449889](https://github.com/sstxww/reinforcement-learning/actions/runs/41513449889) queued at authoring. This STATUS update itself advances the PR HEAD; inspect the *new exact HEAD* and its CI instead of relying on the initial run.
+- PR is mergeable/non-Draft at initial GitHub check but **not approved or integrated**. No exclusive main merge authority has been established; no direct merge performed.
+- Exact global model status: own +0 steps, own persistent Release none; source V5 1408-step SHA verified, same-seed raw model unfinished, baseline finished rank8. No Champion/Best promotion.
+- Next specific action: check PR #208 head and latest CI full-match job, run or document checks; independently review use of full git history; coordinate with existing V7 serial integration proposal PR #185, which does not by itself prove global exclusive merging. If CI succeeds, request serialized integrator to merge, then verify the new main SHA's independent push CI. Avoid raw-model rank claims for unfinished matches.
