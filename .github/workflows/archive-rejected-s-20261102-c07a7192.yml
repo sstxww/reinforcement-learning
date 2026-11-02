@@ -1,0 +1,143 @@
+name: V5 archive verified rejected PPO s-20261102-c07a7192
+
+on:
+  push:
+    branches: ['agent/s-20261102-c07a7192/optimization-001']
+    paths:
+      - '.github/workflows/archive-rejected-s-20261102-c07a7192.yml'
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: archive-rejected-s-20261102-c07a7192
+  cancel-in-progress: false
+
+jobs:
+  save-authentic-model:
+    runs-on: ubuntu-latest
+    timeout-minutes: 65
+    env:
+      GH_TOKEN: ${{ github.token }}
+      MODEL_SHA256: c1851820a7cbd353b8d8c91b4a446c512c4f6ba3f7048259da3f61ad932be0d1
+      SOURCE_RUN: '41450150026'
+      SOURCE_SHA: 2f83885866139d297f4b8ff36489f563d061c894
+      TAG: v5-rejected-s-20261102-c07a7192-1536-41450150026
+      AGENT_ID: s-20261102-c07a7192
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned model audit and TavernGym engine
+        run: |
+          python -m pip install -e '.[test,train]'
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Require successful original real-training run and exact immutable artifact
+        shell: bash
+        run: |
+          test "$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${SOURCE_RUN}" --jq .conclusion)" = success
+          test "$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${SOURCE_RUN}" --jq .head_sha)" = "$SOURCE_SHA"
+          gh run download "$SOURCE_RUN" --repo "$GITHUB_REPOSITORY" \
+            --name "restore-smoke-${AGENT_ID}-${SOURCE_RUN}" --dir source-artifact
+          test -f source-artifact/checkpoints/resumed.zip
+          test -f source-artifact/checkpoints/resumed.metadata.json
+          test -f source-artifact/experiments/${AGENT_ID}/002-76013-model.json
+          echo "$MODEL_SHA256  source-artifact/checkpoints/resumed.zip" | sha256sum --check --status
+          python - <<'PY'
+          import json, os
+          root='source-artifact/'
+          meta=json.load(open(root+'checkpoints/resumed.metadata.json'))
+          match=json.load(open(root+'experiments/'+os.environ['AGENT_ID']+'/002-76013-model.json'))
+          assert meta['total_timesteps']==1536 and meta['algorithm']=='MaskablePPO'
+          assert meta['engine']['source_hash']=='6d8712c93022ba11'
+          assert match['policy']=='model' and match['seed']==76013 and match['completed'] is True
+          assert match['placements'][0]==8 and match['truncated_combats']==0 and match['turn_limit_end'] is False
+          assert match['model_sha256']==os.environ['MODEL_SHA256']
+          print('Source metadata and actual model-match receipt verified against exact checkpoint')
+          PY
+      - name: Strict weights ZIP/optimizer/checkpoint metadata and actual CPU inference
+        run: |
+          python -m tavern_ai.checkpoint_preflight \
+            --model source-artifact/checkpoints/resumed.zip \
+            --metadata source-artifact/checkpoints/resumed.metadata.json \
+            --expected-sha256 "$MODEL_SHA256" --probe-inference
+      - name: Prepare immutable unpromoted rejected model package
+        shell: bash
+        run: |
+          mkdir -p immutable
+          cp source-artifact/checkpoints/resumed.zip immutable/model.zip
+          cp source-artifact/checkpoints/resumed.metadata.json immutable/model.metadata.json
+          cp source-artifact/experiments/"$AGENT_ID"/002-76013-model.json immutable/model-game.json
+          python - <<'PY'
+          import json,hashlib,os,pathlib
+          d=pathlib.Path('immutable')
+          def sha(path):return hashlib.sha256((d/path).read_bytes()).hexdigest()
+          report={
+            'schema':1,'status':'rejected_unpromoted_negative_experiment',
+            'model_release_tag':os.environ['TAG'],
+            'source_run':os.environ['SOURCE_RUN'],'source_commit':os.environ['SOURCE_SHA'],
+            'parent_model_release':'v5-s-20261102-68099929-1408-41428692617',
+            'parent_cumulative_steps':1408,'actual_incremental_ppo_steps':128,
+            'total_timesteps':1536,'model_sha256':sha('model.zip'),
+            'metadata_sha256':sha('model.metadata.json'),
+            'real_full_game_seed':76013,'real_full_game_placement':8,
+            'model_game_receipt_sha256':sha('model-game.json'),
+            'independent_candidate_strength_verified':False,'champion_promoted':False,
+            'explanation':'Model loaded/resumed/finished authentic eight-seat game but remains rank 8; archive for reproducibility, do not choose as champion or main latest.'
+          }
+          assert report['model_sha256']==os.environ['MODEL_SHA256']
+          (d/'archive-attestation.json').write_text(json.dumps(report,indent=2,sort_keys=True)+'\\n')
+          PY
+      - name: Publish unique immutable rejected prerelease and verify actual published bytes
+        shell: bash
+        run: |
+          if ! gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release create "$TAG" \
+              'immutable/model.zip#model.zip' \
+              'immutable/model.metadata.json#model.metadata.json' \
+              'immutable/model-game.json#model-game.json' \
+              'immutable/archive-attestation.json#archive-attestation.json' \
+              --repo "$GITHUB_REPOSITORY" --target "$SOURCE_SHA" --prerelease \
+              --title 'REJECTED UNPROMOTED V5 1536-step PPO (rank 8) s-20261102-c07a7192' \
+              --notes 'Source successful authentic Actions run 41450150026: SHA-verified durable 1408-step V5 Release restored, 128 genuine new PPO updates, cumulative 1536; strict actual model-controlled eight-seat seed 76013 finished rank 8. NO competitive improvement proof. Research archive, not Latest or Champion. Never use for automatic continuation.'
+          fi
+          mkdir -p redownloaded
+          gh release download "$TAG" --repo "$GITHUB_REPOSITORY" \
+            --pattern 'model.zip' --pattern 'model.metadata.json' \
+            --pattern 'model-game.json' --pattern 'archive-attestation.json' \
+            --dir redownloaded
+          for file in model.zip model.metadata.json model-game.json archive-attestation.json; do
+            cmp "immutable/$file" "redownloaded/$file"
+          done
+          echo "$MODEL_SHA256  redownloaded/model.zip" | sha256sum --check --status
+          python -m tavern_ai.checkpoint_preflight \
+            --model redownloaded/model.zip --metadata redownloaded/model.metadata.json \
+            --expected-sha256 "$MODEL_SHA256" --probe-inference
+      - name: Preserve compact genuine Release custody report in own session branch
+        shell: bash
+        run: |
+          test "$GITHUB_REF_NAME" = 'agent/s-20261102-c07a7192/optimization-001'
+          mkdir -p "reports/$AGENT_ID"
+          cp immutable/archive-attestation.json "reports/$AGENT_ID/002-release-archive.json"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "reports/$AGENT_ID/002-release-archive.json"
+          git diff --cached --quiet || git commit -m "archive($AGENT_ID): immutable rejected 1536-step weights verified after Release download"
+          git pull --rebase origin "$GITHUB_REF_NAME"
+          git push origin "HEAD:$GITHUB_REF_NAME"
+      - name: Keep bounded failure/custody diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rejected-model-custody-s-20261102-c07a7192-${{ github.run_id }}
+          path: |
+            immutable/archive-attestation.json
+            reports/s-20261102-c07a7192/002-release-archive.json
+          if-no-files-found: ignore
+          retention-days: 30
