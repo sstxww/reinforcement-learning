@@ -15,7 +15,7 @@
   "engine_source_hash": "6d8712c93022ba11",
   "engine_version": "1.1.0",
   "environment": "TavernGym",
-  "git_sha": "5b435034a9091bd544b0f0e84558b3bffef7dd87",
+  "git_sha": "6d38ca15b7e6e920060b4e22c54d7db8ed847f1b",
   "guard_forced_ends": 0,
   "legal_buy_decisions": 33,
   "legal_buy_turn_count": 8,
@@ -194,7 +194,7 @@
     "play": 21,
     "upgrade": 3
   },
-  "timestamp": "2026-11-02T10:26:53.624282+00:00",
+  "timestamp": "2026-11-02T10:37:43.791381+00:00",
   "truncated_combats": 0,
   "turn_limit_end": false,
   "turns": 15
