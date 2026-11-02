@@ -1,0 +1,82 @@
+name: V6.1 P0 stacked-PR gate + genuine canary s-20261103-183db1dc
+
+on:
+  push:
+    branches:
+      - agent/s-20261103-183db1dc/optimization-001
+    paths:
+      - scripts/v61_pr_base_gate_183db1dc.py
+      - tests/test_v61_pr_base_gate_183db1dc.py
+      - .github/workflows/v61-pr-base-gate-183db1dc.yml
+
+permissions:
+  contents: read
+  checks: read
+  actions: read
+
+concurrency:
+  group: v61-pr-base-gate-s-20261103-183db1dc
+  cancel-in-progress: false
+
+jobs:
+  audit-and-canary:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install test dependencies
+        run: python -m pip install -e '.[test]'
+      - name: P0 regression tests
+        run: python -m pytest -q tests/test_v61_pr_base_gate_183db1dc.py
+      - name: Audit LIVE PR 15 against exact live main and PR head checks
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts reports/s-20261103-183db1dc
+          gh api "repos/$GITHUB_REPOSITORY/pulls/15" > artifacts/pr15.json
+          pr_head="$(gh api "repos/$GITHUB_REPOSITORY/pulls/15" --jq '.head.sha')"
+          gh api "repos/$GITHUB_REPOSITORY/commits/$pr_head/check-runs?per_page=100" > artifacts/checks15.json
+          live_main="$(gh api "repos/$GITHUB_REPOSITORY/branches/main" --jq '.commit.sha')"
+          set +e
+          python scripts/v61_pr_base_gate_183db1dc.py \
+            --pr-json artifacts/pr15.json --checks-json artifacts/checks15.json \
+            --main-sha "$live_main" \
+            --out reports/s-20261103-183db1dc/001-pr15-live-gate.json
+          result=$?
+          set -e
+          if (( result != 2 )); then
+            echo "Expected #15 to be blocked by dependency/non-main-base; got code $result"
+            exit 1
+          fi
+          python - <<'PY'
+          import json
+          p=json.load(open("reports/s-20261103-183db1dc/001-pr15-live-gate.json"))
+          assert p["decision"]=="blocked"
+          assert "PR targets a non-main dependency branch" in p["blockers"],p
+          assert p["auto_merge_authorized"] is False
+          PY
+      - name: Bootstrap pinned real TavernGym engine
+        run: bash scripts/bootstrap_engine.sh
+      - name: One original true eight-seat baseline match
+        run: |
+          python -m tavern_ai.canary \
+            --agent-id s-20261103-183db1dc \
+            --seed 99613 --policy baseline \
+            --receipt experiments/s-20261103-183db1dc/001-99613.json
+          python -m tavern_ai.validate_receipt \
+            experiments/s-20261103-183db1dc/001-99613.json
+      - name: Save original read-only cloud evidence (temporary artifact)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v61-pr15-audit-s-20261103-183db1dc-${{ github.run_id }}
+          path: |
+            reports/s-20261103-183db1dc/*.json
+            experiments/s-20261103-183db1dc/*.json
+          if-no-files-found: ignore
+          retention-days: 30
