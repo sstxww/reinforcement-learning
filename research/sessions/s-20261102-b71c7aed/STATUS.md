@@ -9,3 +9,14 @@
 - Pure invariant unit tests: **10 passed locally**. Actual isolated cloud run: [41449881452](https://github.com/sstxww/reinforcement-learning/actions/runs/41449881452), initially in progress. Must inspect final run outcome and artifact before claiming complete games, model load/resume or new training.
 - New training steps: **not yet verified** (0 claimed). New own game receipts: **not yet verified** (0 claimed). New permanent saved model: none. No Champion promotion, ranked Arena or large PPO job.
 - Live run outcomes should be appended in this unique path only after exact logs/receipts are read; preserve failed-gate logs if training blocked.
+
+## R001 genuine cloud attempt #1: failed safely
+- [GitHub Actions run 41449881452](https://github.com/sstxww/reinforcement-learning/actions/runs/41449881452) **FAILURE** at exact workflow head `ae9bedf8baba2cc8fe24625297e390a841e8cebb`.
+- 10 invariant tests, pinned engine bootstrap and actual two-asset Release download passed; actual preflight reached raw candidate game.
+- Actual seed 920011 raw PPO exceeded 250 **own decisions in one turn**, raising `RuntimeError: Too many actions in one turn; no full-match receipt fabricated`. No candidate full game, no 128 PPO continuation, no new checkpoint, no Champion promotion.
+- Genuine baseline on seed 920011: rank 8, 41 decisions, BUY 13 out of 21 legal-BUY exposures. Original receipt preserved without identity edit in [artifact 13144047764](https://github.com/sstxww/reinforcement-learning/actions/runs/41449881452/artifacts/13144047764); `agent_id` has `-baseline` suffix and does not count as valid independent PR gate for this session.
+- Failure investigation and accepted nonclaims: [failures/001-raw-turn-loop.md](failures/001-raw-turn-loop.md).
+
+## One targeted recovery run
+- Updated only session-owned workflow in commit `984b23c00b8a6884e4c6b6e1c748b12561143f5b` to collect non-intervention raw policy action families (capped 320) and independent own-session real Baseline receipt **before** preserving strict candidate/full-game stop.
+- [GitHub Actions run 41450837403](https://github.com/sstxww/reinforcement-learning/actions/runs/41450837403) queued when recorded. Treat its outcome as unverified pending actual logs and artifacts. No policy modification, no bounded PPO train if raw policy cannot finish, no ranked Arena.
