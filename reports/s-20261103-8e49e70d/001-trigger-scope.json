@@ -1,0 +1,8 @@
+{
+  "schema": 1,
+  "total_workflows": 43,
+  "session_workflows": 30,
+  "flagged_session_workflows": 0,
+  "findings": [],
+  "claim": "static trigger scope only; no actual Actions or merge authorization"
+}
