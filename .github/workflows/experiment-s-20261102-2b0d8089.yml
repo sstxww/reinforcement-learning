@@ -1,0 +1,87 @@
+name: Session s-20261102-2b0d8089 reward ablation
+
+on:
+  push:
+    branches:
+      - 'agent/s-20261102-2b0d8089/optimization-001'
+    paths:
+      - 'tavern_ai/reward.py'
+      - 'tests/test_reward_shaping.py'
+      - 'research/sessions/s-20261102-2b0d8089/run_reward_experiment.py'
+      - '.github/workflows/experiment-s-20261102-2b0d8089.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: reward-s-20261102-2b0d8089
+  cancel-in-progress: false
+
+jobs:
+  train-and-play:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    permissions:
+      contents: write
+    env:
+      PYTHONUNBUFFERED: '1'
+      OMP_NUM_THREADS: '2'
+      MKL_NUM_THREADS: '2'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: |
+          python -m pip install -U pip
+          python -m pip install -e '.[train,test]'
+          python -m pytest
+      - name: Bootstrap verified real TavernGym engine
+        run: bash scripts/bootstrap_engine.sh
+      - name: Verify pinned engine and mask contract
+        run: |
+          python -m tavern_ai.contract
+          python - <<'PY'
+          from sb3_contrib.common.maskable.utils import is_masking_supported
+          from tavern_ai.env import TavernEnv
+          from tavern_ai.reward import SignedLogReward
+          env = SignedLogReward(TavernEnv(seed=20261102))
+          try:
+              obs, info = env.reset(seed=20261102)
+              assert obs["features"].shape == (4017,)
+              assert obs["cards"].shape == (447,)
+              assert is_masking_supported(env)
+              assert env.get_wrapper_attr("action_masks")().shape == (245,)
+          finally:
+              env.close()
+          PY
+      - name: Train 2 x 256 and play 6 genuine complete games
+        run: python research/sessions/s-20261102-2b0d8089/run_reward_experiment.py
+      - name: Validate independently generated match receipts
+        run: |
+          for f in experiments/s-20261102-2b0d8089/*.json; do
+            [[ "$f" == *summary.json ]] && continue
+            python -m tavern_ai.validate_receipt "$f"
+          done
+      - name: Commit session-only receipts, no force-push
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add experiments/s-20261102-2b0d8089/
+          git commit -m "experiment: record six real matches for s-20261102-2b0d8089"
+          git push origin HEAD:refs/heads/agent/s-20261102-2b0d8089/optimization-001
+      - name: Save isolated checkpoints and audit metadata
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: reward-s-20261102-2b0d8089-${{ github.run_id }}
+          path: |
+            checkpoints/s-20261102-2b0d8089/
+            experiments/s-20261102-2b0d8089/
+          if-no-files-found: warn
+          retention-days: 90
