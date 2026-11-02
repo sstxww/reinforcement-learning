@@ -166,7 +166,7 @@ def trace(seed: int, model, model_hash: str) -> dict:
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--model", type=Path, required=True)
-    parser.add_argument("--registry", type=Path, default=Path("models/registry.json"))
+    parser.add_argument("--registry", type=Path, default=Path("models/sessions/s-20261102-decfc670/registry.json"))
     parser.add_argument("--seeds", type=int, nargs="+", default=[86251, 86252])
     parser.add_argument("--out-dir", type=Path, required=True)
     parser.add_argument("--report", type=Path, required=True)
