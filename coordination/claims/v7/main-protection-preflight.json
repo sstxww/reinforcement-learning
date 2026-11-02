@@ -7,7 +7,7 @@
   "base_main_sha": "c1b828734527bae6141805581693d890cc3bff94",
   "branch": "agent/s-20261103-210f5f9e/optimization-001",
   "claim_ref": "claims/v7/main-protection-preflight",
-  "state": "running",
+  "state": "handed_off",
   "scope": [
     "tavern_ai/v7_merge_entry_audit_210f5f9e.py",
     "tests/test_v7_merge_entry_audit_210f5f9e.py",
@@ -17,5 +17,11 @@
   ],
   "not_integration_lock": true,
   "non_overwrite_policy": "No other session's code, workflow, checkpoint, Release or branch",
-  "release_rule": "Mark claim closed/handoff after verified PR evidence; branch records remain immutable"
+  "release_rule": "Mark claim closed/handoff after verified PR evidence; branch records remain immutable",
+  "handoff_pr": "https://github.com/sstxww/reinforcement-learning/pull/221",
+  "handoff_head_sha": "224aacb9cdea9f10daba53c6f3c45cd0397b0021",
+  "handoff_ci": "https://github.com/sstxww/reinforcement-learning/actions/runs/41514530382",
+  "handoff_ci_status": "queued at latest inspection; recheck before review",
+  "main_merge_right": false,
+  "release_statement": "This task is handed off; branch claim is not and never was an integration lease. Do not infer global main merge exclusivity."
 }
