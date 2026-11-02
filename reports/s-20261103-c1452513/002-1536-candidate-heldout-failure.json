@@ -1,0 +1,66 @@
+{
+  "schema": 1,
+  "session_id": "s-20261103-c1452513",
+  "status": "rejected_evaluation_incomplete",
+  "source": "actual_GitHub_Actions_41509707315",
+  "source_run_url": "https://github.com/sstxww/reinforcement-learning/actions/runs/41509707315",
+  "source_commit": "133cc6512a112a84bf152aa482d5e3df1895104a",
+  "engine": "TavernGym 1.1.0",
+  "engine_source_hash": "6d8712c93022ba11",
+  "parent_release_tag": "v5-s-20261102-68099929-1408-41428692617",
+  "parent_sha256": "a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632",
+  "candidate_sha256": "b2b4a1039ca0f5c0e8475646c80996601d26efd081be533972638607c277508d",
+  "parent_training_steps": 1408,
+  "candidate_training_steps": 1536,
+  "actual_additional_steps": 128,
+  "parent_release_hash_preflight_passed": true,
+  "candidate_archive_preflight_passed": true,
+  "candidate_cpu_one_action_inference_passed": true,
+  "actual_parent_paired": {
+    "seeds": [
+      932040,
+      932041
+    ],
+    "raw_ppo_placements": [
+      8,
+      8
+    ],
+    "baseline_placements": [
+      6,
+      8
+    ],
+    "source_path": "reports/s-20261103-c1452513/001-parent-paired-932040.json"
+  },
+  "actual_candidate_full_game": {
+    "seed": 932031,
+    "policy": "model",
+    "completed": true,
+    "turns": 18,
+    "decisions": 114,
+    "placement": 8,
+    "truncated_combats": 0,
+    "turn_limit_end": false,
+    "receipt": "experiments/s-20261103-c1452513/002-model-932031.json"
+  },
+  "candidate_heldout": {
+    "requested_seeds": [
+      932040,
+      932041
+    ],
+    "completed_report": false,
+    "error": "RuntimeError: Full-game safety limit exceeded",
+    "failed_game_seed_not_logged": true,
+    "any_placement_claimed": false
+  },
+  "publishing": {
+    "release_created": false,
+    "save_unpromoted_job": "skipped_after_evaluation_failure",
+    "failed_artifact_url": "https://github.com/sstxww/reinforcement-learning/actions/runs/41509707315/artifacts/13171404727",
+    "failed_artifact_contents": "parent-paired.json, 002-model-932031.json and candidate.metadata.json; no model.zip",
+    "candidate_weights_durable": false
+  },
+  "champion_promoted": false,
+  "improvement_claimed": false,
+  "rank8_root_cause_claimed": false,
+  "note": "A genuine bounded 128-step PPO continuation and one raw full-game succeeded. Independent candidate heldout evaluation did not complete within canary's full-game action safety limit. Do not treat as successful heldout, durable checkpoint, or competitive gain."
+}
