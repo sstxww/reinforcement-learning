@@ -4,7 +4,7 @@ import zipfile
 
 import pytest
 
-from tavern_ai.checkpoint_integrity import metadata_path, save_checkpoint, verify_checkpoint
+from tavern_ai.checkpoint_integrity import metadata_path, pinned_compatibility, save_checkpoint, verify_checkpoint
 
 ENGINE = {"version": "1.1.0", "source_hash": "6d8712c93022ba11", "features": 4017,
           "cards": 447, "actions": 245, "n_cards": 3983}
@@ -84,3 +84,15 @@ def test_missing_pair_refuses_replace(tmp_path):
     with pytest.raises(ValueError, match="incomplete checkpoint pair"):
         save_checkpoint(FakePPO(), path, sample_meta())
     assert path.read_bytes() == b"only weights"
+
+
+def test_schema2_release_fingerprint_accept_and_reject(tmp_path):
+    path = tmp_path / "model.zip"
+    meta = {**sample_meta(), "schema": 2, "compatibility": pinned_compatibility(ENGINE)}
+    saved = save_checkpoint(FakePPO(b"v2 weights"), path, meta)
+    assert saved["schema"] == 2
+    assert verify_checkpoint(path, ENGINE)["compatibility"] == pinned_compatibility(ENGINE)
+    saved["compatibility"]["catalog_sha256"] = "0" * 64
+    metadata_path(path).write_text(json.dumps(saved))
+    with pytest.raises(ValueError, match="compatibility"):
+        verify_checkpoint(path, ENGINE)
