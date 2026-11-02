@@ -46,6 +46,7 @@ jobs:
           git diff --cached --quiet && exit 0
           git commit -m "results(evaluation): record real V1 full-match evidence"
           test "$GITHUB_REF_NAME" = "agent/evaluation/v1"
+          git pull --rebase origin "$GITHUB_REF_NAME"
           git push origin HEAD:"$GITHUB_REF_NAME"
       - name: Upload verification evidence
         if: always()
