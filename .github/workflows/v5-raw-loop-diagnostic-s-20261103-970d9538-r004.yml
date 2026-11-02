@@ -1,0 +1,150 @@
+name: V5 R004 exact failed raw PPO action-loop diagnosis s-20261103-970d9538
+
+on:
+  push:
+    branches:
+      - agent/s-20261103-970d9538/optimization-004
+    paths:
+      - .github/workflows/v5-raw-loop-diagnostic-s-20261103-970d9538-r004.yml
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: v5-r004-s-20261103-970d9538
+  cancel-in-progress: false
+
+jobs:
+  trace:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      GH_TOKEN: ${{ github.token }}
+      CANDIDATE_SHA: 56ac39b408b2579afefdf1b8479c17c5199a44eaeb8e6f02f30d08d67eab2912
+      PARENT_SHA: a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install tested model and provenance dependencies
+        run: python -m pip install -e '.[train,test]'
+      - name: Check current public-observation action-family trace regression
+        run: python -m pytest -q tests/test_behavior_probe_ba09e2d4.py tests/test_buy_opportunity_68099929.py
+      - name: Install exact TavernGym v1.1 source fingerprint
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Original complete eight-seat baseline game for this round
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p experiments/s-20261103-970d9538
+          python -m tavern_ai.canary --agent-id s-20261103-970d9538 --policy baseline \
+            --seed 97411 --receipt experiments/s-20261103-970d9538/004-baseline-97411.json
+          python -m tavern_ai.validate_receipt experiments/s-20261103-970d9538/004-baseline-97411.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('experiments/s-20261103-970d9538/004-baseline-97411.json').read_text())
+          assert d['completed'] is True and sorted(d['placements']) == list(range(1,9))
+          print('V5_R004_BASELINE_RECEIPT='+json.dumps(d,sort_keys=True))
+          PY
+      - name: Retrieve only exact failed 1536-step checkpoint Artifact from our R003
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh run download 41508855386 --repo "$GITHUB_REPOSITORY" \
+            --name v5-r003-s-20261103-970d9538-41508855386 --dir failed
+          test -s failed/checkpoints/candidate.zip
+          test -s failed/checkpoints/candidate.metadata.json
+          printf '%s  %s\n' "$CANDIDATE_SHA" failed/checkpoints/candidate.zip | sha256sum -c -
+          python - <<'PY'
+          from pathlib import Path
+          import json
+          m=json.loads(Path('failed/checkpoints/candidate.metadata.json').read_text())
+          assert m['total_timesteps'] == 1536
+          assert m['checkpoint_sha256'] == '56ac39b408b2579afefdf1b8479c17c5199a44eaeb8e6f02f30d08d67eab2912'
+          assert m['parent_checkpoint_sha256'] == 'a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632'
+          PY
+      - name: Retrieve verified parent V5 1408-step Release for matched comparison
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p parent
+          gh release download v5-s-20261102-68099929-1408-41428692617 \
+            --repo "$GITHUB_REPOSITORY" \
+            --pattern model.zip --pattern model.metadata.json --dir parent
+          printf '%s  %s\n' "$PARENT_SHA" parent/model.zip | sha256sum -c -
+          python -m tavern_ai.release_asset_verifier \
+            --model-id v5-s-20261102-68099929-1408-41428692617 \
+            --weights parent/model.zip --metadata parent/model.metadata.json --check-load
+      - name: True raw public-state probe on exact failed candidate seed 97312
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p reports/s-20261103-970d9538
+          set +e
+          python -m tavern_ai.behavior_probe_ba09e2d4 \
+            --model failed/checkpoints/candidate.zip --seed 97312 \
+            --agent-id s-20261103-970d9538 \
+            --receipt experiments/s-20261103-970d9538/004-1536-model-97312.json \
+            --metrics reports/s-20261103-970d9538/004-1536-97312.json
+          result=$?
+          set -e
+          test "$result" -eq 0 -o "$result" -eq 3
+          test -s reports/s-20261103-970d9538/004-1536-97312.json
+          echo "V5_R004_RAW_CANDIDATE_PROBE_EXIT=$result (0=completed,3=bounded-incomplete)"
+      - name: Matched true raw public-state probe on original 1408-step parent
+        shell: bash
+        run: |
+          set -euo pipefail
+          set +e
+          python -m tavern_ai.behavior_probe_ba09e2d4 \
+            --model parent/model.zip --seed 97312 \
+            --agent-id s-20261103-970d9538 \
+            --receipt experiments/s-20261103-970d9538/004-1408-model-97312.json \
+            --metrics reports/s-20261103-970d9538/004-1408-97312.json
+          result=$?
+          set -e
+          test "$result" -eq 0 -o "$result" -eq 3
+          test -s reports/s-20261103-970d9538/004-1408-97312.json
+          echo "V5_R004_RAW_PARENT_PROBE_EXIT=$result (0=completed,3=bounded-incomplete)"
+      - name: Compare action-family, buy-legal and loop counts without claiming rank for unfinished game
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('reports/s-20261103-970d9538')
+          result={}
+          for name in ('1536','1408'):
+            d=json.loads((p/f'004-{name}-97312.json').read_text())
+            result[name]={
+              'source_model_sha256':d['source_model_sha256'],
+              'complete_eight_seat_game':d['complete_eight_seat_game'],
+              'final_controlled_placement':d.get('final_controlled_placement'),
+              'policy_variant':d.get('policy_variant'),
+              'guard_interventions':d.get('guard_interventions'),
+              'decisions':d['decisions'],
+              'action_families':d['action_families'],
+              'buy_legal_decisions':d['buy_legal_decisions'],
+              'actual_buys':d['actual_buys'],
+              'buy_opportunity_turns':d['buy_opportunity_turns'],
+              'end_with_legal_buy':d['end_with_legal_buy'],
+              'max_consecutive_same_action_in_turn':d['max_consecutive_same_action_in_turn'],
+              'failure_reason':d.get('failure_reason'),
+            }
+          print('V5_R004_ACTION_DIAGNOSTICS='+json.dumps(result,sort_keys=True))
+          (p/'004-comparison.json').write_text(json.dumps({'schema':1,'models':result,'source_run':41508855386,'raw_unassisted':True,'not_strength_claim':True},indent=2)+'\n')
+          PY
+      - name: Preserve authentic original receipt and diagnostic metrics only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v5-r004-s-20261103-970d9538-${{ github.run_id }}
+          path: |
+            experiments/s-20261103-970d9538/*.json
+            reports/s-20261103-970d9538/*.json
+          if-no-files-found: ignore
+          retention-days: 30
