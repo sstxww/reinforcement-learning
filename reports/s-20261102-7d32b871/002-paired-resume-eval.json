@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "session_id": "s-20261102-7d32b871",
+  "source_model_artifact_run": 41449758493,
+  "source_model_sha256": "f8554c0e901651a1b0e394ca3df3b096b010d9f63d567b86d1df931a3ead389c",
+  "source_model_steps": 1536,
+  "new_training_steps": 0,
+  "seeds": [
+    99661,
+    99662
+  ],
+  "real_games_per_arm": 2,
+  "candidate_ranks": [
+    8,
+    8
+  ],
+  "baseline_ranks": [
+    5,
+    8
+  ],
+  "candidate_mean_rank": 8,
+  "baseline_mean_rank": 6.5,
+  "paired_delta_rank_candidate_minus_baseline": 1.5,
+  "candidate_top4_rate": 0.0,
+  "candidate_buy_legal_decision_exposures": 49,
+  "candidate_actual_buys": 0,
+  "all_raw_model_games_completed": true,
+  "guard_interventions": 0,
+  "promote_to_champion": false,
+  "new_release_published": false,
+  "note": "n=2 heldout paired seat0 games, descriptive only; no significance or Arena rank claim."
+}

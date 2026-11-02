@@ -1,0 +1,374 @@
+{
+  "schema": 1,
+  "timestamp": "2026-11-02T13:23:27.854024+00:00",
+  "environment": "TavernGym",
+  "engine_version": "1.1.0",
+  "engine_source_hash": "6d8712c93022ba11",
+  "agent_id": "s-20261102-7d32b871",
+  "policy": "model",
+  "model_sha256": "f8554c0e901651a1b0e394ca3df3b096b010d9f63d567b86d1df931a3ead389c",
+  "seed": 99661,
+  "completed": true,
+  "turns": 14,
+  "decisions": 109,
+  "placements": [
+    8,
+    4,
+    3,
+    7,
+    1,
+    6,
+    5,
+    2
+  ],
+  "truncated_combats": 0,
+  "turn_limit_end": false,
+  "git_sha": "763170d96b4f50833df81f7709b43638490673bd",
+  "opportunity_summary": {
+    "decisions": 109,
+    "by_action_family": {
+      "choose": 2,
+      "reroll": 27,
+      "buy_legal_decisions": 25,
+      "other": 70,
+      "end_turn": 7,
+      "all_end_turns": 7,
+      "upgrade": 3
+    },
+    "buy_legal_decisions": 25,
+    "distinct_turns_with_legal_buy": 7,
+    "unique_public_states_with_legal_buy": 25,
+    "end_while_buy_legal": 0,
+    "turns_with_end_while_buy_legal": 0,
+    "buy_chosen": 0,
+    "all_end_turns": 7,
+    "consecutive_identical_public_observation": 0,
+    "conditional_buy_rate_given_legal": 0.0,
+    "conditional_end_rate_given_legal_buy": 0.0,
+    "caveat": "Every masked BUY is legal; action-level opportunities are temporally dependent. Not all missed legal BUY actions are mistakes."
+  },
+  "trace_first_32": [
+    {
+      "turn": 0,
+      "action": 31,
+      "family": "choose",
+      "buy_legal": false,
+      "legal_buy_count": 0,
+      "board_size": 0,
+      "state_hash": "285975da682a8f060f366895",
+      "same_public_state_as_prior": false
+    },
+    {
+      "turn": 1,
+      "action": 1,
+      "family": "reroll",
+      "buy_legal": true,
+      "legal_buy_count": 4,
+      "board_size": 0,
+      "state_hash": "35639177f1a284c193769f90",
+      "same_public_state_as_prior": false
+    },
+    {
+      "turn": 1,
+      "action": 1,
+      "family": "reroll",
+      "buy_legal": true,
+      "legal_buy_count": 1,
+      "board_size": 0,
+      "state_hash": "7a98714d0840a752e60a10d6",
+      "same_public_state_as_prior": false
+    },
+    {
+      "turn": 1,
+      "action": 1,
+      "family": "reroll",
+      "buy_legal": true,
+      "legal_buy_count": 1,
+      "board_size": 0,
+      "state_hash": "05a085baccb3020a64fc34e7",
+      "same_public_state_as_prior": false
+    },
+    {
+      "turn": 1,
+      "action": 2,
+      "family": "other",
+      "buy_legal": false,
+      "legal_buy_count": 0,
+      "board_size": 0,
+      "state_hash": "0c73cb879eab51bde60495f0",
+      "same_public_state_as_prior": false
+    },
+    {
+      "turn": 1,
+      "action": 2,
+      "family": "other",
+      "buy_legal": false,
+      "legal_buy_count": 0,
+      "board_size": 0,
+      "state_hash": "d89de134cf8d7dd305741952",
+      "same_public_state_as_prior": false
+    },
+    {
+      "turn": 1,
+      "action": 2,
+      "family": "other",
+      "buy_legal": false,
+      "legal_buy_count": 0,
+      "board_size": 0,
+      "state_hash": "7b5c46b060d0f742a9211ee4",
+      "same_public_state_as_prior": false
+    },
+    {
+      "turn": 1,
+      "action": 2,
+      "family": "other",
+      "buy_legal": false,
+      "legal_buy_count": 0,
+      "board_size": 0,
+      "state_hash": "bfca30f11b66c5e2203ab085",
+      "same_public_state_as_prior": false
+    },
+    {
+      "turn": 1,
+      "action": 2,
+      "family": "other",
+      "buy_legal": false,
+      "legal_buy_count": 0,
+      "board_size": 0,
+      "state_hash": "e467e2b656f7351600e30520",
+      "same_public_state_as_prior": false
+    },
+    {
+      "turn": 1,
+      "action": 2,
+      "family": "other",
+      "buy_legal": false,
+      "legal_buy_count": 0,
+      "board_size": 0,
+      "state_hash": "0b429e199c469829fca4d935",
+      "same_public_state_as_prior": false
+    },
+    {
+      "turn": 1,
+      "action": 2,
+      "family": "other",
+      "buy_legal": false,
+      "legal_buy_count": 0,
+      "board_size": 0,
+      "state_hash": "26ed235ef3923c6e29a3b880",
+      "same_public_state_as_prior": false
+    },
+    {
+      "turn": 1,
+      "action": 2,
+      "family": "other",
+      "buy_legal": false,
+      "legal_buy_count": 0,
+      "board_size": 0,
+      "state_hash": "f498eb77f088f8c575d3bcb9",
+      "same_public_state_as_prior": false
+    },
+    {
+      "turn": 1,
+      "action": 2,
+      "family": "other",
+      "buy_legal": false,
+      "legal_buy_count": 0,
+      "board_size": 0,
+      "state_hash": "9b4dad732d277d8be42364b2",
+      "same_public_state_as_prior": false
+    },
+    {
+      "turn": 1,
+      "action": 2,
+      "family": "other",
+      "buy_legal": false,
+      "legal_buy_count": 0,
+      "board_size": 0,
+      "state_hash": "f792ea9ad045b3d27020a629",
+      "same_public_state_as_prior": false
+    },
+    {
+      "turn": 1,
+      "action": 0,
+      "family": "end_turn",
+      "buy_legal": false,
+      "legal_buy_count": 0,
+      "board_size": 0,
+      "state_hash": "289ab40bab4c0efbfea1422a",
+      "same_public_state_as_prior": false
+    },
+    {
+      "turn": 2,
+      "action": 3,
+      "family": "upgrade",
+      "buy_legal": true,
+      "legal_buy_count": 4,
+      "board_size": 0,
+      "state_hash": "f5db63a87d0df27c715d8af2",
+      "same_public_state_as_prior": false
+    },
+    {
+      "turn": 2,
+      "action": 2,
+      "family": "other",
+      "buy_legal": false,
+      "legal_buy_count": 0,
+      "board_size": 0,
+      "state_hash": "6c79d0622a3fac3bc5b6ba63",
+      "same_public_state_as_prior": false
+    },
+    {
+      "turn": 2,
+      "action": 2,
+      "family": "other",
+      "buy_legal": false,
+      "legal_buy_count": 0,
+      "board_size": 0,
+      "state_hash": "900f7952078551239a78cb06",
+      "same_public_state_as_prior": false
+    },
+    {
+      "turn": 2,
+      "action": 2,
+      "family": "other",
+      "buy_legal": false,
+      "legal_buy_count": 0,
+      "board_size": 0,
+      "state_hash": "458bd0907e21f715a8830701",
+      "same_public_state_as_prior": false
+    },
+    {
+      "turn": 2,
+      "action": 2,
+      "family": "other",
+      "buy_legal": false,
+      "legal_buy_count": 0,
+      "board_size": 0,
+      "state_hash": "67184c32dac0c486f6313fdc",
+      "same_public_state_as_prior": false
+    },
+    {
+      "turn": 2,
+      "action": 2,
+      "family": "other",
+      "buy_legal": false,
+      "legal_buy_count": 0,
+      "board_size": 0,
+      "state_hash": "29d9abf53d4d90c1010eee45",
+      "same_public_state_as_prior": false
+    },
+    {
+      "turn": 2,
+      "action": 2,
+      "family": "other",
+      "buy_legal": false,
+      "legal_buy_count": 0,
+      "board_size": 0,
+      "state_hash": "65d845ab5c3c1bcb5567c8ec",
+      "same_public_state_as_prior": false
+    },
+    {
+      "turn": 2,
+      "action": 2,
+      "family": "other",
+      "buy_legal": false,
+      "legal_buy_count": 0,
+      "board_size": 0,
+      "state_hash": "c13af81874e764988fd3f69a",
+      "same_public_state_as_prior": false
+    },
+    {
+      "turn": 2,
+      "action": 2,
+      "family": "other",
+      "buy_legal": false,
+      "legal_buy_count": 0,
+      "board_size": 0,
+      "state_hash": "5d8b87cf16146d939e350106",
+      "same_public_state_as_prior": false
+    },
+    {
+      "turn": 2,
+      "action": 2,
+      "family": "other",
+      "buy_legal": false,
+      "legal_buy_count": 0,
+      "board_size": 0,
+      "state_hash": "045bff877a98281249cfa4ad",
+      "same_public_state_as_prior": false
+    },
+    {
+      "turn": 2,
+      "action": 2,
+      "family": "other",
+      "buy_legal": false,
+      "legal_buy_count": 0,
+      "board_size": 0,
+      "state_hash": "f1ce195f0b1d004c7846c145",
+      "same_public_state_as_prior": false
+    },
+    {
+      "turn": 2,
+      "action": 0,
+      "family": "end_turn",
+      "buy_legal": false,
+      "legal_buy_count": 0,
+      "board_size": 0,
+      "state_hash": "999aa1c9656d9066495b15d1",
+      "same_public_state_as_prior": false
+    },
+    {
+      "turn": 3,
+      "action": 1,
+      "family": "reroll",
+      "buy_legal": true,
+      "legal_buy_count": 5,
+      "board_size": 0,
+      "state_hash": "659b68a6d729aaf5b789c503",
+      "same_public_state_as_prior": false
+    },
+    {
+      "turn": 3,
+      "action": 1,
+      "family": "reroll",
+      "buy_legal": true,
+      "legal_buy_count": 5,
+      "board_size": 0,
+      "state_hash": "7e4c1b60134ec034abc576a5",
+      "same_public_state_as_prior": false
+    },
+    {
+      "turn": 3,
+      "action": 1,
+      "family": "reroll",
+      "buy_legal": true,
+      "legal_buy_count": 5,
+      "board_size": 0,
+      "state_hash": "20ca15e2c72d58255523cc98",
+      "same_public_state_as_prior": false
+    },
+    {
+      "turn": 3,
+      "action": 1,
+      "family": "reroll",
+      "buy_legal": true,
+      "legal_buy_count": 1,
+      "board_size": 0,
+      "state_hash": "1579459ab96edf60b051ef10",
+      "same_public_state_as_prior": false
+    },
+    {
+      "turn": 3,
+      "action": 1,
+      "family": "reroll",
+      "buy_legal": false,
+      "legal_buy_count": 0,
+      "board_size": 0,
+      "state_hash": "ecd73550019f66c377f423a5",
+      "same_public_state_as_prior": false
+    }
+  ],
+  "model_guard_forced_end": 0,
+  "public_observation_only": true
+}
