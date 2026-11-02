@@ -36,14 +36,14 @@ jobs:
             --steps 128 --seed 261102 --out outputs/s-20261102-e046f72e
       - name: Run original extractor model in complete 8-seat game
         run: |
-          timeout 15m python -m tavern_ai.canary \
+          timeout 15m python -m tavern_ai.compact_canary \
             --agent-id s-20261102-e046f72e --policy model \
             --model outputs/s-20261102-e046f72e/control.zip --seed 26110201 \
             --receipt experiments/s-20261102-e046f72e/control-26110201.json
           python -m tavern_ai.validate_receipt experiments/s-20261102-e046f72e/control-26110201.json
       - name: Run candidate in complete 8-seat game (required session receipt)
         run: |
-          timeout 15m python -m tavern_ai.canary \
+          timeout 15m python -m tavern_ai.compact_canary \
             --agent-id s-20261102-e046f72e --policy model \
             --model outputs/s-20261102-e046f72e/candidate.zip --seed 26110201 \
             --receipt experiments/s-20261102-e046f72e/001-26110201.json
