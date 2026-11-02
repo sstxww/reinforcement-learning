@@ -1,0 +1,106 @@
+{
+  "schema": 1,
+  "session_id": "s-20261102-fb6a2c91",
+  "round": 1,
+  "execution": {
+    "workflow_run_id": 41450269678,
+    "run_url": "https://github.com/sstxww/reinforcement-learning/actions/runs/41450269678",
+    "conclusion": "success",
+    "artifact_id": 13144104301,
+    "artifact_url": "https://github.com/sstxww/reinforcement-learning/actions/runs/41450269678/artifacts/13144104301",
+    "source_commit": "cae534ccd29add55516cf7a9d6022324f3e2f40c"
+  },
+  "parent": {
+    "release": "v5-s-20261102-68099929-1408-41428692617",
+    "sha256": "a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632",
+    "cumulative_ppo_steps": 1408,
+    "release_weight_bytes_checked": true,
+    "release_metadata_bytes_checked": true,
+    "cpu_load_checked": true
+  },
+  "child": {
+    "release": "v5-experimental-s-20261102-fb6a2c91-resume128-001",
+    "release_url": "https://github.com/sstxww/reinforcement-learning/releases/tag/v5-experimental-s-20261102-fb6a2c91-resume128-001",
+    "model_sha256": "d6e27e7ca3cbde0997cc1bdcb7d1a62b3d19ab9d67f7ffcbde37c204cb4ff843",
+    "actual_incremental_ppo_steps": 128,
+    "cumulative_ppo_steps": 1536,
+    "algorithm": "MaskablePPO",
+    "optimizer_archive_present": true,
+    "source_release_read_from_downloaded_assets": true,
+    "durable_release_created": true,
+    "independently_redownloaded_new_release": false,
+    "promotion": "none",
+    "champion": false
+  },
+  "engine": {
+    "version": "1.1.0",
+    "source_hash": "6d8712c93022ba11",
+    "features": 4017,
+    "cards": 447,
+    "actions": 245
+  },
+  "true_match_receipts": [
+    {
+      "policy": "baseline",
+      "seed": 92360,
+      "completed": true,
+      "placement": 8,
+      "turns": 14,
+      "decisions": 55,
+      "truncated_combats": 0,
+      "receipt": "experiments/s-20261102-fb6a2c91/001-92360.json"
+    },
+    {
+      "policy": "unassisted_model",
+      "seed": 92362,
+      "completed": true,
+      "placement": 8,
+      "turns": 16,
+      "decisions": 129,
+      "truncated_combats": 0,
+      "model_sha256": "d6e27e7ca3cbde0997cc1bdcb7d1a62b3d19ab9d67f7ffcbde37c204cb4ff843",
+      "receipt": "experiments/s-20261102-fb6a2c91/002-92362.json"
+    }
+  ],
+  "paired_heldout": {
+    "seeds": [
+      92370,
+      92371
+    ],
+    "model_ranks": [
+      8,
+      8
+    ],
+    "baseline_ranks": [
+      8,
+      8
+    ],
+    "model_mean_placement": 8,
+    "baseline_mean_placement": 8,
+    "model_top4_rate": 0,
+    "model_first_rate": 0,
+    "paired_mean_placement_delta": 0,
+    "raw_model_not_guarded": true,
+    "interpretation": "Two paired games do NOT establish a competitive improvement."
+  },
+  "research_findings": {
+    "v2_true_game_buy_legal_exposures": 74,
+    "v2_actual_buys": 0,
+    "v2_refresh_freeze_id_1_2": 222,
+    "v2_total_actions": 248,
+    "forced_buy_ablation_3_game_buys": 46,
+    "forced_buy_ablation_3_game_ranks": [
+      8,
+      8,
+      8
+    ],
+    "hypotheses": "Multiple action-family loops (Refresh/Freeze and Play/Cancel) and sparse terminal reward may contribute; causal root and successful correction unproven."
+  },
+  "limitations": [
+    "Model Release published and SHA matched locally against GitHub Release API digest; independent redownload/reload of the newly published child Release was NOT tested.",
+    "Parent Release SHA, metadata digest and real CPU load passed.",
+    "No promotion because model remains rank8 and matched-seed sample is only two.",
+    "The rules baseline controlled a separate game seed92360 for session CI; comparisons are only seeds92370,92371.",
+    "Do not interpret authentic full games alone as competitive progress."
+  ]
+}
