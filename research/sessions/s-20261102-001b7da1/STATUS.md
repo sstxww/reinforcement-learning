@@ -10,3 +10,9 @@
 - Existing latest candidate: `v5-s-20261102-68099929-1408-41428692617`, 1408 steps, unpromoted. No verified Champion.
 - Branch-scoped match workflow: `.github/workflows/v5-fullmatch-s-20261102-001b7da1.yml`, exact one push trigger on its own path, no repo write token.
 - Blockers: cannot claim reliable durable automatic resume, strength gain, or completion until actual Actions evidence; historical schema-1 metadata missing checksum needs independent preflight.
+
+## Verified outcome of initial workflow
+- [Real eight-seat Actions run 41449696658](https://github.com/sstxww/reinforcement-learning/actions/runs/41449696658): SUCCESS, including unit regression, pinned engine, real game and artifact upload.
+- Artifact 13142974966 was downloaded and inspected. Its original JSON was committed as `experiments/s-20261102-001b7da1/001-91801.json`.
+- Baseline seed 91801, seat-0 rank 7, 18 turns, 46 decisions; complete=true, truncated_combats=0, turn_limit_end=false. This is **not** a PPO game.
+- Local targeted regression tests (including two mock trainer-resume tests) now 7/7 pass. CI on the final PR head remains a separate gate.
