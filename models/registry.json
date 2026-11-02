@@ -55,7 +55,9 @@
     ],
     "paired_improvement_verified": false,
     "promoted_to_best": false,
-    "note": "Published and redownloaded Release; model remains rank8 in 3 independent paired games, no competitive advantage."
+    "note": "Published and redownloaded Release; model remains rank8 in 3 independent paired games, no competitive advantage.",
+    "independent_optimizer_resume_from_this_release_tested": false,
+    "model_load_from_downloaded_release_tested": false
   },
   "candidates": [
     {
@@ -238,7 +240,7 @@
     "release_assets_seen_in_github_api": true,
     "release_asset_bytes_verified_in_this_session": true,
     "latest_release_resume_tested": true,
-    "notes": "Source PR reports verified V1-to-384-step continuation, but latest 1280-step Release has not passed independent download+resume. No model promotion is implied.",
+    "notes": "Latest 1408-step checkpoint produced by verified 1280→1408 true PPO resume in 41427963534; V5 published bytes were redownloaded and byte-verified in 41428692617, but independent optimizer continuation from newly published V5 tag remains not tested.",
     "latest_v5_release_download_tested": true,
     "validation_run": "https://github.com/sstxww/reinforcement-learning/actions/runs/41428692617"
   },
