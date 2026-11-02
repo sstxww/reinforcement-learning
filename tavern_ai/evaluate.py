@@ -3,8 +3,11 @@ from __future__ import annotations
 import argparse, json, statistics
 from pathlib import Path
 from .canary import run
+from .receipt_integrity import validate_integrity
 
 def summarize(records: list[dict]) -> dict:
+    if not records:
+        raise ValueError("Cannot summarize zero games")
     placements = [r["placements"][0] for r in records]
     return {
         "games": len(records),
@@ -13,6 +16,34 @@ def summarize(records: list[dict]) -> dict:
         "first_place_rate": sum(x == 1 for x in placements) / len(records),
         "placements": placements, "seeds": [r["seed"] for r in records],
     }
+
+def _verify_full_game_records(records: list[dict], policy: str, seeds: list[int]) -> None:
+    """Fail closed on malformed, mismatched or duplicate full-game evidence.
+
+    Only the raw tavern_ai.canary runner is used for policy evaluation. A
+    rescued / fallback-policy game is not interchangeable with that runner.
+    """
+    if len(records) != len(seeds):
+        raise ValueError("Missing or duplicate evaluation game receipts")
+    seen: set[int] = set()
+    model_hashes: set[str] = set()
+    for record, expected_seed in zip(records, seeds):
+        validate_integrity(record)
+        actual_seed = record["seed"]
+        if actual_seed != expected_seed or actual_seed in seen:
+            raise ValueError("Evaluation receipt seed mismatch or duplicate")
+        if record["policy"] != policy:
+            raise ValueError("Evaluation receipt policy mismatch")
+        if record.get("seat", 0) != 0:
+            raise ValueError("This evaluation runner controls seat zero only")
+        if record.get("fallback_actions", 0) != 0 or record.get("guard_forced_ends", 0) != 0:
+            raise ValueError("Guarded or fallback receipts require a separate evaluation protocol")
+        seen.add(actual_seed)
+        if policy == "model":
+            model_hashes.add(record["model_sha256"])
+    if policy == "model" and len(model_hashes) != 1:
+        raise ValueError("Multiple model weight hashes in one evaluation batch")
+
 
 def evaluate(policy: str | int = "baseline", model: Path | int | None = None, games: int | None = None, start_seed: int = 24000,
              compare_baseline: bool = False) -> dict:
@@ -33,14 +64,20 @@ def evaluate(policy: str | int = "baseline", model: Path | int | None = None, ga
         run(start_seed + i, "evaluation", policy, str(model) if model else None)
         for i in range(games)
     ]
+    expected_seeds = list(range(start_seed, start_seed + games))
+    _verify_full_game_records(candidate, policy, expected_seeds)
     report = {
         "policy": policy, "candidate": summarize(candidate),
         "seed_start": start_seed,
         "comparison": "seven scripted TavernGym bots, not Arena Elo",
         "inference": "Descriptive results only; small samples do not establish improvement",
+        "receipt_integrity": "strict eight-seat source/seed/policy/weight verification",
+        "controlled_seat": 0,
+        "model_evidence_mode": "raw model; guard and fallback not permitted",
     }
     if compare_baseline:
         baseline = [run(start_seed + i, "evaluation", "baseline") for i in range(games)]
+        _verify_full_game_records(baseline, "baseline", expected_seeds)
         report["baseline"] = summarize(baseline)
         report["paired_mean_placement_delta"] = (
             report["candidate"]["mean_placement"] - report["baseline"]["mean_placement"]
