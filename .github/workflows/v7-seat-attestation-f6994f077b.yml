@@ -1,0 +1,66 @@
+name: V7 rotated-seat receipt attestation s-20261103-f6994f077b
+
+on:
+  push:
+    branches:
+      - agent/s-20261103-f6994f077b/optimization-001
+    paths:
+      - .github/workflows/v7-seat-attestation-f6994f077b.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: v7-seat-attestation-s-20261103-f6994f077b
+  cancel-in-progress: false
+
+jobs:
+  verify-seat-attribution-and-real-baseline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install project and testing requirements
+        run: python -m pip install -e '.[test]'
+      - name: Synthetic negative tests and existing integrity regressions
+        run: |
+          python -m pytest -q tests/test_receipt_seat_attestation_f6994f077b.py tests/test_receipt_integrity.py tests/test_seat_rotation.py
+      - name: Build and check pinned real TavernGym
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Genuine controlled-seat-3 baseline full eight-seat match
+        run: |
+          timeout 900 python -m tavern_ai.seat_rotation \
+            --agent-id s-20261103-f6994f077b \
+            --seeds 99841 --seats 3 \
+            --receipt-dir outputs/seat-matches \
+            --report outputs/seat3-summary.json
+      - name: Re-check independent strict receipt and emit immutable evidence
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from tavern_ai.receipt_integrity import validate_integrity
+          path = Path("outputs/seat-matches/rotated-99841-seat3.json")
+          row = json.loads(path.read_text(encoding="utf-8"))
+          validate_integrity(row)
+          assert row["policy"] == "baseline" and row["seat"] == 3
+          assert row["agent_id"] == "s-20261103-f6994f077b"
+          assert row["agent_placement"] == row["placements"][3]
+          assert row["completed"] and not row["turn_limit_end"]
+          print("AUTHENTIC_SEAT3_RECEIPT=" + json.dumps(row, sort_keys=True))
+          PY
+      - name: Keep authentic run receipts separately (temporary Artifact)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v7-seat-attestation-f6994f077b-${{ github.run_id }}
+          path: outputs/
+          retention-days: 30
+          if-no-files-found: warn
