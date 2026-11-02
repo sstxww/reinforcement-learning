@@ -1,0 +1,39 @@
+{
+  "baseline_mean_rank": 7.333333333333333,
+  "engine": {
+    "source_hash": "6d8712c93022ba11",
+    "version": "1.1.0"
+  },
+  "fallback_reported": false,
+  "fallback_telemetry_complete": false,
+  "games_per_arm": 3,
+  "inference": "Descriptive paired full-game evidence only; no confidence or causal claim, promotion needs independent review and complete action/fallback telemetry.",
+  "mean_paired_rank_delta": 0.6666666666666666,
+  "model_first_rate": 0,
+  "model_mean_rank": 8,
+  "model_sha256": "a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632",
+  "model_top4_rate": 0,
+  "pairs": [
+    {
+      "baseline_rank": 6,
+      "model_minus_baseline": 2,
+      "model_rank": 8,
+      "seed": 99125
+    },
+    {
+      "baseline_rank": 8,
+      "model_minus_baseline": 0,
+      "model_rank": 8,
+      "seed": 99126
+    },
+    {
+      "baseline_rank": 8,
+      "model_minus_baseline": 0,
+      "model_rank": 8,
+      "seed": 99127
+    }
+  ],
+  "promotion_eligible": false,
+  "pure_model_play_verified": false,
+  "schema": 1
+}
