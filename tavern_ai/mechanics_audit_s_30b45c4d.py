@@ -87,9 +87,10 @@ def build_catalog(source_path: Path) -> tuple[list[dict], dict]:
     for key in ("kind", "tier", "races", "keywords", "pools", "text"):
         if any(key not in c for c in cards):
             raise ValueError(f"Missing catalog field: {key}")
+    # observe2 card ID 0 is padding; engine encodes CardId(i) as i+1.
     index = [
         {
-            "card_index": i, "card_id": c["id"],
+            "observation_card_index": i + 1, "card_id": c["id"],
             "name": c.get("name", ""), "name_zh": c.get("name_zh", ""),
             "kind": c["kind"], "tier": c["tier"],
             "attack": c.get("atk", 0), "health": c.get("hp", 0),
@@ -238,8 +239,8 @@ def main() -> None:
     args = p.parse_args()
     index, summary = build_catalog(args.source)
     engine = verify_engine()
-    if len(index) != engine["n_cards"]:
-        raise RuntimeError("Catalog row count differs from live engine card vocabulary")
+    if len(index) + 1 != engine["n_cards"]:
+        raise RuntimeError("Catalog size + zero-padding differs from live engine card vocabulary")
     receipt, audit = audit_full_game(args.seed)
     summary["live_engine"] = engine
     summary["full_game_audit"] = audit
