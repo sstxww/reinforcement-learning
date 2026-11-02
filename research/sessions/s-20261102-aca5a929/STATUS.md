@@ -10,6 +10,6 @@
 - Report: `reports/s-20261102-aca5a929/001-results.json`; receipts: `experiments/s-20261102-aca5a929/*.json` (16 records).
 - Rules pinned: TavernGym 1.1.0, source `6d8712c93022ba11`, observe2 4017/447/245.
 - Regression: `tests/test_obs2_bridge_s20261102_aca5a929.py` + live runtime prefix assertion; no hidden data used.
-- PR: draft for review after receipts; see GitHub PR associated with this branch.
+- PR: [draft #74](https://github.com/sstxww/reinforcement-learning/pull/74); intentionally not merged or promoted.
 - Resume: `python -m pip install -e '.[test]'; bash scripts/bootstrap_engine.sh; python -m pytest; python -m tavern_ai.card_synergy_aca5a929 --run`. Repeat uses same train/test seeds; do not confuse reproducibility with an independent new sample.
 - Latest integration advice: preserve negative finding and observe2 regression; do not merge as a stronger model or declare Champion. New hypothesis: supervised tactical shop-card evaluation conditioned on phase and board combat need instead of static tribe counts.

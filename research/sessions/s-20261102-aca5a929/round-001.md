@@ -30,6 +30,7 @@
 - Full reproducer after engine bootstrap: `python -m pytest tests/test_card_synergy_aca5a929.py`; `python -m tavern_ai.card_synergy_aca5a929 --run`.
 
 ## Final real execution: negative pilot
+- Review PR: [draft #74](https://github.com/sstxww/reinforcement-learning/pull/74), no automatic merge.
 - First run [41421892518](https://github.com/sstxww/reinforcement-learning/actions/runs/41421892518) failed before completing any training match due to an incorrect old/observe2 card-length assumption; see `failures/001-observe2-legacy-layout.md`.
 - Repaired code `2fd46064290c772e79318fbe75c442ff31851506`, then [run 41422373796](https://github.com/sstxww/reinforcement-learning/actions/runs/41422373796) **SUCCESS**: unit tests, pinned true engine, actual 8 training matches, actual 8 heldout matches, receipt validation, SHA256 validation and branch-scoped results commit all passed.
 - 4 grid candidates × 2 training seeds = **8 genuinely completed games**, PPO steps **0**, gradient optimizer updates **0**; training mean ranks: `[6.5,7.0,7.0,7.0]` (n=2 per arm). Frozen selection index 0: stat=1, tier=0.5, race=0, pair=0. Thus neither added tribe overlap nor pair signal was selected.
