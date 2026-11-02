@@ -1,31 +1,28 @@
-# Round 001 — P0/P1 integration gate and rank-eight evidence
+# Round 001 — P0/P1 integration and P2 no-BUY diagnosis
 
-Session: `s-20261102-5d71c0ab`. Branch: `agent/s-20261102-5d71c0ab/optimization-001`.
-Initial main base: `1afd8297e3c661bee3117ac5301b1ca08d64869b`. Repository: `sstxww/reinforcement-learning`.
+Session: `s-20261102-5d71c0ab`. Own branch: `agent/s-20261102-5d71c0ab/optimization-001`. Start main SHA: `1afd8297e3c661bee3117ac5301b1ca08d64869b`.
 
-## Actual initial audit (2026-11-02)
-- Open PRs at first snapshot: 75, including 74 Draft and one non-Draft (#15).
-- #15 targets `agent/learning/v1` and depends on Draft #9, so merging it straight into main is unsafe.
-- Main previously passed full-match CI at `db5e23ae8c218808821327d806b05d2604cfadfb` (run 41432038040). Main subsequently advanced; no claim that this initial run covers later commits.
-- Fifteen published Releases were visible; presence of model assets does not independently prove restorability.
-- Canonical `models/registry.json` has no Best/Champion. It indexes a 1,408-step unpromoted candidate with three heldout ranks 8/8/8 vs baseline 6/8/8. These are historical recorded outcomes, NOT this session's new games.
-- An actionable promotion integrity gap: `model_registry.read_registry` previously allowed Champion based only on a `review_status=verified` label; it did not require the separate durability/load/resume/match/competitive-evidence flags.
+## P0 real state
+Initial audit: 75 open PR, 74 Draft, sole non-Draft #15 is stacked on Draft #9 and targets its branch. No PR was merged without passing safety/dependency gates. Several overlapping checkpoint/telemetry drafts already exist; main is changing concurrently.
 
-## Change in this round
-- Harden only the existing `tavern_ai/model_registry.py` Champion gate (no new competing registry).
-- Add synthetic offline regression tests that reject absent/false/string evidence flags and dangling role references.
-- Use one bounded session-unique workflow to run an actual eight-seat baseline match, independently preflight a published 1,408-step model, and collect two paired legal-BUY comparisons.
-- No Arena ranked play; no new PPO training until P0–P2 results justify it. No claim of Champion or strength gain.
+## P1 actual source change and evidence
+Hardened the EXISTING `tavern_ai/model_registry.py` Champion validator: `verified` label alone is inadequate, require literal true for durable download, SHA, load, optimizer resume, complete match, competitive gain. Population and Rejected reference validation also added. Synthetic regression tests passed in [dedicated run 41449729015](https://github.com/sstxww/reinforcement-learning/actions/runs/41449729015), no champion designated. GitHub Release real 1,408-step checkpoint was re-downloaded, digest matched, CPU load and one mask-legal inference passed; optimizer continuation from this specific downloaded tag remains **untested**.
 
-## Execution state
-This file is a pre-run handoff, not a completed-game receipt. Check the exact commit's Actions run and downloaded `outputs/*.json` before treating the match or diagnosis as verified. If CI completes, add immutable evidence and update STATUS in this branch before requesting merge.
+## P2 authentic new evidence
+Owned baseline match (one full 8-seat simulated game), seed **884631**, place **8**, `Game.is_over=true`, `placements=[8,2,5,3,4,7,1,6]`, turns 15, 37 decisions. Real receipt `experiments/s-20261102-5d71c0ab/001-884631.json` from successful GitHub Action.
 
-## Existing PR prioritization
-- A (ready to merge now): none proven; Draft and dependency gates block immediate integration.
-- B (repair/dependencies): #9 before #15; other checkpoint compatibility drafts need latest-HEAD checks.
-- C (more evaluation): many model and BC experiments report small or uncertain effects.
-- D (negative experiments): #12, #19, #51, #60, #65, #71, #74 and other explicitly negative drafts must not be promoted.
-- E (stacked/duplicates): #103→#107, #90→#105, #62→#65, #72→#76 and overlapping Release-checkpoint PRs require integration review.
+New independent held-out seeds **884632/884633**, `v5-s-20261102-68099929-1408-41428692617` model SHA `a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632`:
+- Pure model rank **[8,8]**, mask-legal BUY decision exposures **82**, BUY chosen **0**, model decision total **249**, actions ID1 **85** and ID2 **140**, no guard forced-ends.
+- Same seeds Baseline rank **[6,7]**, exposures **49**, BUY **33**, model minus baseline mean placement **+1.5** (larger is worse).
+- Not all legal BUY exposures are independent or good buys; rank comparison n=2 does not prove significance. Engine semantics and action-induced public state progression need separate verification before causal fix.
 
-## Next stop
-Verify the new run, save full receipt under `experiments/s-20261102-5d71c0ab/`, record raw vs guarded behavior without mixing their ranks, then review main HEAD and CI before considering a merge. Continue PPO only after meaningful behavior diagnosis and reliable checkpoint restoration.
+Source run and time-bounded artifact: https://github.com/sstxww/reinforcement-learning/actions/runs/41449729015/artifacts/13143652738. Compact permanent structured report: `reports/s-20261102-5d71c0ab/001-model-evidence.json`.
+
+## Workflow format fix
+Initial audit artifact `checkpoint-preflight.json` had printed environment-wrapping lines before valid JSON; the command did exit successfully, but machine-readable artifact was not clean. Replaced redirection with pipefail + final-line extraction + `json.tool` parse validation. Requires a new run of this branch to validate.
+
+## Evaluation and training conclusion
+No new PPO steps: **0**. No Champion/Best promotion. No official Arena. Repeated real no-BUY despite legal opportunities is robust enough to prioritize code-level action mapping, per-action state-delta telemetry, and a single-variable controlled intervention before training scale. Do not force-BUY blindly; other existing PRs have negative forced-BUY outcomes.
+
+## Integration next gate
+Recheck PR #118 exact final-head CI after this commit and recheck main's current head. If green and conflicts absent, have integration owner review and merge with exact-head SHA; post-merge main CI must also pass. If concurrent integration claims cannot be safely held, leave PR open rather than racing main.

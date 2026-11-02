@@ -41,7 +41,9 @@ jobs:
         run: |
           mkdir -p checkpoints outputs
           gh release download v5-s-20261102-68099929-1408-41428692617 -p model.zip -p model.metadata.json --dir checkpoints --clobber
-          python -m tavern_ai.checkpoint_preflight --model checkpoints/model.zip --metadata checkpoints/model.metadata.json --expected-sha256 a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632 --probe-inference > outputs/checkpoint-preflight.json
+          set -o pipefail
+          python -m tavern_ai.checkpoint_preflight --model checkpoints/model.zip --metadata checkpoints/model.metadata.json --expected-sha256 a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632 --probe-inference | tail -n 1 > outputs/checkpoint-preflight.json
+          python -m json.tool outputs/checkpoint-preflight.json > /dev/null
       - name: Two independent-seed buy-opportunity comparisons
         run: |
           python -m tavern_ai.buy_opportunities_83d91476 --model checkpoints/model.zip --expected-sha256 a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632 --seeds 884632 884633 --out outputs/opportunities.json
