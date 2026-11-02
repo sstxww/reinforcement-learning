@@ -18,6 +18,9 @@
 ## Own verification scope
 - Current R001 branch base: main `42f4cf3e5fd6dad68c0779345f9e76f42ca80c9c`.
 - Additive model index + ZIP/hash/metadata preflight and unit tests.
-- An isolated workflow is responsible for a real baseline-controlled eight-seat canary receipt in `experiments/s-20261102-490e3c78/001-59001.json`; do not treat it as executed until its Actions run succeeds and the file exists. This canary is engineering evidence, not a PPO model test.
+- Isolated [Actions run 41427592476](https://github.com/sstxww/reinforcement-learning/actions/runs/41427592476) **SUCCESS**: registry preflight tests, full repo pytest, pinned TavernGym bootstrap, actual baseline-controlled complete eight-seat game and owned receipt push succeeded. The verified receipt is `experiments/s-20261102-490e3c78/001-59001.json`; seed 59001; rank **8**, turns **16**, controlled decisions **39**, placements `[8,1,7,2,6,3,4,5]`; 0 truncated combats, `turn_limit_end=false`. It is baseline-only engineering proof, not PPO strength evidence.
 - Additional PPO training steps **0** in this round; independent latest V2 checkpoint byte download/restore/inference **not run** by this session. Scaling blocked by unresolved P1–P2 gates.
 - This draft is for independent integration review, not direct main push.
+
+## Concurrent integration warning
+While our branch ran, other V5 agents opened model registry/recovery drafts (#79–#87) and other PRs merged to main. This work is deliberately **draft**, not a green light to merge duplicate registries. Integrator must compare overlapping implementations and verify newest main plus head CI before any selective merge. Our own model training steps are 0.
