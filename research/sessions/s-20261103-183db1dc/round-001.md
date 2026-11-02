@@ -34,3 +34,13 @@ If the run fails, read the actual job step/log, preserve the failure URL and a s
 ## Next technical question
 
 Can we demonstrate an exact-current-main, non-Draft PR with a completed latest-head CI and independently cleared dependencies without any unmerged stacked base? If so, it can be recommended for INTEGRATOR review, never auto-merged.
+
+## Verified execution addendum — authenticated GitHub run 41510253654
+
+- Run https://github.com/sstxww/reinforcement-learning/actions/runs/41510253654 **completed SUCCESS**, workflow head `17ed01ecfdd938c5aadcbb67c02d528d8e0d377b`.
+- P0 regression tests, live exact-main/head PR audit, pinned TavernGym bootstrap and one real eight-seat baseline match all passed. Original cloud artifact ID `13172888057` was downloaded and JSON inspected; the two evidence JSON files above were committed unchanged in content to this branch.
+- `reports/s-20261103-183db1dc/001-pr15-live-gate.json`: main observed `70c411b64034c8f66618811ff7a98914395735a5`, PR #15 blocked for non-main target, old base SHA and missing human dependency-review confirmation; checks on PR #15 head included one successful required run.
+- `experiments/s-20261103-183db1dc/001-99613.json`: `policy=baseline`, `completed=true`, `seed=99613`, seat 0 rank **7**, all ranks `[7,5,8,2,3,1,6,4]`, `turns=14`, `decisions=49`, no combat truncation and no artificial end. Original evidence `git_sha=17ed01ecfdd938c5aadcbb67c02d528d8e0d377b`; do not overwrite with later documentation commit.
+- New PPO steps **0**; new model Release **none**; model 8-seat games **0**; no strength or champion claim. Own completed baseline eight-seat games **1**.
+- Artifact is an expiring 30-day cache; committed small JSON files form permanent source-controlled evidence, but not persistent model weights.
+- No merge to main by this WORKER.
