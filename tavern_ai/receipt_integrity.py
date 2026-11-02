@@ -15,6 +15,18 @@ def validate_integrity(receipt: dict) -> bool:
     validate_legacy(receipt)
     if sorted(receipt["placements"]) != list(range(1, 9)):
         raise ValueError("Eight placements must be a permutation of 1..8")
+    # A rotated-seat result must be attributed to the *controlled* seat, not
+    # silently reported as seat zero's placement. Legacy seat-zero receipts
+    # omit these optional fields and remain valid.
+    seat = receipt.get("seat", 0)
+    if type(seat) is not int or not 0 <= seat < 8:
+        raise ValueError("Controlled seat must be an integer in 0..7")
+    if "agent_placement" in receipt:
+        placement = receipt["agent_placement"]
+        if type(placement) is not int or placement != receipt["placements"][seat]:
+            raise ValueError("Seat/rank mismatch: Agent placement does not match controlled seat")
+    elif seat != 0:
+        raise ValueError("Rotated-seat receipt requires agent_placement")
     if type(receipt.get("seed")) is not int or receipt["seed"] < 0:
         raise ValueError("Missing or invalid integer seed")
     if receipt.get("engine_version") != "1.1.0":
