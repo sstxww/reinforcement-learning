@@ -1,8 +1,10 @@
 name: V7 e79c962b read-only PR audit and genuine eight-seat smoke
 
+# The single genuine baseline game ran on push at 209c2904. Do not
+# repeatedly replay that costly engine build on receipt/doc commits.
+# The normal repository pull_request CI continues to gate current HEAD.
 on:
-  push:
-    branches: ['agent/s-20261103-e79c962b/optimization-001']
+  workflow_dispatch:
 
 permissions:
   contents: read

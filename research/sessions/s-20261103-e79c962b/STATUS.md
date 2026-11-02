@@ -1,17 +1,24 @@
-# V7 handoff — s-20261103-e79c962b (round 001)
+# V7 handoff — s-20261103-e79c962b R001
 
-- **TASK_KEY**: integrate/exact-head-ci-preflight; **role**: REPAIRER/REVIEWER (no integration lease). **State**: running; to be updated after GitHub Actions.
-- **Base main**: `990acd21d598a34a554a80c50089a8f1a9423ac4`; **current main**: must re-fetch (other sessions merge concurrently).
-- **Owned branch**: `agent/s-20261103-e79c962b/optimization-001`; initial code commit `062588a27dba5105b82b76138a58188d4ff6dc46`, test commit `d7c90805bbcdd90dd88e69333931024b6ca08de6`. Fetch branch HEAD before merging.
-- **Source**: latest Gmail AutoTavern-AI V7 32,014-byte TXT read in full. Repo AGENTS.md, SESSION_PROTOCOL, CLOSED_LOOP, main CI/train/canary/evaluator, registry inspected.
-- **Inherited PRs**: #176 already merged at `3a745c6` earlier; #165 privileged release publisher still Draft; #173/#177/#172 overlap assisted evidence alias handling; #9/#15 stacked and not directly mergeable into main. **This session merged none**.
-- **Own PR / exact-head CI**: not yet opened at this entry; do not infer success from a queued workflow. Need link current PR/run and verify actual completed jobs/artifact.
-- **Change**: new read-only `scripts/v7_pr_head_audit.py` and synthetic offline `tests/test_v7_pr_head_audit_e79c962b.py`. Requires explicit expected head/main SHAs; rejects stale refs, Draft, unknown mergeability, absent exact-head complete successful full-match GitHub Actions check. Always returns `merge_authorized=false`: review, receipt provenance, branch rules, CAS integration lease, merge-result tests not automated.
-- **Local unit test**: 7 passed (synthetic, no engine or match proof). GitHub independent workflow smoke is needed.
-- **Checkpoint**: canonical registry latest `v5-s-20261102-68099929-1408-41428692617`, Release https://github.com/sstxww/reinforcement-learning/releases/tag/v5-s-20261102-68099929-1408-41428692617 ; SHA256 `a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632`; TavernGym 1.1.0/observe2 4017+447/245/source 6d8712c93022ba11; optimizer-restoration of **this session** not attempted.
-- **Actual new PPO steps**: **0**. **New Release**: none. **Best/Champion**: null; no promotion. **New raw-model game**: none. Prior recorded held-out raw rank [8,8,8], unpromoted.
-- **Real eight-player game owned by this session**: targeted `seed=99773`, `seat=0`, baseline vs seven engine bots, workflow receipt pending. Never call this a model-performance evaluation; if no genuine run receipt available, report **0 completed games**.
-- **Main post-merge CI**: #176 commit `3a745c6` CI https://github.com/sstxww/reinforcement-learning/actions/runs/41511419671 completed success on refresh; newer main `990acd21` CI https://github.com/sstxww/reinforcement-learning/actions/runs/41511814464 was still in progress. No own merge/main verification.
-- **Known root issue**: previous-head CI can be mistaken for latest-head merge evidence; audit script is a safe preliminary filter, not a unique integrator or release gate.
-- **Failure/limitations**: no atomic global task claim installed or merge lease; isolated unique files prevent overwrite but do not confer integration authority. External full-check permissions can return errors; script fails closed. No model improvement proven.
-- **Next owner first step**: fetch this PR's exact HEAD, main current SHA, completed full-match check and original eight-seat workflow receipt; after independent audit of code/receipt and valid exclusive integration rights, move PR through required review and merge, then verify new main CI. Do not falsely treat the script as authorization.
+| Field | Authoritative observation |
+|---|---|
+| TASK_KEY | integrate/exact-head-ci-preflight |
+| State / role | ready_for_integration_review / REPAIRER + REVIEWER; no exclusive merge lease |
+| Base main | `990acd21d598a34a554a80c50089a8f1a9423ac4` |
+| Latest observed main | `c1b828734527bae6141805581693d890cc3bff94` (#165 merged **by another session**; refresh before any review) |
+| Branch | `agent/s-20261103-e79c962b/optimization-001` |
+| HEAD at genuine run | `209c2904e167e76c61f466f88e582ca4e2a4312d`; later receipt commit must be read afresh |
+| PR | Branch proposed as non-Draft PR after original verified receipt commit; inspect open PR by branch for final URL and exact HEAD |
+| Overlapping open PRs | #173/#177/#172 assisted-evidence aliases; do not blind-merge. #165 publisher merged to main at `c1b8287`. #9/#15 stacked dependency |
+| Current main CI | #165 main SHA `c1b8287`, [run 41512315964](https://github.com/sstxww/reinforcement-learning/actions/runs/41512315964) **in-progress at inspection**, not certified; prior `990acd21` [run 41511814464](https://github.com/sstxww/reinforcement-learning/actions/runs/41511814464) success |
+| Unit test evidence | 7 synthetic pytest tests passed locally and in own live workflow |
+| Own original game | [workflow #41512219188](https://github.com/sstxww/reinforcement-learning/actions/runs/41512219188), original Artifact 13174375780; pinned TavernGym 1.1.0 source hash `6d8712c93022ba11`; **baseline vs 7 scripted bots**, seed **99773**, seat **0**, completed 14 turns, 44 decisions, seat rank **7**, eight placements **[7,1,8,5,4,6,3,2]**, no combat truncation or forced turn cap. Original JSON SHA256 `6e7f566039335480737d049a69d11aae59fde3e922d81d6864da293c115826a1` at `experiments/s-20261103-e79c962b/001-99773.json`. Uploaded artifact only 30-day retention; checked-in receipt is the durable small-data record |
+| Training/model | **0 new MaskablePPO steps**, 0 model-only games, 0 new checkpoint or Release. Canonical read-only source [1408-step Release](https://github.com/sstxww/reinforcement-learning/releases/tag/v5-s-20261102-68099929-1408-41428692617) SHA256 `a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632`; **not loaded or resumed by this session**, optimizer unchecked here |
+| Game comparison | Own single baseline n=1 only, no model matched-seed comparison. Previously registered candidate n=3 raw [8,8,8] vs baseline [6,8,8] from other sessions; no gain |
+| Root cause | Old-head CI can be mistaken for exact current HEAD success; fail-closed preflight catches this class. No claim about PPO rank-eight causal origin |
+| Important failure | #165 separate continuation Action [41509707315](https://github.com/sstxww/reinforcement-learning/actions/runs/41509707315) failed with `RuntimeError: Full-game safety limit exceeded` during held-out raw candidate evaluation; publishing skipped. A successful earlier model-only seed 932031 **rank 8** does not establish full paired reliability. Not our own training |
+| Integration | Own PR unmerged; **no valid unique integration lock**; script deliberately never authorizes merge and must not be mistaken for one |
+| Next owner first action | Re-read PR head SHA and latest main; verify CI `tests-and-full-match` is completed success on latest HEAD, inspect original baseline receipt, current-main diff, review and exclusive lease. Only then use guarded PR merge API and verify postmerge main CI. For model continuation, first root-cause #165's held-out raw safety limit separately |
+
+## Safety and costs
+Only owned files changed. Our owned workflow is now manual-only after first actual baseline run to prevent repeated builds from receipt/doc commits. Its earlier successful job is attributed solely to SHA `209c2904`, not to the later receipt commit. A new PR full-match CI must validate the actual final branch HEAD. No external Arena, no credential edits or force pushes.
