@@ -1,0 +1,381 @@
+{
+  "schema": 1,
+  "timestamp": "2026-11-02T19:42:24.376116+00:00",
+  "environment": "TavernGym",
+  "engine_version": "1.1.0",
+  "engine_source_hash": "6d8712c93022ba11",
+  "agent_id": "s-20261103-406afe60",
+  "seed": 99831,
+  "policy": "model",
+  "model_sha256": "a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632",
+  "selection_mode": "argmax",
+  "sampling_seed": null,
+  "completed": true,
+  "turns": 14,
+  "decisions": 125,
+  "placements": [
+    8,
+    5,
+    3,
+    2,
+    1,
+    4,
+    6,
+    7
+  ],
+  "truncated_combats": 0,
+  "turn_limit_end": false,
+  "git_sha": "b7260914ab2d7264cc44f1abc41f63bdf7f598f3",
+  "opportunity_summary": {
+    "decisions": 125,
+    "by_action_family": {
+      "choose": 4,
+      "reroll": 39,
+      "buy_legal_decisions": 47,
+      "freeze": 70,
+      "end_turn": 7,
+      "all_end_turns": 7,
+      "play": 2,
+      "upgrade": 1,
+      "sell": 2
+    },
+    "buy_legal_decisions": 47,
+    "distinct_turns_with_legal_buy": 7,
+    "unique_public_states_with_legal_buy": 47,
+    "end_while_buy_legal": 0,
+    "turns_with_end_while_buy_legal": 0,
+    "buy_chosen": 0,
+    "all_end_turns": 7,
+    "consecutive_identical_public_observation": 0,
+    "conditional_buy_rate_given_legal": 0.0,
+    "conditional_end_rate_given_legal_buy": 0.0,
+    "caveat": "Every masked BUY is legal; action-level opportunities are temporally dependent. Not all missed legal BUY actions are mistakes."
+  },
+  "trace_first_32": [
+    {
+      "turn": 0,
+      "action": 30,
+      "family": "choose",
+      "buy_legal": false,
+      "legal_buy_count": 0,
+      "board_size": 0,
+      "state_hash": "111ec04990e0af84ac468bcf",
+      "same_public_state_as_prior": false
+    },
+    {
+      "turn": 1,
+      "action": 1,
+      "family": "reroll",
+      "buy_legal": true,
+      "legal_buy_count": 4,
+      "board_size": 0,
+      "state_hash": "23ecceb32c8efccbd3fa30a6",
+      "same_public_state_as_prior": false
+    },
+    {
+      "turn": 1,
+      "action": 1,
+      "family": "reroll",
+      "buy_legal": true,
+      "legal_buy_count": 1,
+      "board_size": 0,
+      "state_hash": "9aef4292c24cdb94e51eb3df",
+      "same_public_state_as_prior": false
+    },
+    {
+      "turn": 1,
+      "action": 1,
+      "family": "reroll",
+      "buy_legal": false,
+      "legal_buy_count": 0,
+      "board_size": 0,
+      "state_hash": "0f19656398b5a550a65dd129",
+      "same_public_state_as_prior": false
+    },
+    {
+      "turn": 1,
+      "action": 2,
+      "family": "freeze",
+      "buy_legal": false,
+      "legal_buy_count": 0,
+      "board_size": 0,
+      "state_hash": "4efd936773075a3cf8f1578d",
+      "same_public_state_as_prior": false
+    },
+    {
+      "turn": 1,
+      "action": 2,
+      "family": "freeze",
+      "buy_legal": false,
+      "legal_buy_count": 0,
+      "board_size": 0,
+      "state_hash": "269df8535e7ffcb97f1a0bdc",
+      "same_public_state_as_prior": false
+    },
+    {
+      "turn": 1,
+      "action": 2,
+      "family": "freeze",
+      "buy_legal": false,
+      "legal_buy_count": 0,
+      "board_size": 0,
+      "state_hash": "e88b55317d040ebf02e69c42",
+      "same_public_state_as_prior": false
+    },
+    {
+      "turn": 1,
+      "action": 2,
+      "family": "freeze",
+      "buy_legal": false,
+      "legal_buy_count": 0,
+      "board_size": 0,
+      "state_hash": "7e7bee40ed11dd7eeb6baa8f",
+      "same_public_state_as_prior": false
+    },
+    {
+      "turn": 1,
+      "action": 2,
+      "family": "freeze",
+      "buy_legal": false,
+      "legal_buy_count": 0,
+      "board_size": 0,
+      "state_hash": "f16a40fcc992e3318edb3b2f",
+      "same_public_state_as_prior": false
+    },
+    {
+      "turn": 1,
+      "action": 2,
+      "family": "freeze",
+      "buy_legal": false,
+      "legal_buy_count": 0,
+      "board_size": 0,
+      "state_hash": "36eb5a6d8e32b5dee4420422",
+      "same_public_state_as_prior": false
+    },
+    {
+      "turn": 1,
+      "action": 2,
+      "family": "freeze",
+      "buy_legal": false,
+      "legal_buy_count": 0,
+      "board_size": 0,
+      "state_hash": "274287f4103b566f0bdcf015",
+      "same_public_state_as_prior": false
+    },
+    {
+      "turn": 1,
+      "action": 2,
+      "family": "freeze",
+      "buy_legal": false,
+      "legal_buy_count": 0,
+      "board_size": 0,
+      "state_hash": "2407a989b3033ec2f023490d",
+      "same_public_state_as_prior": false
+    },
+    {
+      "turn": 1,
+      "action": 2,
+      "family": "freeze",
+      "buy_legal": false,
+      "legal_buy_count": 0,
+      "board_size": 0,
+      "state_hash": "f520a5f6694af734e426267b",
+      "same_public_state_as_prior": false
+    },
+    {
+      "turn": 1,
+      "action": 2,
+      "family": "freeze",
+      "buy_legal": false,
+      "legal_buy_count": 0,
+      "board_size": 0,
+      "state_hash": "215a12d8e5b4494218578d27",
+      "same_public_state_as_prior": false
+    },
+    {
+      "turn": 1,
+      "action": 0,
+      "family": "end_turn",
+      "buy_legal": false,
+      "legal_buy_count": 0,
+      "board_size": 0,
+      "state_hash": "31d39ca2d91d12b8d7e646c8",
+      "same_public_state_as_prior": false
+    },
+    {
+      "turn": 2,
+      "action": 1,
+      "family": "reroll",
+      "buy_legal": true,
+      "legal_buy_count": 4,
+      "board_size": 0,
+      "state_hash": "1b4245008e515e68400d59ba",
+      "same_public_state_as_prior": false
+    },
+    {
+      "turn": 2,
+      "action": 1,
+      "family": "reroll",
+      "buy_legal": true,
+      "legal_buy_count": 4,
+      "board_size": 0,
+      "state_hash": "633af8e8d14aae063bedbdd5",
+      "same_public_state_as_prior": false
+    },
+    {
+      "turn": 2,
+      "action": 1,
+      "family": "reroll",
+      "buy_legal": true,
+      "legal_buy_count": 1,
+      "board_size": 0,
+      "state_hash": "f579274a11ebe247734595ab",
+      "same_public_state_as_prior": false
+    },
+    {
+      "turn": 2,
+      "action": 1,
+      "family": "reroll",
+      "buy_legal": false,
+      "legal_buy_count": 0,
+      "board_size": 0,
+      "state_hash": "2a46c07ce22477a8dfd45b0f",
+      "same_public_state_as_prior": false
+    },
+    {
+      "turn": 2,
+      "action": 2,
+      "family": "freeze",
+      "buy_legal": false,
+      "legal_buy_count": 0,
+      "board_size": 0,
+      "state_hash": "092422b1a8f773234ebed19a",
+      "same_public_state_as_prior": false
+    },
+    {
+      "turn": 2,
+      "action": 2,
+      "family": "freeze",
+      "buy_legal": false,
+      "legal_buy_count": 0,
+      "board_size": 0,
+      "state_hash": "b2da4b4325d66ebf813a707e",
+      "same_public_state_as_prior": false
+    },
+    {
+      "turn": 2,
+      "action": 2,
+      "family": "freeze",
+      "buy_legal": false,
+      "legal_buy_count": 0,
+      "board_size": 0,
+      "state_hash": "6134a4b1d7508dc5c5ce585e",
+      "same_public_state_as_prior": false
+    },
+    {
+      "turn": 2,
+      "action": 2,
+      "family": "freeze",
+      "buy_legal": false,
+      "legal_buy_count": 0,
+      "board_size": 0,
+      "state_hash": "76fed953118f522910e2860b",
+      "same_public_state_as_prior": false
+    },
+    {
+      "turn": 2,
+      "action": 2,
+      "family": "freeze",
+      "buy_legal": false,
+      "legal_buy_count": 0,
+      "board_size": 0,
+      "state_hash": "402b9e2a239714446e5db847",
+      "same_public_state_as_prior": false
+    },
+    {
+      "turn": 2,
+      "action": 2,
+      "family": "freeze",
+      "buy_legal": false,
+      "legal_buy_count": 0,
+      "board_size": 0,
+      "state_hash": "9142e0327292fb2c7b8ff348",
+      "same_public_state_as_prior": false
+    },
+    {
+      "turn": 2,
+      "action": 2,
+      "family": "freeze",
+      "buy_legal": false,
+      "legal_buy_count": 0,
+      "board_size": 0,
+      "state_hash": "18e15f9d805cdbcba38fba17",
+      "same_public_state_as_prior": false
+    },
+    {
+      "turn": 2,
+      "action": 2,
+      "family": "freeze",
+      "buy_legal": false,
+      "legal_buy_count": 0,
+      "board_size": 0,
+      "state_hash": "061ed9d81d48b8899350fc0c",
+      "same_public_state_as_prior": false
+    },
+    {
+      "turn": 2,
+      "action": 2,
+      "family": "freeze",
+      "buy_legal": false,
+      "legal_buy_count": 0,
+      "board_size": 0,
+      "state_hash": "7f058ad63d7143f1087a3230",
+      "same_public_state_as_prior": false
+    },
+    {
+      "turn": 2,
+      "action": 2,
+      "family": "freeze",
+      "buy_legal": false,
+      "legal_buy_count": 0,
+      "board_size": 0,
+      "state_hash": "76ed9c4b36f7bafc9253cc3a",
+      "same_public_state_as_prior": false
+    },
+    {
+      "turn": 2,
+      "action": 0,
+      "family": "end_turn",
+      "buy_legal": false,
+      "legal_buy_count": 0,
+      "board_size": 0,
+      "state_hash": "96659d70b8760f392a6eed27",
+      "same_public_state_as_prior": false
+    },
+    {
+      "turn": 3,
+      "action": 1,
+      "family": "reroll",
+      "buy_legal": true,
+      "legal_buy_count": 4,
+      "board_size": 0,
+      "state_hash": "efd993691c79afacfb13cd3e",
+      "same_public_state_as_prior": false
+    },
+    {
+      "turn": 3,
+      "action": 1,
+      "family": "reroll",
+      "buy_legal": true,
+      "legal_buy_count": 4,
+      "board_size": 0,
+      "state_hash": "339c2462fc19ebd3ca8f8406",
+      "same_public_state_as_prior": false
+    }
+  ],
+  "fallback_actions": 0,
+  "guard_forced_ends": 0,
+  "model_guard_forced_end": 0,
+  "public_observation_only": true,
+  "purpose": "single-seed selection ablation; no strength or promotion claim"
+}
