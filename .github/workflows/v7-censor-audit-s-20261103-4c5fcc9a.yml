@@ -1,0 +1,59 @@
+name: V7 - 1536 identity and censored evaluation audit s-20261103-4c5fcc9a
+
+on:
+  push:
+    branches:
+      - agent/s-20261103-4c5fcc9a/optimization-001
+    paths:
+      - 'scripts/v7_candidate_censor_audit_4c5fcc9a.py'
+      - 'tests/test_v7_candidate_censor_audit_4c5fcc9a.py'
+      - '.github/workflows/v7-censor-audit-s-20261103-4c5fcc9a.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: v7-censor-s-20261103-4c5fcc9a
+  cancel-in-progress: false
+
+jobs:
+  audit-and-original-real-game:
+    runs-on: ubuntu-latest
+    timeout-minutes: 48
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install bounded unit dependencies
+        run: python -m pip install -e '.[test]'
+      - name: Check strict model identity and censored-match tests
+        run: python -m pytest -q tests/test_v7_candidate_censor_audit_4c5fcc9a.py
+      - name: Audit existing genuine historical evidence (not own new model games)
+        run: |
+          python scripts/v7_candidate_censor_audit_4c5fcc9a.py \
+            --baseline experiments/s-20261103-4fd17801/001-baseline-97303.json \
+            --parent experiments/s-20261103-4fd17801/002-source-model-97303.json \
+            --candidate experiments/s-20261103-4fd17801/003-candidate-97304.json \
+            --manifest models/sessions/s-20261103-4fd17801/1536-candidate.json \
+            --failure reports/s-20261103-c1452513/002-1536-candidate-heldout-failure.json \
+            --out outputs/s-20261103-4c5fcc9a-001-audit.json
+      - name: Install pinned TavernGym engine
+        run: bash scripts/bootstrap_engine.sh
+      - name: Validate engine contract
+        run: python -m tavern_ai.contract
+      - name: Own original full eight-seat baseline canary (not PPO skill)
+        run: |
+          python -m tavern_ai.canary \
+            --agent-id s-20261103-4c5fcc9a --seed 99731 \
+            --policy baseline --receipt outputs/s-20261103-4c5fcc9a-001-99731.json
+          python -m tavern_ai.validate_receipt outputs/s-20261103-4c5fcc9a-001-99731.json
+      - name: Preserve real original evidence (temporary, not durable model storage)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: s-20261103-4c5fcc9a-v7-audit-and-game
+          path: outputs/s-20261103-4c5fcc9a-001-*.json
+          if-no-files-found: ignore
+          retention-days: 14

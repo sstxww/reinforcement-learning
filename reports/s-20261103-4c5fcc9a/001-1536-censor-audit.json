@@ -1,0 +1,39 @@
+{
+  "schema": 1,
+  "audit": "historical_evidence_identity_and_censoring_only",
+  "source": "existing committed real TavernGym results; no new match generated",
+  "parent_sha256": "a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632",
+  "matched_parent_baseline": {
+    "seed": 97303,
+    "baseline_rank": 5,
+    "parent_rank": 8,
+    "parent_minus_baseline": 3,
+    "pairs": 1
+  },
+  "cohorts": [
+    {
+      "sha256": "e9eb78bb100dd2398258d7f7797b7fc589bc3ef7abd0badca34c964823a04e13",
+      "training_steps": 1536,
+      "seed": 97304,
+      "complete_raw_model_game": true,
+      "rank": 8,
+      "durable_checkpoint": false,
+      "candidate_vs_parent_matched_games": 0
+    },
+    {
+      "sha256": "b2b4a1039ca0f5c0e8475646c80996601d26efd081be533972638607c277508d",
+      "training_steps": 1536,
+      "heldout_requested_seeds": [
+        932040,
+        932041
+      ],
+      "heldout_completed": false,
+      "heldout_rank": null,
+      "failure": "RuntimeError: Full-game safety limit exceeded",
+      "candidate_vs_parent_matched_games": 0
+    }
+  ],
+  "combined_candidate_mean_rank": null,
+  "verified_candidate_improvement": false,
+  "note": "Distinct 1536-step checkpoints must not be pooled. Incomplete games have no placement."
+}
