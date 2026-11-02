@@ -11,6 +11,7 @@
     "tests/test_model_seat1_s_6f28c1b9.py",
     ".github/workflows/v7-model-seat1-s-6f28c1b9.yml",
     "research/sessions/s-20261103-6f28c1b9/*",
+    "research/knowledge/proposals/s-20261103-6f28c1b9-001.md",
     "experiments/s-20261103-6f28c1b9/*",
     "reports/s-20261103-6f28c1b9/*"
   ],
@@ -19,7 +20,29 @@
     "new_ppo_steps": 0,
     "timeout_minutes": 65
   },
-  "status": "claimed",
-  "scope": "task-claim only; does not provide main merge lease",
-  "handoff": "claim survives until PR reaches terminal integration; owner will mark released or handoff"
+  "status": "completed_experiment_waiting_main_gate",
+  "pr": "https://github.com/sstxww/reinforcement-learning/pull/212",
+  "exact_head_sha": "15be77afa117cb0dc12b5916727933bfde94c018",
+  "run": "https://github.com/sstxww/reinforcement-learning/actions/runs/41513511752",
+  "artifact_id": 13174886541,
+  "results": {
+    "baseline_complete": true,
+    "baseline_rank": 8,
+    "raw_complete": true,
+    "raw_rank": 8,
+    "seed": 992310,
+    "seat": 1,
+    "n_pairs": 1,
+    "raw_model_sha256": "a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632",
+    "new_training_steps": 0
+  },
+  "proof_paths": [
+    "experiments/s-20261103-6f28c1b9/rotated-992310-seat1.json",
+    "experiments/s-20261103-6f28c1b9/001-992310-seat1-model.json",
+    "reports/s-20261103-6f28c1b9/001-992310-paired-summary.json"
+  ],
+  "main_merge_lease": false,
+  "main_merge_blocker": "No enforced global single-writer main integration. Issue #182 demonstrates CAS branch doesn't exclude other merge writers. Exact-head CI and independent review also required.",
+  "scope": "TASK claim only, not main exclusive lease",
+  "handoff": "Verify latest PR #212 exact-head CI and reviewer, then only designated enforced integrator may merge. No model promotion; rank8 in one pairing."
 }
