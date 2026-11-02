@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - agent/s-20261103-f2a75c38/optimization-001
+    paths:
+      - 'tavern_ai/release_step_audit_s_f2a75c38.py'
+      - 'tests/test_release_step_audit_s_f2a75c38.py'
   workflow_dispatch:
 
 permissions:
