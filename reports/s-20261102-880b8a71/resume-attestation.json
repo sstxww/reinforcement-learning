@@ -1,0 +1,21 @@
+{
+  "complete_game_verified": false,
+  "engine": {
+    "actions": 245,
+    "cards": 447,
+    "features": 4017,
+    "n_cards": 3984,
+    "source_hash": "6d8712c93022ba11",
+    "version": "1.1.0"
+  },
+  "increment_timesteps": 128,
+  "model_role": "challenger_unpromoted",
+  "promotion": "none",
+  "resumed_checkpoint_sha256": "ce9b73b5eea8eedccfcdd48c59105e829dbb20a4e8aa8e3dce6c7f6210a2c980",
+  "resumed_total_timesteps": 1408,
+  "schema": 1,
+  "source_checkpoint_sha256": "73bde2666426cecce39f135980a897bb2cd4a7d70783ba04c9c0d29477a6664a",
+  "source_release": "v2-learning-41413557445",
+  "source_total_timesteps": 1280,
+  "warning": "Hash and PPO step verification only; full-game and paired evaluation are separate gates."
+}

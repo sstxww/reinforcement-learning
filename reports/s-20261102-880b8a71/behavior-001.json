@@ -1,0 +1,1384 @@
+{
+  "schema": 1,
+  "session_id": "s-20261102-880b8a71",
+  "source": "actual_taverngym",
+  "engine": {
+    "version": "1.1.0",
+    "source_hash": "6d8712c93022ba11",
+    "features": 4017,
+    "cards": 447,
+    "actions": 245,
+    "n_cards": 3984
+  },
+  "model_sha256": "ce9b73b5eea8eedccfcdd48c59105e829dbb20a4e8aa8e3dce6c7f6210a2c980",
+  "ppo_steps_in_this_audit": 0,
+  "raw_probe": {
+    "seed": 23051,
+    "completed": false,
+    "stop_reason": "own_action_audit_budget_exhausted",
+    "game_turn": 7,
+    "raw_model_actions": 600,
+    "model_chosen_ends": 6,
+    "guard_forced_ends": 0,
+    "guard_limit_per_turn": null,
+    "action_category_counts": {
+      "choose": 3,
+      "other": 344,
+      "end_turn": 6,
+      "upgrade": 2,
+      "play": 245
+    },
+    "legal_action_opportunities": {
+      "own_decisions": 600,
+      "legal_end_turn_opportunities": 353,
+      "decisions_with_legal_buy": 28
+    },
+    "choice_when_buy_legal": {
+      "other": 27,
+      "upgrade": 1
+    },
+    "observation_progress": {
+      "consecutive_observation_pairs": 592
+    },
+    "per_turn_decisions": {
+      "0": 1,
+      "1": 14,
+      "2": 15,
+      "3": 16,
+      "4": 17,
+      "5": 18,
+      "6": 17,
+      "7": 502
+    },
+    "first_actions": [
+      {
+        "turn": 0,
+        "chosen": 30,
+        "raw": 30,
+        "buy_legal": false,
+        "forced": false
+      },
+      {
+        "turn": 1,
+        "chosen": 1,
+        "raw": 1,
+        "buy_legal": true,
+        "forced": false
+      },
+      {
+        "turn": 1,
+        "chosen": 1,
+        "raw": 1,
+        "buy_legal": true,
+        "forced": false
+      },
+      {
+        "turn": 1,
+        "chosen": 1,
+        "raw": 1,
+        "buy_legal": true,
+        "forced": false
+      },
+      {
+        "turn": 1,
+        "chosen": 2,
+        "raw": 2,
+        "buy_legal": false,
+        "forced": false
+      },
+      {
+        "turn": 1,
+        "chosen": 2,
+        "raw": 2,
+        "buy_legal": false,
+        "forced": false
+      },
+      {
+        "turn": 1,
+        "chosen": 2,
+        "raw": 2,
+        "buy_legal": false,
+        "forced": false
+      },
+      {
+        "turn": 1,
+        "chosen": 2,
+        "raw": 2,
+        "buy_legal": false,
+        "forced": false
+      },
+      {
+        "turn": 1,
+        "chosen": 2,
+        "raw": 2,
+        "buy_legal": false,
+        "forced": false
+      },
+      {
+        "turn": 1,
+        "chosen": 2,
+        "raw": 2,
+        "buy_legal": false,
+        "forced": false
+      },
+      {
+        "turn": 1,
+        "chosen": 2,
+        "raw": 2,
+        "buy_legal": false,
+        "forced": false
+      },
+      {
+        "turn": 1,
+        "chosen": 2,
+        "raw": 2,
+        "buy_legal": false,
+        "forced": false
+      },
+      {
+        "turn": 1,
+        "chosen": 2,
+        "raw": 2,
+        "buy_legal": false,
+        "forced": false
+      },
+      {
+        "turn": 1,
+        "chosen": 2,
+        "raw": 2,
+        "buy_legal": false,
+        "forced": false
+      },
+      {
+        "turn": 1,
+        "chosen": 0,
+        "raw": 0,
+        "buy_legal": false,
+        "forced": false
+      },
+      {
+        "turn": 2,
+        "chosen": 1,
+        "raw": 1,
+        "buy_legal": true,
+        "forced": false
+      },
+      {
+        "turn": 2,
+        "chosen": 1,
+        "raw": 1,
+        "buy_legal": true,
+        "forced": false
+      },
+      {
+        "turn": 2,
+        "chosen": 1,
+        "raw": 1,
+        "buy_legal": true,
+        "forced": false
+      },
+      {
+        "turn": 2,
+        "chosen": 1,
+        "raw": 1,
+        "buy_legal": false,
+        "forced": false
+      },
+      {
+        "turn": 2,
+        "chosen": 2,
+        "raw": 2,
+        "buy_legal": false,
+        "forced": false
+      },
+      {
+        "turn": 2,
+        "chosen": 2,
+        "raw": 2,
+        "buy_legal": false,
+        "forced": false
+      },
+      {
+        "turn": 2,
+        "chosen": 2,
+        "raw": 2,
+        "buy_legal": false,
+        "forced": false
+      },
+      {
+        "turn": 2,
+        "chosen": 2,
+        "raw": 2,
+        "buy_legal": false,
+        "forced": false
+      },
+      {
+        "turn": 2,
+        "chosen": 2,
+        "raw": 2,
+        "buy_legal": false,
+        "forced": false
+      },
+      {
+        "turn": 2,
+        "chosen": 2,
+        "raw": 2,
+        "buy_legal": false,
+        "forced": false
+      },
+      {
+        "turn": 2,
+        "chosen": 2,
+        "raw": 2,
+        "buy_legal": false,
+        "forced": false
+      },
+      {
+        "turn": 2,
+        "chosen": 2,
+        "raw": 2,
+        "buy_legal": false,
+        "forced": false
+      },
+      {
+        "turn": 2,
+        "chosen": 2,
+        "raw": 2,
+        "buy_legal": false,
+        "forced": false
+      },
+      {
+        "turn": 2,
+        "chosen": 2,
+        "raw": 2,
+        "buy_legal": false,
+        "forced": false
+      },
+      {
+        "turn": 2,
+        "chosen": 0,
+        "raw": 0,
+        "buy_legal": false,
+        "forced": false
+      },
+      {
+        "turn": 3,
+        "chosen": 1,
+        "raw": 1,
+        "buy_legal": true,
+        "forced": false
+      },
+      {
+        "turn": 3,
+        "chosen": 1,
+        "raw": 1,
+        "buy_legal": true,
+        "forced": false
+      }
+    ]
+  },
+  "guarded_games": [
+    {
+      "seed": 23051,
+      "completed": true,
+      "stop_reason": null,
+      "game_turn": 17,
+      "raw_model_actions": 135,
+      "model_chosen_ends": 6,
+      "guard_forced_ends": 1,
+      "guard_limit_per_turn": 36,
+      "action_category_counts": {
+        "choose": 3,
+        "other": 111,
+        "end_turn": 7,
+        "upgrade": 2,
+        "play": 12
+      },
+      "legal_action_opportunities": {
+        "own_decisions": 135,
+        "legal_end_turn_opportunities": 121,
+        "decisions_with_legal_buy": 28
+      },
+      "choice_when_buy_legal": {
+        "other": 27,
+        "upgrade": 1
+      },
+      "observation_progress": {
+        "consecutive_observation_pairs": 127
+      },
+      "per_turn_decisions": {
+        "0": 1,
+        "1": 14,
+        "2": 15,
+        "3": 16,
+        "4": 17,
+        "5": 18,
+        "6": 17,
+        "7": 37
+      },
+      "first_actions": [
+        {
+          "turn": 0,
+          "chosen": 30,
+          "raw": 30,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 1,
+          "chosen": 1,
+          "raw": 1,
+          "buy_legal": true,
+          "forced": false
+        },
+        {
+          "turn": 1,
+          "chosen": 1,
+          "raw": 1,
+          "buy_legal": true,
+          "forced": false
+        },
+        {
+          "turn": 1,
+          "chosen": 1,
+          "raw": 1,
+          "buy_legal": true,
+          "forced": false
+        },
+        {
+          "turn": 1,
+          "chosen": 2,
+          "raw": 2,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 1,
+          "chosen": 2,
+          "raw": 2,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 1,
+          "chosen": 2,
+          "raw": 2,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 1,
+          "chosen": 2,
+          "raw": 2,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 1,
+          "chosen": 2,
+          "raw": 2,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 1,
+          "chosen": 2,
+          "raw": 2,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 1,
+          "chosen": 2,
+          "raw": 2,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 1,
+          "chosen": 2,
+          "raw": 2,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 1,
+          "chosen": 2,
+          "raw": 2,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 1,
+          "chosen": 2,
+          "raw": 2,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 1,
+          "chosen": 0,
+          "raw": 0,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 2,
+          "chosen": 1,
+          "raw": 1,
+          "buy_legal": true,
+          "forced": false
+        },
+        {
+          "turn": 2,
+          "chosen": 1,
+          "raw": 1,
+          "buy_legal": true,
+          "forced": false
+        },
+        {
+          "turn": 2,
+          "chosen": 1,
+          "raw": 1,
+          "buy_legal": true,
+          "forced": false
+        },
+        {
+          "turn": 2,
+          "chosen": 1,
+          "raw": 1,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 2,
+          "chosen": 2,
+          "raw": 2,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 2,
+          "chosen": 2,
+          "raw": 2,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 2,
+          "chosen": 2,
+          "raw": 2,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 2,
+          "chosen": 2,
+          "raw": 2,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 2,
+          "chosen": 2,
+          "raw": 2,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 2,
+          "chosen": 2,
+          "raw": 2,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 2,
+          "chosen": 2,
+          "raw": 2,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 2,
+          "chosen": 2,
+          "raw": 2,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 2,
+          "chosen": 2,
+          "raw": 2,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 2,
+          "chosen": 2,
+          "raw": 2,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 2,
+          "chosen": 0,
+          "raw": 0,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 3,
+          "chosen": 1,
+          "raw": 1,
+          "buy_legal": true,
+          "forced": false
+        },
+        {
+          "turn": 3,
+          "chosen": 1,
+          "raw": 1,
+          "buy_legal": true,
+          "forced": false
+        }
+      ],
+      "rank": 8
+    },
+    {
+      "seed": 27100,
+      "completed": true,
+      "stop_reason": null,
+      "game_turn": 14,
+      "raw_model_actions": 197,
+      "model_chosen_ends": 5,
+      "guard_forced_ends": 3,
+      "guard_limit_per_turn": 36,
+      "action_category_counts": {
+        "choose": 8,
+        "other": 171,
+        "end_turn": 8,
+        "play": 6,
+        "shop_or_sell": 3,
+        "upgrade": 1
+      },
+      "legal_action_opportunities": {
+        "own_decisions": 197,
+        "legal_end_turn_opportunities": 189,
+        "decisions_with_legal_buy": 54
+      },
+      "choice_when_buy_legal": {
+        "other": 47,
+        "play": 6,
+        "shop_or_sell": 1
+      },
+      "observation_progress": {
+        "consecutive_observation_pairs": 188
+      },
+      "per_turn_decisions": {
+        "0": 1,
+        "1": 14,
+        "2": 15,
+        "3": 16,
+        "4": 19,
+        "5": 21,
+        "6": 37,
+        "7": 37,
+        "8": 37
+      },
+      "first_actions": [
+        {
+          "turn": 0,
+          "chosen": 30,
+          "raw": 30,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 1,
+          "chosen": 1,
+          "raw": 1,
+          "buy_legal": true,
+          "forced": false
+        },
+        {
+          "turn": 1,
+          "chosen": 1,
+          "raw": 1,
+          "buy_legal": true,
+          "forced": false
+        },
+        {
+          "turn": 1,
+          "chosen": 1,
+          "raw": 1,
+          "buy_legal": true,
+          "forced": false
+        },
+        {
+          "turn": 1,
+          "chosen": 2,
+          "raw": 2,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 1,
+          "chosen": 2,
+          "raw": 2,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 1,
+          "chosen": 2,
+          "raw": 2,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 1,
+          "chosen": 2,
+          "raw": 2,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 1,
+          "chosen": 2,
+          "raw": 2,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 1,
+          "chosen": 2,
+          "raw": 2,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 1,
+          "chosen": 2,
+          "raw": 2,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 1,
+          "chosen": 2,
+          "raw": 2,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 1,
+          "chosen": 2,
+          "raw": 2,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 1,
+          "chosen": 2,
+          "raw": 2,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 1,
+          "chosen": 0,
+          "raw": 0,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 2,
+          "chosen": 1,
+          "raw": 1,
+          "buy_legal": true,
+          "forced": false
+        },
+        {
+          "turn": 2,
+          "chosen": 1,
+          "raw": 1,
+          "buy_legal": true,
+          "forced": false
+        },
+        {
+          "turn": 2,
+          "chosen": 1,
+          "raw": 1,
+          "buy_legal": true,
+          "forced": false
+        },
+        {
+          "turn": 2,
+          "chosen": 1,
+          "raw": 1,
+          "buy_legal": true,
+          "forced": false
+        },
+        {
+          "turn": 2,
+          "chosen": 2,
+          "raw": 2,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 2,
+          "chosen": 2,
+          "raw": 2,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 2,
+          "chosen": 2,
+          "raw": 2,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 2,
+          "chosen": 2,
+          "raw": 2,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 2,
+          "chosen": 2,
+          "raw": 2,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 2,
+          "chosen": 2,
+          "raw": 2,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 2,
+          "chosen": 2,
+          "raw": 2,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 2,
+          "chosen": 2,
+          "raw": 2,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 2,
+          "chosen": 2,
+          "raw": 2,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 2,
+          "chosen": 2,
+          "raw": 2,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 2,
+          "chosen": 0,
+          "raw": 0,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 3,
+          "chosen": 1,
+          "raw": 1,
+          "buy_legal": true,
+          "forced": false
+        },
+        {
+          "turn": 3,
+          "chosen": 1,
+          "raw": 1,
+          "buy_legal": true,
+          "forced": false
+        }
+      ],
+      "rank": 8
+    },
+    {
+      "seed": 27101,
+      "completed": true,
+      "stop_reason": null,
+      "game_turn": 14,
+      "raw_model_actions": 155,
+      "model_chosen_ends": 5,
+      "guard_forced_ends": 2,
+      "guard_limit_per_turn": 36,
+      "action_category_counts": {
+        "choose": 3,
+        "other": 135,
+        "end_turn": 7,
+        "play": 6,
+        "shop_or_sell": 3,
+        "upgrade": 1
+      },
+      "legal_action_opportunities": {
+        "own_decisions": 155,
+        "legal_end_turn_opportunities": 152,
+        "decisions_with_legal_buy": 49
+      },
+      "choice_when_buy_legal": {
+        "other": 40,
+        "play": 6,
+        "shop_or_sell": 3
+      },
+      "observation_progress": {
+        "consecutive_observation_pairs": 147
+      },
+      "per_turn_decisions": {
+        "0": 1,
+        "1": 14,
+        "2": 15,
+        "3": 16,
+        "4": 17,
+        "5": 18,
+        "6": 37,
+        "7": 37
+      },
+      "first_actions": [
+        {
+          "turn": 0,
+          "chosen": 30,
+          "raw": 30,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 1,
+          "chosen": 1,
+          "raw": 1,
+          "buy_legal": true,
+          "forced": false
+        },
+        {
+          "turn": 1,
+          "chosen": 1,
+          "raw": 1,
+          "buy_legal": true,
+          "forced": false
+        },
+        {
+          "turn": 1,
+          "chosen": 1,
+          "raw": 1,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 1,
+          "chosen": 2,
+          "raw": 2,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 1,
+          "chosen": 2,
+          "raw": 2,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 1,
+          "chosen": 2,
+          "raw": 2,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 1,
+          "chosen": 2,
+          "raw": 2,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 1,
+          "chosen": 2,
+          "raw": 2,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 1,
+          "chosen": 2,
+          "raw": 2,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 1,
+          "chosen": 2,
+          "raw": 2,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 1,
+          "chosen": 2,
+          "raw": 2,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 1,
+          "chosen": 2,
+          "raw": 2,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 1,
+          "chosen": 2,
+          "raw": 2,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 1,
+          "chosen": 0,
+          "raw": 0,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 2,
+          "chosen": 1,
+          "raw": 1,
+          "buy_legal": true,
+          "forced": false
+        },
+        {
+          "turn": 2,
+          "chosen": 1,
+          "raw": 1,
+          "buy_legal": true,
+          "forced": false
+        },
+        {
+          "turn": 2,
+          "chosen": 1,
+          "raw": 1,
+          "buy_legal": true,
+          "forced": false
+        },
+        {
+          "turn": 2,
+          "chosen": 1,
+          "raw": 1,
+          "buy_legal": true,
+          "forced": false
+        },
+        {
+          "turn": 2,
+          "chosen": 2,
+          "raw": 2,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 2,
+          "chosen": 2,
+          "raw": 2,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 2,
+          "chosen": 2,
+          "raw": 2,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 2,
+          "chosen": 2,
+          "raw": 2,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 2,
+          "chosen": 2,
+          "raw": 2,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 2,
+          "chosen": 2,
+          "raw": 2,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 2,
+          "chosen": 2,
+          "raw": 2,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 2,
+          "chosen": 2,
+          "raw": 2,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 2,
+          "chosen": 2,
+          "raw": 2,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 2,
+          "chosen": 2,
+          "raw": 2,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 2,
+          "chosen": 0,
+          "raw": 0,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 3,
+          "chosen": 1,
+          "raw": 1,
+          "buy_legal": true,
+          "forced": false
+        },
+        {
+          "turn": 3,
+          "chosen": 1,
+          "raw": 1,
+          "buy_legal": true,
+          "forced": false
+        }
+      ],
+      "rank": 8
+    },
+    {
+      "seed": 27102,
+      "completed": true,
+      "stop_reason": null,
+      "game_turn": 16,
+      "raw_model_actions": 136,
+      "model_chosen_ends": 7,
+      "guard_forced_ends": 0,
+      "guard_limit_per_turn": 36,
+      "action_category_counts": {
+        "choose": 5,
+        "other": 114,
+        "end_turn": 7,
+        "play": 6,
+        "upgrade": 1,
+        "shop_or_sell": 2,
+        "buy": 1
+      },
+      "legal_action_opportunities": {
+        "own_decisions": 136,
+        "legal_end_turn_opportunities": 131,
+        "decisions_with_legal_buy": 69
+      },
+      "choice_when_buy_legal": {
+        "other": 63,
+        "play": 5,
+        "buy": 1
+      },
+      "observation_progress": {
+        "consecutive_observation_pairs": 128
+      },
+      "per_turn_decisions": {
+        "0": 1,
+        "1": 14,
+        "2": 15,
+        "3": 16,
+        "4": 23,
+        "5": 18,
+        "6": 23,
+        "7": 26
+      },
+      "first_actions": [
+        {
+          "turn": 0,
+          "chosen": 30,
+          "raw": 30,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 1,
+          "chosen": 1,
+          "raw": 1,
+          "buy_legal": true,
+          "forced": false
+        },
+        {
+          "turn": 1,
+          "chosen": 1,
+          "raw": 1,
+          "buy_legal": true,
+          "forced": false
+        },
+        {
+          "turn": 1,
+          "chosen": 1,
+          "raw": 1,
+          "buy_legal": true,
+          "forced": false
+        },
+        {
+          "turn": 1,
+          "chosen": 2,
+          "raw": 2,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 1,
+          "chosen": 2,
+          "raw": 2,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 1,
+          "chosen": 2,
+          "raw": 2,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 1,
+          "chosen": 2,
+          "raw": 2,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 1,
+          "chosen": 2,
+          "raw": 2,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 1,
+          "chosen": 2,
+          "raw": 2,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 1,
+          "chosen": 2,
+          "raw": 2,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 1,
+          "chosen": 2,
+          "raw": 2,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 1,
+          "chosen": 2,
+          "raw": 2,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 1,
+          "chosen": 2,
+          "raw": 2,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 1,
+          "chosen": 0,
+          "raw": 0,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 2,
+          "chosen": 1,
+          "raw": 1,
+          "buy_legal": true,
+          "forced": false
+        },
+        {
+          "turn": 2,
+          "chosen": 1,
+          "raw": 1,
+          "buy_legal": true,
+          "forced": false
+        },
+        {
+          "turn": 2,
+          "chosen": 1,
+          "raw": 1,
+          "buy_legal": true,
+          "forced": false
+        },
+        {
+          "turn": 2,
+          "chosen": 1,
+          "raw": 1,
+          "buy_legal": true,
+          "forced": false
+        },
+        {
+          "turn": 2,
+          "chosen": 2,
+          "raw": 2,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 2,
+          "chosen": 2,
+          "raw": 2,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 2,
+          "chosen": 2,
+          "raw": 2,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 2,
+          "chosen": 2,
+          "raw": 2,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 2,
+          "chosen": 2,
+          "raw": 2,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 2,
+          "chosen": 2,
+          "raw": 2,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 2,
+          "chosen": 2,
+          "raw": 2,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 2,
+          "chosen": 2,
+          "raw": 2,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 2,
+          "chosen": 2,
+          "raw": 2,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 2,
+          "chosen": 2,
+          "raw": 2,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 2,
+          "chosen": 0,
+          "raw": 0,
+          "buy_legal": false,
+          "forced": false
+        },
+        {
+          "turn": 3,
+          "chosen": 1,
+          "raw": 1,
+          "buy_legal": true,
+          "forced": false
+        },
+        {
+          "turn": 3,
+          "chosen": 1,
+          "raw": 1,
+          "buy_legal": true,
+          "forced": false
+        }
+      ],
+      "rank": 8
+    }
+  ],
+  "baseline_paired_games": [
+    {
+      "seed": 27100,
+      "rank": 8,
+      "completed": true,
+      "decisions": 42
+    },
+    {
+      "seed": 27101,
+      "rank": 6,
+      "completed": true,
+      "decisions": 41
+    },
+    {
+      "seed": 27102,
+      "rank": 7,
+      "completed": true,
+      "decisions": 54
+    }
+  ],
+  "paired_candidate_minus_baseline_rank_deltas": [
+    0,
+    2,
+    1
+  ],
+  "paired_mean_rank_delta": 1,
+  "all_guarded_games_completed": true,
+  "raw_game_strength_claim": false,
+  "promotion": "none",
+  "warning": "Guarded policy is assisted; do not interpret its rank as raw model strength. Raw probe may be incomplete."
+}

@@ -1,0 +1,106 @@
+name: V5 s-20261102-880b8a71 - verify Release, bounded PPO resume and games
+on:
+  push:
+    branches:
+      - agent/s-20261102-880b8a71/optimization-001
+    paths:
+      - 'scripts/verify_release_resume_v5_880b8a71.py'
+      - 'tests/test_release_resume_v5_880b8a71.py'
+      - 'tavern_ai/behavior_audit_v5_880b8a71.py'
+      - 'tests/test_behavior_audit_v5_880b8a71.py'
+      - '.github/workflows/experiment-s-20261102-880b8a71.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+  actions: read
+concurrency:
+  group: v5-release-resume-s-20261102-880b8a71
+  cancel-in-progress: false
+jobs:
+  verify-and-resume:
+    if: github.repository == 'sstxww/reinforcement-learning' && github.ref == 'refs/heads/agent/s-20261102-880b8a71/optimization-001'
+    runs-on: ubuntu-latest
+    timeout-minutes: 100
+    env:
+      GH_TOKEN: ${{ github.token }}
+      SOURCE_TAG: v2-learning-41413557445
+      SOURCE_SHA: 73bde2666426cecce39f135980a897bb2cd4a7d70783ba04c9c0d29477a6664a
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run all Python tests
+        run: |
+          python -m pip install -e '.[train,test]'
+          python -m pytest
+      - name: Verify TavernGym pinned engine, public observation contract
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Download immutable experimental Release and fail closed on SHA
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p checkpoints/source checkpoints/next reports/s-20261102-880b8a71 experiments/s-20261102-880b8a71
+          gh release download "$SOURCE_TAG" --repo "$GITHUB_REPOSITORY" --pattern model.zip --pattern model.metadata.json --dir checkpoints/source
+          printf '%s  %s\n' "$SOURCE_SHA" checkpoints/source/model.zip | sha256sum --check -
+          python scripts/verify_release_resume_v5_880b8a71.py preflight --source-model checkpoints/source/model.zip --source-metadata checkpoints/source/model.metadata.json
+      - name: Continue 128 genuine PPO steps without overwriting source
+        run: |
+          python -m tavern_ai.train --steps 128 --seed 42 --resume checkpoints/source/model.zip --out checkpoints/next/model.zip
+          python scripts/verify_release_resume_v5_880b8a71.py postflight --source-model checkpoints/source/model.zip --source-metadata checkpoints/source/model.metadata.json --resumed-model checkpoints/next/model.zip --resumed-metadata checkpoints/next/model.metadata.json --report reports/s-20261102-880b8a71/resume-attestation.json
+      - name: Measure raw-model stall and run separately labelled guarded eight-seat matches
+        run: |
+          python -m tavern_ai.behavior_audit_v5_880b8a71 --model checkpoints/next/model.zip --out-dir experiments/s-20261102-880b8a71 --report reports/s-20261102-880b8a71/behavior-001.json
+          for receipt in experiments/s-20261102-880b8a71/*.json; do
+            python -m tavern_ai.validate_receipt "$receipt"
+          done
+      - name: Verify assisted evidence and keep promotion blocked
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          m=json.loads(Path('checkpoints/next/model.metadata.json').read_text())
+          r=json.loads(Path('experiments/s-20261102-880b8a71/001-23051.json').read_text())
+          report=json.loads(Path('reports/s-20261102-880b8a71/behavior-001.json').read_text())
+          assert r['policy']=='guarded_model' and r['completed'] and r['agent_id']=='s-20261102-880b8a71'
+          assert r['raw_model_only'] is False and r['model_sha256']==m['checkpoint_sha256']
+          assert sorted(r['placements'])==list(range(1,9)) and not r['truncated_combats'] and not r['turn_limit_end']
+          assert m['total_timesteps']==1408 and m['role']=='challenger_unpromoted'
+          assert report['all_guarded_games_completed'] and report['promotion']=='none'
+          assert len(report['baseline_paired_games'])==3
+          assert all(p['completed'] for p in report['baseline_paired_games'])
+          print('Guarded games and paired seeds verified. Raw policy is NOT validated for Champion.')
+          PY
+      - name: Commit only genuine separate guarded-game evidence on own branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = 'agent/s-20261102-880b8a71/optimization-001'
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add experiments/s-20261102-880b8a71/*.json reports/s-20261102-880b8a71/*.json
+          git diff --cached --quiet && exit 0
+          git commit -m 'evidence(v5): actual guarded games, legal buy opportunities and raw PPO stall'
+          git pull --rebase origin "$GITHUB_REF_NAME"
+          git push origin "HEAD:$GITHUB_REF_NAME"
+      - name: Deliberately avoid new Release for failed raw-model full-game gate
+        run: |
+          echo 'No Release, no Champion: raw model failed real game in run 41427593167.'
+          echo 'Resumed weight remains in temporary Artifact for diagnosis only.'
+      - name: Retain model and failure diagnostics even if later gate fails
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v5-resume-evidence-${{ github.run_id }}
+          path: |
+            checkpoints/next/model.zip
+            checkpoints/next/model.metadata.json
+            reports/s-20261102-880b8a71/*.json
+            experiments/s-20261102-880b8a71/*.json
+          if-no-files-found: ignore
+          retention-days: 30
