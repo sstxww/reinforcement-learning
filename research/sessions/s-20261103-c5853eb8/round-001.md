@@ -21,3 +21,8 @@ PPO steps added here = **0**. No candidate weights, optimizer SHA or durable mod
 
 ## Next
 Inspect workflow job and Artifact. If successful commit validated original JSON; run PR CI on latest head and current main, obtain independent review before enabling merged workflow on main. Then future integrator can use workflow_dispatch with expected PR head, main head and CI run ID. If any gate fails, classify and record the exact error instead of force merging.
+
+## Later authenticated result
+- Own run [41512112571](https://github.com/sstxww/reinforcement-learning/actions/runs/41512112571) completed SUCCESS: pinned actual eight-seat TavernGym 1.1.0 baseline seat 0, seed 93493, rank 5, turns 13, decisions 50, placements [5,1,8,3,4,7,6,2], no truncation. Raw original receipt committed at `experiments/s-20261103-c5853eb8/001-93493.json`; SHA256 `1edd45bf6270122e08c14d169f05cde693614a6ea2ec07d91a2526b2c50f0e10`.
+- Examining actual run metadata revealed a dangerous stale-head false positive: run `head_sha` can be older than PR association's head. Commits `ffca08d5` and `fe58b07e` require the run's own executed SHA and recorded main base. 17 local synthetic pytest regressions PASS.
+- Non-Draft PR https://github.com/sstxww/reinforcement-learning/pull/190 opened; latest-head PR CI / independent security review / exclusive integrator still required. No PPO steps or new Release; only baseline proof.
