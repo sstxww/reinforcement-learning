@@ -1,0 +1,64 @@
+name: Session s-20261102-c6c2196f - real-engine receipt integrity
+on:
+  push:
+    branches:
+      - agent/s-20261102-c6c2196f/optimization-001
+    paths:
+      - 'tavern_ai/receipt_integrity.py'
+      - 'tavern_ai/receipt_audit_experiment.py'
+      - 'tests/test_receipt_integrity.py'
+      - '.github/workflows/experiment-s-20261102-c6c2196f.yml'
+permissions:
+  contents: write
+concurrency:
+  group: receipt-integrity-s-20261102-c6c2196f
+  cancel-in-progress: false
+jobs:
+  audit-real-engine:
+    runs-on: ubuntu-latest
+    timeout-minutes: 65
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install unit test dependencies
+        run: |
+          python -m pip install -e '.[test]'
+          python -m pytest tests/test_receipt_integrity.py
+      - name: Bootstrap verified TavernGym 1.1.0
+        run: bash scripts/bootstrap_engine.sh
+      - name: Complete three independent eight-seat real-engine games
+        run: |
+          python -m tavern_ai.receipt_audit_experiment \
+            --agent-id s-20261102-c6c2196f --seed-start 36001 --games 3 \
+            --out-dir experiments/s-20261102-c6c2196f \
+            --report reports/s-20261102-c6c2196f/receipt-integrity.json
+          for receipt in experiments/s-20261102-c6c2196f/*.json; do
+            python -m tavern_ai.validate_receipt "$receipt"
+          done
+      - name: Commit only session owned real evidence (no training loop)
+        if: success()
+        shell: bash
+        run: |
+          test "$GITHUB_REF_NAME" = "agent/s-20261102-c6c2196f/optimization-001"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add experiments/s-20261102-c6c2196f/*.json reports/s-20261102-c6c2196f/*.json
+          git diff --cached --quiet && exit 0
+          git commit -m "results(s-20261102-c6c2196f): real-engine receipt audit evidence"
+          git pull --rebase origin "$GITHUB_REF_NAME"
+          git push origin "HEAD:$GITHUB_REF_NAME"
+      - name: Preserve receipts and metrics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: receipt-audit-s-20261102-c6c2196f-${{ github.run_id }}
+          path: |
+            experiments/s-20261102-c6c2196f/*.json
+            reports/s-20261102-c6c2196f/*.json
+          if-no-files-found: ignore
+          retention-days: 30
