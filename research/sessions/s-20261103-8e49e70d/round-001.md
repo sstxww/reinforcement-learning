@@ -23,4 +23,4 @@ The one-shot runner was removed from eventual PR code in commit `4e1007a34b55fbd
 
 ## Next
 
-Original evidence now committed. Submit **non-Draft PR**, verify latest-head PR CI's own true eight-seat job, then independent review/merge-compatibility checks. No main merge without globally exclusive integration entry; exact-head green is required but insufficient for main merge.
+Original evidence now committed. Submitted **non-Draft PR [#230](https://github.com/sstxww/reinforcement-learning/pull/230)**; verify latest-head PR CI's own true eight-seat job, then independent review/merge-compatibility checks. No main merge without globally exclusive integration entry; exact-head green is required but insufficient for main merge.
