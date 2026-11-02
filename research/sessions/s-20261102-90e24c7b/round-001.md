@@ -49,3 +49,14 @@ Do not claim those six games or V2 recovery happened until the workflow succeeds
 - Safety guard is always disclosed; guarded model results are not the pure raw model result.
 - This is diagnostic, not a power claim. Never enter ranked TavernArena without separate permission.
 - Branch-only workflow commits only own experiments and reports. No modification of other sessions, main, upstream or shared training jobs.
+
+
+## Actual final CI and game results (verified)
+
+GitHub Actions #41428407299: SUCCESS, engine bootstrap+hash, unit tests, release download SHA256, all six actual games and strict full receipts passed. Branch evidence commit 84867fb92e3eacc6ca90d45ebcae9111263b203c. The actual game control seed and receipt JSON are recorded under experiments/s-20261102-90e24c7b/.
+- **Baseline (seat 0, seeds 89101–89103):** placements [6,8,8], mean 7.3333, 147 decisions, 41 chosen buys across 73 legal-buy decisions, no forced end.
+- **Saved V2 1,280 PPO-step model, legal-end safety guard:** placements [8,8,8], mean 8.0, 1,087 decisions, 521 legal-buy decisions and **zero** chosen Buy actions, 12 safety-forced EndTurn events. Each match Game.is_over(), no engine combat truncation or turn-limit. 0% top-four both. Model ranks include explicitly recorded intervention and are not a raw policy success claim.
+- Per-game action family evidence: 89101: cancel 110, play 114, freeze 50, refresh 25, Buy 0; 89102: cancel 257, play 257, Buy 0; 89103: cancel 74, play 77, freeze 50, Buy 0. Model tavern tier stayed 1 in observed early turns; board often empty. These are directly observed logs, not causal attribution.
+- **Confirmed for these 3 seeds:** zero purchases cannot be attributed to Buy being illegal; action selection itself ignores masked-legal purchases, and optional-action loops consume many steps. **Unknown:** relative roles of reward, training distribution, action logits, card encoder and initial conditions. Three trials do not imply every seed or every trained model is alike.
+- **Next falsifiable experiment:** limit to one explicit buy-priority intervention in a model-guarded comparison; measure actual buy occurrence and board growth on new seeds, with original guard and paired baseline unchanged. Rule overrides are labeled and cannot be called new model learning.
+- Training steps performed by this session: 0. Checkpoint saved by this session: none. Existing Release was verified and loaded, not modified.
