@@ -1,0 +1,59 @@
+{
+  "algorithm": "real-game purchase-slot rule calibration (NOT PPO)",
+  "calibration_metrics": {
+    "baseline": {
+      "buy_choice_opportunities": 0,
+      "first_place_rate": 0.0,
+      "games": 2,
+      "mean_placement": 7,
+      "seat_zero_placements": [
+        8,
+        6
+      ],
+      "top4_rate": 0.0,
+      "total_decisions": 100
+    },
+    "rightmost": {
+      "buy_choice_opportunities": 37,
+      "first_place_rate": 0.0,
+      "games": 2,
+      "mean_placement": 6.5,
+      "seat_zero_placements": [
+        8,
+        5
+      ],
+      "top4_rate": 0.0,
+      "total_decisions": 131
+    },
+    "uniform": {
+      "buy_choice_opportunities": 26,
+      "first_place_rate": 0.0,
+      "games": 2,
+      "mean_placement": 7,
+      "seat_zero_placements": [
+        7,
+        7
+      ],
+      "top4_rate": 0.0,
+      "total_decisions": 124
+    }
+  },
+  "engine_source_hash": "6d8712c93022ba11",
+  "engine_version": "1.1.0",
+  "holdout_seeds": [
+    38200,
+    38201,
+    38202
+  ],
+  "schema": 1,
+  "selected_mode": "rightmost",
+  "session_id": "s-20261102-1d9e7456",
+  "source_commit": "1fdaf8ef998626517256be26172dda7cd3901b21",
+  "train_seeds": [
+    38100,
+    38101
+  ],
+  "training_agent_decisions": 355,
+  "training_games": 6,
+  "training_ppo_steps": 0
+}

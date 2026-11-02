@@ -1,0 +1,490 @@
+{
+  "schema": 1,
+  "session_id": "s-20261102-1d9e7456",
+  "hypothesis": "Seeded uniform purchase slot breaks first-slot bias",
+  "base_sha": "6ac59235b8238196a0e6462de77b72413c829372",
+  "engine": {
+    "version": "1.1.0",
+    "source_hash": "6d8712c93022ba11",
+    "features": 4017,
+    "cards": 447,
+    "actions": 245,
+    "n_cards": 3984
+  },
+  "selection_sha256": "22c6e04d3c389d23063066a4d5d97d13d9550d8c49b7a99fd2547a689503ee3f",
+  "selection": {
+    "schema": 1,
+    "session_id": "s-20261102-1d9e7456",
+    "algorithm": "real-game purchase-slot rule calibration (NOT PPO)",
+    "selected_mode": "rightmost",
+    "train_seeds": [
+      38100,
+      38101
+    ],
+    "holdout_seeds": [
+      38200,
+      38201,
+      38202
+    ],
+    "calibration_metrics": {
+      "baseline": {
+        "games": 2,
+        "mean_placement": 7,
+        "top4_rate": 0.0,
+        "first_place_rate": 0.0,
+        "seat_zero_placements": [
+          8,
+          6
+        ],
+        "total_decisions": 100,
+        "buy_choice_opportunities": 0
+      },
+      "uniform": {
+        "games": 2,
+        "mean_placement": 7,
+        "top4_rate": 0.0,
+        "first_place_rate": 0.0,
+        "seat_zero_placements": [
+          7,
+          7
+        ],
+        "total_decisions": 124,
+        "buy_choice_opportunities": 26
+      },
+      "rightmost": {
+        "games": 2,
+        "mean_placement": 6.5,
+        "top4_rate": 0.0,
+        "first_place_rate": 0.0,
+        "seat_zero_placements": [
+          8,
+          5
+        ],
+        "total_decisions": 131,
+        "buy_choice_opportunities": 37
+      }
+    },
+    "training_games": 6,
+    "training_agent_decisions": 355,
+    "training_ppo_steps": 0,
+    "engine_version": "1.1.0",
+    "engine_source_hash": "6d8712c93022ba11",
+    "source_commit": "1fdaf8ef998626517256be26172dda7cd3901b21"
+  },
+  "heldout_metrics": {
+    "baseline": {
+      "games": 3,
+      "mean_placement": 8,
+      "top4_rate": 0.0,
+      "first_place_rate": 0.0,
+      "seat_zero_placements": [
+        8,
+        8,
+        8
+      ],
+      "total_decisions": 119,
+      "buy_choice_opportunities": 0
+    },
+    "rightmost": {
+      "games": 3,
+      "mean_placement": 5.666666666666667,
+      "top4_rate": 0.0,
+      "first_place_rate": 0.0,
+      "seat_zero_placements": [
+        5,
+        7,
+        5
+      ],
+      "total_decisions": 157,
+      "buy_choice_opportunities": 45
+    }
+  },
+  "all_training_receipts": {
+    "baseline": [
+      {
+        "schema": 1,
+        "timestamp": "2026-11-02T08:38:40.652030+00:00",
+        "environment": "TavernGym",
+        "engine_source_hash": "6d8712c93022ba11",
+        "engine_version": "1.1.0",
+        "agent_id": "s-20261102-1d9e7456",
+        "policy": "purchase-slot-baseline",
+        "seed": 38100,
+        "completed": true,
+        "turns": 14,
+        "decisions": 35,
+        "placements": [
+          8,
+          2,
+          3,
+          4,
+          5,
+          1,
+          7,
+          6
+        ],
+        "truncated_combats": 0,
+        "turn_limit_end": false,
+        "git_sha": "1fdaf8ef998626517256be26172dda7cd3901b21",
+        "model_sha256": null,
+        "buy_choice_opportunities": 0,
+        "buy_choices_changed": 0,
+        "illegal_actions": 0,
+        "runtime_seconds": 0.009
+      },
+      {
+        "schema": 1,
+        "timestamp": "2026-11-02T08:38:40.661888+00:00",
+        "environment": "TavernGym",
+        "engine_source_hash": "6d8712c93022ba11",
+        "engine_version": "1.1.0",
+        "agent_id": "s-20261102-1d9e7456",
+        "policy": "purchase-slot-baseline",
+        "seed": 38101,
+        "completed": true,
+        "turns": 16,
+        "decisions": 65,
+        "placements": [
+          6,
+          2,
+          1,
+          4,
+          7,
+          5,
+          3,
+          8
+        ],
+        "truncated_combats": 0,
+        "turn_limit_end": false,
+        "git_sha": "1fdaf8ef998626517256be26172dda7cd3901b21",
+        "model_sha256": null,
+        "buy_choice_opportunities": 0,
+        "buy_choices_changed": 0,
+        "illegal_actions": 0,
+        "runtime_seconds": 0.01
+      }
+    ],
+    "uniform": [
+      {
+        "schema": 1,
+        "timestamp": "2026-11-02T08:38:40.667640+00:00",
+        "environment": "TavernGym",
+        "engine_source_hash": "6d8712c93022ba11",
+        "engine_version": "1.1.0",
+        "agent_id": "s-20261102-1d9e7456",
+        "policy": "purchase-slot-uniform",
+        "seed": 38100,
+        "completed": true,
+        "turns": 12,
+        "decisions": 52,
+        "placements": [
+          7,
+          8,
+          2,
+          5,
+          4,
+          1,
+          3,
+          6
+        ],
+        "truncated_combats": 0,
+        "turn_limit_end": false,
+        "git_sha": "1fdaf8ef998626517256be26172dda7cd3901b21",
+        "model_sha256": null,
+        "buy_choice_opportunities": 12,
+        "buy_choices_changed": 9,
+        "illegal_actions": 0,
+        "runtime_seconds": 0.006
+      },
+      {
+        "schema": 1,
+        "timestamp": "2026-11-02T08:38:40.675435+00:00",
+        "environment": "TavernGym",
+        "engine_source_hash": "6d8712c93022ba11",
+        "engine_version": "1.1.0",
+        "agent_id": "s-20261102-1d9e7456",
+        "policy": "purchase-slot-uniform",
+        "seed": 38101,
+        "completed": true,
+        "turns": 13,
+        "decisions": 72,
+        "placements": [
+          7,
+          3,
+          1,
+          5,
+          6,
+          2,
+          4,
+          8
+        ],
+        "truncated_combats": 0,
+        "turn_limit_end": false,
+        "git_sha": "1fdaf8ef998626517256be26172dda7cd3901b21",
+        "model_sha256": null,
+        "buy_choice_opportunities": 14,
+        "buy_choices_changed": 10,
+        "illegal_actions": 0,
+        "runtime_seconds": 0.008
+      }
+    ],
+    "rightmost": [
+      {
+        "schema": 1,
+        "timestamp": "2026-11-02T08:38:40.681970+00:00",
+        "environment": "TavernGym",
+        "engine_source_hash": "6d8712c93022ba11",
+        "engine_version": "1.1.0",
+        "agent_id": "s-20261102-1d9e7456",
+        "policy": "purchase-slot-rightmost",
+        "seed": 38100,
+        "completed": true,
+        "turns": 14,
+        "decisions": 48,
+        "placements": [
+          8,
+          4,
+          2,
+          1,
+          3,
+          5,
+          6,
+          7
+        ],
+        "truncated_combats": 0,
+        "turn_limit_end": false,
+        "git_sha": "1fdaf8ef998626517256be26172dda7cd3901b21",
+        "model_sha256": null,
+        "buy_choice_opportunities": 13,
+        "buy_choices_changed": 13,
+        "illegal_actions": 0,
+        "runtime_seconds": 0.006
+      },
+      {
+        "schema": 1,
+        "timestamp": "2026-11-02T08:38:40.690758+00:00",
+        "environment": "TavernGym",
+        "engine_source_hash": "6d8712c93022ba11",
+        "engine_version": "1.1.0",
+        "agent_id": "s-20261102-1d9e7456",
+        "policy": "purchase-slot-rightmost",
+        "seed": 38101,
+        "completed": true,
+        "turns": 16,
+        "decisions": 83,
+        "placements": [
+          5,
+          4,
+          1,
+          3,
+          8,
+          6,
+          7,
+          2
+        ],
+        "truncated_combats": 0,
+        "turn_limit_end": false,
+        "git_sha": "1fdaf8ef998626517256be26172dda7cd3901b21",
+        "model_sha256": null,
+        "buy_choice_opportunities": 24,
+        "buy_choices_changed": 24,
+        "illegal_actions": 0,
+        "runtime_seconds": 0.009
+      }
+    ]
+  },
+  "all_holdout_receipts": {
+    "baseline": [
+      {
+        "schema": 1,
+        "timestamp": "2026-11-02T08:38:40.698193+00:00",
+        "environment": "TavernGym",
+        "engine_source_hash": "6d8712c93022ba11",
+        "engine_version": "1.1.0",
+        "agent_id": "s-20261102-1d9e7456",
+        "policy": "purchase-slot-baseline",
+        "seed": 38200,
+        "completed": true,
+        "turns": 15,
+        "decisions": 41,
+        "placements": [
+          8,
+          6,
+          3,
+          1,
+          4,
+          2,
+          7,
+          5
+        ],
+        "truncated_combats": 0,
+        "turn_limit_end": false,
+        "git_sha": "1fdaf8ef998626517256be26172dda7cd3901b21",
+        "model_sha256": null,
+        "buy_choice_opportunities": 0,
+        "buy_choices_changed": 0,
+        "illegal_actions": 0,
+        "runtime_seconds": 0.007
+      },
+      {
+        "schema": 1,
+        "timestamp": "2026-11-02T08:38:40.704065+00:00",
+        "environment": "TavernGym",
+        "engine_source_hash": "6d8712c93022ba11",
+        "engine_version": "1.1.0",
+        "agent_id": "s-20261102-1d9e7456",
+        "policy": "purchase-slot-baseline",
+        "seed": 38201,
+        "completed": true,
+        "turns": 14,
+        "decisions": 39,
+        "placements": [
+          8,
+          6,
+          1,
+          3,
+          2,
+          4,
+          7,
+          5
+        ],
+        "truncated_combats": 0,
+        "turn_limit_end": false,
+        "git_sha": "1fdaf8ef998626517256be26172dda7cd3901b21",
+        "model_sha256": null,
+        "buy_choice_opportunities": 0,
+        "buy_choices_changed": 0,
+        "illegal_actions": 0,
+        "runtime_seconds": 0.006
+      },
+      {
+        "schema": 1,
+        "timestamp": "2026-11-02T08:38:40.710290+00:00",
+        "environment": "TavernGym",
+        "engine_source_hash": "6d8712c93022ba11",
+        "engine_version": "1.1.0",
+        "agent_id": "s-20261102-1d9e7456",
+        "policy": "purchase-slot-baseline",
+        "seed": 38202,
+        "completed": true,
+        "turns": 15,
+        "decisions": 39,
+        "placements": [
+          8,
+          2,
+          5,
+          3,
+          6,
+          4,
+          1,
+          7
+        ],
+        "truncated_combats": 0,
+        "turn_limit_end": false,
+        "git_sha": "1fdaf8ef998626517256be26172dda7cd3901b21",
+        "model_sha256": null,
+        "buy_choice_opportunities": 0,
+        "buy_choices_changed": 0,
+        "illegal_actions": 0,
+        "runtime_seconds": 0.006
+      }
+    ],
+    "rightmost": [
+      {
+        "schema": 1,
+        "timestamp": "2026-11-02T08:38:40.718015+00:00",
+        "environment": "TavernGym",
+        "engine_source_hash": "6d8712c93022ba11",
+        "engine_version": "1.1.0",
+        "agent_id": "s-20261102-1d9e7456",
+        "policy": "purchase-slot-rightmost",
+        "seed": 38200,
+        "completed": true,
+        "turns": 17,
+        "decisions": 54,
+        "placements": [
+          5,
+          3,
+          8,
+          1,
+          6,
+          7,
+          4,
+          2
+        ],
+        "truncated_combats": 0,
+        "turn_limit_end": false,
+        "git_sha": "1fdaf8ef998626517256be26172dda7cd3901b21",
+        "model_sha256": null,
+        "buy_choice_opportunities": 18,
+        "buy_choices_changed": 18,
+        "illegal_actions": 0,
+        "runtime_seconds": 0.008
+      },
+      {
+        "schema": 1,
+        "timestamp": "2026-11-02T08:38:40.725606+00:00",
+        "environment": "TavernGym",
+        "engine_source_hash": "6d8712c93022ba11",
+        "engine_version": "1.1.0",
+        "agent_id": "s-20261102-1d9e7456",
+        "policy": "purchase-slot-rightmost",
+        "seed": 38201,
+        "completed": true,
+        "turns": 20,
+        "decisions": 40,
+        "placements": [
+          7,
+          4,
+          2,
+          5,
+          1,
+          6,
+          8,
+          3
+        ],
+        "truncated_combats": 0,
+        "turn_limit_end": false,
+        "git_sha": "1fdaf8ef998626517256be26172dda7cd3901b21",
+        "model_sha256": null,
+        "buy_choice_opportunities": 9,
+        "buy_choices_changed": 9,
+        "illegal_actions": 0,
+        "runtime_seconds": 0.007
+      },
+      {
+        "schema": 1,
+        "timestamp": "2026-11-02T08:38:40.733584+00:00",
+        "environment": "TavernGym",
+        "engine_source_hash": "6d8712c93022ba11",
+        "engine_version": "1.1.0",
+        "agent_id": "s-20261102-1d9e7456",
+        "policy": "purchase-slot-rightmost",
+        "seed": 38202,
+        "completed": true,
+        "turns": 15,
+        "decisions": 63,
+        "placements": [
+          5,
+          7,
+          4,
+          8,
+          3,
+          6,
+          1,
+          2
+        ],
+        "truncated_combats": 0,
+        "turn_limit_end": false,
+        "git_sha": "1fdaf8ef998626517256be26172dda7cd3901b21",
+        "model_sha256": null,
+        "buy_choice_opportunities": 18,
+        "buy_choices_changed": 18,
+        "illegal_actions": 0,
+        "runtime_seconds": 0.008
+      }
+    ]
+  },
+  "delta_mean_placement_vs_baseline": -2.333333333333333,
+  "evidence_limits": "2 calibration seeds/mode, 3 heldout seeds; cannot establish improvement."
+}
