@@ -1,0 +1,85 @@
+name: V5 isolated paired evidence and real baseline canaries s-20261102-5ce8a1d4
+
+on:
+  push:
+    branches:
+      - 'agent/s-20261102-5ce8a1d4/optimization-001'
+    paths:
+      - '.github/workflows/paired-evidence-s-20261102-5ce8a1d4.yml'
+      - 'tavern_ai/paired_evidence_s_5ce8a1d4.py'
+      - 'tests/test_paired_evidence_s_5ce8a1d4.py'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: paired-evidence-s-20261102-5ce8a1d4
+  cancel-in-progress: false
+
+jobs:
+  real-paired-negative-control:
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install and regression-test repository
+        run: |
+          python -m pip install -e '.[test]'
+          python -m pytest
+      - name: Bootstrap exact pinned TavernGym
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Play two authentic same-seed eight-seat negative-control games
+        run: |
+          set -eu
+          python -m tavern_ai.canary --agent-id s-20261102-5ce8a1d4 \
+            --policy baseline --seed 90131 \
+            --receipt experiments/s-20261102-5ce8a1d4/001-baseline-90131.json
+          python -m tavern_ai.validate_receipt experiments/s-20261102-5ce8a1d4/001-baseline-90131.json
+          python -m tavern_ai.canary --agent-id s-20261102-5ce8a1d4 \
+            --policy baseline --seed 90131 \
+            --receipt experiments/s-20261102-5ce8a1d4/001-repeat-90131.json
+          python -m tavern_ai.validate_receipt experiments/s-20261102-5ce8a1d4/001-repeat-90131.json
+          python -m tavern_ai.paired_evidence_s_5ce8a1d4 \
+            --baseline experiments/s-20261102-5ce8a1d4/001-baseline-90131.json \
+            --candidate experiments/s-20261102-5ce8a1d4/001-repeat-90131.json \
+            --seats 0 --baseline-mode raw --candidate-mode raw \
+            --out reports/s-20261102-5ce8a1d4/001-paired-negative-control.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path("reports/s-20261102-5ce8a1d4/001-paired-negative-control.json").read_text())
+          assert r["games_per_policy"] == 1 and r["mean_delta_candidate_minus_baseline"] == 0
+          assert r["baseline_mode"] == r["candidate_mode"] == "raw"
+          assert r["champion_promoted"] is False
+          print("PASS: real baseline-vs-baseline paired negative control; NOT PPO improvement")
+          PY
+      - name: Commit only own permanent full-game evidence, no feedback loop
+        if: success()
+        run: |
+          set -eu
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add experiments/s-20261102-5ce8a1d4/001-baseline-90131.json \
+                  experiments/s-20261102-5ce8a1d4/001-repeat-90131.json \
+                  reports/s-20261102-5ce8a1d4/001-paired-negative-control.json
+          if ! git diff --cached --quiet; then
+            git commit -m "test(s-20261102-5ce8a1d4): commit authentic negative-control receipts"
+            git push origin "HEAD:refs/heads/agent/s-20261102-5ce8a1d4/optimization-001"
+          fi
+      - name: Retain original evidence independent of branch push
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: paired-evidence-s-20261102-5ce8a1d4
+          path: |
+            experiments/s-20261102-5ce8a1d4/*.json
+            reports/s-20261102-5ce8a1d4/*.json
+          if-no-files-found: warn
+          retention-days: 30
