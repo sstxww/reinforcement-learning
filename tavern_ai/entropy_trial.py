@@ -13,7 +13,7 @@ from pathlib import Path
 
 import numpy as np
 
-from .canary import run as play
+from .guarded_match import run as play
 from .contract import ACTIONS, CARDS, FEATURES, verify_engine
 
 
