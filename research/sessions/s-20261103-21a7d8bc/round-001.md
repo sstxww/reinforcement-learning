@@ -13,7 +13,7 @@
   - Audit command `python scripts/v7_buy_pair_s_20261103_21a7d8bc.py --baseline experiments/s-20261103-21a7d8bc/001-baseline-97421.json --raw-model experiments/s-20261103-21a7d8bc/002-raw-1408-97421.json --agent-id s-20261103-21a7d8bc --expected-sha256 a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632 --out reports/s-20261103-21a7d8bc/001-matched-buy-97421.json` passed.
 - Actual continuation command `python -m tavern_ai.train --steps 128 --seed 97421 --resume checkpoints/model.zip --out checkpoints/candidate.zip`: parent 1408→new 1536; metadata parent SHA binds input and candidate SHA256 = `cf34d9728dc50d97707c2c65c6095f330c84c07d0763963db675484f2d797d7c`.
 - Candidate itself, **not baseline rescue**, `python -m tavern_ai.canary --agent-id s-20261103-21a7d8bc --seed 97422 --policy model --model checkpoints/candidate.zip --receipt experiments/s-20261103-21a7d8bc/003-candidate-97422.json` — 13 turns, 124 decisions, completed rank **8**, 0 combat truncations; strict receipt validation success. This is a smoke test on a different seed, not a candidate-vs-source paired performance estimate.
-- Original artifact https://github.com/sstxww/reinforcement-learning/actions/runs/41512015082/artifacts/13174595714 (ID 13174595714, digest `sha256:5bbe0d3e6e5bab2e44e4816a9cb67e290dbb6bda5bc8c04338c7477f2d973080`, expires 2026-11-16T19:46:23Z). The candidate ZIP is **NOT in a durable Release**. Model registry status records `durable=false`, `model_promoted=false`.
+- Original artifact https://github.com/sstxww/reinforcement-learning/actions/runs/41512015082/artifacts/13174595714 (ID 13174595714, digest `sha256:5bbe0d3e6e5bab2e44e4816a9cb67e290dbb6bda5bc8c04338c7477f2d973080`, expires 2026-11-16T19:46:23Z). At original training completion the candidate ZIP was only transient; after the separate R002 archival publisher it is **durably saved as a rejected, unpromoted GitHub prerelease**. The session candidate-status manifest is updated to `durable=true` and still `model_promoted=false`.
 - Authenticated archiver https://github.com/sstxww/reinforcement-learning/actions/runs/41513677139 verified exact source head and every receipt digest, full candidate ZIP digest, then committed all three **original, unmodified** match receipts, one paired report and metadata at `8af5721734c765778916fdd8b63021c7a7d00374`. Only safe plain-text files added, not raw weights.
 
 ## Hypothesis verdict and uncertainty
@@ -27,3 +27,10 @@
 
 ## Handoff
 Read `research/sessions/s-20261103-21a7d8bc/STATUS.md`, the three original JSON receipts, `reports/s-20261103-21a7d8bc/001-matched-buy-97421.json`, and candidate metadata index. PR link to be added after PR creation, else locate by exact branch. Do not retrain from this expiring candidate after 2026-11-16 without a separately verified weight backup.
+
+## Postscript — R002 durable Release + PR gate
+
+- Release https://github.com/sstxww/reinforcement-learning/releases/tag/v7-s-20261103-21a7d8bc-1536-41512015082 is a real GitHub **prerelease** with the identical SHA-verified 1536-step `model.zip`, metadata, all three full-game receipts, paired report and sha256sums. Release publishing and independent download/sha check: https://github.com/sstxww/reinforcement-learning/actions/runs/41515765298 **SUCCESS**.
+- Repo official Best/Champion untouched, model remains **rejected_for_promotion_rank8**. Original transient Artifact is still available until expiration, but no longer the sole weight storage.
+- R001 PR: https://github.com/sstxww/reinforcement-learning/pull/232 (non-Draft); prior exact-head CI https://github.com/sstxww/reinforcement-learning/actions/runs/41515008682 **SUCCESS**. This postscript/manifest update changes PR head; inspect the newest HEAD and CI before any integration.
+- Coordination ref `coord/autotavern-main-integrate` last showed released lease with explicit note of a concurrent merge during held lease; therefore no main-merge lease is claimed here.

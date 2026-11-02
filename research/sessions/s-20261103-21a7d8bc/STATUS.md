@@ -1,6 +1,6 @@
 # AutoTavern-AI V7 — s-20261103-21a7d8bc handoff (R001)
 
-- STATUS: evidence_archived; ready to open non-Draft PR; latest PR-head CI and integration ownership are NOT yet verified.
+- STATUS: ready_for_integration_review; original experiment and Release complete; new PR head requires exact latest-head CI; no exclusive main merge lease.
 - TASK_KEY: eval/v7-raw-buy-replication-97421
 - ROLE: EVALUATOR / REPAIRER, **not** exclusive INTEGRATOR
 - TASK CLAIM: `claims/v7/raw-buy-replication-97421` (created by this session; no main integration lock)
@@ -17,8 +17,16 @@
 - PARENT 1408-step RELEASE: https://github.com/sstxww/reinforcement-learning/releases/tag/v5-s-20261102-68099929-1408-41428692617; SHA256 `a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632`
 - ACTUAL PPO RESUME: 1408→1536 (`+128`), seed 97421; candidate SHA256 `cf34d9728dc50d97707c2c65c6095f330c84c07d0763963db675484f2d797d7c`; explicit CPU load and optimizer state provenance verified
 - CANDIDATE MODEL STATUS: `models/sessions/s-20261103-21a7d8bc/candidate-1536.status.json`; unpromoted/rejected for rank8, Best/Champion unchanged
-- MODEL WEIGHT STORAGE: **temporary Artifact ONLY**, https://github.com/sstxww/reinforcement-learning/actions/runs/41512015082/artifacts/13174595714, expires 2026-11-16T19:46:23Z; SHA checked, no durable candidate Release and no claim of indefinite resumption
+- MODEL WEIGHT STORAGE: **durable experimental unpromoted prerelease** https://github.com/sstxww/reinforcement-learning/releases/tag/v7-s-20261103-21a7d8bc-1536-41512015082; 17,525,202-byte candidate model.zip SHA256 `cf34d9728dc50d97707c2c65c6095f330c84c07d0763963db675484f2d797d7c`, independently re-downloaded and SHA-verified by https://github.com/sstxww/reinforcement-learning/actions/runs/41515765298 **SUCCESS**. Original source Artifact still expires 2026-11-16; Release does not. No Best/Champion, no improvement claim.
 - TEST: 8 synthetic negative/positive proof assertions in `tests/test_v7_buy_pair_s_20261103_21a7d8bc.py`, actual Actions test step passed; synthetic tests are NOT game evidence
 - REUSED MERGED: PR #176 FREEZE taxonomy + real resume; PR #165 least-privilege Release publisher; did not edit shared `train.yml` or main
-- MAIN INTEGRATION: NOT performed; task claim is NOT an exclusive main integration lease. Review PR diff, exact-head CI, main SHA and branch conflicts before any merge
+- PR: https://github.com/sstxww/reinforcement-learning/pull/232, non-Draft, 14 isolated files. Exact previous head `0475af195989a491b9f00ef2bd8404b9fc678088` PR CI https://github.com/sstxww/reinforcement-learning/actions/runs/41515008682 **SUCCESS**, including new complete 8-seat baseline match. **This manifest update changes PR HEAD; reverify latest-head CI after update.**
+- MAIN INTEGRATION: NOT performed; task claim is NOT an exclusive main integration lease. `coord/autotavern-main-integrate:coordination/merge_lease.json` recorded a prior merge during lease ownership; no global-enforcement proof. Release publisher also did NOT write main. Review PR diff, exact-head CI, main SHA and branch conflicts before any merge
 - NEXT ACTION FOR NEXT SESSION: fetch this branch and PR; check exact PR HEAD `CI - full-match gate`, read `experiments/s-20261103-21a7d8bc/002-raw-1408-97421.json` and original Action #41512015082; only then initiate a *new, separately claimed*, fixed-seed Freeze/no-progress/BUY-logit probe. Do NOT simply force BUY or promote 1536 candidate.
+
+## R002 durable model custody (separate owned branch)
+
+- TASK_KEY: `archive/v7-rejected-1536-s-20261103-21a7d8bc`; claim `claims/v7/archive-1536-s-20261103-21a7d8bc`; branch `agent/s-20261103-21a7d8bc/optimization-002`.
+- Source original training run #41512015082 and verified archiver #41513677139.
+- Model Release: https://github.com/sstxww/reinforcement-learning/releases/tag/v7-s-20261103-21a7d8bc-1536-41512015082. Publish + independent re-download SHA run #41515765298 **SUCCESS**; seven assets (model.zip, metadata, three full-game receipts, paired report, sha256sums.txt). This is **not** model promotion and no registry changes.
+- On a subsequent unrelated new model experiment, use fresh task claim and heldout seeds; do not continue training based solely on rank 8 candidate.
