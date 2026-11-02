@@ -1,0 +1,62 @@
+name: V5 R001 raw PPO state transition evidence 71e4c9b2
+
+on:
+  push:
+    branches:
+      - agent/s-20261103-71e4c9b2/optimization-001
+    paths:
+      - .github/workflows/v5-raw-transition-71e4c9b2.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: v5-raw-transition-71e4c9b2
+  cancel-in-progress: false
+
+jobs:
+  real-evidence:
+    runs-on: ubuntu-latest
+    timeout-minutes: 70
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned training dependencies and unit regressions
+        run: |
+          python -m pip install -e '.[train,test]'
+          python -m pytest -q tests/test_transition_probe_s_71e4c9b2.py
+      - name: Install and check actual TavernGym engine
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Independent completed baseline eight-seat game (same seed)
+        run: |
+          mkdir -p outputs
+          timeout 600 python -m tavern_ai.canary --agent-id s-20261103-71e4c9b2 --seed 99232 --policy baseline --receipt outputs/baseline-99232.json
+          python -m tavern_ai.validate_receipt outputs/baseline-99232.json
+      - name: Restore exact published unpromoted V5 model
+        run: |
+          set -euo pipefail
+          mkdir -p inputs
+          gh release download v5-s-20261102-68099929-1408-41428692617 --repo sstxww/reinforcement-learning --pattern model.zip --pattern model.metadata.json --dir inputs
+          echo 'a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632  inputs/model.zip' | sha256sum -c -
+          python -m tavern_ai.checkpoint_preflight --model inputs/model.zip --metadata inputs/model.metadata.json --expected-sha256 a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632 --probe-inference > outputs/release-preflight.json
+      - name: Genuine raw model same-turn public transition probe (bounded)
+        run: |
+          timeout 600 python -m tavern_ai.transition_probe_s_71e4c9b2 --model inputs/model.zip --sha256 a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632 --seed 99232 --max-actions 220 --out outputs/raw-transition-99232.json
+      - name: Genuine raw PPO full eight-seat game on independent seed
+        run: |
+          timeout 600 python -m tavern_ai.canary --agent-id s-20261103-71e4c9b2 --seed 99232 --policy model --model inputs/model.zip --receipt outputs/model-99232.json
+          python -m tavern_ai.validate_receipt outputs/model-99232.json
+      - name: Preserve real evidence even if model game fails
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v5-raw-transition-71e4c9b2-${{ github.run_id }}
+          path: outputs/*.json
+          if-no-files-found: warn
+          retention-days: 30
