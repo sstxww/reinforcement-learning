@@ -45,7 +45,11 @@ def validate(repo: str, pr: dict, main_sha: str, expected_head: str,
 
     matching = [r for r in runs if r.get("head_sha") == expected_head
                 and r.get("event") == "pull_request"
-                and r.get("name") == "CI - full-match gate"]
+                and r.get("name") == "CI - full-match gate"
+                and any(link.get("number") == pr.get("number")
+                        and link.get("head", {}).get("sha") == expected_head
+                        and link.get("base", {}).get("sha") == main_sha
+                        for link in r.get("pull_requests", []))]
     latest = max(matching, key=lambda r: (r.get("created_at") or "", r.get("id") or 0), default=None)
     if latest is None:
         failures.append("No exact-head PR full-match CI workflow found")
