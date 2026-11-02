@@ -1,0 +1,75 @@
+name: V5 integrate verified Release preflight s-20261103-970d9538
+
+on:
+  push:
+    branches:
+      - agent/s-20261103-970d9538/optimization-001
+    paths:
+      - .github/workflows/v5-integrate-s-20261103-970d9538.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: v5-integrate-s-20261103-970d9538
+  cancel-in-progress: false
+
+jobs:
+  test-release-and-original-eight-seat:
+    runs-on: ubuntu-latest
+    timeout-minutes: 65
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install training and testing dependencies
+        run: python -m pip install -e '.[train,test]'
+      - name: Check extracted Release-integrity regressions against live main registry
+        run: |
+          python -m pytest -q tests/test_release_asset_verifier.py tests/test_registry_integrity.py
+          python -m tavern_ai.release_asset_verifier
+      - name: Install pinned TavernGym engine
+        run: bash scripts/bootstrap_engine.sh
+      - name: Re-download immutable V5 source Release and verify actual ZIP load
+        shell: bash
+        run: |
+          mkdir -p checkpoints
+          gh release download v5-s-20261102-68099929-1408-41428692617 \
+            --repo "${GITHUB_REPOSITORY}" \
+            --pattern model.zip --pattern model.metadata.json \
+            --dir checkpoints
+          python -m tavern_ai.release_asset_verifier \
+            --model-id v5-s-20261102-68099929-1408-41428692617 \
+            --weights checkpoints/model.zip \
+            --metadata checkpoints/model.metadata.json --check-load
+      - name: Run one genuine complete eight-seat baseline match
+        shell: bash
+        run: |
+          mkdir -p experiments/s-20261103-970d9538
+          python -m tavern_ai.contract
+          python -m tavern_ai.canary --agent-id s-20261103-970d9538 \
+            --policy baseline --seed 96131 \
+            --receipt experiments/s-20261103-970d9538/001-96131.json
+          python -m tavern_ai.validate_receipt experiments/s-20261103-970d9538/001-96131.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path("experiments/s-20261103-970d9538/001-96131.json")
+          doc=json.loads(p.read_text(encoding="utf-8"))
+          assert doc["completed"] is True
+          assert sorted(doc["placements"]) == list(range(1,9))
+          print("AUTOTAVERN_RECEIPT_BEGIN")
+          print(json.dumps(doc,ensure_ascii=False,sort_keys=True))
+          print("AUTOTAVERN_RECEIPT_END")
+          PY
+      - name: Preserve actual evidence only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v5-integration-s-20261103-970d9538-${{ github.run_id }}
+          path: experiments/s-20261103-970d9538/*.json
+          if-no-files-found: ignore
+          retention-days: 30
