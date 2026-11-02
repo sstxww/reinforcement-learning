@@ -1,9 +1,8 @@
 name: V5 isolated paired gate and 128-step resume s-20261102-71136659
 
 on:
-  push:
-    branches:
-      - agent/s-20261102-71136659/optimization-001
+  # Initial isolated push run 41449601213 was explicitly triggered once.
+  # Repeat only through manual workflow_dispatch to avoid duplicate model releases.
   workflow_dispatch:
 
 permissions:
