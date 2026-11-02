@@ -1,6 +1,6 @@
 import pytest
 
-from tavern_ai.seat_rotation import summarize, validate_grid
+from tavern_ai.seat_rotation import summarize, validate_grid, receipt_filename
 
 
 def test_grid_validates_seats_and_game_budget():
@@ -34,3 +34,9 @@ def test_summarize_indexes_controlled_seat_not_seat_zero():
 def test_zero_records_fail_fast():
     with pytest.raises(ValueError, match="zero"):
         summarize([])
+
+def test_round_scoped_receipt_filenames():
+    assert receipt_filename(2, 41023, 0) == "002-41023.json"
+    assert receipt_filename(2, 41023, 6) == "rotated-002-41023-seat6.json"
+    with pytest.raises(ValueError, match="Round"):
+        receipt_filename(0, 41023, 0)

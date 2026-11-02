@@ -1,18 +1,12 @@
 # Session status — s-20261102-e9dad467
 
-- State: R001 genuine run passed; draft PR under independent CI review. Do not mark merged.
-- Branch: agent/s-20261102-e9dad467/optimization-001
-- Base main: 315b068bac5ab6d8403c3c9b18f8c101c0cded5d
-- Code commit: a29d5ecef78e058334a8ea03adaf7c73fd3966e2
-- Evidence commit: 8f54dcb627be0761b59059abf3d4834623c6b2ac
-- PR: https://github.com/sstxww/reinforcement-learning/pull/43 (draft, not merged)
-- Actual Actions run: https://github.com/sstxww/reinforcement-learning/actions/runs/41416644671 (success, 15 tests passed)
-- Real gameplay: six complete true TavernGym 1.1.0 matches, seeds 41021 and 41022, controlled seats 0/3/6, all guard flags clean. Exact placements/decisions in round-001.md.
-- Evaluation: 6 games; seat 0 ranks [8,8] (mean 8), seat 3 [7,7] (mean 7), seat 6 [8,8] (mean 8); top-four 0/6, first-place 0/6; no demonstrated advantage or game strength improvement.
-- Training steps: 0, no new model; no candidate promotion and no claimed Best.
-- Checkpoint recovery: none; source-hashed rule policy only. No permanent PPO checkpoint in this session.
-- Policy SHA256: e4722a44660f8a880c9eeb949c80e81ebb652926f43d71acd64f958762bd6bac.
-- Receipts: experiments/s-20261102-e9dad467/; report: reports/s-20261102-e9dad467/rotation.json.
-- Artifact: seat-rotation-s-20261102-e9dad467 from run 41416644671, retention until 2026-12-02; Git branch stores JSON separately.
-- Failure count: zero in this round. No Release publication attempted; historical 403 is unrelated.
-- Next: confirm latest PR CI; independent held-out seat rotation on fresh seeds in a separate round if resources permit.
+- Current: R002 held-out seat rotation on separate optimization-002 branch; pending new real workflow.
+- R001 PR: https://github.com/sstxww/reinforcement-learning/pull/43 (draft, independent CI pending at R002 branch creation).
+- R001 run: https://github.com/sstxww/reinforcement-learning/actions/runs/41416644671 success; six complete true TavernGym games, 15 tests pass; no top-four results.
+- R002 parent: baee34ae58555dfe7dc57725e958881abfc98f87.
+- R002 branch: agent/s-20261102-e9dad467/optimization-002.
+- Experiment: 4 new held-out seeds × 3 seats = 12 planned complete matches, isolated R002 workflow and receipt names.
+- Actual PPO training steps: 0. No model, no new Best, no checkpoint for this session; exact baseline source SHA256 in individual R001 receipts.
+- Durable R001 evidence: experiments/s-20261102-e9dad467/ and reports/s-20261102-e9dad467/rotation.json.
+- R002 evidence: not yet verified; check Actions logs and output. R001 Artifact is short-lived; model persistence not claimed.
+- Next: inspect R002 run, validate new receipts, update R002 research proposal and draft PR after real game success.

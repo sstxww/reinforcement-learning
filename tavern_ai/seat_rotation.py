@@ -137,10 +137,17 @@ def summarize(records: list[dict]) -> dict:
         ),
     }
 
+def receipt_filename(round_number: int, seed: int, seat: int) -> str:
+    if type(round_number) is not int or round_number < 1:
+        raise ValueError("Round number must be a positive integer")
+    validate_grid([seed], [seat])
+    return f"{round_number:03d}-{seed}.json" if seat == 0 else f"rotated-{round_number:03d}-{seed}-seat{seat}.json"
+
 
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--agent-id", required=True)
+    parser.add_argument("--round", type=int, default=1)
     parser.add_argument("--seeds", type=int, nargs="+", required=True)
     parser.add_argument("--seats", type=int, nargs="+", required=True)
     parser.add_argument("--receipt-dir", type=Path, required=True)
@@ -152,7 +159,7 @@ def main() -> None:
     for seed in args.seeds:
         for seat in args.seats:
             row = play(seed, args.agent_id, seat)
-            filename = f"001-{seed}.json" if seat == 0 else f"rotated-{seed}-seat{seat}.json"
+            filename = receipt_filename(args.round, seed, seat)
             target = args.receipt_dir / filename
             target.write_text(json.dumps(row, ensure_ascii=False, indent=2), encoding="utf-8")
             print(json.dumps({"receipt": str(target), "seat": seat, "placement": row["agent_placement"], "completed": row["completed"]}), flush=True)
