@@ -1,0 +1,57 @@
+{
+  "schema": 1,
+  "source_action_run": 41430849292,
+  "source": "real TavernGym full-game receipts",
+  "engine_source_hash": "6d8712c93022ba11",
+  "model_release": "v2-learning-41413557445",
+  "model_sha256": "73bde2666426cecce39f135980a897bb2cd4a7d70783ba04c9c0d29477a6664a",
+  "new_ppo_steps": 0,
+  "guarded_model": {
+    "seeds": [
+      87102,
+      87103
+    ],
+    "ranks": [
+      8,
+      8
+    ],
+    "mean_rank": 8,
+    "decisions": [
+      238,
+      105
+    ],
+    "guard_interventions": [
+      4,
+      0
+    ],
+    "buys": [
+      0,
+      0
+    ],
+    "legal_buy_turns": [
+      7,
+      6
+    ],
+    "completed": [
+      true,
+      true
+    ]
+  },
+  "baseline": {
+    "seeds": [
+      87102,
+      87103
+    ],
+    "ranks": [
+      5,
+      7
+    ],
+    "mean_rank": 6
+  },
+  "paired_deltas": [
+    3,
+    1
+  ],
+  "champion_eligible": false,
+  "interpretation": "Engineering anti-oscillation guard restores full game on seed 87102 but both guarded games rank 8. No purchase in either, despite 7/6 turns with legal purchase. No competitive improvement evidence."
+}
