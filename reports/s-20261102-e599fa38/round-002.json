@@ -1,0 +1,90 @@
+{
+  "schema": 1,
+  "experiment": "guard_budget_ablation",
+  "seeds": [
+    33001,
+    33002,
+    33003,
+    33004,
+    33005,
+    33006
+  ],
+  "low_budget": 16,
+  "high_budget": 32,
+  "model_sha256": "5b66d29acccb4ecefb302f28a86d40aaa981e121fb830bfe1e752923fc602fcb",
+  "low": {
+    "games": 6,
+    "placements": [
+      8,
+      8,
+      8,
+      8,
+      8,
+      8
+    ],
+    "mean_placement": 8,
+    "top4_rate": 0,
+    "first_place_rate": 0,
+    "mean_decisions": 105.16666666666667,
+    "mean_interventions": 2.5,
+    "decisions": [
+      104,
+      118,
+      110,
+      99,
+      107,
+      93
+    ],
+    "interventions": [
+      6,
+      4,
+      2,
+      1,
+      2,
+      0
+    ]
+  },
+  "high": {
+    "games": 6,
+    "placements": [
+      8,
+      8,
+      8,
+      8,
+      8,
+      8
+    ],
+    "mean_placement": 8,
+    "top4_rate": 0,
+    "first_place_rate": 0,
+    "mean_decisions": 140,
+    "mean_interventions": 1.8333333333333333,
+    "decisions": [
+      179,
+      147,
+      142,
+      140,
+      139,
+      93
+    ],
+    "interventions": [
+      3,
+      2,
+      2,
+      2,
+      2,
+      0
+    ]
+  },
+  "paired_rank_delta_low_minus_high": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "mean_rank_delta_low_minus_high": 0,
+  "mean_decisions_delta_low_minus_high": -34.83333333333333,
+  "interpretation": "Descriptive; small seed sets cannot prove strength improvement"
+}

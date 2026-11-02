@@ -1,15 +1,14 @@
-# Session s-20261102-e599fa38 status
+# s-20261102-e599fa38 — STATUS
 
-- Current state: **completed_for_review** for engineering feasibility; **candidate NOT promoted**.
-- Branch: `agent/s-20261102-e599fa38/optimization-001`; initial main SHA `315b068bac5ab6d8403c3c9b18f8c101c0cded5d`.
-- Experiment source SHA: `0e4724e59ff0916f85fdcf2643cfa38dd22328f5`.
-- PR: https://github.com/sstxww/reinforcement-learning/pull/31 (Draft; independent CI verification pending).
-- Workflow succeeded: https://github.com/sstxww/reinforcement-learning/actions/runs/41415158420; **25 tests passed**, **128 PPO steps**.
-- Own model-controlled guarded games: seed 31071 and 31072 both complete, rank 8/8.
-- Comparison: baseline 8/6 on same seeds; n=2, no demonstrated improvement.
-- Best status: **no new Best**. Latest candidate checkpoint SHA256 `5b66d29acccb4ecefb302f28a86d40aaa981e121fb830bfe1e752923fc602fcb`.
-- Restore: download https://github.com/sstxww/reinforcement-learning/actions/runs/41415158420/artifacts/13128035277 before expiry **2026-12-02 UTC**; extract `checkpoints/s-20261102-e599fa38/model.zip` and metadata, verify hash and pinned environment before loading. Short-lived Artifact only; **not permanently recoverable**.
-- Raw-model failure: unguarded seed 31071 hit `Full-game safety limit exceeded`; see `failures/001-raw-ppo-loop.md`.
-- Research: `round-001.md`; `metrics-001.json`; proposal `research/knowledge/proposals/s-20261102-e599fa38-001.md`.
-- Pending integration gates: open PR, verify latest PR-head CI, independent review, no auto merge.
-- Next hypothesis: identify repeated high-frequency PPO non-terminal choices, diagnose mask/turn progress, and compare guard bounds on more independent seeds.
+- Latest round: **002**; current status: **completed_for_review**, no competitive improvement.
+- Branch: `agent/s-20261102-e599fa38/optimization-002`; own R002 source: `1f8d60ff9e764f94374493c1bb86c61229f5ec35`; original main: `315b068bac5ab6d8403c3c9b18f8c101c0cded5d`.
+- Round 001 PR: https://github.com/sstxww/reinforcement-learning/pull/31 (Draft; latest head CI **passed**, commit `9887e95afc579ab47e6ae2b3b5c1d1faf6b3d9f2`).
+- Round 002 PR: pending creation; target main, dependency R001 PR #31.
+- Actual R001 training: **128 MaskablePPO steps**, seed 71879, https://github.com/sstxww/reinforcement-learning/actions/runs/41415158420; 2 guarded complete games, raw unguarded seed31071 safety limit. 25 tests pass.
+- Actual R002: https://github.com/sstxww/reinforcement-learning/actions/runs/41416658875 (**success**); reused exact R001 checkpoint, **0 new PPO steps**; 31 tests, 12 full real eight-seat games across 6 matched seeds, 16 and 32 budgets.
+- R002 metrics: mean rank 8 both, 0 wins/0 top4; mean decisions **105.17 vs 140.00** (cap16 vs cap32).
+- **Best remains null/unpromoted**. Candidate SHA256: `5b66d29acccb4ecefb302f28a86d40aaa981e121fb830bfe1e752923fc602fcb`.
+- Restore R001 checkpoint: https://github.com/sstxww/reinforcement-learning/actions/runs/41415158420/artifacts/13128035277 ; expires **2026-12-02 UTC**; verify exact SHA256 and pinned engine before loading. This is only temporary Artifact, not permanently durable.
+- R002 evidence: `round-002.md`, `reports/s-20261102-e599fa38/round-002.json`, 12 authentic receipts, proposal `research/knowledge/proposals/s-20261102-e599fa38-002.md`; Artifact https://github.com/sstxww/reinforcement-learning/actions/runs/41416658875/artifacts/13127314081 expires **2026-12-02 UTC**.
+- Remaining gates: open PR, verify latest PR CI, integration review. No formal Arena game has been authorized.
+- Next hypothesis: trace high-frequency low-progress masked PPO actions and improve actual game decision quality rather than just terminate faster.
