@@ -2,11 +2,11 @@
   "schema": 1,
   "champion_id": null,
   "latest_resumable_id": null,
-  "notes": "Published release metadata is an inventory, not proof of local download, inference, resume or competitive strength. Never promote Champion without independent evaluation.",
+  "notes": "V2 Challenger has verified Release checksum, pinned-engine CPU load and one masked legal action. Full PPO continuation, independent candidate game and competitive improvement remain unverified; Champion and Latest are null.",
   "entries": [
     {
       "model_id": "v2-learning-41413557445",
-      "role": "unverified",
+      "role": "challenger",
       "release_url": "https://github.com/sstxww/reinforcement-learning/releases/download/v2-learning-41413557445/model.zip",
       "metadata_url": "https://github.com/sstxww/reinforcement-learning/releases/download/v2-learning-41413557445/model.metadata.json",
       "model_sha256": "73bde2666426cecce39f135980a897bb2cd4a7d70783ba04c9c0d29477a6664a",
@@ -14,7 +14,7 @@
       "engine_version": "1.1.0",
       "algorithm": "MaskablePPO",
       "training_steps": 1280,
-      "source": "PR #15 and GitHub Release API inventory; not independently recovered in this session yet",
+      "source": "PR #15 / Release API; V2 bytes independently downloaded and verified in Actions #41427457452",
       "provenance": "https://github.com/sstxww/reinforcement-learning/pull/15",
       "known_evaluation": {
         "games": 4,
@@ -35,13 +35,14 @@
         "conclusion": "no verified gain"
       },
       "verification": {
-        "hash": false,
-        "load": false,
-        "inference": false,
+        "hash": true,
+        "load": true,
+        "inference": true,
         "resume": false,
         "full_game": false,
         "independent_evaluation": false
-      }
+      },
+      "verification_run_url": "https://github.com/sstxww/reinforcement-learning/actions/runs/41427457452"
     }
   ]
 }
