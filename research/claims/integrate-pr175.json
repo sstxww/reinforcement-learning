@@ -3,7 +3,7 @@
   "task_key": "integrate/pr-175",
   "session_id": "s-20261103-80bb83fb",
   "role": "REVIEWER",
-  "status": "claimed",
+  "status": "blocked_with_evidence",
   "claim_ref": "refs/heads/claims/integrate-pr175",
   "base_main_sha": "3a745c6f6a48c65528bcbeb81b8627b8db93f046",
   "issued_at": "2026-11-02T19:38:11.515Z",
@@ -13,5 +13,7 @@
     "research/sessions/s-20261103-80bb83fb/",
     "research/knowledge/proposals/s-20261103-80bb83fb-001.md"
   ],
-  "merge_right_granted": false
+  "merge_right_granted": false,
+  "disposition": "Do not merge PR175 while rollback samefile()->unlink() TOCTOU may remove a concurrent writer's checkpoint. Independent reviews already filed on PR175; exact-head CI 41511418837 SUCCESS but safety gate failed. Hand off to PR175 author for fix.",
+  "updated_at": "2026-11-02T19:41:35.921Z"
 }
