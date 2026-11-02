@@ -1,0 +1,79 @@
+name: V5 isolated Release-registry resume preflight s-20261102-16ab9eb1
+
+on:
+  push:
+    branches:
+      - 'agent/s-20261102-16ab9eb1/optimization-001'
+    paths:
+      - 'tavern_ai/verified_resume_16ab9eb1.py'
+      - 'tests/test_verified_resume_16ab9eb1.py'
+      - '.github/workflows/verified-resume-s-20261102-16ab9eb1.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: verified-resume-s-20261102-16ab9eb1
+  cancel-in-progress: false
+
+jobs:
+  verify-persistent-model-and-real-game:
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install CPU training and unit test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[train,test]'
+      - name: Offline fail-closed regression gates
+        run: python -m pytest tests/test_verified_resume_16ab9eb1.py -q
+      - name: Install exactly pinned TavernGym
+        run: bash scripts/bootstrap_engine.sh
+      - name: Download canonical model Release, not expiring Actions Artifact
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p checkpoints reports/s-20261102-16ab9eb1
+          MODEL_ID="$(python -c 'import json; print(json.load(open("models/registry.json"))["latest"]["id"])')"
+          gh release download "$MODEL_ID" --repo "$GITHUB_REPOSITORY" --dir checkpoints \
+            --pattern model.zip --pattern model.metadata.json
+          echo "MODEL_ID=$MODEL_ID" >> "$GITHUB_ENV"
+      - name: Verify registered SHA, ZIP optimizer, metadata, CPU load and legal inference
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m tavern_ai.verified_resume_16ab9eb1 \
+            --model-id "$MODEL_ID" --checkpoint checkpoints/model.zip \
+            --metadata checkpoints/model.metadata.json \
+            > reports/s-20261102-16ab9eb1/001-release-preflight.json
+          SHA="$(python -c 'import json; d=json.load(open("models/registry.json")); print(d["latest"]["checkpoint_sha256"])')"
+          # SB3 prints wrapper diagnostics before the final JSON. Preserve only
+          # the explicit last JSON line; pipefail retains inference error status.
+          python -m tavern_ai.checkpoint_preflight \
+            --model checkpoints/model.zip --metadata checkpoints/model.metadata.json \
+            --expected-sha256 "$SHA" --probe-inference \
+            | tail -n 1 > reports/s-20261102-16ab9eb1/001-cpu-load.json
+          python -m json.tool reports/s-20261102-16ab9eb1/001-cpu-load.json > /dev/null
+      - name: New complete eight-seat TavernGym canary (engineering baseline)
+        run: |
+          python -m tavern_ai.canary \
+            --agent-id s-20261102-16ab9eb1 --policy baseline --seed 932601 \
+            --receipt experiments/s-20261102-16ab9eb1/001-932601.json
+          python -m tavern_ai.validate_receipt \
+            experiments/s-20261102-16ab9eb1/001-932601.json
+      - name: Upload exact receipts without auto-committing or promoting any model
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: verified-resume-s-20261102-16ab9eb1
+          path: |
+            reports/s-20261102-16ab9eb1/*.json
+            experiments/s-20261102-16ab9eb1/*.json
+          if-no-files-found: warn
+          retention-days: 30
