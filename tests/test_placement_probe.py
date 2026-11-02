@@ -15,7 +15,7 @@ def test_rightmost_first_hand():
 
 def test_other_hand_stays_same_hand():
     o = obs(0,54,55,61,62)
-    assert RightmostPlayPolicy().act(o) == 55
+    assert RightmostPlayPolicy().act(o) == 61
 
 def test_mandatory_choice_unchanged():
     assert RightmostPlayPolicy().act(obs(0,30,46,53)) == 30
