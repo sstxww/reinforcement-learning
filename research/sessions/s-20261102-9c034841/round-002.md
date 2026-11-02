@@ -5,6 +5,7 @@
 - Round-002 isolated branch: `agent/s-20261102-9c034841/optimization-002`; base main `315b068bac5ab6d8403c3c9b18f8c101c0cded5d`.
 - Actual evaluated policy commit: `40e8b269998a34ee22eb1957aa8a27a70ff18aaa`; evidence commit: `d843987b84e04a9d0e3d997e15a40a9906c17c63`.
 - Successful real GitHub Actions run: https://github.com/sstxww/reinforcement-learning/actions/runs/41416603661
+- Round 002 draft review PR: https://github.com/sstxww/reinforcement-learning/pull/48; independent latest-head CI must pass.
 - Previous round and CI passed: https://github.com/sstxww/reinforcement-learning/pull/30 ; CI https://github.com/sstxww/reinforcement-learning/actions/runs/41416043342
 - Motivation: R001 on different held-out seeds had unverified -0.5 placement delta but candidate decisions mean 54.25 vs baseline 40.0. Hypothesis: limiting planned upgrade-to-buy substitutions from the first 3 own actions to only the first own action per turn should **reduce decision count** without materially harming placement.
 

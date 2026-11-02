@@ -12,5 +12,5 @@
 - R002 full report: `round-002.md`; machine metrics `reports/s-20261102-9c034841/round-002-report.json`; proposal `research/knowledge/proposals/s-20261102-9c034841-002.md`.
 - Artifact ID 13127557959 expires 2026-12-02 08:57:59 UTC; Git receipts survive artifact expiry.
 - Prior round: [PR #30](https://github.com/sstxww/reinforcement-learning/pull/30) (**latest CI success**: https://github.com/sstxww/reinforcement-learning/actions/runs/41416043342); remains draft/unmerged. Prior failure 41414939740 repaired in R001, not in R002.
-- Round 002 PR to be created; review latest PR-head CI before calling integration-ready.
+- Round 002 PR: https://github.com/sstxww/reinforcement-learning/pull/48 (**draft; latest PR-head CI required**). No merge authorized.
 - Next hypothesis: instrument actual economic/board-state reasons for poor placements instead of assuming fewer upgrade overrides improves efficiency.
