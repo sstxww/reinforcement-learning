@@ -23,6 +23,8 @@ def test_success_writes_every_seed_independently(tmp_path):
     s = mod.run_batch(session_id=SID, start_seed=99301, games=2, policy='baseline',
                       out_dir=tmp_path, game_fn=fake_record, validator=lambda row: True)
     assert s['status'] == 'complete'
+    assert s['policy_provenance'] == 'baseline, no model used'
+    assert s['source_model_sha256'] is None
     assert s['by_arm']['baseline']['placements_completed_only'] == [1, 1]
     assert (tmp_path / 'receipts/baseline-99302.json').is_file()
 
