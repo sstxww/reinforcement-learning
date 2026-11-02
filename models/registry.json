@@ -1,0 +1,84 @@
+{
+  "schema": 1,
+  "repository": "sstxww/reinforcement-learning",
+  "engine": {
+    "version": "1.1.0",
+    "source_hash": "6d8712c93022ba11",
+    "features": 4017,
+    "cards": 447,
+    "actions": 245
+  },
+  "champion": null,
+  "latest_candidate": "v2-learning-41413557445",
+  "notes": [
+    "Unpromoted research checkpoints; do not equate simulation ranks with ranked Arena MMR.",
+    "The latest V2 Release asset was listed via GitHub API; this session's re-download/restart validation is pending its own Actions run.",
+    "Source: PR #8 infrastructure registry proposal, PR #9/#15 learning evidence, published GitHub Release asset digests."
+  ],
+  "checkpoints": [
+    {
+      "id": "v1-learning-9eada5801f99",
+      "role": "challenger",
+      "release_tag": "v1-learning-9eada5801f99",
+      "model_asset": "model.zip",
+      "metadata_asset": "model.metadata.json",
+      "sha256": "dc5195658995358e70c0d565a979b9cf05ccc5e47ae7adaa0a2f078f01cad917",
+      "steps": 256,
+      "parent": null,
+      "reported_full_match": true,
+      "reported_heldout_ranks": [
+        8,
+        8,
+        8
+      ],
+      "source_run": 41412362662,
+      "release_asset_listed": true,
+      "session_redownload_verified": false
+    },
+    {
+      "id": "v1-learning-resume-41413508653",
+      "role": "challenger",
+      "release_tag": "v1-learning-resume-41413508653",
+      "model_asset": "model.zip",
+      "metadata_asset": "model.metadata.json",
+      "sha256": "79f90ee56e1bf49eac86e39cb76e0df70e2316a5baf5067515bced15649829e7",
+      "steps": 384,
+      "parent": "v1-learning-9eada5801f99",
+      "reported_full_match": true,
+      "reported_heldout_ranks": [
+        8,
+        8,
+        8
+      ],
+      "source_run": 41413508653,
+      "release_asset_listed": true,
+      "session_redownload_verified": false
+    },
+    {
+      "id": "v2-learning-41413557445",
+      "role": "challenger",
+      "release_tag": "v2-learning-41413557445",
+      "model_asset": "model.zip",
+      "metadata_asset": "model.metadata.json",
+      "sha256": "73bde2666426cecce39f135980a897bb2cd4a7d70783ba04c9c0d29477a6664a",
+      "steps": 1280,
+      "parent": "v1-learning-9eada5801f99",
+      "reported_full_match": true,
+      "reported_heldout_ranks": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "reported_baseline_ranks": [
+        7,
+        6,
+        8,
+        8
+      ],
+      "source_run": 41413557445,
+      "release_asset_listed": true,
+      "session_redownload_verified": false
+    }
+  ]
+}
