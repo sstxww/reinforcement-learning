@@ -1,0 +1,38 @@
+{
+  "policy": "model",
+  "candidate": {
+    "games": 2,
+    "mean_placement": 8,
+    "top4_rate": 0,
+    "first_place_rate": 0,
+    "placements": [
+      8,
+      8
+    ],
+    "seeds": [
+      932040,
+      932041
+    ]
+  },
+  "seed_start": 932040,
+  "comparison": "seven scripted TavernGym bots, not Arena Elo",
+  "inference": "Descriptive results only; small samples do not establish improvement",
+  "receipt_integrity": "strict eight-seat source/seed/policy/weight verification",
+  "controlled_seat": 0,
+  "model_evidence_mode": "raw model; guard and fallback not permitted",
+  "baseline": {
+    "games": 2,
+    "mean_placement": 7,
+    "top4_rate": 0,
+    "first_place_rate": 0,
+    "placements": [
+      6,
+      8
+    ],
+    "seeds": [
+      932040,
+      932041
+    ]
+  },
+  "paired_mean_placement_delta": 1
+}
