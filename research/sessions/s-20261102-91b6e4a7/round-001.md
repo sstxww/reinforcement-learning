@@ -28,3 +28,7 @@ Before spending more PPO steps, instrument legal BUY opportunities, affordable B
 
 ## PR integration status
 Leave integration gated on this session's genuine game receipt, latest PR-head full-match CI, reviewer and main CI. No other session's branch or research files were changed.
+
+## Original baseline full-match gate (executed)
+
+GitHub Actions #41427822784 on head 3cf971c7b037f53a874bfa851a52e00191ce6d97 passed installation, tests, pinned engine and full TavernGym 8-seat baseline-controlled game. Original receipt experiments/s-20261102-91b6e4a7/001-91031.json committed by run in 65bf5ccc1a9f1dfaf7d9fef8aef7f95964cd4826. Seed=91031, rank=8, 14 turns, 51 decisions, complete=true, no combat truncation, no turn-limit guard; model steps=0, policy=baseline. This satisfies the session-owned infrastructure match requirement, not PPO validation. Latest PR CI still needs independent verification.
