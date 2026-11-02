@@ -1,12 +1,12 @@
 # s-20261102-221336eb STATUS
-- Round: 001, six paired seeds and 12 genuine TavernGym eight-seat games.
-- Branch: agent/s-20261102-221336eb/optimization-001
-- Base SHA: 315b068bac5ab6d8403c3c9b18f8c101c0cded5d; executed SHA: ef310bfec9e9a7638f0bb0a65b1b08891c6d70b3
-- Workflow: https://github.com/sstxww/reinforcement-learning/actions/runs/41416453477
+- Round: 002, six new paired seeds and 12 genuine TavernGym eight-seat games.
+- Branch: agent/s-20261102-221336eb/optimization-002
+- Base SHA: 315b068bac5ab6d8403c3c9b18f8c101c0cded5d; executed SHA: 57518ca45244cce7a82b4079743bdce77e7f857b
+- Workflow: https://github.com/sstxww/reinforcement-learning/actions/runs/41417053292
 - Result: Candidate rank advantage not established; cap was exercised
-- Candidate mean rank: 7, baseline: 7.166666666666667.
+- Candidate mean rank: 8, baseline: 6.666666666666667.
 - Illegal moves: 0. Truncation/turn-limit: 0 (receipt validation).
 - Model/checkpoint: none; strategy-only study; Best model not changed.
-- Evidence: experiments/s-20261102-221336eb/, research/sessions/s-20261102-221336eb/evaluation.json
+- Evidence: experiments/s-20261102-221336eb/, research/sessions/s-20261102-221336eb/evaluation-002.json
 - PR: to be opened after job succeeds.
 - Remaining: independent confirmation, owner review, no model promotion.
