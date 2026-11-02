@@ -55,13 +55,7 @@ jobs:
           gh api "repos/$GITHUB_REPOSITORY/pulls/$PR" > /tmp/v7/pr.json
           main="$(gh api "repos/$GITHUB_REPOSITORY/branches/main" --jq '.commit.sha')"
           [[ "$(gh api "repos/$GITHUB_REPOSITORY/pulls/$PR" --jq '.head.sha')" == "$HEAD" ]]
-          gh api --paginate "repos/$GITHUB_REPOSITORY/commits/$HEAD/check-runs?per_page=100" \
-            --jq '.check_runs[]' > /tmp/v7/check-lines.jsonl
-          python - <<'PY'
-          import json
-          rows=[json.loads(s) for s in open("/tmp/v7/check-lines.jsonl") if s.strip()]
-          json.dump({"total_count":len(rows),"check_runs":rows}, open("/tmp/v7/checks.json","w"))
-          PY
+          gh api "repos/$GITHUB_REPOSITORY/commits/$HEAD/check-runs?per_page=100" > /tmp/v7/checks.json
           git fetch --no-tags origin "$main" "$HEAD"
           ancestor=""
           if git merge-base --is-ancestor "$main" "$HEAD"; then ancestor="--ancestor"; fi
