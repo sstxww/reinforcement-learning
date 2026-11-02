@@ -1,0 +1,55 @@
+name: V7 exact-main CI audit and real eight-seat smoke fea0d63f
+
+on:
+  push:
+    branches:
+      - agent/s-20261103-fea0d63f/optimization-001
+    paths:
+      - .github/workflows/v7-main-ci-probe-fea0d63f.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: v7-main-ci-probe-fea0d63f
+  cancel-in-progress: false
+
+jobs:
+  independent-v7-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install test dependencies
+        run: python -m pip install -e '.[test]'
+      - name: Test exact-main SHA CI attestation fail-closed logic
+        run: python -m pytest -q tests/test_v7_main_ci_attestation_fea0d63f.py
+      - name: Live read-only main CI attestation (snapshot, fail-closed)
+        id: live-audit
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python scripts/v7_main_ci_attestation_fea0d63f.py --out outputs/001-main-ci-snapshot.json
+      - name: Install pinned TavernGym engine
+        run: bash scripts/bootstrap_engine.sh
+      - name: Verify native engine source, observations and action masks
+        run: python -m tavern_ai.contract
+      - name: Genuine independent complete eight-seat baseline game
+        run: |
+          mkdir -p outputs
+          python -m tavern_ai.canary --agent-id s-20261103-fea0d63f \
+            --seed 99743 --policy baseline --receipt outputs/001-99743.json
+          python -m tavern_ai.validate_receipt outputs/001-99743.json
+      - name: Preserve actual source receipts (short-lived Artifact only)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v7-ci-audit-fea0d63f-${{ github.run_id }}
+          path: outputs/*.json
+          if-no-files-found: ignore
+          retention-days: 30

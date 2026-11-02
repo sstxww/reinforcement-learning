@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "repository": "sstxww/reinforcement-learning",
+  "main_sha": "c1b828734527bae6141805581693d890cc3bff94",
+  "run_id": 41512315964,
+  "run_attempt": 1,
+  "run_url": "https://github.com/sstxww/reinforcement-learning/actions/runs/41512315964",
+  "job_url": "https://github.com/sstxww/reinforcement-learning/actions/runs/41512315964/job/125507001823",
+  "status": "exact_main_ci_steps_verified",
+  "checked_at": "2026-11-02T19:49:15.410410+00:00",
+  "verified_step_names": [
+    "Unit tests and PR evidence",
+    "Install pinned engine and verified patch",
+    "Confirm engine layout",
+    "Real full eight-seat simulated match",
+    "Preserve CI evidence"
+  ],
+  "post_merge_artifact_bytes_verified": false,
+  "merge_lock_held": false,
+  "training_performed_by_this_audit": false,
+  "model_improvement_claimed": false,
+  "caveat": "Exact-main successful CI job/step metadata only. The main ref can advance after this audit; recheck immediately before an integration claim."
+}
