@@ -1,0 +1,67 @@
+{
+  "schema": 1,
+  "agent_id": "s-20261102-6d2f9a71",
+  "hypothesis": "0.04 entropy improves paired held-out placement over 0.01 after a fixed small PPO budget",
+  "engine": {
+    "version": "1.1.0",
+    "source_hash": "6d8712c93022ba11",
+    "features": 4017,
+    "cards": 447,
+    "actions": 245,
+    "n_cards": 3984
+  },
+  "observation_contract": {
+    "features": 4017,
+    "cards": 447,
+    "actions": 245
+  },
+  "train_seed": 77331,
+  "eval_seeds": [
+    61001,
+    61002
+  ],
+  "steps_requested_per_arm": 256,
+  "arms": {
+    "reference": {
+      "entropy_coef": 0.01,
+      "training_steps": 256,
+      "checkpoint_sha256": "28b36a7e669a2c1322817cdf802bab83538bb933cc16a401608c2c3cc21e56ed",
+      "checkpoint": "checkpoints/s-20261102-6d2f9a71/reference.zip",
+      "evaluation": {
+        "games": 2,
+        "seat0_placements": [
+          8,
+          8
+        ],
+        "mean_placement": 8,
+        "top4_rate": 0.0,
+        "first_rate": 0.0,
+        "mean_decisions": 172.5,
+        "illegal_actions": 0,
+        "protective_truncations": 0
+      }
+    },
+    "candidate": {
+      "entropy_coef": 0.04,
+      "training_steps": 256,
+      "checkpoint_sha256": "4d0c4107a45522d298c9404c6e22b38ff6254fe76d64a5bb5c5fb14bbadc944e",
+      "checkpoint": "checkpoints/s-20261102-6d2f9a71/candidate.zip",
+      "evaluation": {
+        "games": 2,
+        "seat0_placements": [
+          8,
+          8
+        ],
+        "mean_placement": 8,
+        "top4_rate": 0.0,
+        "first_rate": 0.0,
+        "mean_decisions": 172.5,
+        "illegal_actions": 0,
+        "protective_truncations": 0
+      }
+    }
+  },
+  "candidate_minus_reference_mean_placement": 0,
+  "interpretation": "Exploratory tiny-sample ablation; not a strength claim.",
+  "storage": "Session-scoped GitHub Actions artifact; expires after retention period."
+}
