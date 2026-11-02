@@ -1,0 +1,69 @@
+name: Privacy probe s-20261102-42875425 R001
+
+on:
+  push:
+    branches:
+      - 'agent/s-20261102-42875425/optimization-001'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: privacy-s-20261102-42875425-001
+  cancel-in-progress: false
+
+jobs:
+  privacy-and-evidence:
+    if: github.repository == 'sstxww/reinforcement-learning'
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install isolated tests
+        run: |
+          python -m pip install -e '.[test]'
+          python -m pytest -q
+      - name: Install real pinned TavernGym engine
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Real engine-backed metamorphic tests
+        run: python -m pytest -q tests/test_privacy_s_20261102_42875425.py
+      - name: Probe two independent real-engine initial states
+        run: |
+          python -m tavern_ai.privacy_s_20261102_42875425 --seeds 83011 83012 --out reports/s-20261102-42875425/001-observation-privacy.json
+      - name: Complete genuine eight-player baseline infrastructure game
+        run: |
+          python -m tavern_ai.canary --agent-id s-20261102-42875425 --seed 83031 --policy baseline --receipt experiments/s-20261102-42875425/001-83031.json
+          python -m tavern_ai.validate_receipt experiments/s-20261102-42875425/001-83031.json
+      - name: Commit ONLY the session's verified actual outputs
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "${GITHUB_REF_NAME}" = "agent/s-20261102-42875425/optimization-001"
+          test -f experiments/s-20261102-42875425/001-83031.json
+          test -f reports/s-20261102-42875425/001-observation-privacy.json
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add experiments/s-20261102-42875425/001-83031.json reports/s-20261102-42875425/001-observation-privacy.json
+          if ! git diff --cached --quiet; then
+            git commit -m "results(privacy): preserve real probe and eight-seat receipt [skip ci]"
+            git pull --rebase origin "${GITHUB_REF_NAME}"
+            git push origin HEAD:"${GITHUB_REF_NAME}"
+          fi
+      - name: Upload ephemeral evidence copy
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: privacy-s-20261102-42875425-r001
+          path: |
+            reports/s-20261102-42875425/*.json
+            experiments/s-20261102-42875425/*.json
+          if-no-files-found: ignore
+          retention-days: 30
