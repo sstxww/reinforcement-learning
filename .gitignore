@@ -1,6 +1,13 @@
 __pycache__/
 *.py[cod]
 .pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+dist/
+build/
+.coverage
+htmlcov/
 .venv/
 .env
 .env.*
@@ -10,7 +17,10 @@ checkpoints/
 artifacts/
 outputs/
 runs/
+wandb/
+tensorboard/
 *.zip
 *.pt
 *.pth
+*.ckpt
 arena_client.py
