@@ -1,0 +1,122 @@
+name: V5 isolated resume integrity and own-game s-20261102-6e4b91ac
+
+on:
+  push:
+    branches:
+      - 'agent/s-20261102-6e4b91ac/optimization-001'
+    paths:
+      - '.github/workflows/v5-resume-integrity-s-20261102-6e4b91ac.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: v5-s-20261102-6e4b91ac-r001
+  cancel-in-progress: false
+
+jobs:
+  independent-receipt:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Unit regression for fail-closed resume
+        run: |
+          python -m pip install -e '.[test]'
+          python -m pytest tests/test_train_resume_integrity_s_6e4b91ac.py
+      - name: Install pinned genuine TavernGym
+        run: bash scripts/bootstrap_engine.sh
+      - name: Generate own genuine completed eight-seat baseline evidence
+        run: |
+          python -m tavern_ai.canary --agent-id s-20261102-6e4b91ac \
+            --policy baseline --seed 86401 \
+            --receipt experiments/s-20261102-6e4b91ac/001-86401.json
+          python -m tavern_ai.validate_receipt experiments/s-20261102-6e4b91ac/001-86401.json
+      - name: Commit only this session's authenticated receipt (no repeat trigger)
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add experiments/s-20261102-6e4b91ac/001-86401.json
+          git commit -m 'evidence: real TavernGym eight-seat baseline for s-20261102-6e4b91ac [skip ci]'
+          git push origin HEAD:agent/s-20261102-6e4b91ac/optimization-001
+
+  bounded-release-resume:
+    needs: independent-receipt
+    runs-on: ubuntu-latest
+    timeout-minutes: 65
+    env:
+      GH_TOKEN: ${{ github.token }}
+      SOURCE_TAG: v5-s-20261102-68099929-1408-41428692617
+      EXPECTED_SOURCE_SHA: a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632
+      OUT_TAG: v5-s-20261102-6e4b91ac-resume128
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install train dependencies and pinned TavernGym
+        run: |
+          python -m pip install -e '.[train,test]'
+          bash scripts/bootstrap_engine.sh
+      - name: Download and verify durable source checkpoint before any PPO updates
+        run: |
+          mkdir -p checkpoints
+          gh release download "$SOURCE_TAG" --repo "$GITHUB_REPOSITORY" --pattern 'model.*' --dir checkpoints
+          python -m tavern_ai.checkpoint_preflight \
+            --model checkpoints/model.zip \
+            --metadata checkpoints/model.metadata.json \
+            --expected-sha256 "$EXPECTED_SOURCE_SHA" --probe-inference
+      - name: Continue existing PPO by exactly 128 timesteps
+        run: |
+          python -m tavern_ai.train --resume checkpoints/model.zip --steps 128 \
+            --seed 86402 --out checkpoints/resumed.zip
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from tavern_ai.registry_integrity import verify_checkpoint
+          old=json.loads(Path('checkpoints/model.metadata.json').read_text())
+          new=json.loads(Path('checkpoints/resumed.metadata.json').read_text())
+          assert new['total_timesteps']==old['total_timesteps']+128,(old,new)
+          verify_checkpoint(Path('checkpoints/resumed.zip'),new['checkpoint_sha256'])
+          print('Verified actual PPO step delta and resumed model digest')
+          PY
+      - name: Require unguarded candidate to complete a real eight-seat game
+        run: |
+          python -m tavern_ai.canary --agent-id s-20261102-6e4b91ac \
+            --policy model --model checkpoints/resumed.zip --seed 86403 \
+            --receipt checkpoints/001-model-86403.json
+          python -m tavern_ai.validate_receipt checkpoints/001-model-86403.json
+      - name: Publish unpromoted durable checkpoint only after complete game gate
+        run: |
+          gh release create "$OUT_TAG" --repo "$GITHUB_REPOSITORY" --prerelease \
+            --target "$GITHUB_SHA" \
+            --title "V5 128-step integrity smoke - unpromoted s-20261102-6e4b91ac" \
+            --notes "Isolated 128 PPO continuation; SHA-verified source; one complete unguarded model game. Not a Champion or statistical strength improvement." \
+            checkpoints/resumed.zip#model.zip \
+            checkpoints/resumed.metadata.json#model.metadata.json \
+            checkpoints/001-model-86403.json
+          mkdir -p downloaded
+          gh release download "$OUT_TAG" --repo "$GITHUB_REPOSITORY" --pattern 'model.*' --dir downloaded
+          python - <<'PY'
+          import hashlib
+          from pathlib import Path
+          for name,original in [('model.zip','checkpoints/resumed.zip'),('model.metadata.json','checkpoints/resumed.metadata.json')]:
+              source=Path(original).read_bytes()
+              saved=(Path('downloaded')/name).read_bytes()
+              assert hashlib.sha256(source).digest()==hashlib.sha256(saved).digest(),name
+          print('Verified durable Release downloaded bytes for both assets')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: resume-integrity-s-20261102-6e4b91ac
+          path: |
+            checkpoints/*.metadata.json
+            checkpoints/001-model-86403.json
+          if-no-files-found: ignore
+          retention-days: 14
