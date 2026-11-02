@@ -1,0 +1,17 @@
+# V7 session status: s-20261103-406afe60
+
+- **TASK_KEY:** policy/raw-ppo-sampling-vs-argmax-99831
+- **ROUND:** R001; **ROLE:** EVALUATOR/REPAIRER; **state:** running (not integrated).
+- **BASE_MAIN_SHA:** `3a745c6f6a48c65528bcbeb81b8627b8db93f046`; main moved from `c5edec2e3261dacdf3908796ebfe0457fb76c02e` when another integrator merged PR #176.
+- **OWN_BRANCH:** `agent/s-20261103-406afe60/optimization-001`. Initial tested source commit: `b7260914ab2d7264cc44f1abc41f63bdf7f598f3`; later handoff documentation adds commits. Only own namespace files.
+- **P0 inherited:** PR #166 merged `c5edec2e`, main CI run 41510861696 later SUCCESS. PR #176 merged by **another** session `3a745c6f`; its main CI run 41511419671 was running during first inspection. PR #15 has base `agent/learning/v1` and depends on Draft #9. No PR was merged by this session.
+- **P0 gate:** We have **no verified exclusive integrator lease**. Do not merge main or claim lock. Shared train/eval/registry files deliberately untouched.
+- **P2 hypothesis:** Existing unpromoted 1408-step raw PPO rarely buys despite masked-legal BUY. Test whether its deterministic argmax is a bottleneck by comparing the exact same weights with direct stochastic masked `MaskablePPO.predict(..., deterministic=False)`. It is a policy-selection ablation, **not new training or evidence of strength**.
+- **Source:** canonical registry `v5-s-20261102-68099929-1408-41428692617`, Release https://github.com/sstxww/reinforcement-learning/releases/tag/v5-s-20261102-68099929-1408-41428692617 ; SHA256 `a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632`; TavernGym 1.1.0, source hash `6d8712c93022ba11`, 4017 floats / 447 cards / 245 actions. The workflow executes the actual independent Release preflight.
+- **Actual new PPO steps:** 0. No new checkpoint, optimizer state, Release, or promotion. No best/champion. Do not rerun ineffective training just to increase steps.
+- **Own Actions:** https://github.com/sstxww/reinforcement-learning/actions/runs/41511916662 , initially in_progress at source commit `b7260914`. Workflow is branch-only, read-only token, 75 minute max, one seed and one-shot push trigger; no automatic retry.
+- **Real eight-seat games planned, not yet claimed:** seed 99831, seat 0, seven official bots; baseline; raw argmax; raw sampled; authoritative receipts only once matching run artifact is read and verified. Any unfinished raw game is a failure **without ranking**, not rank eight.
+- **Evidence comparisons:** historical raw model rank eight / zero BUY on legal BUY exposures; current R001 baseline vs model outcome **unknown** while Actions runs. `n=1` exploratory even if successful; no causal or quality conclusion.
+- **Failure status:** none yet verified; unexpected gate/loop must be recorded separately, with job log and run ID, and no fabricated completed receipt.
+- **PR and merge:** PR not yet opened until original match receipt is available; no head SHA/PR CI/merge SHA/main postmerge CI is claimed. Do not promote any model.
+- **Next exact action:** Inspect Actions run #41511916662 for completion, fetch its original JSON Artifact, independently check `completed=true`, 1..8 permutation, seed, model SHA, engine and zero fallback. Commit actual receipt(s) under `experiments/s-20261103-406afe60/`, update this STATUS and R001, create non-Draft PR targeting latest main, inspect exact-head CI; hand to actual integrator if no valid lease.
