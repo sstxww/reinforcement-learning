@@ -1,1 +1,0 @@
-One-shot permanent Release attempt for the SHA-pinned REJECTED 1536-step candidate from own Artifact 13172197990; audit bytes and metadata, never Champion. Do not retry a 403 without permission changes.
