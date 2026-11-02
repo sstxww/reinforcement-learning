@@ -1,0 +1,16 @@
+{
+  "schema": 1,
+  "status": "INCOMPLETE_HELDOUT_MODEL_SAFETY_LIMIT",
+  "failure_signature": "RuntimeError: Full-game safety limit exceeded",
+  "failed_evaluation_run": "https://github.com/sstxww/reinforcement-learning/actions/runs/41450970156",
+  "first_heldout_seed": 93874,
+  "second_seed_not_checked": 93875,
+  "attempted_paired_games": 2,
+  "completed_paired_games": 0,
+  "reason": "Unmodified deterministic model failed its first independent heldout full-game before a valid paired score could be computed",
+  "source_successful_model_game_seed": 93873,
+  "source_model_game_rank": 8,
+  "no_promotion": true,
+  "not_a_benchmark_score": true,
+  "warning": "The previous source game completion does not establish general robustness or improvement."
+}

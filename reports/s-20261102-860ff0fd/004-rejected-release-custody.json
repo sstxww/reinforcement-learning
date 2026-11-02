@@ -1,0 +1,11 @@
+{
+  "schema": 1,
+  "release_url": "https://github.com/sstxww/reinforcement-learning/releases/tag/v5-s-20261102-860ff0fd-1536-41449658176",
+  "model_sha256": "2a0aa260c08b087b1bd703a102af7b6a25a1785e17a2b11bbf854ea48f5b99eb",
+  "total_timesteps": 1536,
+  "asset_roundtrip_verified": true,
+  "status": "rejected_incomplete_heldout",
+  "champion": false,
+  "source_run": 41449658176,
+  "failed_evaluation_run": 41450970156
+}
