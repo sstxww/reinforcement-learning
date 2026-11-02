@@ -1,0 +1,32 @@
+{
+  "agent_id": "s-20261102-13020d89",
+  "budget_guard_ends": 0,
+  "buys": 17,
+  "completed": true,
+  "decisions": 46,
+  "deferred_upgrades": 1,
+  "engine_source_hash": "6d8712c93022ba11",
+  "engine_version": "1.1.0",
+  "environment": "TavernGym",
+  "git_sha": "9afdc1df057e554cda8f8ec51222c2a06f297bd4",
+  "min_board": 2,
+  "model_sha256": null,
+  "placements": [
+    8,
+    7,
+    3,
+    4,
+    5,
+    1,
+    2,
+    6
+  ],
+  "policy": "economy_gate",
+  "schema": 1,
+  "seed": 73022,
+  "timestamp": "2026-11-02T09:39:52.127030+00:00",
+  "truncated_combats": 0,
+  "turn_limit_end": false,
+  "turns": 19,
+  "upgrades": 2
+}

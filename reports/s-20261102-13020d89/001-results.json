@@ -1,0 +1,78 @@
+{
+  "base_sha": "315b068bac5ab6d8403c3c9b18f8c101c0cded5d",
+  "baseline": {
+    "budget_guard_ends": 0,
+    "first_rate": 0.0,
+    "mean_rank": 7,
+    "n": 4,
+    "ranks": [
+      6,
+      6,
+      8,
+      8
+    ],
+    "top4_rate": 0.0,
+    "upgrade_deferrals": 0
+  },
+  "canary": {
+    "completed": true,
+    "rank": 8,
+    "seed": 73030
+  },
+  "candidate": {
+    "budget_guard_ends": 0,
+    "first_rate": 0.0,
+    "mean_rank": 6.25,
+    "n": 4,
+    "ranks": [
+      5,
+      6,
+      8,
+      6
+    ],
+    "top4_rate": 0.0,
+    "upgrade_deferrals": 4
+  },
+  "caution": "Only four independent seeds, protected baseline 85-action end cap; no MMR claim.",
+  "complete_eight_seat_games": 13,
+  "config_sha256": "12c092e650d8a6be5b803b5e6a50f87763f74cd732ca8135a7a11e4915ed2be8",
+  "engine_source_hash": "6d8712c93022ba11",
+  "engine_version": "1.1.0",
+  "heldout_seeds": [
+    73020,
+    73021,
+    73022,
+    73023
+  ],
+  "paired_mean_rank_delta": -0.75,
+  "ppo_steps": 0,
+  "recommendation": "RETEST",
+  "selected_min_board": 2,
+  "session_id": "s-20261102-13020d89",
+  "train": {
+    "2": {
+      "budget_guard_ends": 0,
+      "first_rate": 0.0,
+      "mean_rank": 7,
+      "n": 2,
+      "ranks": [
+        6,
+        8
+      ],
+      "top4_rate": 0.0,
+      "upgrade_deferrals": 2
+    },
+    "5": {
+      "budget_guard_ends": 0,
+      "first_rate": 0.0,
+      "mean_rank": 7,
+      "n": 2,
+      "ranks": [
+        6,
+        8
+      ],
+      "top4_rate": 0.0,
+      "upgrade_deferrals": 2
+    }
+  }
+}
