@@ -14,3 +14,7 @@
 - **Restore location:** expiring session Artifact at https://github.com/sstxww/reinforcement-learning/actions/runs/41413908927/artifacts/13125934555 (30 days, expires 2026-12-02 UTC). Download and SHA256-verify before use. Not a durable model registry; expired weights are not recoverable from Git.
 - **Best result:** no top-four result in 3 own held-out games; score 8.00; insufficient to claim strength.
 - **Next:** confirm PR CI; test longer, compute action-type proportions, bootstrap uncertainty on 20+ held-out seeds. Do not change other open Agent PR files or push main.
+
+## Round 002 started
+- Isolated new runner: `.github/workflows/experiment-s-20261102-bedfc382-r002.yml` on own branch; actual measurements and receipt pending at creation.
+- New planned training: 4096 per arm, 20 held-out paired seeds 32001–32020; artifacts and receipts under `r002` / `002-` prefixes, preserving round 001.
