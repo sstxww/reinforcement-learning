@@ -42,7 +42,7 @@ jobs:
             --pattern model.zip --pattern model.metadata.json \
             --dir outputs/s-20261102-decfc670
           python -m tavern_ai.checkpoint_registry \
-            --registry models/registry.json \
+            --registry models/sessions/s-20261102-decfc670/registry.json \
             --model-id v2-learning-41413557445 \
             --model outputs/s-20261102-decfc670/model.zip \
             --metadata outputs/s-20261102-decfc670/model.metadata.json \
@@ -51,7 +51,7 @@ jobs:
         run: |
           python -m tavern_ai.rank8_probe_decfc670 \
             --model outputs/s-20261102-decfc670/model.zip \
-            --registry models/registry.json \
+            --registry models/sessions/s-20261102-decfc670/registry.json \
             --seeds 86251 86252 \
             --out-dir experiments/s-20261102-decfc670 \
             --report reports/s-20261102-decfc670/002-rank8-opportunities.json
