@@ -1,0 +1,73 @@
+name: Card ablation - s-20261102-04414822
+
+on:
+  push:
+    branches:
+      - 'agent/s-20261102-04414822/optimization-001'
+    paths:
+      - '.github/workflows/experiment-s-20261102-04414822.yml'
+      - 'tavern_ai/card_ablation.py'
+      - 'tavern_ai/model.py'
+      - 'tests/test_card_embedding_width.py'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: 'exp-s-20261102-04414822'
+  cancel-in-progress: false
+
+jobs:
+  isolated-card-ablation:
+    if: github.ref == 'refs/heads/agent/s-20261102-04414822/optimization-001'
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      SESSION_ID: 's-20261102-04414822'
+      OMP_NUM_THREADS: '2'
+      MKL_NUM_THREADS: '2'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install bounded experiment dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[train,test]'
+      - name: Run unit tests
+        run: python -m pytest
+      - name: Install pinned real TavernGym engine
+        run: bash scripts/bootstrap_engine.sh
+      - name: Verify engine version and observe2 action mask
+        run: python -m tavern_ai.contract
+      - name: Mandatory independent eight-player game
+        run: |
+          python -m tavern_ai.canary --agent-id "$SESSION_ID" --seed 27100 --policy baseline --receipt "experiments/$SESSION_ID/001-27100.json"
+          python -m tavern_ai.validate_receipt "experiments/$SESSION_ID/001-27100.json"
+      - name: Equal-budget PPO card-width experiment and full model games
+        run: |
+          python -m tavern_ai.card_ablation --agent-id "$SESSION_ID" --seed 27110 --steps 128 --start-seed 27111 --games 2
+      - name: Commit only genuine experiment receipts and journal to own branch
+        if: always()
+        shell: bash
+        run: |
+          git config user.name 'autotavern-experiment-bot'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A -- "experiments/$SESSION_ID" "research/sessions/$SESSION_ID" "research/knowledge/proposals/$SESSION_ID-001.md"
+          if ! git diff --cached --quiet; then
+            git commit -m "experiment($SESSION_ID): record real matches and PPO ablation"
+            git push origin "HEAD:refs/heads/$GITHUB_REF_NAME"
+          fi
+      - name: Save expiring, per-session model and metadata artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: 'checkpoints-s-20261102-04414822'
+          path: |
+            checkpoints/s-20261102-04414822/*.zip
+            checkpoints/s-20261102-04414822/*.json
+            research/sessions/s-20261102-04414822/metrics-001.json
+            experiments/s-20261102-04414822/*.json
+          if-no-files-found: warn
+          retention-days: 30
