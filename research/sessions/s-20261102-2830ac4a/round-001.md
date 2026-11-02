@@ -32,3 +32,17 @@ Scope: `tavern_ai/hold_sell_experiment.py`, `tests/test_hold_sell_experiment.py`
 
 ## Outcome / next research question
 The exact result must be read from the real workflow and committed receipts. Until then, **no performance improvement is claimed**. If the candidate loses consistently, consider a conditional sell policy (only sell when buying and board constraints warrant it) in an isolated subsequent round. If it improves, expand independent seeds before model promotion.
+
+## Verified execution results (2026-11-02; append-only evidence)
+- Run: https://github.com/sstxww/reinforcement-learning/actions/runs/41415008425 — `completed/success` at code SHA `f6cd60f951be78c67e30c6a717e5d600b05d49d8`.
+- Unit/regression tests passed, pinned source contract verified, all candidate/control receipts validated by `tavern_ai.validate_receipt`.
+- Mandatory independent candidate match seed 34200: `Game.is_over() == True`, own rank **8**, placements **[8,5,7,1,3,6,4,2]**, 44 decisions, 15 turns, 0 illegal actions, 0 combat truncations and no turn-limit end.
+- Held-out seeds 34201–34203: baseline ranks **[7,8,8]**, candidate ranks **[7,8,8]**; both mean placement **7.6667**, first rate **0/3**, top-four rate **0/3**, per-seed deltas **[0,0,0]**.
+- Seven complete real eight-seat games total: one independent candidate acceptance match and six paired heldout matches (three per arm). None are Arena matches.
+- Candidate policy source SHA256 `0fbedc281a33e4ff5f7c52ddb22e2290db7193c055b1a85f1cccb72c260c481f`; no PPO model or model-weight SHA exists because this was a deterministic strategy ablation.
+- Results: `reports/s-20261102-2830ac4a/hold-sell-paired.json`, `experiments/s-20261102-2830ac4a/001-34200.json`, `experiments/s-20261102-2830ac4a/{candidate,control}-{34201,34202,34203}.json`.
+- Separate artifact ID `13127795190`, expires `2026-12-02T08:44:36Z`. Evidence JSON also committed to Git; no model checkpoint.
+- **Result:** no measured rank improvement; `not proven`. Identical decisions counts/placements warrant testing whether branch-specific sell opportunities actually occurred, rather than assuming the hypothesis was sufficiently exercised.
+- Failed run repairs: none required in this round. Existing other-PR CI fault `ModuleNotFoundError: sb3_contrib` is not this session's failure and was not changed.
+- No transient files were committed. Source, independent tests, workflow, JSON receipts, summary and docs are retained.
+- Suggested next round: instrument `baseline_action != candidate_action` and count legal optional sell opportunities, then evaluate only nonzero-exposure seeds and check for leakage/selection bias.
