@@ -19,6 +19,7 @@ def valid():
     }
     run = {
         "id": 321, "name": "CI - full-match gate", "event": "pull_request",
+        "workflow_id": 404236977, "path": ".github/workflows/ci.yml",
         "head_sha": HEAD, "status": "completed", "conclusion": "success",
         "created_at": "2026-11-03T00:00:00Z",
         "html_url": "https://github.com/sstxww/reinforcement-learning/actions/runs/321",
@@ -112,3 +113,26 @@ def test_assisted_and_invalid_receipts_fail_closed():
 def test_model_weights_must_not_be_committed():
     _, _, _, changed, _ = valid()
     assert not verdict(changed=changed + ["models/candidate.zip"])["ready_for_exclusive_integration_review"]
+
+def test_fake_workflow_with_same_name_cannot_spoof_ci():
+    _, runs, _, _, _ = valid()
+    runs[0]["workflow_id"] = 12345
+    assert not verdict(runs=runs)["ready_for_exclusive_integration_review"]
+    _, runs, _, _, _ = valid()
+    runs[0]["path"] = ".github/workflows/untrusted.yml"
+    assert not verdict(runs=runs)["ready_for_exclusive_integration_review"]
+
+
+def test_pr_cannot_modify_its_own_trust_root_ci_gate():
+    _, _, _, changed, _ = valid()
+    assert not verdict(changed=changed + [".github/workflows/ci.yml"])["ready_for_exclusive_integration_review"]
+
+
+def test_nested_and_disguised_assistance_is_rejected():
+    for mutation in ({"policy_variant": "hero_cancel_guard_v1"},
+                     {"opportunity_diagnostics": {"counts": {"fallback_actions": 2}}},
+                     {"model_guard_forced_end": 1},
+                     {"assisted": True}):
+        _, _, _, _, receipt = valid()
+        receipt.update(mutation)
+        assert not verdict(receipt=receipt)["ready_for_exclusive_integration_review"]
