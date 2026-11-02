@@ -15,9 +15,30 @@ An **independent** AI training/research scaffold built on the open-source [AutoT
 
 ## Run in GitHub Actions (preferred)
 
-Go to **Actions** in this repository. `CI · full-match gate` validates a PR and plays one real TavernGym game. `Train · incremental V1` is manually runnable or runs weekly on `main`, downloads the last successful compatible model if available, trains a bounded number of extra PPO steps, evaluates, and uploads `v1-model` as a downloadable Artifact.
+Go to **Actions** in this repository. `CI · full-match gate` validates a PR and plays a genuine complete eight-seat TavernGym match. `Train · incremental V1` is designed for bounded, weekly or manually initiated GitHub-runner training. The main workflow's original 90-day Artifacts are **not** durable checkpoint storage; a proposed Release-based restoration enhancement is under review in [PR #8](https://github.com/sstxww/reinforcement-learning/pull/8). Do not assume unmerged branch workflow changes are already active on main.
 
-**Status:** scaffold only, not yet successfully run in Actions; no training score is claimed. Model Artifacts have **90-day retention**; they are not permanent backups.
+## Verified V1 round-1 evidence (2026-11-02)
+
+The original [main CI 41406564039](https://github.com/sstxww/reinforcement-learning/actions/runs/41406564039) passed 12 tests, compiled actual TavernGym 1.1.0 with `observe2` (4017 floats / 447 card IDs / 245 actions), and finished an eight-player baseline match: seed 1001, 46 decisions, seat-0 rank **7**. This is a real simulation result, not Arena Elo.
+
+Each of four isolated research branches has committed a separate **real `Game.is_over()` receipt** (all eight placements, no truncated combats):
+
+| Branch | Recorded full-match seed | Seat-0 decisions | Seat-0 rank | Research PR |
+|---|---:|---:|---:|---|
+| `agent/strategy/v1` | 11001 | 52 | 6 | [#6](https://github.com/sstxww/reinforcement-learning/pull/6) |
+| `agent/learning/v1` (baseline test) | 12001 | 36 | 8 | [#9](https://github.com/sstxww/reinforcement-learning/pull/9) |
+| `agent/evaluation/v1` | 13001 | 51 | 4 | [#7](https://github.com/sstxww/reinforcement-learning/pull/7) |
+| `agent/infrastructure/v1` | 14001 | 41 | 7 | [#8](https://github.com/sstxww/reinforcement-learning/pull/8) |
+
+The separate full-match CI replay succeeded on specific commits for all four roles; **future branch-head changes require their own fresh successful CI**. These research PRs remain subject to review; do not merge failed or unverified revisions.
+
+**Actual PPO candidate:** [learning Actions 41412362662](https://github.com/sstxww/reinforcement-learning/actions/runs/41412362662) completed 256 MaskablePPO training timesteps, then a genuine model-controlled full eight-seat match (seed 1302, 149 model decisions, seat-0 rank **8**) and 3 independent seeded matches (placements **8, 8, 8**, mean rank 8, top-four 0%, first-place 0%). It is **not** a strength improvement. The prior run [41412048034](https://github.com/sstxww/reinforcement-learning/actions/runs/41412048034) also trained 256 steps but its model-controlled full game **failed** a safety bound, and must remain recorded as a failed experiment.
+
+The successful experimental model has an actual versioned **unpromoted GitHub prerelease**: [v1-learning-9eada5801f99](https://github.com/sstxww/reinforcement-learning/releases/tag/v1-learning-9eada5801f99), with `model.zip`, `model.metadata.json`, and held-out evaluation JSON. Verified model SHA-256: `dc5195658995358e70c0d565a979b9cf05ccc5e47ae7adaa0a2f078f01cad917`. The `Best` model has **not** been established. A separate [cloud Release-download → 128-step PPO resume → full-model-game verification](https://github.com/sstxww/reinforcement-learning/actions/runs/41413508653) was launched, and its final result must be checked before claiming verified persistent training continuation.
+
+Fixed-seed baseline metrics are in [`reports/evaluation/v1-baseline.json`](https://github.com/sstxww/reinforcement-learning/blob/agent/evaluation/v1/reports/evaluation/v1-baseline.json): 4 games, placements `[7,6,8,8]`, mean 7.25. The strategy's single same-seed V0/V1 comparison was rank 8 vs rank 8, **no established improvement**. These results are only small descriptive samples, not TavArena rankings or significance claims.
+
+Read [`docs/RECOVERY.md`](docs/RECOVERY.md) and [`docs/MODEL_STORAGE.md`](docs/MODEL_STORAGE.md) (proposed infrastructure PR), [`models/registry.json`](models/registry.json) and [round-1 integration tracker #2](https://github.com/sstxww/reinforcement-learning/issues/2) for model roles, outstanding gates, provenance, and safe recovery. Cache cleanup must never remove uniquely useful checkpoints, receipts or experiment reports. No official TavernArena scored match has been authorized or executed.
 
 ## Manual Linux / cloud setup
 
