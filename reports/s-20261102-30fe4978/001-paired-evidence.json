@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "source": "validated_eight_seat_receipts",
+  "engine_version": "1.1.0",
+  "engine_source_hash": "6d8712c93022ba11",
+  "controlled_seat": 0,
+  "seeds": [
+    99125,
+    99126,
+    99127
+  ],
+  "candidate_model_sha256": "a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632",
+  "candidate": {
+    "games": 3,
+    "mean_rank": 8,
+    "top4_rate": 0,
+    "first_rate": 0,
+    "ranks": [
+      8,
+      8,
+      8
+    ]
+  },
+  "baseline": {
+    "games": 3,
+    "mean_rank": 7.333333333333333,
+    "top4_rate": 0,
+    "first_rate": 0,
+    "ranks": [
+      6,
+      8,
+      8
+    ]
+  },
+  "candidate_minus_baseline_rank_deltas": [
+    2,
+    0,
+    0
+  ],
+  "mean_rank_delta": 0.6666666666666666,
+  "approx_t_ci95": [
+    -2.202,
+    3.535333333333333
+  ],
+  "raw_model_only": true,
+  "fallback_count": 0,
+  "champion_promotion_eligible": false,
+  "caveat": "Retrospective paired receipt audit, no new games or PPO training. Small-sample t interval is descriptive, not causal or proof of competitive gain."
+}
