@@ -1,0 +1,59 @@
+name: V5 registry smoke s-20261102-91b6e4a7
+
+on:
+  push:
+    branches:
+      - agent/s-20261102-91b6e4a7/optimization-001
+    paths:
+      - .github/workflows/model-registry-smoke-91b6e4a7.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: v5-registry-smoke-91b6e4a7
+  cancel-in-progress: false
+
+jobs:
+  registry-and-real-match:
+    runs-on: ubuntu-latest
+    timeout-minutes: 70
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install Python tests
+        run: |
+          python -m pip install -e '.[test]'
+      - name: Validate existing Release registry and offline tests
+        run: |
+          python -m tavern_ai.checkpoint_catalog
+          python -m pytest tests/test_checkpoint_catalog_91b6e4a7.py
+      - name: Install verified pinned TavernGym
+        run: bash scripts/bootstrap_engine.sh
+      - name: Validate engine and complete an original eight-seat match
+        run: |
+          python -m tavern_ai.contract
+          python -m tavern_ai.canary --agent-id s-20261102-91b6e4a7 --seed 91031 --policy baseline --receipt experiments/s-20261102-91b6e4a7/001-91031.json
+          python -m tavern_ai.validate_receipt experiments/s-20261102-91b6e4a7/001-91031.json
+          python -m tavern_ai.checkpoint_catalog
+      - name: Commit only authentic own-game receipt to isolated branch
+        shell: bash
+        run: |
+          test "$GITHUB_REF_NAME" = "agent/s-20261102-91b6e4a7/optimization-001"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add experiments/s-20261102-91b6e4a7/001-91031.json
+          git commit -m "test(v5): archive original complete eight-seat registry smoke receipt"
+          git push origin HEAD:refs/heads/agent/s-20261102-91b6e4a7/optimization-001
+      - name: Archive original receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v5-registry-game-91b6e4a7
+          path: experiments/s-20261102-91b6e4a7/*.json
+          if-no-files-found: ignore
+          retention-days: 30
