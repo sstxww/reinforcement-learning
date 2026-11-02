@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "status": "REJECTED_MODEL_GAME_FAILED",
+  "complete_raw_model_game_verified": false,
+  "policy": "raw_ppo_model",
+  "failure_gate": "Unassisted complete eight-seat game required",
+  "first_failed_run": "https://github.com/sstxww/reinforcement-learning/actions/runs/41510156769",
+  "failure_signature": "Full-game safety limit exceeded",
+  "probe_exit_code": 3,
+  "probe_completed": false,
+  "model_sha256": "8ca9945226cf73f273f88a5301f522f5c388e6a53040707e267de35f38c9ea24",
+  "model_total_timesteps": 1536,
+  "parent_checkpoint_sha256": "a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632",
+  "champion_promoted": false,
+  "strength_improvement_verified": false,
+  "note": "This is a failed raw-model diagnostic, NOT a completed match receipt."
+}
