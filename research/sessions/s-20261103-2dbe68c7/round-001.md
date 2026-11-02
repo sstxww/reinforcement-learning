@@ -11,3 +11,12 @@
 - Model context only (no training): TavernGym 1.1.0, engine hash `6d8712c93022ba11`, observe2 4017/447/245, experiment checkpoint `a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632` unpromoted. Optimizer status not reevaluated.
 - Inference: utility should prevent orphaned evidence references in new reports; no claim of rank improvement, paired uncertainty improvement, or validated global merge.
 - Next: inspect CI/job logs; commit actual receipt and an updated status after execution; PR non-Draft; hand off to genuine integrator after latest-head tests.
+
+
+## Verified round outcome — exact runner evidence
+
+- Own actual full pinned eight-seat TavernGym baseline [Actions 41512700446](https://github.com/sstxww/reinforcement-learning/actions/runs/41512700446) **completed SUCCESS**, job 125508333948, checkpoint/model **not used**; seed 99737, seat 0, turns 16, model/new PPO steps 0, decisions 46, placements `[8,5,3,4,2,6,7,1]`, baseline rank **8**, no truncated combat or turn-limit end. Source head `b8935c78a7042b277a778a26f6445cb84a544c89`; authentic receipt committed [67228123](https://github.com/sstxww/reinforcement-learning/commit/67228123eb70baabf8e8c5fb74ff9bae0cb571da) to `experiments/s-20261103-2dbe68c7/001-99737-baseline.json`. Temporary artifact [13175150195](https://github.com/sstxww/reinforcement-learning/actions/runs/41512700446/artifacts/13175150195), **not permanent model custody**.
+- Initial PR #189 CI [41512858640](https://github.com/sstxww/reinforcement-learning/actions/runs/41512858640) **failed evidence gate** after **391 passed, 1 skipped** due to missing committed receipt; not a unit-test failure. See `failures/001-initial-pr-missing-receipt.md` for root cause and correction; next exact-head PR CI must be checked independently.
+- [PR #189](https://github.com/sstxww/reinforcement-learning/pull/189) is **non-Draft**, submitted for integration review; status = **awaiting latest-head CI**, not merged or integrated. No exclusive V7 main-merge lease exists for this task claim, so never direct main merge.
+- Own new model Release/weight/optimizer: none; training 0; raw PPO games 0; baseline full-game games 1; paired new sample n=0. No model improvement claim, no Best/Champion update. No ranked TavernArena.
+- Next owner action: recheck current main SHA, PR #189 latest HEAD and CI, check added receipt integrity, ensure production code scope remains independent, then hand to a verified global serialized integrator. If latest CI fails, inspect actual job logs and fix minimally.
