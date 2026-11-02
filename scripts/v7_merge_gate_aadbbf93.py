@@ -122,7 +122,7 @@ def assess(pr: dict, main_sha: str, expected_main: str, expected_head: str,
 def run_check(pr_number: int, expected_main: str, expected_head: str, receipt_path: str) -> dict:
     if pr_number < 1 or pr_number > 1_000_000:
         raise ValueError("Invalid PR number")
-    if not re.fullmatch(r"experiments/s-[0-9]{8}-[a-z0-9]+/[a-zA-Z0-9_.-]+\\.json", receipt_path):
+    if not re.fullmatch(r"experiments/s-[0-9]{8}-[a-z0-9]+/[a-zA-Z0-9_.-]+\.json", receipt_path):
         raise ValueError("Invalid or unsafe receipt path")
     prefix = "/repos/" + REPO
     main = github_get(prefix + "/branches/main")
