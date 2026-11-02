@@ -37,8 +37,8 @@ jobs:
           python -m tavern_ai.contract
       - name: Play paired genuine eight-seat full matches
         run: |
-          python -m tavern_ai.hero_power_ablation_s20261102_3a93dae9 --seeds 18101 18102 18103 18104 18105 18106
-          for SEED in 18101 18102 18103 18104 18105 18106; do
+          python -m tavern_ai.hero_power_ablation_s20261102_3a93dae9 --seeds 18201 18202 18203 18204 18205 18206
+          for SEED in 18201 18202 18203 18204 18205 18206; do
             python -m tavern_ai.validate_receipt "experiments/s-20261102-3a93dae9/001-$SEED.json"
             python -m tavern_ai.validate_receipt "experiments/s-20261102-3a93dae9/baseline-$SEED.json"
           done
@@ -49,9 +49,9 @@ jobs:
           test "$GITHUB_REF_NAME" = "agent/s-20261102-3a93dae9/optimization-001"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add experiments/s-20261102-3a93dae9/ research/sessions/s-20261102-3a93dae9/paired-affordable-results.json
+          git add experiments/s-20261102-3a93dae9/ research/sessions/s-20261102-3a93dae9/paired-confirmatory-results.json
           if ! git diff --cached --quiet; then
-            git commit -m "results(s-20261102-3a93dae9): record affordable hero power paired full games"
+            git commit -m "results(s-20261102-3a93dae9): record independent confirmation paired full games"
             git push origin HEAD:"$GITHUB_REF_NAME"
           fi
       - name: Upload bounded session evidence
@@ -61,6 +61,6 @@ jobs:
           name: hero-power-s-20261102-3a93dae9-${{ github.run_id }}
           path: |
             experiments/s-20261102-3a93dae9/*.json
-            research/sessions/s-20261102-3a93dae9/paired-affordable-results.json
+            research/sessions/s-20261102-3a93dae9/paired-confirmatory-results.json
           if-no-files-found: ignore
           retention-days: 30
