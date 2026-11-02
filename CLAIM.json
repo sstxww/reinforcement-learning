@@ -12,9 +12,9 @@
     "research/sessions/s-20261103-8e49e70d/**",
     "research/knowledge/proposals/s-20261103-8e49e70d-001.md"
   ],
-  "state": "released_to_review_and_integration",
+  "state": "released_evidence_verified_ready_for_integrator",
   "main_merge_lock": false,
-  "note": "Task claim intentionally released/handoff despite pending PR CI. No main merge or unpromoted model changes. Own original real baseline receipt and static report are committed.",
+  "note": "Claim released. Own run + artifact and distinct PR exact-head CI + full match SUCCESS. This is a quality-gated non-Draft PR, NOT merged; no global merge right.",
   "current_work_head": "6b89ad4869528c377d5aea6555692b9cb6915244",
   "pr_url": "https://github.com/sstxww/reinforcement-learning/pull/230",
   "pr_draft": false,
@@ -23,12 +23,31 @@
   "latest_pr_ci_url": "https://github.com/sstxww/reinforcement-learning/actions/runs/41514742571",
   "claim_active": false,
   "owner_relinquished_task_claim": true,
-  "latest_pr_ci_status_at_release": "queued",
+  "latest_pr_ci_status_at_release": "completed_success",
   "unmet_gates": [
-    "current exact-head PR CI completed success, actual jobs and full match",
-    "independent code/security review",
-    "globally exclusive main integration entry",
-    "SHA-bound merge and postmerge main CI"
+    "independent PR code/security review",
+    "proven globally exclusive main integration entry",
+    "SHA-bound main merge",
+    "exact postmerge main CI"
   ],
-  "next_agent_action": "Check PR #230 current HEAD and Actions run #41514742571; require complete CI and independent review. Do not main-merge without a proven exclusive integrator."
+  "next_agent_action": "Open PR #230 at HEAD 6b89ad4869528c377d5aea6555692b9cb6915244; verify green Actions 41514742571, independent review and a proven exclusive merge entry. If main SHA changes revalidate. After SHA-bound merge verify new main CI.",
+  "latest_pr_ci_head_sha": "6b89ad4869528c377d5aea6555692b9cb6915244",
+  "latest_pr_ci_run_job_id": 125515284972,
+  "ci_distinct_baseline_game": {
+    "seed": 1001,
+    "rank": 7,
+    "placements": [
+      7,
+      3,
+      4,
+      5,
+      1,
+      2,
+      8,
+      6
+    ],
+    "completed": true,
+    "artifact_id": 13174058689,
+    "sha256": "8f9d50f33807a5275a0a50d16caf0c43566db716b9038b212c5b126890a749d7"
+  }
 }
