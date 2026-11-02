@@ -4,6 +4,10 @@ on:
   push:
     branches:
       - 'agent/s-20261102-c097d0cc/optimization-001'
+    paths:
+      - 'tavern_ai/placement_probe.py'
+      - 'tests/test_placement_probe.py'
+      - '.github/workflows/experiment-s-20261102-c097d0cc.yml'
 
 permissions:
   contents: write
@@ -36,7 +40,7 @@ jobs:
       - name: Paired full eight-seat simulations (no early stopping)
         run: |
           timeout 25m python -m tavern_ai.placement_probe \
-            --agent-id s-20261102-c097d0cc --seed-start 31001 --games 4
+            --agent-id s-20261102-c097d0cc --seed-start 31001 --games 20
           for receipt in experiments/s-20261102-c097d0cc/001-*.json; do
             python -m tavern_ai.validate_receipt "$receipt"
           done
