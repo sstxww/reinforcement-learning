@@ -1,0 +1,65 @@
+name: Freeze-at-exit paired TavernGym s-20261102-717d0e50
+on:
+  push:
+    branches: ['agent/s-20261102-717d0e50/optimization-001']
+    paths:
+      - '.github/workflows/experiment-s-20261102-717d0e50.yml'
+      - 'tavern_ai/freeze_exit_s_717d0e50.py'
+      - 'tests/test_freeze_exit_s_717d0e50.py'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: freeze-s-20261102-717d0e50
+  cancel-in-progress: false
+jobs:
+  real-ten-pair-ablation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 65
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install test dependencies
+        run: |
+          python -m pip install -e '.[test]'
+      - name: Run isolated and project unit tests
+        run: python -m pytest
+      - name: Install pinned real TavernGym
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Run true ten paired seeds of eight players
+        run: python -m tavern_ai.freeze_exit_s_717d0e50
+      - name: Verify every genuine receipt
+        run: |
+          for f in experiments/s-20261102-717d0e50/*.json; do
+            python -m tavern_ai.validate_receipt "$f"
+          done
+      - name: Commit only session-owned completed match evidence
+        if: success()
+        shell: bash
+        run: |
+          test "$GITHUB_REF_NAME" = 'agent/s-20261102-717d0e50/optimization-001'
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add experiments/s-20261102-717d0e50/ research/sessions/s-20261102-717d0e50/metrics-001.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'results(s-20261102-717d0e50): verified freeze paired games'
+            git pull --rebase origin "$GITHUB_REF_NAME"
+            git push origin "HEAD:$GITHUB_REF_NAME"
+          fi
+      - name: Preserve session evidence without claiming permanence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: freeze-s-20261102-717d0e50-${{ github.run_id }}
+          path: |
+            experiments/s-20261102-717d0e50/*.json
+            research/sessions/s-20261102-717d0e50/metrics-001.json
+          if-no-files-found: ignore
+          retention-days: 30
