@@ -25,11 +25,11 @@ jobs:
     env:
       GH_TOKEN: ${{ github.token }}
     steps:
-      - uses: actions/checkout$v4
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
           persist-credentials: true
-      - uses: actions/setup-python$v5
+      - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
       - name: Install CPU training and test stack
@@ -68,7 +68,7 @@ jobs:
       - name: Commit owned real receipts and compact metrics only
         run: |
           git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]$users.noreply.github.com'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add experiments/s-20261102-309d57fc/ reports/s-20261102-309d57fc/
           if ! git diff --cached --quiet; then
             git commit -m 'results(v5): checkpoint smoke resume and real TavernGym evidence'
@@ -87,7 +87,7 @@ jobs:
             --notes '128-step smoke resumed from pinned V2 release; full-game plus two paired diagnostics; NOT a champion promotion.'
       - name: Preserve failure diagnostics even if resume or game fails
         if: always()
-        uses: actions/upload-artifact$v4
+        uses: actions/upload-artifact@v4
         with:
           name: checkpoint-audit-s-20261102-309d57fc-${{ github.run_id }}
           path: |
