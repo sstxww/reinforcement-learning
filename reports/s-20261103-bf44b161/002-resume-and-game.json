@@ -2,7 +2,7 @@
   "schema": 1,
   "session_id": "s-20261103-bf44b161",
   "round": 2,
-  "status": "rejected_raw_game_safety_limit",
+  "status": "rejected_raw_game_safety_limit_but_released_for_diagnostics",
   "run_id": 41509203645,
   "run_url": "https://github.com/sstxww/reinforcement-learning/actions/runs/41509203645",
   "engine": {
@@ -60,5 +60,21 @@
     "is_durable": false
   },
   "champion_eligible": false,
-  "champion_promoted": false
+  "champion_promoted": false,
+  "rejected_release": {
+    "tag": "v5-rejected-s-20261103-bf44b161-1536-41509203645",
+    "url": "https://github.com/sstxww/reinforcement-learning/releases/tag/v5-rejected-s-20261103-bf44b161-1536-41509203645",
+    "run_id": 41510224472,
+    "run_conclusion": "success",
+    "assets": [
+      "model.zip",
+      "model.metadata.json",
+      "checksums.sha256",
+      "rejection.json"
+    ],
+    "checkpoint_sha256_verified": true,
+    "independent_redownload_byte_comparison": true,
+    "registered_as_best": false,
+    "model_candidate_rejected": true
+  }
 }
