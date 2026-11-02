@@ -1,0 +1,78 @@
+name: Session s-20261102-6d2f9a71 - paired PPO entropy
+
+on:
+  push:
+    branches:
+      - agent/s-20261102-6d2f9a71/optimization-001
+    paths:
+      - .github/workflows/experiment-s-20261102-6d2f9a71.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: isolated-entropy-s-20261102-6d2f9a71
+  cancel-in-progress: false
+
+jobs:
+  bounded-entropy-trial:
+    if: github.ref == 'refs/heads/agent/s-20261102-6d2f9a71/optimization-001'
+    runs-on: ubuntu-latest
+    timeout-minutes: 85
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install CPU training and test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[train,test]'
+      - name: Unit tests
+        run: python -m pytest tests/test_entropy_trial.py tests/test_baseline.py tests/test_receipt.py
+      - name: Install fixed TavernGym and verify source and patch
+        run: bash scripts/bootstrap_engine.sh
+      - name: Independently train paired PPO models and play four complete eight-seat games
+        shell: bash
+        run: |
+          python -m tavern_ai.entropy_trial \
+            --agent-id s-20261102-6d2f9a71 \
+            --train-seed 77331 \
+            --eval-seeds 61001 61002 \
+            --steps 256 \
+            --output-dir checkpoints/s-20261102-6d2f9a71
+          for f in experiments/s-20261102-6d2f9a71/*.json; do
+            python -m tavern_ai.validate_receipt "$f"
+          done
+          GITHUB_HEAD_REF=agent/s-20261102-6d2f9a71/optimization-001 python scripts/check_pr_evidence.py
+      - name: Generate machine-checkable model hashes
+        run: |
+          sha256sum checkpoints/s-20261102-6d2f9a71/*.zip \
+            > checkpoints/s-20261102-6d2f9a71/SHA256SUMS
+          sha256sum -c checkpoints/s-20261102-6d2f9a71/SHA256SUMS
+      - name: Upload session-scoped checkpoints (90 day expiry, not permanent)
+        uses: actions/upload-artifact@v4
+        with:
+          name: entropy-s-20261102-6d2f9a71-${{ github.run_id }}
+          path: |
+            checkpoints/s-20261102-6d2f9a71/*.zip
+            checkpoints/s-20261102-6d2f9a71/SHA256SUMS
+            research/sessions/s-20261102-6d2f9a71/metrics-001.json
+            experiments/s-20261102-6d2f9a71/*.json
+          retention-days: 90
+          if-no-files-found: error
+      - name: Commit real receipts and metrics to this session branch only
+        shell: bash
+        run: |
+          set -euo pipefail
+          BRANCH='agent/s-20261102-6d2f9a71/optimization-001'
+          test "${GITHUB_REF}" = "refs/heads/${BRANCH}"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- experiments/s-20261102-6d2f9a71/ research/sessions/s-20261102-6d2f9a71/metrics-001.json
+          git diff --cached --exit-code && exit 1 || true
+          git commit -m 'experiment(s-20261102-6d2f9a71): commit verified real eight-seat game receipts'
+          git push origin HEAD:refs/heads/${BRANCH}
