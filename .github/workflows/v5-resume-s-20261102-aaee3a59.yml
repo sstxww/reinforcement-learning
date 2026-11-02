@@ -1,0 +1,114 @@
+name: V5 fail-closed resume and real-game smoke (s-20261102-aaee3a59)
+
+on:
+  push:
+    branches:
+      - agent/s-20261102-aaee3a59/optimization-001
+    paths:
+      - tavern_ai/resume_source_gate.py
+      - tavern_ai/train.py
+      - tests/test_resume_source_gate_aaee3a59.py
+      - .github/workflows/train.yml
+      - .github/workflows/v5-resume-s-20261102-aaee3a59.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: v5-resume-s-20261102-aaee3a59
+  cancel-in-progress: false
+
+jobs:
+  actual-engine-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[train,test]'
+      - name: Install exact pinned TavernGym
+        run: bash scripts/bootstrap_engine.sh
+      - name: Synthetic corruption and lineage regression
+        run: python -m pytest -q tests/test_resume_source_gate_aaee3a59.py
+      - name: Genuine complete eight-seat baseline canary
+        run: |
+          python -m tavern_ai.canary --agent-id s-20261102-aaee3a59 \
+            --policy baseline --seed 94431 \
+            --receipt experiments/s-20261102-aaee3a59/001-94431.json
+          python -m tavern_ai.validate_receipt experiments/s-20261102-aaee3a59/001-94431.json
+      - name: Verify reproducible baseline against already archived real receipt
+        run: |
+          python - <<'PY'
+          import json, subprocess
+          from pathlib import Path
+          path = "experiments/s-20261102-aaee3a59/001-94431.json"
+          archive = json.loads(subprocess.check_output(["git", "show", "HEAD:" + path], text=True))
+          fresh = json.loads(Path(path).read_text(encoding="utf-8"))
+          fields = ("engine_source_hash", "engine_version", "agent_id", "policy", "seed",
+                    "completed", "turns", "decisions", "placements", "truncated_combats",
+                    "turn_limit_end")
+          for key in fields:
+              if archive[key] != fresh[key]:
+                  raise RuntimeError("Baseline replay mismatch: " + key)
+          print("Real baseline replay agrees with logged/archived complete game")
+          PY
+          git restore experiments/s-20261102-aaee3a59/001-94431.json
+      - name: Download exact registered unpromoted Release
+        shell: bash
+        run: |
+          set -euo pipefail
+          TAG="$(python -m tavern_ai.resume_source_gate --print-release-tag)"
+          mkdir -p checkpoints/source artifacts
+          gh release download "$TAG" --repo "$GITHUB_REPOSITORY" \
+            --pattern model.zip --pattern model.metadata.json --dir checkpoints/source
+          python -m tavern_ai.resume_source_gate --origin release \
+            --weights checkpoints/source/model.zip \
+            --metadata checkpoints/source/model.metadata.json \
+            --probe-inference | tee artifacts/release-preflight.json
+      - name: Real bounded 128-step PPO continuation (not a strength claim)
+        run: |
+          python -m tavern_ai.train --steps 128 --seed 94432 \
+            --resume checkpoints/source/model.zip \
+            --out checkpoints/candidate/model.zip | tee artifacts/training.json
+          python -m tavern_ai.resume_source_gate --origin artifact \
+            --weights checkpoints/candidate/model.zip \
+            --metadata checkpoints/candidate/model.metadata.json \
+            --probe-inference | tee artifacts/candidate-preflight.json
+      - name: Candidate-controlled full eight-seat game (no rescue)
+        run: |
+          timeout 900 python -m tavern_ai.canary \
+            --agent-id s-20261102-aaee3a59 \
+            --policy model --model checkpoints/candidate/model.zip \
+            --seed 94433 --receipt artifacts/1536-candidate-model-game.json
+          python -m tavern_ai.validate_receipt artifacts/1536-candidate-model-game.json
+      - name: Validate candidate evidence and preserve as short-lived artifact
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          meta = json.loads(Path("checkpoints/candidate/model.metadata.json").read_text(encoding="utf-8"))
+          game = json.loads(Path("artifacts/1536-candidate-model-game.json").read_text(encoding="utf-8"))
+          assert game["model_sha256"] == meta["checkpoint_sha256"]
+          assert game["policy"] == "model" and game["completed"]
+          assert game["truncated_combats"] == 0 and not game["turn_limit_end"]
+          assert meta["total_timesteps"] == 1536
+          print("One true unguarded model-controlled game, no Champion promotion")
+          PY
+      - name: Short-lived diagnostic outputs (NOT permanent model storage)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v5-resume-smoke-s-20261102-aaee3a59-${{ github.run_id }}
+          path: |
+            artifacts/
+            checkpoints/candidate/model.zip
+            checkpoints/candidate/model.metadata.json
+          if-no-files-found: ignore
+          retention-days: 7

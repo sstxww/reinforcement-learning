@@ -1,0 +1,60 @@
+{
+  "schema": 1,
+  "session_id": "s-20261102-aaee3a59",
+  "round": 1,
+  "policy": "MaskablePPO",
+  "engine": {
+    "version": "1.1.0",
+    "source_hash": "6d8712c93022ba11",
+    "float_features": 4017,
+    "card_slots": 447,
+    "actions": 245,
+    "card_vocabulary": 3984
+  },
+  "parent": {
+    "release_tag": "v5-s-20261102-68099929-1408-41428692617",
+    "checkpoint_sha256": "a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632",
+    "cumulative_steps": 1408
+  },
+  "candidate": {
+    "checkpoint_sha256": "920bfa96370f0a40dcd7cae30e1652f323f27cb7516787e0375a4e8f1b046fc0",
+    "training_seed": 94432,
+    "added_steps": 128,
+    "cumulative_steps": 1536,
+    "checkpoint_integrity_checked": true,
+    "cpu_inference_probed": true,
+    "optimizer_continuation_actual_steps": 128,
+    "champion_promoted": false,
+    "competitive_gain_verified": false
+  },
+  "training": {
+    "run_url": "https://github.com/sstxww/reinforcement-learning/actions/runs/41450695383",
+    "job_id": 125294870562,
+    "training_step": "success",
+    "candidate_check_step": "success",
+    "actual_complete_game_step": "success",
+    "workflow_conclusion": "failure",
+    "workflow_failure": "Git identity missing during final receipt commit; not a PPO failure"
+  },
+  "model_game": {
+    "receipt": "experiments/s-20261102-aaee3a59/002-94433.json",
+    "seed": 94433,
+    "complete": true,
+    "seat0_rank": 8,
+    "decisions": 91,
+    "turns": 15,
+    "truncated_combats": 0,
+    "turn_limit_end": false
+  },
+  "storage": {
+    "short_lived_artifact_url": "https://github.com/sstxww/reinforcement-learning/actions/runs/41450695383/artifacts/13144484155",
+    "artifact_retention_days": 7,
+    "durable_release_target": "v5-s-20261102-aaee3a59-1536-41450695383",
+    "durable_release_published_confirmed": false,
+    "release_workflow": "https://github.com/sstxww/reinforcement-learning/actions/runs/41451915674",
+    "release_attempt_status": "failed",
+    "release_failure": "HTTP 403 Resource not accessible by integration on POST /repos/sstxww/reinforcement-learning/releases; no tag/assets created",
+    "release_recovery_requirement": "Owner authorized GitHub Release contents-write credential or approved main-only Release publisher; no repeated GH_TOKEN attempt"
+  },
+  "note": "Research-only unpromoted challenger. No fresh paired strength comparison, no Arena Elo; do not update canonical Champion/Best."
+}

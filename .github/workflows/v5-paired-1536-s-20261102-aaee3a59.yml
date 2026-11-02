@@ -1,0 +1,89 @@
+name: V5 paired heldout 1536-step challenge vs baseline (s-20261102-aaee3a59)
+
+on:
+  push:
+    branches:
+      - agent/s-20261102-aaee3a59/optimization-001
+    paths:
+      - .github/workflows/v5-paired-1536-s-20261102-aaee3a59.yml
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: v5-paired-1536-s-20261102-aaee3a59
+  cancel-in-progress: false
+
+jobs:
+  three-independent-pairs:
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install complete training+test dependencies and pinned real engine
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[train,test]'
+          bash scripts/bootstrap_engine.sh
+      - name: Download exact 1536-step candidate from source run, not latest Artifacts
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh run download 41450695383 --repo "$GITHUB_REPOSITORY" \
+            --name v5-resume-smoke-s-20261102-aaee3a59-41450695383 --dir custody
+          echo "920bfa96370f0a40dcd7cae30e1652f323f27cb7516787e0375a4e8f1b046fc0  custody/checkpoints/candidate/model.zip" | sha256sum -c -
+          python -m tavern_ai.resume_source_gate --origin artifact \
+            --weights custody/checkpoints/candidate/model.zip \
+            --metadata custody/checkpoints/candidate/model.metadata.json \
+            --probe-inference
+      - name: Three independent heldout seed pairs, exact same seat-zero engine/bots
+        run: |
+          python -m tavern_ai.evaluate \
+            --policy model --model custody/checkpoints/candidate/model.zip \
+            --games 3 --start-seed 94434 --compare-baseline \
+            --out artifacts/paired-1536-94434-94436.json
+      - name: Add honest paired descriptive statistical record
+        run: |
+          python - <<'PY'
+          import json, statistics
+          from pathlib import Path
+          p = Path("artifacts/paired-1536-94434-94436.json")
+          result = json.loads(p.read_text(encoding="utf-8"))
+          candidate = result["candidate"]
+          baseline = result["baseline"]
+          assert candidate["games"] == baseline["games"] == 3
+          assert candidate["seeds"] == baseline["seeds"] == [94434,94435,94436]
+          diffs = [m-b for m,b in zip(candidate["placements"],baseline["placements"])]
+          report = {
+             "schema":1,"source_checkpoint_sha256":"920bfa96370f0a40dcd7cae30e1652f323f27cb7516787e0375a4e8f1b046fc0",
+             "source_training_run":41450695383,
+             "candidate_policy":"raw_unmodified_model_not_guarded",
+             "evaluation_type":"three_real_full_eight-seat_paired_seed_zero-seat_matches",
+             "seeds":candidate["seeds"],"model_ranks":candidate["placements"],
+             "baseline_ranks":baseline["placements"],"paired_deltas":diffs,
+             "mean_paired_delta":statistics.mean(diffs),
+             "model_mean_rank":candidate["mean_placement"],
+             "baseline_mean_rank":baseline["mean_placement"],
+             "model_top4_rate":candidate["top4_rate"],"model_first_rate":candidate["first_place_rate"],
+             "statistics":"descriptive only; n=3 and seat 0 only; no uncertainty-confirmed promotion",
+             "champion_promoted":False,
+             "does_not_test_arena":True
+          }
+          q = Path("artifacts/paired-1536-summary.json")
+          q.write_text(json.dumps(report,indent=2,sort_keys=True)+"\n",encoding="utf-8")
+          print(json.dumps(report,sort_keys=True))
+          PY
+      - name: Preserve exact verified evaluation provenance
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v5-paired-1536-s-20261102-aaee3a59-${{ github.run_id }}
+          path: artifacts/
+          if-no-files-found: ignore
+          retention-days: 30
