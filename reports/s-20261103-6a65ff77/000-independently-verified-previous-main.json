@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "session_id": "s-20261103-6a65ff77",
+  "task_key": "integrate/postmerge-exact-main-ci-evidence",
+  "source": "independently downloaded authentic GitHub Actions artifact",
+  "main_sha_at_observation": "c1b828734527bae6141805581693d890cc3bff94",
+  "run_url": "https://github.com/sstxww/reinforcement-learning/actions/runs/41512315964",
+  "run_id": 41512315964,
+  "conclusion": "success",
+  "job_name": "tests-and-full-match",
+  "required_steps_completed_success": true,
+  "artifact_id": 13173024502,
+  "artifact_name": "ci-full-match-41512315964",
+  "original_receipt_member": "ci-full-match.json",
+  "original_receipt_sha256": "8b49e84d6ff0e1eef771826f8ccb5b4a81d1cf2f9bacf29b842cffbc0bd4ac10",
+  "game": {
+    "engine": "TavernGym 1.1.0",
+    "engine_source_hash": "6d8712c93022ba11",
+    "policy": "baseline",
+    "seed": 1001,
+    "controlled_seat": 0,
+    "completed": true,
+    "turns": 16,
+    "decisions": 46,
+    "placements": [
+      7,
+      3,
+      4,
+      5,
+      1,
+      2,
+      8,
+      6
+    ],
+    "truncated_combats": 0,
+    "turn_limit_end": false,
+    "model_sha256": null
+  },
+  "not_session_game": true,
+  "training_steps_this_session": 0,
+  "postmerge_verified_for": "c1b828734527bae6141805581693d890cc3bff94",
+  "warning": "Exact-SHA snapshot only: rerun checker if main changes; baseline infrastructure game is not raw PPO strength evidence."
+}
