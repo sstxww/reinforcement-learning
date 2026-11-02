@@ -1,0 +1,303 @@
+name: "V5 R002 real 1408 to 1536 durable resume s-20261103-a9d49781"
+
+on:
+  push:
+    branches:
+      - "agent/s-20261103-a9d49781/optimization-002"
+    paths:
+      - ".github/workflows/v5-resume-s-20261103-a9d49781-r002.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: "v5-canonical-resume-s-20261103-a9d49781-r002"
+  cancel-in-progress: false
+
+jobs:
+  train-and-real-game:
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install integrated main package and focused checkpoint regressions
+        run: |
+          python -m pip install -e '.[train,test]'
+          python -m pytest -q tests/test_release_asset_verifier.py tests/test_model_registry.py
+      - name: Verify pinned TavernGym and contract
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Restore immutable unpromoted 1408-step Release, fail closed
+        run: |
+          python -m tavern_ai.release_restore_entry \
+            --model-id v5-s-20261102-68099929-1408-41428692617 \
+            --out-dir checkpoints
+      - name: Actually resume MaskablePPO optimizer for exactly 128 steps
+        run: |
+          python -m tavern_ai.train \
+            --steps 128 --seed 99367 \
+            --resume checkpoints/model.zip \
+            --out checkpoints/candidate.zip
+      - name: Verify new SHA, source lineage, 1536 steps and optimizer advance
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p reports/s-20261103-a9d49781
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib, json
+          from sb3_contrib import MaskablePPO
+          root=Path('checkpoints')
+          old=json.loads((root/'model.metadata.json').read_text())
+          new=json.loads((root/'candidate.metadata.json').read_text())
+          def sha(p): return hashlib.sha256(p.read_bytes()).hexdigest()
+          source=sha(root/'model.zip')
+          candidate=sha(root/'candidate.zip')
+          assert source=='a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632'
+          assert candidate != source and new['checkpoint_sha256']==candidate
+          assert new['parent_checkpoint_sha256']==source
+          assert old['total_timesteps']==1408 and new['total_timesteps']==1536
+          assert old['engine']==new['engine']
+          m0=MaskablePPO.load(str(root/'model.zip'), device='cpu')
+          m1=MaskablePPO.load(str(root/'candidate.zip'), device='cpu')
+          assert m0.num_timesteps==1408 and m1.num_timesteps==1536
+          def opt_steps(m):
+              vals=[]
+              for item in m.policy.optimizer.state_dict()['state'].values():
+                  z=item.get('step')
+                  if z is not None:
+                      vals.append(int(z.item() if hasattr(z,'item') else z))
+              if not vals: raise ValueError('Optimizer state missing step counters')
+              return min(vals),max(vals)
+          before,after=opt_steps(m0),opt_steps(m1)
+          assert after[1] > before[1], f'Optimizer did not advance: {before} -> {after}'
+          report={'schema':1,'source_release':'v5-s-20261102-68099929-1408-41428692617',
+            'source_sha256':source,'new_sha256':candidate,
+            'source_total_steps':1408,'new_total_steps':1536,'increment':128,
+            'source_optimizer_steps':before,'new_optimizer_steps':after,
+            'optimizer_state_advanced':True,'engine_version':'1.1.0',
+            'raw_model_game_pending':True,'model_role':'unpromoted_experiment',
+            'champion_promoted':False}
+          out=Path('reports/s-20261103-a9d49781/002-resume-evidence.json')
+          out.write_text(json.dumps(report,indent=2,sort_keys=True)+'\n')
+          print(json.dumps(report,sort_keys=True))
+          PY
+          python -m tavern_ai.checkpoint_preflight \
+            --model checkpoints/candidate.zip --metadata checkpoints/candidate.metadata.json \
+            --expected-sha256 "$(sha256sum checkpoints/candidate.zip | awk '{print $1}')" \
+            --probe-inference
+      - name: New unassisted candidate plays complete genuine eight-seat match
+        run: |
+          mkdir -p experiments/s-20261103-a9d49781
+          timeout 600 python -m tavern_ai.canary \
+            --agent-id s-20261103-a9d49781 --policy model --model checkpoints/candidate.zip \
+            --seed 99368 --receipt experiments/s-20261103-a9d49781/002-99368.json
+          python -m tavern_ai.validate_receipt experiments/s-20261103-a9d49781/002-99368.json
+      - name: Capture failed raw model decision trace, never a fictitious receipt
+        if: failure()
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p reports/s-20261103-a9d49781
+          test -s checkpoints/candidate.zip || exit 0
+          set +e
+          timeout 150 python -m tavern_ai.behavior_probe_ba09e2d4 \
+            --model checkpoints/candidate.zip --seed 99368 \
+            --agent-id s-20261103-a9d49781 \
+            --receipt experiments/s-20261103-a9d49781/002-probe-only-if-complete.json \
+            --metrics reports/s-20261103-a9d49781/002-incomplete-model-trace.json
+          probe_exit=$?
+          set -e
+          PROBE_EXIT="$probe_exit" python - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          sha=hashlib.sha256(Path('checkpoints/candidate.zip').read_bytes()).hexdigest()
+          m=json.loads(Path('checkpoints/candidate.metadata.json').read_text())
+          trace_path=Path('reports/s-20261103-a9d49781/002-incomplete-model-trace.json')
+          trace=json.loads(trace_path.read_text()) if trace_path.exists() else {}
+          report={'schema':1,'status':'REJECTED_MODEL_GAME_FAILED',
+            'complete_raw_model_game_verified':False,'policy':'raw_ppo_model',
+            'failure_gate':'Unassisted complete eight-seat game required',
+            'first_failed_run':'https://github.com/sstxww/reinforcement-learning/actions/runs/41510156769',
+            'failure_signature':'Full-game safety limit exceeded',
+            'probe_exit_code':int(os.environ['PROBE_EXIT']),
+            'probe_completed':trace.get('complete_eight_seat_game'),
+            'model_sha256':sha,'model_total_timesteps':m['total_timesteps'],
+            'parent_checkpoint_sha256':m['parent_checkpoint_sha256'],
+            'champion_promoted':False,'strength_improvement_verified':False,
+            'note':'This is a failed raw-model diagnostic, NOT a completed match receipt.'}
+          Path('reports/s-20261103-a9d49781/002-model-game-failure.json').write_text(json.dumps(report,indent=2)+'\n')
+          print(json.dumps(report))
+          PY
+
+      - name: Heldout paired candidate and rules baseline real full games
+        run: |
+          timeout 900 python -m tavern_ai.evaluate \
+            --model checkpoints/candidate.zip --games 1 \
+            --start-seed 99369 --compare-baseline \
+            --out reports/s-20261103-a9d49781/002-paired-evaluation.json
+      - name: Preserve versioned model and failure diagnostic for recovery
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v5-r002-s-20261103-a9d49781-model-and-evidence
+          path: |
+            checkpoints/candidate.zip
+            checkpoints/candidate.metadata.json
+            experiments/s-20261103-a9d49781/002-99368.json
+            reports/s-20261103-a9d49781/002-resume-evidence.json
+            reports/s-20261103-a9d49781/002-paired-evaluation.json
+            reports/s-20261103-a9d49781/002-incomplete-model-trace.json
+            reports/s-20261103-a9d49781/002-model-game-failure.json
+          retention-days: 14
+          if-no-files-found: warn
+
+  publish-after-gates:
+    needs: train-and-real-game
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download only this successful run's verified artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: v5-r002-s-20261103-a9d49781-model-and-evidence
+          path: .
+      - name: Validate before committing any own evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s checkpoints/candidate.zip
+          test -s checkpoints/candidate.metadata.json
+          python - <<'PY'
+          import json,hashlib
+          from pathlib import Path
+          p=Path('checkpoints/candidate.zip')
+          m=json.loads(Path('checkpoints/candidate.metadata.json').read_text())
+          e=json.loads(Path('reports/s-20261103-a9d49781/002-resume-evidence.json').read_text())
+          c=json.loads(Path('experiments/s-20261103-a9d49781/002-99368.json').read_text())
+          v=json.loads(Path('reports/s-20261103-a9d49781/002-paired-evaluation.json').read_text())
+          h=hashlib.sha256(p.read_bytes()).hexdigest()
+          assert h==m['checkpoint_sha256']==e['new_sha256']
+          assert m['total_timesteps']==1536
+          assert c['policy']=='model' and c['completed'] is True and c['model_sha256']==h
+          assert c['truncated_combats']==0 and c['turn_limit_end'] is False
+          assert v['candidate']['games']==1 and v['baseline']['games']==1
+          assert v['model_evidence_mode']=='raw model; guard and fallback not permitted'
+          print('Verified real candidate game and paired evaluation; no promotion.')
+          PY
+      - name: Commit authentic own match receipt and concise evidence only
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add experiments/s-20261103-a9d49781/002-99368.json reports/s-20261103-a9d49781/002-resume-evidence.json reports/s-20261103-a9d49781/002-paired-evaluation.json
+          if ! git diff --cached --quiet; then
+            git commit -m "test(v5): document authentic postmerge 128-step PPO resume and model game"
+            git push origin HEAD:refs/heads/agent/s-20261103-a9d49781/optimization-002
+          fi
+      - name: Publish unique durable UNPROMOTED candidate GitHub Release
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="v5-smoke-s-20261103-a9d49781-resume128-$GITHUB_RUN_ID"
+          mkdir -p publish
+          cp checkpoints/candidate.zip publish/model.zip
+          cp checkpoints/candidate.metadata.json publish/model.metadata.json
+          sha256sum publish/model.zip publish/model.metadata.json > publish/checksums.sha256
+          gh release create "$tag" --repo "$GITHUB_REPOSITORY" \
+            --target "$GITHUB_SHA" --prerelease \
+            --title "R002 isolated 1408-to-1536 unpromoted PPO smoke" \
+            --notes "Experimental unpromoted checkpoint. Genuine raw model full match + paired heldout seed are required gates. No competitive gain or Champion claim. Run ${{ github.run_id }}." \
+            publish/model.zip publish/model.metadata.json publish/checksums.sha256 \
+            experiments/s-20261103-a9d49781/002-99368.json \
+            reports/s-20261103-a9d49781/002-resume-evidence.json \
+            reports/s-20261103-a9d49781/002-paired-evaluation.json
+          mkdir -p verification
+          gh release download "$tag" --repo "$GITHUB_REPOSITORY" \
+            --pattern model.zip --pattern model.metadata.json --dir verification
+          cmp publish/model.zip verification/model.zip
+          cmp publish/model.metadata.json verification/model.metadata.json
+          echo "Durable unpromoted Release verified: $tag"
+
+  archive-rejected-diagnostic:
+    needs: train-and-real-game
+    if: ${{ always() && needs['train-and-real-game'].result == 'failure' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Retrieve explicitly failed, unpromoted checkpoint bytes
+        uses: actions/download-artifact@v4
+        with:
+          name: v5-r002-s-20261103-a9d49781-model-and-evidence
+          path: .
+      - name: Verify rejection evidence, parent lineage and new checkpoint SHA
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import hashlib,json
+          from pathlib import Path
+          folder=Path('checkpoints')
+          weights=folder/'candidate.zip'
+          metadata=json.loads((folder/'candidate.metadata.json').read_text())
+          lineage=json.loads(Path('reports/s-20261103-a9d49781/002-resume-evidence.json').read_text())
+          failure=json.loads(Path('reports/s-20261103-a9d49781/002-model-game-failure.json').read_text())
+          digest=hashlib.sha256(weights.read_bytes()).hexdigest()
+          assert digest==metadata['checkpoint_sha256']==lineage['new_sha256']==failure['model_sha256']
+          assert metadata['parent_checkpoint_sha256']==lineage['source_sha256']
+          assert metadata['total_timesteps']==1536 and lineage['optimizer_state_advanced'] is True
+          assert failure['status']=='REJECTED_MODEL_GAME_FAILED' and failure['complete_raw_model_game_verified'] is False
+          assert not Path('experiments/s-20261103-a9d49781/002-99368.json').exists()
+          print('Confirmed rejected diagnostic: candidate weights were continued but no full model game passed.')
+          PY
+      - name: Commit ONLY failure evidence, not weight files or fake game receipts
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add reports/s-20261103-a9d49781/002-resume-evidence.json reports/s-20261103-a9d49781/002-model-game-failure.json
+          if [ -s reports/s-20261103-a9d49781/002-incomplete-model-trace.json ]; then
+            git add reports/s-20261103-a9d49781/002-incomplete-model-trace.json
+          fi
+          if ! git diff --cached --quiet; then
+            git commit -m "research(v5): record actual optimizer resume and failed raw model full game"
+            git push origin HEAD:refs/heads/agent/s-20261103-a9d49781/optimization-002
+          fi
+      - name: Permanently store REJECTED / unpromoted checkpoint for future diagnosis
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="v5-rejected-s-20261103-a9d49781-1536-$GITHUB_RUN_ID"
+          mkdir -p publish
+          cp checkpoints/candidate.zip publish/model.zip
+          cp checkpoints/candidate.metadata.json publish/model.metadata.json
+          sha256sum publish/model.zip publish/model.metadata.json > publish/checksums.sha256
+          gh release create "$tag" --repo "$GITHUB_REPOSITORY" \
+            --target "$GITHUB_SHA" --prerelease \
+            --title "REJECTED PPO 1536-step diagnostic: raw game failed" \
+            --notes "REJECTED: 1408-to-1536 optimizer continuation succeeded but raw model full eight-seat game failed the safety limit. No completed model match, no paired evaluation, no Champion or strength claim. Historical failure run 41510156769." \
+            publish/model.zip publish/model.metadata.json publish/checksums.sha256 \
+            reports/s-20261103-a9d49781/002-resume-evidence.json \
+            reports/s-20261103-a9d49781/002-model-game-failure.json
+          mkdir -p verification
+          gh release download "$tag" --repo "$GITHUB_REPOSITORY" \
+            --pattern model.zip --pattern model.metadata.json --dir verification
+          cmp publish/model.zip verification/model.zip
+          cmp publish/model.metadata.json verification/model.metadata.json
+          echo "Durable rejected failure checkpoint verified: $tag"

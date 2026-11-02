@@ -1,0 +1,22 @@
+{
+  "champion_promoted": false,
+  "engine_version": "1.1.0",
+  "increment": 128,
+  "model_role": "unpromoted_experiment",
+  "new_optimizer_steps": [
+    96,
+    96
+  ],
+  "new_sha256": "8ca9945226cf73f273f88a5301f522f5c388e6a53040707e267de35f38c9ea24",
+  "new_total_steps": 1536,
+  "optimizer_state_advanced": true,
+  "raw_model_game_pending": true,
+  "schema": 1,
+  "source_optimizer_steps": [
+    88,
+    88
+  ],
+  "source_release": "v5-s-20261102-68099929-1408-41428692617",
+  "source_sha256": "a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632",
+  "source_total_steps": 1408
+}
