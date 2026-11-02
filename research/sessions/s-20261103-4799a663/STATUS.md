@@ -21,3 +21,11 @@
 - FAILURE TRACKING: pending; preserve any incomplete PPO as failure with rank=null and completed=false, never fabricate placements
 - MERGE STATUS: no PR merged in this session. main unprotected and no verified exclusive integrator ownership; no direct merge
 - NEXT ACTION: finish own workflow, verify both authentic receipts/sha/job status, commit originals from logs/artifact, inspect exact-HEAD PR CI, and present non-Draft PR to authorized serial integrator.
+
+## GitHub transaction after setup
+- PR: https://github.com/sstxww/reinforcement-learning/pull/214 (Draft because independent authentic game receipt and exact-head CI are not yet complete; do not merge early)
+- Last committed experiment workflow HEAD (at PR opening): `3378dc95de1be291ae2b5bd7d4e718806022c61b`
+- Actual isolated Actions run: https://github.com/sstxww/reinforcement-learning/actions/runs/41513448828, state **queued** when last checked. Queued is not proof of model or baseline game, tests or release restoration.
+- Independent P0 review posted: https://github.com/sstxww/reinforcement-learning/pull/175#issuecomment-6586891207 (not an approval)
+- Unique task claim is deliberately left as a historical owner marker. Before taking over, check owner PR and do not treat it as an eternal active lease. No integration lock was acquired.
+- First next action: inspect run 41513448828 jobs/logs/artifact; only if actual completed valid receipts are present, commit authentic bytes into own `experiments/` and update this status; otherwise record exact failure and source SHA, no rank claim.
