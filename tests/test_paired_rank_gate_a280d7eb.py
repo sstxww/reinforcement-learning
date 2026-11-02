@@ -16,6 +16,8 @@ def receipt(seed, rank, policy, *, seat=0):
         "policy": policy, "model_sha256": "a" * 64 if policy == "model" else None,
         "placements": placement, "turns": 10, "decisions": 35,
         "truncated_combats": 0, "turn_limit_end": False,
+        **({"raw_model_only": True, "guard_forced_ends": 0}
+           if policy == "model" else {}),
     }
 
 
@@ -50,6 +52,17 @@ def test_never_treat_assisted_result_as_raw(guard):
     m, b = pair()
     m[0].update(guard)
     with pytest.raises(ValueError, match="Guarded"):
+        summarize(m, b)
+
+
+def test_missing_raw_model_disclosure_fails_closed():
+    m, b = pair()
+    del m[0]["raw_model_only"]
+    with pytest.raises(ValueError, match="undisclosed"):
+        summarize(m, b)
+    m, b = pair()
+    del m[0]["guard_forced_ends"]
+    with pytest.raises(ValueError, match="undisclosed"):
         summarize(m, b)
 
 
