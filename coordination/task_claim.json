@@ -1,0 +1,16 @@
+{
+  "task_key": "ci/merge-base-bound-run-regression",
+  "session_id": "s-20261103-d8bde8c1",
+  "round": "001",
+  "role": "REPAIRER/REVIEWER",
+  "base_main_sha": "c1b828734527bae6141805581693d890cc3bff94",
+  "work_branch": "agent/s-20261103-d8bde8c1/optimization-001",
+  "owned_files": [
+    "scripts/v7_ci_merge_base_d8bde8c1.py",
+    "tests/test_v7_ci_merge_base_d8bde8c1.py",
+    ".github/workflows/v7-ci-merge-base-s-20261103-d8bde8c1.yml"
+  ],
+  "shared_files_touched": [],
+  "claim_scope": "task only, NOT main merge lease",
+  "handoff": "release claim at end; do not interpret this ref as a global merge lock"
+}
