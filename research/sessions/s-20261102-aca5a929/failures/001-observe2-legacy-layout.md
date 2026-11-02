@@ -8,3 +8,9 @@
 - Repair 1 commit: `2fd46064290c772e79318fbe75c442ff31851506`; use the pinned public `CARDS=447` contract for Arena observation length. Before full training, instantiate a real engine Game and explicitly verify that the old board/hand/shop card-index prefix is preserved by observe2. If not, refuse further training rather than silently read incorrect card IDs.
 - Repair-run: [GitHub Actions 41422373796](https://github.com/sstxww/reinforcement-learning/actions/runs/41422373796). Status and outcome to be added from observed logs.
 - Bounded retries: initial execution + at most 2 meaningful fixes; never re-run the same deterministic broken SHA.
+
+
+## Verified repair outcome
+- [Actions 41422373796](https://github.com/sstxww/reinforcement-learning/actions/runs/41422373796) **SUCCESS** after fix: pinned engine hash checked, real old observe/card stream compared with extended observe2, all 16 actual full-game receipts completed and validated.
+- Additional regression `tests/test_obs2_bridge_s20261102_aca5a929.py` covers public-card prefix on a real installed engine (skipped if the engine is absent). The executable training path independently asserts this compatibility before any optimization.
+- No second repair needed. One initial failure, one substantial repair, one successful retest. The false shape guard caused no invalid game results or leaked model promotion.
