@@ -52,6 +52,14 @@ def read_registry(path: Path) -> dict:
     for key in ("champion", "challenger", "latest"):
         if roles.get(key) is not None and roles[key] not in ids:
             raise ValueError(f"Role {key} references an unknown model")
+    # Named population/rejected pools must reference known immutable model IDs.
+    for role in ("population", "rejected"):
+        members = roles.get(role, [])
+        if not isinstance(members, list) or len(members) != len(set(
+                member for member in members if isinstance(member, str))):
+            raise ValueError(f"Invalid {role} model pool")
+        if any(not isinstance(member, str) or member not in ids for member in members):
+            raise ValueError(f"Unknown model in {role} pool")
     if roles.get("champion") is not None:
         selected = next(e for e in entries if e["id"] == roles["champion"])
         if selected["review_status"] != "verified":
