@@ -1,0 +1,41 @@
+name: Isolated buy-frequency experiment s-20261102-9c034841 r002
+on:
+  push:
+    branches: ['agent/s-20261102-9c034841/optimization-002']
+    paths:
+      - 'tavern_ai/upgrade_frequency_s_20261102_9c034841.py'
+      - 'tests/test_upgrade_frequency_s_20261102_9c034841.py'
+permissions:
+  contents: read
+concurrency:
+  group: buy-frequency-s-20261102-9c034841-r002
+  cancel-in-progress: false
+jobs:
+  real-three-arm-evaluation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 80
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install test suite
+        run: python -m pip install -e '.[test]'
+      - name: All regression tests
+        run: python -m pytest
+      - name: Boot pinned genuine TavernGym
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Complete candidate game and 12 three-arm heldout matches
+        run: |
+          python -m tavern_ai.upgrade_frequency_s_20261102_9c034841 --seed 49201 --eval-seeds 49211 49212 49213 49214 --out outputs/s-20261102-9c034841/r002
+          python -m tavern_ai.validate_receipt outputs/s-20261102-9c034841/r002/002-49201.json
+      - name: Preserve actual results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: s-20261102-9c034841-r002-evidence
+          path: outputs/s-20261102-9c034841/r002/*.json
+          if-no-files-found: ignore
+          retention-days: 30
