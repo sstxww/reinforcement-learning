@@ -1,24 +1,29 @@
-# AutoTavern V5 session s-20261102-fb6a2c91 — STATUS
+# AutoTavern V5 — s-20261102-fb6a2c91 STATUS (R001 completed, integration Draft)
 
-Session owner: this independent ChatGPT conversation. Own branch: `agent/s-20261102-fb6a2c91/optimization-001`. Review: https://github.com/sstxww/reinforcement-learning/pull/133.
+Own branch: `agent/s-20261102-fb6a2c91/optimization-001`. PR https://github.com/sstxww/reinforcement-learning/pull/133. Original main base: `ef77ae6bc5d9bef09e903fac7705917ec3b7366d`; main is moving concurrently. Upstream read-only. Only own isolated branch modified. **No Champion promotion or main merge.**
 
-## Origin and P0 integration
-- Main base (immutable): `ef77ae6bc5d9bef09e903fac7705917ec3b7366d`. Main advances concurrently; do not overwrite it or another session.
-- #93 held: current main has five registered candidates but #93's unit tests require exactly four and full metadata index equality; the green old-head PR CI cannot certify integration. Comment sent.
-- #15 held: only Ready PR depends on #9 which is Draft and has no verified latest-head CI. No merge attempted; comment sent.
-- No upstream/official ranked arena, no Champion/Best changes, no modifications to shared `train.yml`.
+## P0 direct integration audit
+- Commented on #93 blocking a merge: its tests hard-code 4 candidates and full metadata index coverage, but canonical main already contains 5 (including V5 1408) and has an existing dual-asset verifier. Prior green head-CI does not prove merge compatibility. Do not merge unchanged.
+- Commented on #15: only ready-to-review PR depends on still Draft #9; V2 continuation showed no gain. Hold stacked merge.
+- Reviewed rank-eight evidence and posted pinned-engine semantics to issue #78. No PR in that pair safely merged by this session.
 
-## Completed real evidence (this own branch)
-- GitHub Actions https://github.com/sstxww/reinforcement-learning/actions/runs/41450269678.
-- Offline lineage regressions **passed**; pinned TavernGym 1.1.0 build + source hash `6d8712c93022ba11` **passed**.
-- Authentic **baseline**-controlled full eight-seat game seed `92360`: completed=true, placement seat0=8, turns=14, decisions=55, `placements=[8,2,4,7,1,3,5,6]`, truncated combats=0. Exact verified and committed receipt: `experiments/s-20261102-fb6a2c91/001-92360.json`. This does not certify any PPO model.
-- Existing experimental 1408-step V5 Release downloaded by independent workflow. Source tag `v5-s-20261102-68099929-1408-41428692617`; parent SHA256 `a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632`.
-- At this STATUS update, the actual 128-step resume/child model gate is **in progress**. No child SHA/Release/true-model rank or competitive gain is asserted without later workflow evidence. Read the live job steps before updating status.
+## P1 real Release-backed resume and archive — VERIFIED
+- Actual independent GitHub Actions run https://github.com/sstxww/reinforcement-learning/actions/runs/41450269678: **SUCCESS** including tests, pinned engine, original full game, parent Release download, hash/CPU-load gate, true MaskablePPO incremental training, model-only canary, two-game paired heldout evaluation and GitHub Release publication.
+- Parent Release `v5-s-20261102-68099929-1408-41428692617`: 1408 steps; SHA256 `a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632`; both source Release assets byte-verified and model CPU-loaded.
+- **True +128 steps** with seed 92361, cumulative 1536; child model.zip SHA256 `d6e27e7ca3cbde0997cc1bdcb7d1a62b3d19ab9d67f7ffcbde37c204cb4ff843` (separately verified against actual job artifact and public Release API digest). Child metadata matches 1536 steps and pinned engine; ZIP retains PPO optimizer state.
+- Permanent unpromoted prerelease: https://github.com/sstxww/reinforcement-learning/releases/tag/v5-experimental-s-20261102-fb6a2c91-resume128-001, includes model.zip (17,525,202 bytes), model.metadata.json, lineage.json, SHA256 receipt, and model-game gate. Unlike 30-day Actions artifact this is versioned Release. **Independent re-download + true optimizer resume from this NEW child Release is not tested; do not claim it.**
+- Full raw-artifact provenance: https://github.com/sstxww/reinforcement-learning/actions/runs/41450269678/artifacts/13144104301 ; original job output was inspected and the exact child SHA checked against checkpoint bytes.
 
-## P2 proven and falsified hypotheses
-- `reports/s-20261102-83d91476/001-buy-opportunity-report.json`: V2 2 genuine games, ranks [8,8], zero buys at 74 legal BUY decision exposures, raw actions IDs 1/2 222/248; same-seed baseline ranks [6,7] with 33 buys.
-- Exact pinned upstream Rust actions: 1 Refresh, 2 Freeze (toggles shop), 7 Cancel, 8..15 Buy; the action mask checks affordability (gold or health) and hand capacity.
-- Draft stacked PR #107: 3 paired buy-overridden games still [8,8,8] despite 46 real buys; Play↔Cancel cycle also present. Therefore simple forced BUY is insufficient; do not promote based on action counts alone.
+## P1/P2 authentic competitive results — NO GAIN
+- Original own baseline full game seed 92360, seat0 rank8, 14 turns, 55 decisions, completed, zero truncated; receipt `experiments/s-20261102-fb6a2c91/001-92360.json`, committed from authentic Action.
+- Original own **unassisted MaskablePPO** model game seed 92362: seat0 rank8, 16 turns, 129 decisions, completed, zero truncated; child hash `d6e27e7c...`; exact authentic receipt `experiments/s-20261102-fb6a2c91/002-92362.json` copied from real Action artifact. No guard substituted.
+- Paired heldout seeds 92370/92371: child model ranks `[8,8]` vs baseline `[8,8]`, delta=0; top4=0%. n=2 is insufficient for competitive strength claims. Model **NOT** Best/Champion.
+- Compact reproducible evidence report: `reports/s-20261102-fb6a2c91/001-real-resume-and-eval.json`. No full-game metrics invented; original receipts and report are stored on own branch.
 
-## Next gates
-Review the genuine 128-step child SHA, 1408->1536 lineage, its model-only game (or explicit no-game failure), two-game paired evaluation when completed, published unique Release assets or a real permission blocker, and exact latest-head CI before requesting merge. An expiring Artifact is not durable model storage.
+## P2 diagnosis
+- Prior real V2: 0 BUY across 74 legal BUY decision exposures; raw IDs1/2 222/248. Pinned source decodes 1 Refresh, 2 Freeze (shop toggle), 7 Cancel, 8..15 Buy. Legal-mask checks affordability.
+- Stacked Draft #107 explicitly forced 46 buys in three games, but still `[8,8,8]`; observed Play↔Cancel oscillations. Buying alone not a sufficient fix; root-cause and successful correction unproved.
+- Current additional 128 PPO steps did not improve measured rank. Do not scale training blindly; instrument public state changes, Freeze toggles, and Play/Cancel target selection next.
+
+## Merge gates / handoff
+- PR #133 is intentionally Draft. The **initial PR CI run #41450393171 failed** before the authentic session receipt existed in the branch; this first-run failure is not evidence that the now-complete branch passes or fails. Re-check latest-head PR CI after the evidence/report commits. Do not merge without fresh exact-head CI, current main compatibility, independent child Release recovery test, and P2 action-loop review.
