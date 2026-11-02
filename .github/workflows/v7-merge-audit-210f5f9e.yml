@@ -1,0 +1,69 @@
+name: V7 independent merge safety and real eight-seat baseline - s-20261103-210f5f9e
+
+on:
+  push:
+    branches:
+      - agent/s-20261103-210f5f9e/optimization-001
+    paths:
+      - .github/workflows/v7-merge-audit-210f5f9e.yml
+      - tavern_ai/v7_merge_entry_audit_210f5f9e.py
+      - tests/test_v7_merge_entry_audit_210f5f9e.py
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: v7-merge-audit-s-20261103-210f5f9e
+  cancel-in-progress: false
+
+jobs:
+  preflight-and-real-baseline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install and run negative merge-gate regressions
+        run: |
+          python -m pip install -e '.[test]'
+          python -m pytest tests/test_v7_merge_entry_audit_210f5f9e.py
+      - name: Live main branch protection audit (read-only)
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p outputs
+          gh api "repos/$GITHUB_REPOSITORY/branches/main" > outputs/main-branch.json
+          gh api "repos/$GITHUB_REPOSITORY/rulesets" > outputs/rulesets.json
+          python -m tavern_ai.v7_merge_entry_audit_210f5f9e \
+            --branch-json outputs/main-branch.json \
+            --rulesets-json outputs/rulesets.json > outputs/merge-entry-audit.json
+          python - <<'PY'
+          import json
+          r=json.load(open("outputs/merge-entry-audit.json"))
+          assert r["eligible_for_exclusive_merge"] is False
+          assert r["blockers"]
+          print("PASS: no global merge ownership inferred from CAS ref")
+          PY
+      - name: Install pinned TavernGym and verify contract
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Run actual eight-seat TavernGym baseline
+        run: |
+          python -m tavern_ai.canary --agent-id s-20261103-210f5f9e \
+            --seed 99817 --policy baseline --receipt outputs/001-99817.json
+          python -m tavern_ai.validate_receipt outputs/001-99817.json
+          sha256sum outputs/001-99817.json > outputs/001-99817.sha256
+      - name: Preserve original raw evidence (temporary, not Release)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v7-merge-audit-s-20261103-210f5f9e-${{ github.run_id }}
+          path: outputs/*
+          if-no-files-found: ignore
+          retention-days: 30
