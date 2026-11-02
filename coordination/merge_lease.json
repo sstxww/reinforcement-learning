@@ -1,0 +1,15 @@
+{
+  "schema": 1,
+  "kind": "autotavern-main-integrate-exclusive-lease",
+  "state": "held",
+  "session_id": "s-20261103-d0e7ebb090",
+  "task_key": "integrate/pr-164",
+  "owner": "sstxww",
+  "issued_at": "2026-11-02T19:38:47.296Z",
+  "expires_at": "2026-11-02T19:44:47.296Z",
+  "nonce": "d0e7ebb090-164-3a745c6",
+  "target_pr": 164,
+  "expected_pr_head": "30cb86f71b22eda8ed92f9f4d19598c93c5e9a23",
+  "observed_main_sha": "3a745c6f6a48c65528bcbeb81b8627b8db93f046",
+  "release_rule": "CAS update_ref expected_sha to a released commit; no forced takeover"
+}
