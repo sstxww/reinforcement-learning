@@ -19,7 +19,9 @@ def test_real_release_inventory_is_pessimistic():
     data = validate_registry(inventory())
     assert data["champion_id"] is None
     assert data["latest_resumable_id"] is None
-    assert data["entries"][0]["role"] == "unverified"
+    assert data["entries"][0]["role"] == "challenger"
+    assert data["entries"][0]["verification"]["hash"] is True
+    assert data["entries"][0]["verification"]["inference"] is True
     assert data["entries"][0]["verification"]["resume"] is False
 
 
