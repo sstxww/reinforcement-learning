@@ -10,6 +10,11 @@ def test_main_train_is_main_only_and_serialized():
     assert "if: github.ref == 'refs/heads/main'" in txt
     assert "group: tavern-ai-train-main" in txt
     assert "cancel-in-progress: false" in txt
+    assert "permissions:\n  contents: read\n  actions: read" in txt
+    assert "publish:\n    needs: train" in txt
+    assert txt.count("contents: write") == 1
+    assert "    permissions:\n      contents: write\n      actions: read" in txt
+    assert txt.index("  publish:") > txt.index("      - name: Save resumable checkpoint")
 
 
 def test_explicit_release_restore_rejects_unregistered_or_tampered_bytes():
