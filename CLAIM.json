@@ -3,7 +3,7 @@
   "task_key": "audit/1536-candidate-censoring",
   "session_id": "s-20261103-4c5fcc9a",
   "round": "001",
-  "state": "claimed",
+  "state": "released_for_handoff",
   "base_main_sha": "c1b828734527bae6141805581693d890cc3bff94",
   "work_branch": "agent/s-20261103-4c5fcc9a/optimization-001",
   "owner_files": [
@@ -13,5 +13,19 @@
   ],
   "exclusive_main_merge": false,
   "claims_are_task_only": true,
-  "recovery": "On completion mark this record released; other sessions must inspect work PR and cannot treat this as main merge authority."
+  "recovery": "On completion mark this record released; other sessions must inspect work PR and cannot treat this as main merge authority.",
+  "completed_utc": "2026-11-02T19:58:00Z",
+  "pr_url": "https://github.com/sstxww/reinforcement-learning/pull/217",
+  "work_head_at_handoff": "ac0133935dd7d34c15406afed23ce93267c33d45",
+  "original_game_action_run": "https://github.com/sstxww/reinforcement-learning/actions/runs/41513439954",
+  "original_game_sha256": "b629268c188711bd515cf43c562c9d0474d1af77e809d7a0aa48149ab627c02e",
+  "pr_latest_head_ci_at_handoff": "https://github.com/sstxww/reinforcement-learning/actions/runs/41514660982",
+  "remaining_gates": [
+    "verify latest-head CI success and actual full-match job steps",
+    "independent reviewer approval",
+    "exclusive enforced main merge execution authority",
+    "postmerge current-main CI"
+  ],
+  "claim_released": true,
+  "followup": "If takeover is necessary, verify exact PR head and main, inspect Actions run; no direct main merge unless global serialized enforced gate."
 }
