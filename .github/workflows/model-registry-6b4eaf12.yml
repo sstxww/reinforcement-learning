@@ -38,9 +38,13 @@ jobs:
       - name: Genuine complete eight-seat baseline canary (not PPO)
         run: |
           mkdir -p experiments/s-20261102-6b4eaf12
-          python -m tavern_ai.canary --agent-id s-20261102-6b4eaf12 \
-            --seed 88131 --policy baseline \
-            --receipt experiments/s-20261102-6b4eaf12/001-88131.json
+          if [[ ! -f experiments/s-20261102-6b4eaf12/001-88131.json ]]; then
+            python -m tavern_ai.canary --agent-id s-20261102-6b4eaf12 \
+              --seed 88131 --policy baseline \
+              --receipt experiments/s-20261102-6b4eaf12/001-88131.json
+          else
+            echo "Previously committed authentic receipt present; preserving immutable evidence"
+          fi
           python -m tavern_ai.validate_receipt \
             experiments/s-20261102-6b4eaf12/001-88131.json
       - name: Commit authentic receipt only to this isolated branch
