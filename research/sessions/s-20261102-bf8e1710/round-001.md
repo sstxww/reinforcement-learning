@@ -4,7 +4,7 @@ Session: s-20261102-bf8e1710
 Base main SHA: 6ac59235b8238196a0e6462de77b72413c829372
 Training branch: agent/s-20261102-bf8e1710/optimization-001
 Execution commit: a1658e2fc8fd64e8c5220970b4d9f0c19000546f
-PR: to be created by the research agent after this workflow completes
+PR: https://github.com/sstxww/reinforcement-learning/pull/23 (draft; no proven strength gain)
 Run: https://github.com/sstxww/reinforcement-learning/actions/runs/41414320347
 
 ## Hypothesis and prior evidence

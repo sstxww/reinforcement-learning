@@ -3,7 +3,7 @@
 Branch: agent/s-20261102-bf8e1710/optimization-001
 Base SHA: 6ac59235b8238196a0e6462de77b72413c829372
 Training commit: a1658e2fc8fd64e8c5220970b4d9f0c19000546f
-PR: pending creation/review
+PR: https://github.com/sstxww/reinforcement-learning/pull/23 (draft, pending independent CI)
 Round: 001 complete (empirical, not merged)
 Training steps: 512 total, 256 per arm
 Latest verified held-out mean rank: potential 7.667
