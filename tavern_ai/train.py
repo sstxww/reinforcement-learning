@@ -1,9 +1,12 @@
-"""Incremental mask-aware PPO training and compatible checkpoint resume."""
+"""Incremental mask-aware PPO training with checkpoint integrity and resume."""
 from __future__ import annotations
-import argparse,json
+import argparse,hashlib,json
 from pathlib import Path
 from .contract import verify_engine
 from .env import TavernEnv
+
+def sha256(path:Path)->str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
 
 def run(steps:int,seed:int,model_out:Path,resume:Path|None=None):
     from sb3_contrib import MaskablePPO
@@ -17,6 +20,8 @@ def run(steps:int,seed:int,model_out:Path,resume:Path|None=None):
         if not meta_path.is_file():raise ValueError("Missing checkpoint compatibility metadata")
         prev=json.loads(meta_path.read_text(encoding="utf-8"))
         if prev["engine"]!=engine:raise ValueError("Checkpoint engine or card vocabulary mismatch")
+        if prev.get("checkpoint_sha256") and sha256(resume)!=prev["checkpoint_sha256"]:
+            raise ValueError("Checkpoint hash mismatch; aborting unsafe resume")
         model=MaskablePPO.load(str(resume),env=env,device="cpu")
     else:
         model=MaskablePPO("MultiInputPolicy",env,device="cpu",verbose=1,seed=seed,
@@ -26,10 +31,13 @@ def run(steps:int,seed:int,model_out:Path,resume:Path|None=None):
               "features_extractor_kwargs":{"features_dim":256},
               "net_arch":{"pi":[128],"vf":[128]}})
     try:
+        initial=int(model.num_timesteps)
         model.learn(total_timesteps=steps,reset_num_timesteps=False)
         model_out.parent.mkdir(parents=True,exist_ok=True)
         model.save(str(model_out))
-        meta={"schema":1,"engine":engine,"total_timesteps":int(model.num_timesteps),
+        meta={"schema":2,"engine":engine,"total_timesteps":int(model.num_timesteps),
+              "increment_timesteps":int(model.num_timesteps)-initial,
+              "checkpoint_sha256":sha256(model_out),
               "training_seed":seed,"algorithm":"MaskablePPO",
               "notes":"V1 CPU single-seat vs seven scripted bots"}
         model_out.with_suffix(".metadata.json").write_text(json.dumps(meta,indent=2),encoding="utf-8")
