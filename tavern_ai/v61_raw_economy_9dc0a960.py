@@ -56,7 +56,11 @@ class RawActions:
     def as_dict(self):
         exposures = self.counts["buy_legal_decision_exposures"]
         return {
-            "counts": dict(self.counts),
+            "counts": {k: int(self.counts[k]) for k in (
+                "decisions", "buy_legal_decision_exposures", "buy_actions",
+                "end_turn_with_buy_legal", "end_turn", "play_band",
+                "upgrade_action_3", "unchanged_public_obs_between_decisions"
+            )},
             "raw_action_histogram": dict(self.raw_ids),
             "first_64_decisions": self.first,
             "buy_given_legal_exposure": (

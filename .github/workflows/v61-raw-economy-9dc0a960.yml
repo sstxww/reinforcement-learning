@@ -4,6 +4,10 @@ on:
   push:
     branches:
       - agent/s-20261103-9dc0a960/optimization-001
+    paths:
+      - 'tavern_ai/v61_raw_economy_9dc0a960.py'
+      - 'tests/test_v61_raw_economy_9dc0a960.py'
+      - '.github/workflows/v61-raw-economy-9dc0a960.yml'
   workflow_dispatch:
 
 permissions:
