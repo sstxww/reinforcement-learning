@@ -52,10 +52,11 @@ def validate(pr: dict, ref: dict, ci: dict, jobs: dict, reviews: list,
             "Latest-head CI has not succeeded")
     related = [p for p in ci.get("pull_requests", []) if p.get("number") == number]
     require(bool(related), "CI run is not linked to target PR")
-    # PR CI can run on a synthetic merge SHA; then pin its recorded PR head.
-    run_exact = ci.get("head_sha") == head or any(
-        p.get("head", {}).get("sha") == head for p in related)
-    require(run_exact, "CI does not prove the exact PR head SHA")
+    # PR associations can reflect a *newer* head than the SHA actually tested.
+    # The Actions run must execute this exact head and its recorded base.
+    require(ci.get("head_sha") == head, "CI executed a stale PR head SHA")
+    require(any(p.get("base", {}).get("sha") == main for p in related),
+            "CI was not executed against the expected main base")
     proof = False
     for job in jobs.get("jobs", []):
         if job.get("name") != "tests-and-full-match" or job.get("conclusion") != "success":
