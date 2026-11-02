@@ -1,0 +1,79 @@
+name: "Isolated reward-shaping s-20261102-bf8e1710"
+
+on:
+  push:
+    branches:
+      - "agent/s-20261102-bf8e1710/optimization-001"
+    paths-ignore:
+      - "experiments/s-20261102-bf8e1710/**"
+      - "research/sessions/s-20261102-bf8e1710/**"
+      - "research/knowledge/proposals/s-20261102-bf8e1710-001.md"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: "isolate-s-20261102-bf8e1710-001"
+  cancel-in-progress: false
+
+jobs:
+  real-training-and-independent-full-match:
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    env:
+      SESSION_ID: "s-20261102-bf8e1710"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install CPU PPO and unit tests
+        run: |
+          python -m pip install -e '.[train,test]'
+          python -m pytest tests/test_reward_shaping.py
+      - name: Bootstrap exact TavernGym 1.1.0 simulator
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Run independent preflight full eight-seat baseline match
+        run: |
+          python -m tavern_ai.canary --agent-id "$SESSION_ID" \
+            --seed 33000 --policy baseline \
+            --receipt "experiments/$SESSION_ID/baseline-33000.json"
+          python -m tavern_ai.validate_receipt \
+            "experiments/$SESSION_ID/baseline-33000.json"
+      - name: Paired bounded MaskablePPO training and model-seat full games
+        run: |
+          python -m tavern_ai.reward_experiment \
+            --session-id "$SESSION_ID" --steps 256 --seed 33123 \
+            --eval-start-seed 33011 --eval-games 3
+          python -m tavern_ai.validate_receipt \
+            "experiments/$SESSION_ID/001-33001.json"
+      - name: Save only authentic receipts and research summaries on own branch
+        if: always()
+        shell: bash
+        run: |
+          if [ -f "experiments/$SESSION_ID/baseline-33000.json" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add "experiments/$SESSION_ID" \
+              "research/sessions/$SESSION_ID" \
+              "research/knowledge/proposals/$SESSION_ID-001.md" || true
+            if ! git diff --cached --quiet; then
+              git commit -m "experiment($SESSION_ID): persist real engine receipts and metrics [skip ci]"
+              git push origin "HEAD:refs/heads/$GITHUB_REF_NAME"
+            fi
+          fi
+      - name: Upload separate 90-day checkpoints and evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: "s-20261102-bf8e1710-round-001"
+          path: |
+            checkpoints/s-20261102-bf8e1710/**/model.zip
+            experiments/s-20261102-bf8e1710/*.json
+            research/sessions/s-20261102-bf8e1710/*.md
+          if-no-files-found: ignore
+          retention-days: 90
