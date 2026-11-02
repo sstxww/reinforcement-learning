@@ -95,3 +95,54 @@ def test_schema2_checkpoint_is_supported_and_hash_checked(tmp_path):
     metadata.write_text(json.dumps(obj), encoding="utf-8")
     with pytest.raises(ValueError, match="metadata SHA-256"):
         verify_local(entry, archive, metadata)
+
+
+def test_champion_requires_all_readiness_evidence(tmp_path):
+    """A human-changed 'verified' label must not silently promote weights."""
+    entry = {
+        "id": "a",
+        "sha256": "a" * 64,
+        "url": "https://github.com/sstxww/reinforcement-learning/releases/download/a/model.zip",
+        "review_status": "verified",
+    }
+    data = {"schema": 1, "models": [entry],
+            "roles": {"champion": "a", "challenger": None, "latest": None,
+                      "population": [], "rejected": []}}
+    f = tmp_path / "registry.json"
+    f.write_text(json.dumps(data), encoding="utf-8")
+    with pytest.raises(ValueError, match="Champion lacks required evidence"):
+        read_registry(f)
+    for field in ("hash_verified", "load_verified", "optimizer_resume_verified",
+                  "complete_match_verified", "competitive_gain_verified"):
+        entry[field] = True
+    f.write_text(json.dumps(data), encoding="utf-8")
+    assert read_registry(f)["roles"]["champion"] == "a"
+    entry["competitive_gain_verified"] = False
+    f.write_text(json.dumps(data), encoding="utf-8")
+    with pytest.raises(ValueError, match="competitive_gain_verified"):
+        read_registry(f)
+
+
+def test_population_and_rejected_references_are_checked(tmp_path):
+    entry = {
+        "id": "a",
+        "sha256": "a" * 64,
+        "url": "https://github.com/sstxww/reinforcement-learning/releases/download/a/model.zip",
+        "review_status": "unverified",
+    }
+    data = {"schema": 1, "models": [entry],
+            "roles": {"champion": None, "challenger": None, "latest": None,
+                      "population": ["not-a-model"], "rejected": []}}
+    f = tmp_path / "registry.json"
+    f.write_text(json.dumps(data), encoding="utf-8")
+    with pytest.raises(ValueError, match="Unknown model in population"):
+        read_registry(f)
+    data["roles"]["population"] = ["a", "a"]
+    f.write_text(json.dumps(data), encoding="utf-8")
+    with pytest.raises(ValueError, match="Invalid population"):
+        read_registry(f)
+    data["roles"]["population"] = ["a"]
+    data["roles"]["rejected"] = ["missing"]
+    f.write_text(json.dumps(data), encoding="utf-8")
+    with pytest.raises(ValueError, match="Unknown model in rejected"):
+        read_registry(f)
