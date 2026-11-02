@@ -5,6 +5,7 @@ on:
     branches:
       - 'agent/s-20261103-aadbbf93/optimization-001'
   workflow_dispatch:
+  pull_request:
 
 permissions:
   contents: read
