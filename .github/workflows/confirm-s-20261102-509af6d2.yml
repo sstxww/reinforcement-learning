@@ -1,0 +1,66 @@
+name: Confirmatory opening-upgrade evaluation s-20261102-509af6d2
+on:
+  push:
+    branches:
+      - 'agent/s-20261102-509af6d2/optimization-001'
+    paths:
+      - '.github/workflows/confirm-s-20261102-509af6d2.yml'
+permissions:
+  contents: write
+concurrency:
+  group: confirm-s-20261102-509af6d2
+  cancel-in-progress: false
+jobs:
+  sixteen-heldout-pairs:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[test]'
+      - name: Execute full test suite
+        run: python -m pytest
+      - name: Verify pinned TavernGym
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Run 16 previously unused paired seeds on genuine engine
+        run: |
+          python -m tavern_ai.s_20261102_509af6d2 \
+            --seeds 38201 38202 38203 38204 38205 38206 38207 38208 38209 38210 38211 38212 38213 38214 38215 38216 \
+            --out-dir experiments/s-20261102-509af6d2 \
+            --report reports/s-20261102-509af6d2/confirmation-16.json
+          for path in experiments/s-20261102-509af6d2/001-382*.json; do
+            python -m tavern_ai.validate_receipt "$path"
+          done
+      - name: Commit only new authentic independent receipts
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = "agent/s-20261102-509af6d2/optimization-001"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add experiments/s-20261102-509af6d2/ reports/s-20261102-509af6d2/
+          if ! git diff --cached --quiet; then
+            git commit -m "results(s-20261102-509af6d2): confirm candidate on 16 held-out seeded pairs"
+            git pull --rebase origin "$GITHUB_REF_NAME"
+            git push origin HEAD:"$GITHUB_REF_NAME"
+          fi
+      - name: Save evidence backup
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: heldout-s-20261102-509af6d2-evidence
+          path: |
+            experiments/s-20261102-509af6d2/*.json
+            reports/s-20261102-509af6d2/*.json
+          retention-days: 30
+          if-no-files-found: ignore
