@@ -1,0 +1,116 @@
+{
+  "schema": 1,
+  "session_id": "s-20261103-7c7c11cb",
+  "round": 1,
+  "task_key": "integrate/postmerge-pr164-schema2-validation",
+  "status": "real-training-and-games-verified; permanent-release-pending",
+  "source": {
+    "pr": 164,
+    "merged_by": "other session",
+    "merge_sha": "990acd21d598a34a554a80c50089a8f1a9423ac4",
+    "postmerge_main_ci": "https://github.com/sstxww/reinforcement-learning/actions/runs/41511814464",
+    "postmerge_main_ci_status": "success",
+    "postmerge_unit_tests": "383 passed, 1 skipped",
+    "verified_engine_full_game": true
+  },
+  "engine": {
+    "version": "1.1.0",
+    "source_hash": "6d8712c93022ba11",
+    "observation": "observe2",
+    "features": 4017,
+    "cards": 447,
+    "actions": 245
+  },
+  "training": {
+    "own_source_commit": "f7f13ba0d1348f6cdc89b5be14b3d18c1d6812bc",
+    "run_url": "https://github.com/sstxww/reinforcement-learning/actions/runs/41512463704",
+    "run_status": "success",
+    "source_release": "v2-learning-41413557445",
+    "parent_sha256": "73bde2666426cecce39f135980a897bb2cd4a7d70783ba04c9c0d29477a6664a",
+    "steps_before": 1280,
+    "additional_steps": 128,
+    "steps_after": 1408,
+    "algorithm": "MaskablePPO",
+    "metadata_schema": 2,
+    "optimizer_zip_preflight": true,
+    "model_zip_sha256": "1d2d8aa4dc5210ecead7f75a6d0ca41c6fcbab34461618a05481079dc30100ac",
+    "metadata_sha256": "92cd480f237675c1a284f946d6244cd2de575de71bbc37c4d0b75490b2622c96",
+    "temporary_artifact_id": 13175155239,
+    "artifact_retention_days": 30,
+    "permanent_release_tag": "v7-rejected-s-20261103-7c7c11cb-1408-1d2d8aa4",
+    "release_publisher_run": "https://github.com/sstxww/reinforcement-learning/actions/runs/41513319168",
+    "release_success_verified": false
+  },
+  "games": [
+    {
+      "policy": "baseline",
+      "seed": 43282,
+      "seat": 0,
+      "completed": true,
+      "rank": 8,
+      "turns": 19,
+      "decisions": 43,
+      "placements": [
+        8,
+        1,
+        6,
+        4,
+        2,
+        3,
+        7,
+        5
+      ],
+      "truncated_combats": 0,
+      "turn_limit_end": false,
+      "receipt": "experiments/s-20261103-7c7c11cb/001-baseline-43282.json"
+    },
+    {
+      "policy": "model",
+      "seed": 43283,
+      "seat": 0,
+      "completed": true,
+      "rank": 8,
+      "turns": 19,
+      "decisions": 122,
+      "placements": [
+        8,
+        3,
+        5,
+        4,
+        1,
+        2,
+        6,
+        7
+      ],
+      "truncated_combats": 0,
+      "turn_limit_end": false,
+      "model_sha256": "1d2d8aa4dc5210ecead7f75a6d0ca41c6fcbab34461618a05481079dc30100ac",
+      "no_guards_or_fallback": true,
+      "receipt": "experiments/s-20261103-7c7c11cb/001-raw-model-43283.json"
+    }
+  ],
+  "comparison": {
+    "paired": false,
+    "independent_heldout_seed_set_used": false,
+    "meaningful_advantage_claimed": false,
+    "statistical_significance_claimed": false,
+    "model_performance": "one complete raw PPO seed placed eighth; different baseline seed also placed eighth",
+    "unproven_causes": [
+      "action progress loops",
+      "missing buys despite legal opportunities",
+      "insufficient learning signal"
+    ],
+    "next_hypothesis": "matched raw seed/seat buying opportunity versus action-state progress trace without forced guards"
+  },
+  "promotion": {
+    "best": false,
+    "champion": false,
+    "latest": false,
+    "rejected_diagnostic": true
+  },
+  "permissions": {
+    "exclusive_main_merge_lease": false,
+    "main_merged_by_this_session": false,
+    "ranked_arena_played": false
+  }
+}
