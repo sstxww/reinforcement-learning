@@ -1,0 +1,101 @@
+name: V5 model archive and behavior gate s-20261102-9450775f
+
+on:
+  push:
+    branches:
+      - 'agent/s-20261102-9450775f/optimization-001'
+    paths:
+      - 'tavern_ai/model_gate_s9450775f.py'
+      - 'tests/test_model_gate_s9450775f.py'
+      - '.github/workflows/model-gate-s-20261102-9450775f.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: model-gate-s-20261102-9450775f
+  cancel-in-progress: false
+
+jobs:
+  model-gate:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install bounded test/runtime requirements
+        run: |
+          python -m pip install -e '.[train,test]'
+          python -m pytest tests/test_model_gate_s9450775f.py tests/test_receipt.py
+      - name: Install pinned genuine TavernGym engine
+        run: bash scripts/bootstrap_engine.sh
+      - name: Fetch published immutable-candidate release files
+        run: |
+          mkdir -p checkpoints
+          gh release download v2-learning-41413557445 --repo "$GITHUB_REPOSITORY" \
+            --pattern model.zip --pattern model.metadata.json --dir checkpoints
+          printf '%s  %s\n' \
+            73bde2666426cecce39f135980a897bb2cd4a7d70783ba04c9c0d29477a6664a \
+            checkpoints/model.zip | sha256sum --check
+      - name: Real bounded model-only diagnosis (no baseline fallback)
+        run: |
+          python -m tavern_ai.model_gate_s9450775f \
+            --model checkpoints/model.zip \
+            --metadata checkpoints/model.metadata.json \
+            --expected-sha256 73bde2666426cecce39f135980a897bb2cd4a7d70783ba04c9c0d29477a6664a \
+            --seed 945077 --max-decisions 800 \
+            --out reports/s-20261102-9450775f/model-gate.json
+      - name: Separate real unchanged-baseline eight-seat PR evidence
+        run: |
+          python -m tavern_ai.canary --agent-id s-20261102-9450775f \
+            --seed 945078 --policy baseline \
+            --receipt experiments/s-20261102-9450775f/001-945078.json
+          python -m tavern_ai.validate_receipt experiments/s-20261102-9450775f/001-945078.json
+      - name: Upload exact diagnostics and genuine receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: model-gate-s-20261102-9450775f
+          path: |
+            reports/s-20261102-9450775f/
+            experiments/s-20261102-9450775f/
+          if-no-files-found: ignore
+          retention-days: 30
+      - name: Commit only our small evidence (bounded concurrency-safe push)
+        if: success()
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = "agent/s-20261102-9450775f/optimization-001"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          # Keep the computed evidence outside the working tree while syncing.
+          cp reports/s-20261102-9450775f/model-gate.json "$RUNNER_TEMP/model-gate-report.json"
+          cp experiments/s-20261102-9450775f/001-945078.json "$RUNNER_TEMP/real-baseline-receipt.json"
+          for attempt in 1 2 3; do
+            git fetch origin "$GITHUB_REF_NAME"
+            git reset --hard FETCH_HEAD
+            mkdir -p reports/s-20261102-9450775f experiments/s-20261102-9450775f
+            cp "$RUNNER_TEMP/model-gate-report.json" reports/s-20261102-9450775f/model-gate.json
+            cp "$RUNNER_TEMP/real-baseline-receipt.json" experiments/s-20261102-9450775f/001-945078.json
+            git add reports/s-20261102-9450775f/model-gate.json experiments/s-20261102-9450775f/001-945078.json
+            if git diff --cached --quiet; then
+              echo "Evidence already committed at current branch head"
+              exit 0
+            fi
+            git commit -m "[s-20261102-9450775f] Save verified archive diagnosis and genuine separate baseline match"
+            if git push origin "HEAD:$GITHUB_REF_NAME"; then
+              exit 0
+            fi
+            echo "Non-fast-forward in own branch, retrying with fresh base (attempt $attempt/3)"
+          done
+          echo "Unable to commit evidence after three bounded retries; Artifact retains a recoverable copy"
+          exit 1
