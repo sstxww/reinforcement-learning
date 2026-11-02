@@ -14,7 +14,7 @@ import statistics
 from datetime import datetime, timezone
 from pathlib import Path
 
-from .canary import run as full_match
+from .reward_match import run as full_match
 from .contract import PATCH_SHA256, UPSTREAM_COMMIT, verify_engine
 from .env import TavernEnv
 from .model import TavernExtractor
@@ -43,6 +43,7 @@ def score(matches: list[dict]) -> dict:
         "guard_truncations": sum(m["truncated_combats"] for m in matches),
         "turn_limit_ends": sum(bool(m["turn_limit_end"]) for m in matches),
         "decisions": [m["decisions"] for m in matches],
+        "model_safety_overrides": [m.get("model_safety_overrides", 0) for m in matches],
     }
 
 
@@ -137,7 +138,7 @@ def run(session_id: str, steps: int, seed: int, evaluation_seeds: list[int]) -> 
         "conclusion": "Exploratory only; 3 seeded games per arm cannot establish a strength improvement.",
         "checkpoint_storage": "GitHub Actions artifact (90-day retention; NOT permanent)",
     }
-    persist(home / "round-001-metrics.json", report)
+    persist(Path("research/sessions") / session_id / "round-001-metrics.json", report)
     write_handoff(report)
     return report
 
@@ -192,7 +193,7 @@ Engine: {report["engine"]["version"]}; hash: {report["engine"]["source_hash"]}.
 Upstream commit: {report["upstream_commit"]}.
 Engine patch SHA256: {report["patch_sha256"]}.
 Observe2: 4017 features, 447 card slots, 245 masked actions.
-Full config and model hashes: experiments/{sid}/round-001-metrics.json.
+Full config and model hashes: research/sessions/{sid}/round-001-metrics.json.
 
 ## Actual held-out results
 Control placements: {a["placements"]}; mean rank {a["mean_rank"]:.3f};
@@ -207,9 +208,19 @@ Receipt: experiments/{sid}/001-{own["seed"]}.json
 TavernGym game reached Game.is_over() == True; seat-0 model rank
 {own["placements"][0]}, full placements {own["placements"]}; seed
 {own["seed"]}; decisions {own["decisions"]}; turns {own["turns"]}.
-Illegal actions: none accepted by canary; combat truncations
+Illegal actions: none accepted by legal-mask driver; combat truncations
 {own["truncated_combats"]}; turn-limit flag {own["turn_limit_end"]}.
+Model safety fallback: at most 48 decisions per turn before a legal
+end-turn (or forced mandatory choice); overrides: {own['model_safety_overrides']}.
 Independent of the common PR CI canary.
+
+## First attempt: failed game-progress guard
+GitHub Actions run 41413409487: the sparse-control model trained 256
+real PPO steps but its unbounded policy failed to finish seed 33011
+within 30000 scheduling rounds. No model match receipt existed for
+that attempt. This revision applies the same per-turn 48-action
+fallback to *both* arms and logs the override count. Baseline seed
+33000 was a valid completed match, rank 8; retained independently.
 
 ## Checkpoints and limitations
 Model SHA256: {model_sha}
@@ -270,7 +281,7 @@ Mean rank delta (shaped - unshaped): {report["observed_mean_rank_delta_potential
 Insufficient sample to establish either a benefit or a failure.
 No claims about TavernArena performance.
 
-Evidence: experiments/{sid}/round-001-metrics.json, full game
+Evidence: research/sessions/{sid}/round-001-metrics.json, full game
 receipts experiments/{sid}/*.json, and {run_url}.
 Model SHA256: {model_sha}; artifact retention only 90 days.
 
