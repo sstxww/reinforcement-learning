@@ -1,0 +1,44 @@
+name: V6.1 isolated guard provenance s-20261103-17407c36
+
+on:
+  push:
+    branches:
+      - 'agent/s-20261103-17407c36/optimization-001'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: v61-s-20261103-17407c36-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  regression-and-genuine-canary:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install isolated test dependencies
+        run: python -m pip install -e '.[test]'
+      - name: Install and verify pinned TavernGym 1.1.0
+        run: bash scripts/bootstrap_engine.sh
+      - name: Guard provenance negative controls and existing paired gate
+        run: |
+          python -m pytest tests/test_guard_provenance_s_20261103_17407c36.py tests/test_paired_receipt_gate_v5_15ac04d0.py
+      - name: Independent original eight-seat baseline canary
+        run: |
+          python -m tavern_ai.canary --agent-id s-20261103-17407c36 \
+            --policy baseline --seed 99412 \
+            --receipt experiments/s-20261103-17407c36/001-99412.json
+          python -m tavern_ai.validate_receipt experiments/s-20261103-17407c36/001-99412.json
+      - name: Preserve actual match evidence (not weights, not durable model)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: s-20261103-17407c36-r001-canary-${{ github.run_id }}
+          path: experiments/s-20261103-17407c36/001-99412.json
+          if-no-files-found: ignore
+          retention-days: 30
