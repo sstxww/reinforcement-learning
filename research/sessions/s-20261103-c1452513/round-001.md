@@ -1,0 +1,10 @@
+# V5 round-001 — bounded integration safety repair
+
+- SESSION_ID: s-20261103-c1452513; branch: agent/s-20261103-c1452513/optimization-001; initial main: 3297987e2721cb5e958a6711890be24d036d512b.
+- Integration context: #116 strict Release ZIP/optimizer gate, #154 registry population/rejected checks, and #117 registered Release manual-only training were already merged by other sessions. Post-merge main CI for #117 was in progress at initial inspection.
+- Change: split write-token Release publisher out of training job; maintain manual registered Release restore, candidate model-only complete game, paired baseline eval, strict Release preflight and SHA roundtrip. Add lineage and static regression tests.
+- Engine contract retained from main: TavernGym 1.1.0, source hash 6d8712c93022ba11, 4017 numeric features, 447 card slots, 245 legal-masked actions.
+- Latest registered experimental model: v5-s-20261102-68099929-1408-41428692617, weight SHA256 a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632; best/champion remains null. Release availability and model behavior are based on other sessions' independently recorded evidence, not tests executed by this branch.
+- P2 external genuine source: #154 Action 41450329264 raw model seed99231 rank8, 122 decisions, BUY=0 in 38 BUY-legal exposures, FREEZE=70, REFRESH=42, fallback=0; plus #107 forced buys did not rescue all-eighth outcome on explored seeds. Cause beyond actions/board economy not yet proven.
+- This session own PPO steps=0, own model-controlled full games=0, new weights=none, new Release=none. Branch smoke game and final-head CI yet to be observed; amend handoff only with authentic outputs.
+- Caution: model registration is manual and current latest remains 1408, so the new 1536 candidate from #117 is not automatically the next resume source. No training expansion unless registered candidate and source custody are reviewed.
