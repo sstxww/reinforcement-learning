@@ -1,0 +1,57 @@
+{
+  "schema": 1,
+  "id": "v7-rejected-s-20261103-581c69c0-r001-d6771d4439d1",
+  "repository": "sstxww/reinforcement-learning",
+  "role": "rejected_diagnostic",
+  "promoted_to_best": false,
+  "champion_eligible": false,
+  "registered_as_latest": false,
+  "persistent_release_verified": true,
+  "release_url": "https://github.com/sstxww/reinforcement-learning/releases/tag/v7-rejected-s-20261103-581c69c0-r001-d6771d4439d1",
+  "release_run": "https://github.com/sstxww/reinforcement-learning/actions/runs/41513659254",
+  "training_run": "https://github.com/sstxww/reinforcement-learning/actions/runs/41512678144",
+  "checkpoint_sha256": "d6771d4439d1deb64231edd4caaf9ebbc8cd2f8db667c94b19a8c144b968b096",
+  "model_bytes": 17525202,
+  "metadata_sha256": "39776b46d044074d7ad4849468f2576b794b78517488eb6b2faccb9eee6cb101",
+  "parent_release": "v5-s-20261102-68099929-1408-41428692617",
+  "parent_checkpoint_sha256": "a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632",
+  "source_training_steps": 1408,
+  "actual_incremental_steps": 128,
+  "total_timesteps": 1536,
+  "algorithm": "MaskablePPO",
+  "checkpoint_metadata_schema": 1,
+  "engine_version": "1.1.0",
+  "engine_source_hash": "6d8712c93022ba11",
+  "model_archive_integrity_verified": true,
+  "cpu_load_inference_verified": true,
+  "real_optimizer_continuation_verified": true,
+  "full_raw_model_games": [
+    {
+      "seed": 97832,
+      "rank": 8,
+      "completed": true
+    },
+    {
+      "seed": 97833,
+      "rank": 8,
+      "completed": true
+    }
+  ],
+  "paired_baseline": [
+    {
+      "seed": 97832,
+      "rank": 2
+    },
+    {
+      "seed": 97833,
+      "rank": 6
+    }
+  ],
+  "paired_n": 2,
+  "paired_mean_rank_delta_model_minus_baseline": 4,
+  "model_strength_gain_verified": false,
+  "model_zip_url": "https://github.com/sstxww/reinforcement-learning/releases/download/v7-rejected-s-20261103-581c69c0-r001-d6771d4439d1/model.zip",
+  "metadata_url": "https://github.com/sstxww/reinforcement-learning/releases/download/v7-rejected-s-20261103-581c69c0-r001-d6771d4439d1/model.metadata.json",
+  "paired_report_url": "https://github.com/sstxww/reinforcement-learning/releases/download/v7-rejected-s-20261103-581c69c0-r001-d6771d4439d1/002-paired-evaluation.json",
+  "notes": "REJECTED: both unassisted model games rank eighth. GH Release assets verified against original file bytes. A small two-pair sample is negative evidence, not a population-level inference; never register as Latest/Best/Champion."
+}
