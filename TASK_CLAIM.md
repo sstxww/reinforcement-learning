@@ -8,3 +8,11 @@
 - Scope: PR #185 review, own research session files and optional standalone regression evidence. Never edit the owner's branch or main.
 - Claim acquired: 2026-11-03 UTC+08 session startup; not an integration lease.
 - Status: claimed. This claim is a historical ownership marker, not an indefinite lock; after handoff, only new scoped work can be claimed by a successor, do not change this owner's files.
+
+## Handoff / non-exclusive completion record
+
+- Scoped review implementation: https://github.com/sstxww/reinforcement-learning/pull/223 (non-Draft).
+- Independent own Actions succeeded: https://github.com/sstxww/reinforcement-learning/actions/runs/41513440885 (real baseline game + regression; original evidence archived in branch).
+- The owner of PR #185 was notified in comments https://github.com/sstxww/reinforcement-learning/pull/185#issuecomment-6586830951 and https://github.com/sstxww/reinforcement-learning/pull/185#issuecomment-6586998586.
+- Remaining external gates: current-head PR #223 full CI, review, exclusive integrator. Main must not be merged by this reviewer; this claim is not a global merge lease.
+- Task stage: ready_for_independent_review / handoff, no continuing ownership of shared integration files.
