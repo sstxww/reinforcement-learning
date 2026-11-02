@@ -44,12 +44,13 @@ def action_family(action: int) -> str:
 
 
 def load_verified_model(path: Path):
-    from sb3_contrib import MaskablePPO
     if not path.is_file():
         raise FileNotFoundError(path)
     sha = hashlib.sha256(path.read_bytes()).hexdigest()
     if sha != V2_SHA256:
         raise ValueError(f"V2 Release model SHA256 mismatch: {sha}")
+    # Test-only CI can reject a corrupt checkpoint before optional train deps.
+    from sb3_contrib import MaskablePPO
     model = MaskablePPO.load(str(path), device="cpu")
     if int(model.num_timesteps) != 1280:
         raise ValueError("Unexpected V2 checkpoint step count")
