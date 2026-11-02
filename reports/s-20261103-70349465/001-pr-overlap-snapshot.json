@@ -1,0 +1,27 @@
+{
+  "schema": 1,
+  "session_id": "s-20261103-70349465",
+  "base_main_sha": "3602f64b798bb51dcf69ef5964fe0b4c4cd39495",
+  "evidence_kind": "read-only GitHub changed-filename snapshots; not exhaustive",
+  "pairs": [
+    {
+      "pr_a": 165,
+      "pr_b": 149,
+      "overlap": [
+        ".github/workflows/train.yml"
+      ]
+    },
+    {
+      "pr_a": 164,
+      "pr_b": 161,
+      "overlap": [
+        "tavern_ai/train.py"
+      ]
+    }
+  ],
+  "warning": "Potential shared-file conflicts, not merge decisions or evidence of passing CI",
+  "own_training_steps": 0,
+  "own_completed_games": 0,
+  "own_releases": 0,
+  "merged_prs": 0
+}
