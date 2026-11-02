@@ -1,0 +1,14 @@
+{
+  "base_sha": "315b068bac5ab6d8403c3c9b18f8c101c0cded5d",
+  "gradient_updates": 0,
+  "kind": "rule_parameter_search_not_a_neural_checkpoint",
+  "ppo_steps": 0,
+  "search_trials": 2,
+  "selected_min_board": 2,
+  "session_id": "s-20261102-13020d89",
+  "train_games": 4,
+  "train_seeds": [
+    73010,
+    73011
+  ]
+}

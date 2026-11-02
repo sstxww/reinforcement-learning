@@ -1,0 +1,60 @@
+name: Economy gate R001 s-20261102-13020d89
+on:
+  push:
+    branches: ['agent/s-20261102-13020d89/optimization-001']
+    paths:
+      - 'tavern_ai/economy_gate_s_20261102_13020d89.py'
+      - 'tests/test_economy_gate_s_20261102_13020d89.py'
+      - '.github/workflows/experiment-s-20261102-13020d89.yml'
+permissions:
+  contents: write
+concurrency:
+  group: economy-gate-s-20261102-13020d89
+  cancel-in-progress: false
+jobs:
+  actual-game-search:
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Test mechanism policy before engine
+        run: |
+          python -m pip install -e '.[test]'
+          python -m pytest tests/test_economy_gate_s_20261102_13020d89.py
+      - name: Install and verify real pinned engine
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Train finite rule parameters and evaluate on heldout real games
+        run: |
+          python -m tavern_ai.economy_gate_s_20261102_13020d89
+          for f in experiments/s-20261102-13020d89/*.json; do
+            python -m tavern_ai.validate_receipt "$f"
+          done
+      - name: Commit genuine completed receipts on own branch only
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = 'agent/s-20261102-13020d89/optimization-001'
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add experiments/s-20261102-13020d89/ reports/s-20261102-13020d89/
+          if ! git diff --cached --quiet; then
+            git commit -m 'results(economy-gate): record 13 genuine eight-seat games'
+            git push origin "HEAD:$GITHUB_REF_NAME"
+          fi
+      - name: Temporary evidence backup
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: economy-gate-s-20261102-13020d89
+          path: |
+            experiments/s-20261102-13020d89/*.json
+            reports/s-20261102-13020d89/*.json
+          if-no-files-found: ignore
+          retention-days: 30
