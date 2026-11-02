@@ -1,15 +1,15 @@
 {
   "schema": 1,
   "kind": "autotavern-main-integrate-exclusive-lease",
-  "state": "held",
+  "state": "released",
   "session_id": "s-20261103-d0e7ebb090",
   "task_key": "integrate/pr-164",
-  "owner": "sstxww",
-  "issued_at": "2026-11-02T19:38:47.296Z",
-  "expires_at": "2026-11-02T19:44:47.296Z",
-  "nonce": "d0e7ebb090-164-3a745c6",
+  "previous_lease_commit": "23a8e916787f88fdfbd2bac17969e8e3f3c1988f",
+  "released_at": "2026-11-02T19:40:14.606Z",
   "target_pr": 164,
-  "expected_pr_head": "30cb86f71b22eda8ed92f9f4d19598c93c5e9a23",
-  "observed_main_sha": "3a745c6f6a48c65528bcbeb81b8627b8db93f046",
-  "release_rule": "CAS update_ref expected_sha to a released commit; no forced takeover"
+  "target_pr_merged_by_other_session": true,
+  "observed_main_sha": "990acd21d598a34a554a80c50089a8f1a9423ac4",
+  "post_merge_ci": "https://github.com/sstxww/reinforcement-learning/actions/runs/41511814464",
+  "coordination_gap": "A merge happened despite this held lease; cannot assert it is globally enforced",
+  "next_step": "integrate only after all participants honor a single CAS lease or protected merge queue"
 }
