@@ -14,3 +14,7 @@
 - Original learning PR #9 source code explicitly writes schema-2 `checkpoint_sha256` and `compatibility`; code has now been adjusted to validate both. Synthetic regression tests cover positive schema 2 and negative wrong hash/compatibility. This is repair attempt 1 of at most 2; awaiting real rerun.
 - Independent PR CI run [41427946441](https://github.com/sstxww/reinforcement-learning/actions/runs/41427946441) succeeded on previous source head. Post-repair latest-head CI must be confirmed separately.
 - Main has now integrated #87 independent registry, so this PR's duplicate registry must be reconciled instead of merging two canonical sources.
+
+## Actual V2 model failure (source run #41428698189)
+- Authentic V2 Release SHA256 `73bde2666426cecce39f135980a897bb2cd4a7d70783ba04c9c0d29477a6664a` **verified independently**. ZIP structural optimizer member, exact engine/version and schema-2 metadata compatibility all passed. Real PPO inference then reached game safety limit (original bound 30,000), **did not finish**. This shows a model policy-progress pathology; no rank is assigned.
+- Next bounded diagnosis saves legal BUY opportunity and repeated-action telemetry on incomplete games, does **not** force turns, and deliberately leaves job red when match failed. No extra training started pending root-cause evidence.

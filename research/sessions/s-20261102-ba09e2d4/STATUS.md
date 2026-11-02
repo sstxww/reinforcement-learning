@@ -14,3 +14,8 @@
 - Full model probe [Actions #41427938674](https://github.com/sstxww/reinforcement-learning/actions/runs/41427938674) downloaded the real V2 Release and installed the pinned engine but failed at an overly strict audit schema gate: `Unsupported checkpoint metadata schema`. No model game ran, no candidate conclusion.
 - Root cause confirmed by PR #9's original model trainer: published Release metadata uses schema **2** including `checkpoint_sha256` and detailed `compatibility`. Our first synthetic tests only covered schema 1.
 - Implemented one bounded correction: schema 2 accepted only with matching actual digest, pinned engine, catalog, ruleset, patch and upstream. Added negative regression tests, preserving schema 1 support for existing main model format. New workflow run must be inspected; do not declare success from code alone.
+
+## Bounded genuine model-game pathology
+- [Real Release job #41428698189](https://github.com/sstxww/reinforcement-learning/actions/runs/41428698189) downloaded and SHA256-verified exact V2 1280-step weight (17,525,115 bytes); TavernGym contract + schema-2 optimizer archive passed.
+- `MaskablePPO.load` reached live inference; a full match **failed to complete** after the original 30,000-loop safety bound. No valid model receipt, no model rank or improvement claim.
+- One diagnostic correction is underway: cap to 6,000 iterations, preserve per-turn legal BUY opportunity metrics even when incomplete, record `complete_eight_seat_game=false`, and keep workflow failure via final enforcement. No forced END_TURN or rank fabrication.

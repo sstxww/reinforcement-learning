@@ -1,0 +1,8 @@
+# s-20261102-ba09e2d4 — R001 V2 Release incomplete model match diagnosis
+
+- **Source Actions:** [41428698189](https://github.com/sstxww/reinforcement-learning/actions/runs/41428698189) (completed failure).
+- **Real model provenance:** v2-learning-41413557445, SHA256 `73bde2666426cecce39f135980a897bb2cd4a7d70783ba04c9c0d29477a6664a`, 17,525,115 bytes, 1,280 reported PPO steps. Actual downloaded bytes, metadata schema2/catalog/ruleset/patch/upstream, required optimizer ZIP members all passed audit.
+- **Game:** seed 87102, real TavernGym 1.1.0 4017/447/245. Model loaded and took actual actions. `Model failed to finish bounded genuine game` after 30,000 outer action loops. No completed match, no placement; zero this-session PPO training steps. Original run had no per-turn telemetry saved on failure.
+- **Root cause:** gameplay progress failure confirmed, specific action-loop family vs excessive legal redraw **not yet established**. Do not blame low learning rate without mask/opportunity trace.
+- **Corrective experiment:** keep model policy unchanged and no forced actions, reduce diagnostic bound to 6,000 iterations and write truthful incomplete telemetry including per-turn legal BUY opportunities, action family counts and max same-action streak. Use `complete_eight_seat_game=false`, no placements/receipt and a failed GitHub job on non-completion. Preserve genuine baseline comparator separately. At most two substantive retries per failure signature.
+- **Next gate:** inspect saved telemetry; distinguish strategic END_TURN with money/buy opportunity versus repeated legal actions with no progress. Only then consider one targeted behavioral fix or BC/reward adjustment and small-scale PPO.

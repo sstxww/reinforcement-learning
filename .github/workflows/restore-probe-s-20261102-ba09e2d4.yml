@@ -48,6 +48,8 @@ jobs:
             --expected-sha256 73bde2666426cecce39f135980a897bb2cd4a7d70783ba04c9c0d29477a6664a \
             --out reports/s-20261102-ba09e2d4/002-release-audit.json
       - name: Independent genuine model-controlled eight-seat game and opportunity telemetry
+        id: model_probe
+        continue-on-error: true
         run: |
           python -m tavern_ai.behavior_probe_ba09e2d4 \
             --agent-id s-20261102-ba09e2d4 --seed 87102 --model checkpoints/model.zip \
@@ -64,7 +66,7 @@ jobs:
           test "${GITHUB_REF_NAME}" = 'agent/s-20261102-ba09e2d4/optimization-001'
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add -- experiments/s-20261102-ba09e2d4/002-87102-model.json experiments/s-20261102-ba09e2d4/002-87102-baseline.json reports/s-20261102-ba09e2d4/002-action-opportunities.json reports/s-20261102-ba09e2d4/002-release-audit.json
+          git add -A -- experiments/s-20261102-ba09e2d4/ reports/s-20261102-ba09e2d4/
           if ! git diff --cached --quiet; then
             git commit -m 'evidence(s-20261102-ba09e2d4): real published PPO and paired baseline opportunities'
             git pull --rebase origin 'agent/s-20261102-ba09e2d4/optimization-001'
@@ -80,3 +82,9 @@ jobs:
             reports/s-20261102-ba09e2d4/002-*.json
           if-no-files-found: ignore
           retention-days: 30
+
+      - name: Enforce genuine model completion (failed games must remain failed)
+        if: always()
+        run: |
+          test -f experiments/s-20261102-ba09e2d4/002-87102-model.json
+          python -m tavern_ai.validate_receipt experiments/s-20261102-ba09e2d4/002-87102-model.json

@@ -103,7 +103,8 @@ def run_model_probe(model_path: Path, seed: int, agent_id: str):
     model = MaskablePPO.load(str(model_path), device="cpu")
     game = taverngym.Game(seed=seed)
     trace = OpportunityTrace()
-    decision_limit = 30000
+    # Keep diagnostics finite even if an otherwise mask-legal model loops.
+    decision_limit = 6000
     for _ in range(decision_limit):
         if game.is_over():
             break
@@ -131,7 +132,19 @@ def run_model_probe(model_path: Path, seed: int, agent_id: str):
         if not progress and not game.is_over():
             raise RuntimeError("Game stalled")
     if not game.is_over():
-        raise RuntimeError("Model failed to finish bounded genuine game")
+        metrics = trace.report()
+        metrics.update({
+            "environment": "TavernGym", "seed": seed,
+            "source_model_sha256": hashlib.sha256(model_path.read_bytes()).hexdigest(),
+            "complete_eight_seat_game": False, "model_controlled": True,
+            "safety_fallback_count": 0,
+            "diagnostic_iteration_limit": decision_limit,
+            "last_observed_turn": int(game.turn),
+            "failure_reason": "model_failed_to_finish_before_bounded_iteration_limit",
+            "final_controlled_placement": None,
+            "note": "Real policy observations; NOT a completed game or a valid match receipt.",
+        })
+        return None, metrics
     receipt = {
         "schema": 1, "timestamp": datetime.now(timezone.utc).isoformat(),
         "environment": "TavernGym", "engine_source_hash": engine["source_hash"],
@@ -166,9 +179,20 @@ def main():
     parser.add_argument("--metrics", type=Path, required=True)
     args = parser.parse_args()
     receipt, metrics = run_model_probe(args.model, args.seed, args.agent_id)
-    for path, obj in ((args.receipt, receipt), (args.metrics, metrics)):
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(json.dumps(obj, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    args.metrics.parent.mkdir(parents=True, exist_ok=True)
+    args.metrics.write_text(json.dumps(metrics, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    if receipt is None:
+        print(json.dumps({
+            "completed": False, "seed": args.seed,
+            "failure_reason": metrics["failure_reason"],
+            "decisions": metrics["decisions"],
+            "buy_legal_decisions": metrics["buy_legal_decisions"],
+            "actual_buys": metrics["actual_buys"],
+            "end_with_legal_buy": metrics["end_with_legal_buy"],
+        }), file=__import__("sys").stderr)
+        raise SystemExit(3)
+    args.receipt.parent.mkdir(parents=True, exist_ok=True)
+    args.receipt.write_text(json.dumps(receipt, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     print(json.dumps({
         "completed": True, "placement": receipt["placements"][0],
         "decisions": metrics["decisions"], "buys": metrics["actual_buys"],
