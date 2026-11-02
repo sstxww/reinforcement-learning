@@ -1,0 +1,61 @@
+name: V5 release consistency - s-20261102-77ba1f52
+
+on:
+  push:
+    branches:
+      - agent/s-20261102-77ba1f52/optimization-001
+    paths:
+      - .github/workflows/release-consistency-s-20261102-77ba1f52.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: v5-release-consistency-s-20261102-77ba1f52
+  cancel-in-progress: false
+
+jobs:
+  reconcile-and-own-real-match:
+    runs-on: ubuntu-latest
+    timeout-minutes: 65
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install test dependencies
+        run: |
+          python -m pip install -e '.[test]'
+      - name: Dynamic canonical Release reconciliation regressions
+        run: |
+          python -m pytest tests/test_release_consistency_77ba1f52.py -q
+          python -m tavern_ai.release_consistency_77ba1f52 --out reports/s-20261102-77ba1f52/001-coverage.json
+      - name: Install pinned real TavernGym
+        run: bash scripts/bootstrap_engine.sh
+      - name: Original complete eight-seat baseline game
+        run: |
+          python -m tavern_ai.contract
+          python -m tavern_ai.canary --agent-id s-20261102-77ba1f52 --seed 92741 --policy baseline --receipt experiments/s-20261102-77ba1f52/001-92741.json
+          python -m tavern_ai.validate_receipt experiments/s-20261102-77ba1f52/001-92741.json
+      - name: Commit only verified own-run evidence to own branch
+        shell: bash
+        run: |
+          test "$GITHUB_REF_NAME" = "agent/s-20261102-77ba1f52/optimization-001"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add experiments/s-20261102-77ba1f52/001-92741.json reports/s-20261102-77ba1f52/001-coverage.json
+          git diff --cached --quiet && exit 0
+          git commit -m "test(v5): archive original full TavernGym game and Release audit"
+          git push origin HEAD:refs/heads/agent/s-20261102-77ba1f52/optimization-001
+      - name: Upload transient failure or successful evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-consistency-s-20261102-77ba1f52
+          path: |
+            reports/s-20261102-77ba1f52/*.json
+            experiments/s-20261102-77ba1f52/*.json
+          if-no-files-found: ignore
+          retention-days: 30
