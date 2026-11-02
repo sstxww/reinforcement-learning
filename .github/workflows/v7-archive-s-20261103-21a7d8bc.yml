@@ -23,7 +23,7 @@ jobs:
     timeout-minutes: 12
     env:
       GH_TOKEN: ${{ github.token }}
-      EVIDENCE_DIR: ${{ runner.temp }}/v7-original-evidence
+      EVIDENCE_DIR: /tmp/v7-original-evidence-s-20261103-21a7d8bc
     steps:
       - uses: actions/checkout@v4
       - name: Require exact successful immutable source run
