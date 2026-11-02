@@ -1,0 +1,173 @@
+{
+  "schema": 1,
+  "session_id": "s-20261102-1b82df52",
+  "hypothesis": "signed-log compression stabilizes numeric input scaling",
+  "engine": {
+    "version": "1.1.0",
+    "source_hash": "6d8712c93022ba11",
+    "features": 4017,
+    "cards": 447,
+    "actions": 245,
+    "n_cards": 3984
+  },
+  "training_seed": 71002,
+  "eval_seeds": [
+    32001,
+    32002,
+    32003
+  ],
+  "requested_steps_per_variant": 256,
+  "github_run_id": "41413617114",
+  "github_sha": "c9f6d5902a20c0c861b4384ba3015a59af7fdbad",
+  "variants": {
+    "raw": {
+      "training": {
+        "checkpoint": "checkpoints/s-20261102-1b82df52/raw.zip",
+        "checkpoint_sha256": "d8e1453f2a9e888323c82cc59cf4fbafeac6837eb46930b4e096574140c324cb",
+        "metadata": "checkpoints/s-20261102-1b82df52/raw.metadata.json",
+        "actual_timesteps": 256,
+        "train_seconds": 1.9
+      },
+      "matches": [
+        {
+          "seed": 32001,
+          "placement": 8,
+          "all_placements": [
+            8,
+            7,
+            4,
+            5,
+            2,
+            1,
+            6,
+            3
+          ],
+          "decisions": 132,
+          "turns": 15,
+          "truncated_combats": 0,
+          "turn_limit_end": false,
+          "receipt": "experiments/s-20261102-1b82df52/raw-32001.json"
+        },
+        {
+          "seed": 32002,
+          "placement": 8,
+          "all_placements": [
+            8,
+            1,
+            5,
+            4,
+            2,
+            7,
+            3,
+            6
+          ],
+          "decisions": 95,
+          "turns": 16,
+          "truncated_combats": 0,
+          "turn_limit_end": false,
+          "receipt": "experiments/s-20261102-1b82df52/raw-32002.json"
+        },
+        {
+          "seed": 32003,
+          "placement": 8,
+          "all_placements": [
+            8,
+            2,
+            3,
+            7,
+            6,
+            5,
+            1,
+            4
+          ],
+          "decisions": 132,
+          "turns": 16,
+          "truncated_combats": 0,
+          "turn_limit_end": false,
+          "receipt": "experiments/s-20261102-1b82df52/raw-32003.json"
+        }
+      ],
+      "mean_placement": 8,
+      "top4_rate": 0.0,
+      "first_rate": 0.0
+    },
+    "signed_log1p": {
+      "training": {
+        "checkpoint": "checkpoints/s-20261102-1b82df52/signed_log1p.zip",
+        "checkpoint_sha256": "29854cd32e32079dd8a854aabc3a338c97095dabcbb13c701660309ef5fe8267",
+        "metadata": "checkpoints/s-20261102-1b82df52/signed_log1p.metadata.json",
+        "actual_timesteps": 256,
+        "train_seconds": 0.42
+      },
+      "matches": [
+        {
+          "seed": 32001,
+          "placement": 8,
+          "all_placements": [
+            8,
+            5,
+            7,
+            1,
+            2,
+            6,
+            4,
+            3
+          ],
+          "decisions": 107,
+          "turns": 16,
+          "truncated_combats": 0,
+          "turn_limit_end": false,
+          "receipt": "experiments/s-20261102-1b82df52/001-32001.json"
+        },
+        {
+          "seed": 32002,
+          "placement": 8,
+          "all_placements": [
+            8,
+            4,
+            2,
+            1,
+            7,
+            5,
+            6,
+            3
+          ],
+          "decisions": 195,
+          "turns": 13,
+          "truncated_combats": 0,
+          "turn_limit_end": false,
+          "receipt": "experiments/s-20261102-1b82df52/signed_log1p-32002.json"
+        },
+        {
+          "seed": 32003,
+          "placement": 8,
+          "all_placements": [
+            8,
+            2,
+            4,
+            3,
+            5,
+            6,
+            7,
+            1
+          ],
+          "decisions": 204,
+          "turns": 16,
+          "truncated_combats": 0,
+          "turn_limit_end": false,
+          "receipt": "experiments/s-20261102-1b82df52/signed_log1p-32003.json"
+        }
+      ],
+      "mean_placement": 8,
+      "top4_rate": 0.0,
+      "first_rate": 0.0
+    }
+  },
+  "paired_placement_delta_log_minus_raw": [
+    0,
+    0,
+    0
+  ],
+  "total_real_ppo_steps": 512,
+  "interpretation": "Paired pilot only; three seeds cannot establish a statistically reliable strength gain."
+}
