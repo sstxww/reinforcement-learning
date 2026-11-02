@@ -34,4 +34,4 @@
 - Next distinct hypothesis: try at most one refresh **before an otherwise legal purchase** on later turns when Refresh and Buy are simultaneously legal, then compare on fresh seeds and count actual interventions. Do not promote a strategy without activation and statistical evaluation.
 
 ## Final gate
-- This session's Actions experiment succeeded. Dedicated PR CI on final head must be checked separately after PR creation.
+- This session's Actions experiment succeeded. [Draft PR #27](https://github.com/sstxww/reinforcement-learning/pull/27) was created. PR CI [41415522281](https://github.com/sstxww/reinforcement-learning/actions/runs/41415522281) passed on `ea1ffaa11fa4f618a9a1a72f36e4f1e01e55ed5f`; check the latest documentation-only commit CI before declaring final head green.
