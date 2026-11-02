@@ -1,0 +1,69 @@
+{
+  "session": "s-20261102-8555759e",
+  "experiment": "first legal choice vs last legal choice in action indices 30..45",
+  "hypothesis": "The default first-choice tie-break introduces systematic choice-index bias",
+  "environment": "real pinned TavernGym 1.1.0 eight-seat matches",
+  "model_training_steps": 0,
+  "policy_sha256": "b441dd7f08eb3e95f0e93c69b3e2656bdbb11d17ffdbaad7ee41d747e56c4fed",
+  "baseline": {
+    "games": 6,
+    "mean_placement": 6.333333333333333,
+    "first_place_rate": 0.0,
+    "top4_rate": 0.16666666666666666,
+    "placements": [
+      8,
+      3,
+      8,
+      5,
+      6,
+      8
+    ],
+    "seeds": [
+      855570,
+      855571,
+      855572,
+      855573,
+      855574,
+      855575
+    ],
+    "total_choice_actions": 43,
+    "total_multi_choice_actions": 43,
+    "total_alternative_choices": 0
+  },
+  "candidate": {
+    "games": 6,
+    "mean_placement": 8,
+    "first_place_rate": 0.0,
+    "top4_rate": 0.0,
+    "placements": [
+      8,
+      8,
+      8,
+      8,
+      8,
+      8
+    ],
+    "seeds": [
+      855570,
+      855571,
+      855572,
+      855573,
+      855574,
+      855575
+    ],
+    "total_choice_actions": 53,
+    "total_multi_choice_actions": 53,
+    "total_alternative_choices": 53
+  },
+  "paired_rank_deltas_candidate_minus_baseline": [
+    0,
+    5,
+    0,
+    3,
+    2,
+    0
+  ],
+  "mean_paired_rank_delta": 1.6666666666666667,
+  "independent_seed_count": 6,
+  "inferential_warning": "Exploratory descriptive comparison. Small N, seeded opponents; no claim of superior strength."
+}
