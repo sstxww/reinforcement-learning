@@ -1,0 +1,19 @@
+{
+  "session_id": "s-20261103-2dbe68c7",
+  "task_key": "p0/report/committed-receipt-reference-gate",
+  "role": "REPAIRER/REVIEWER",
+  "status": "claimed",
+  "base_main_sha": "990acd21d598a34a554a80c50089a8f1a9423ac4",
+  "branch": "agent/s-20261103-2dbe68c7/optimization-001",
+  "scope": [
+    "tavern_ai/report_link_gate_v7.py",
+    "tests/test_report_link_gate_s_20261103_2dbe68c7.py",
+    ".github/workflows/v7-report-links-2dbe68c7.yml",
+    "research/sessions/s-20261103-2dbe68c7/",
+    "research/knowledge/proposals/s-20261103-2dbe68c7-001.md",
+    "experiments/s-20261103-2dbe68c7/"
+  ],
+  "started_at_utc": "2026-11-02T19:41:39Z",
+  "claim_mechanism": "GitHub create ref fails if exact deterministic branch exists; no claim of main merge authority",
+  "release_condition": "Set status to handoff by branch commit; claim ref persists as history, not an integration lease"
+}
