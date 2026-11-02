@@ -1,0 +1,60 @@
+name: Board-full public-view s-20261102-cee57e6a
+on:
+  push:
+    branches: ['agent/s-20261102-cee57e6a/optimization-001']
+    paths:
+      - tavern_ai/research_cee57e6a.py
+      - tests/test_research_cee57e6a.py
+      - .github/workflows/experiment-s-20261102-cee57e6a.yml
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: experiment-s-20261102-cee57e6a
+  cancel-in-progress: false
+jobs:
+  paired-real-games:
+    runs-on: ubuntu-latest
+    timeout-minutes: 65
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Python unit gates
+        run: |
+          python -m pip install -e '.[test]'
+          python -m pytest tests/test_research_cee57e6a.py tests/test_baseline.py tests/test_receipt.py
+      - name: Install verified TavernGym
+        run: bash scripts/bootstrap_engine.sh
+      - name: Real eight-seat hyperparameter search and heldout games
+        run: |
+          python -m tavern_ai.contract
+          python -m tavern_ai.research_cee57e6a \
+            --output experiments/s-20261102-cee57e6a \
+            --report reports/s-20261102-cee57e6a/001-results.json
+          python -m tavern_ai.validate_receipt experiments/s-20261102-cee57e6a/001-mandatory-73029.json
+          python scripts/check_pr_evidence.py
+      - name: Persist only own genuine game evidence
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add experiments/s-20261102-cee57e6a/ reports/s-20261102-cee57e6a/
+          if ! git diff --cached --quiet; then
+            git commit -m 'evidence(s-20261102-cee57e6a): full-game receipts and paired scores'
+            test "$GITHUB_REF_NAME" = 'agent/s-20261102-cee57e6a/optimization-001'
+            git push origin HEAD:"$GITHUB_REF_NAME"
+          fi
+      - name: Backup temporary report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: board-swap-cee57e6a
+          path: |
+            experiments/s-20261102-cee57e6a/*.json
+            reports/s-20261102-cee57e6a/*.json
+          if-no-files-found: ignore
+          retention-days: 30
