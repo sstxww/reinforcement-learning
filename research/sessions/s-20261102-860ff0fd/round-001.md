@@ -17,3 +17,14 @@
 2. Validate own receipt and exact PR CI; leave Draft if unresolved.
 3. On success merge only after latest main conflict review and inspect post-merge main CI.
 4. Follow with durable *output* release publication and version-index PR; current job's upload-artifact cannot be a lasting resume chain.
+
+## Actual verification from GitHub run 41449658176
+- All dedicated smoke job steps SUCCESS, including real pinned engine, exact V5 Release download+SHA256, CPU model load and one masked action.
+- Real parent 1408-step weights SHA256 `a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632`.
+- **128 actual MaskablePPO continuation steps**, counter **1408 → 1536**, saved model hash `2a0aa260c08b087b1bd703a102af7b6a25a1785e17a2b11bbf854ea48f5b99eb`.
+- Completed baseline seed 93871 (rank 8, 38 decisions, 20 turns) genuine receipt committed in `experiments/s-20261102-860ff0fd/001-93871.json` by workflow head `76098e0263d0097560d05bf0419e829c7126ce82`.
+- Completed **model-only** seed 93873 (rank 8, 121 decisions, 18 turns, zero truncations/turn-limit guard) genuine validated stdout+Artifact receipt `experiments/s-20261102-860ff0fd/001-93873.json`; this file is now committed verbatim from validated source log.
+- Real smoke artifact ID 13143987683 expires **2026-11-16 13:07 UTC**, not permanent. No successful Release publication is claimed yet.
+- A new own-branch custody workflow will re-download source artifact, fail closed on SHA/metadata/SB3 optimizer, do fresh n=2 paired full-game evaluation, publish unique unpromoted Release only on all gates, independently re-download and compare exact bytes. If it fails, the candidate remains temporary, not permanent.
+- First PR full-match CI #41449741755 ran 250 passed/1 skipped but failed **missing independent receipt**, not unit tests. Receipt now committed; require latest-head rerun. GITHUB_TOKEN-generated new PR CI may report `action_required` and is not proof of code failure.
+- Concurrent main advanced and merged PR #75 (redundant catalog). Reviewed overlapping PR #68, left duplicate-content hold comment, did not double-merge. No direct main push or other agent branch mutation.
