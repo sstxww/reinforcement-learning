@@ -1,0 +1,120 @@
+name: V5 checkpoint verification s-20261102-cacfdbae
+
+on:
+  push:
+    branches: ['agent/s-20261102-cacfdbae/optimization-001']
+    paths:
+      - '.github/workflows/v5-checkpoint-s-20261102-cacfdbae.yml'
+      - 'models/release_inventory_v5.json'
+      - 'tavern_ai/model_registry.py'
+      - 'tests/test_model_registry.py'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: v5-checkpoint-s-20261102-cacfdbae
+  cancel-in-progress: false
+
+jobs:
+  release-integrity-and-real-match:
+    runs-on: ubuntu-latest
+    timeout-minutes: 110
+    env:
+      GH_TOKEN: ${{ github.token }}
+      MODEL_ID: v2-learning-41413557445
+      AGENT_ID: s-20261102-cacfdbae
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: |
+          python -m pip install -e '.[train,test]'
+      - name: Offline registry regression tests
+        run: |
+          python -m pytest tests/test_model_registry.py
+          python -m tavern_ai.model_registry
+      - name: Install pinned TavernGym
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Re-download actual V2 Release and verify bytes, metadata, optimizer, CPU model load
+        shell: bash
+        run: |
+          mkdir -p checkpoints "reports/${AGENT_ID}"
+          gh release download "$MODEL_ID" --repo "$GITHUB_REPOSITORY" --pattern 'model.*' --dir checkpoints
+          python -m tavern_ai.model_registry --registry models/release_inventory_v5.json --model-id "$MODEL_ID" \
+            --checkpoint checkpoints/model.zip \
+            --metadata checkpoints/model.metadata.json --load \
+            | tee "reports/${AGENT_ID}/release-audit.json"
+      - name: Actual model controls one complete original-weight TavernGym game
+        shell: bash
+        run: |
+          mkdir -p "experiments/${AGENT_ID}"
+          python -m tavern_ai.canary --agent-id "$AGENT_ID" \
+            --policy model --model checkpoints/model.zip --seed 23002 \
+            --receipt "experiments/${AGENT_ID}/001-23002.json"
+          python -m tavern_ai.validate_receipt "experiments/${AGENT_ID}/001-23002.json"
+      - name: Bounded genuine continuation from verified Release
+        shell: bash
+        run: |
+          python -m tavern_ai.train --resume checkpoints/model.zip \
+            --steps 128 --seed 61102 --out checkpoints/resumed.zip \
+            | tee /tmp/v5-resume-training.log
+          tail -n 1 /tmp/v5-resume-training.log > "reports/${AGENT_ID}/resume-training.json"
+          python -m json.tool "reports/${AGENT_ID}/resume-training.json" > /dev/null
+          python - <<'PY'
+          import json
+          old=json.load(open('checkpoints/model.metadata.json'))
+          new=json.load(open('checkpoints/resumed.metadata.json'))
+          assert old['engine']==new['engine']
+          assert new['total_timesteps']>=old['total_timesteps']+128, (old,new)
+          print('Verified incremental trained timesteps',old['total_timesteps'],new['total_timesteps'])
+          PY
+      - name: Resumed policy real game and independent paired seed comparison
+        shell: bash
+        run: |
+          python -m tavern_ai.canary --agent-id "$AGENT_ID" \
+            --policy model --model checkpoints/resumed.zip --seed 23002 \
+            --receipt "experiments/${AGENT_ID}/002-23002-resumed.json"
+          python -m tavern_ai.validate_receipt "experiments/${AGENT_ID}/002-23002-resumed.json"
+          python -m tavern_ai.evaluate --model checkpoints/resumed.zip \
+            --compare-baseline --games 2 --start-seed 24000 \
+            --out "reports/${AGENT_ID}/paired-two-games.json"
+      - name: Save verified receipts and compact evidence to own branch only
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "experiments/${AGENT_ID}/" "reports/${AGENT_ID}/"
+          git commit -m "evidence(v5): genuine checkpoint restore, resume and full games [${AGENT_ID}]"
+          git push origin HEAD:refs/heads/agent/s-20261102-cacfdbae/optimization-001
+      - name: Attempt durable unpromoted smoke-model Release (no Champion)
+        shell: bash
+        continue-on-error: true
+        run: |
+          TAG="v5-s-20261102-cacfdbae-smoke-128"
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "Existing immutable session release found; do not overwrite it"
+          else
+            gh release create "$TAG" checkpoints/resumed.zip#model.zip checkpoints/resumed.metadata.json#model.metadata.json \
+              --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --prerelease \
+              --title "Unpromoted V5 128-step resume smoke candidate s-20261102-cacfdbae" \
+              --notes "Engineering-only smoke checkpoint. No reliable rank gain or Champion promotion. Source v2-learning-41413557445; verify SHA and own real-game receipts before use."
+          fi
+      - name: Preserve bounded artifact for debugging
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v5-s-20261102-cacfdbae
+          path: |
+            reports/s-20261102-cacfdbae/*.json
+            experiments/s-20261102-cacfdbae/*.json
+            checkpoints/resumed.zip
+            checkpoints/resumed.metadata.json
+          if-no-files-found: ignore
+          retention-days: 30
