@@ -23,9 +23,13 @@
   "pr_number": 227,
   "expected_pr_head_sha": "20fb2c1946240d5704030e345b34b22f0b99dfab",
   "exact_pr_head_ci_url": "https://github.com/sstxww/reinforcement-learning/actions/runs/41514349790",
-  "pr_ci_status_at_handoff": "queued (must recheck live)",
+  "pr_ci_status_at_handoff": "completed_success (Action #41514349790; verified exact HEAD 20fb2c1946240d5704030e345b34b22f0b99dfab)",
   "main_merge_authorized": false,
   "global_lock_blocker": "Issue #182 demonstrated bypass of held lease",
-  "next_action": "Check PR #227 exact-head CI and overlap with existing #207, integrate only through enforceable exclusive main gate; verify new main CI.",
-  "handoff_note": "Claim branch is a historical record, NOT an active mutex. Other sessions may resume review without assuming original owner remains active."
+  "next_action": "Cross-review/possible consolidation with PR #207; obtain truly enforced global exclusive integration right (Issue #182), re-read main and PR final HEAD, then authorized merge and exact new-main full-game CI. If another agent merges in parallel, never race.",
+  "handoff_note": "Claim branch is a historical record, NOT an active mutex. Other sessions may resume review without assuming original owner remains active.",
+  "pr_ci_fullmatch_receipt_sha256": "b25f8d6c083bff3312daf294ca1524a3385691fd70f43591af954a8593511de9",
+  "pr_ci_receipt_artifact_id": 13175431634,
+  "pr_ci_game": "baseline, seed 1001, seat0 rank7, completed true, no truncation",
+  "last_observed_main_sha": "c1b828734527bae6141805581693d890cc3bff94"
 }
