@@ -1,4 +1,9 @@
-"""Offline Release registry validation: byte integrity is not PPO restore evidence."""
+"""Complement main registry: verify BOTH Release files and ZIP/engine integrity.
+
+Main's registry is authoritative. 'latest' means latest *unpromoted
+experimental release*, never an independently verified resumable Champion.
+Checks here do not deserialize PPO weights or verify optimizer restoration.
+"""
 from __future__ import annotations
 import argparse
 import hashlib
@@ -7,126 +12,103 @@ import re
 import zipfile
 from pathlib import Path
 
+from .registry_integrity import validate_registry, verify_checkpoint
+
 ENGINE = {"version": "1.1.0", "source_hash": "6d8712c93022ba11",
           "features": 4017, "cards": 447, "actions": 245}
-ROLES = {"Challenger", "Latest", "Population", "Rejected"}
-HEX = re.compile(r"^[0-9a-f]{64}$")
-RELEASE = "https://github.com/sstxww/reinforcement-learning/releases/download/"
+# GitHub Release API digest claims. Verify actual bytes before relying on them.
+METADATA_SHA256 = {
+    "v1-learning-9eada5801f99": "74a6b25af97087a003d74a3b8e274ac9dbf95bf91fa409eb0fea1a5cc05e5ac6",
+    "v1-learning-165a76a18afb": "086e5303989a6ed3e65729803af664168f865403584124c6a4918e54f2118937",
+    "v1-learning-resume-41413508653": "5562c29610044263ed8b632c84fc939d6e68bad11616911344e86f450692c010",
+    "v2-learning-41413557445": "6f0b433191a8242dcedc627f6be49d1551a82788ce7bfd8e60416ede8146acc0",
+}
+HEX = re.compile(r"^[a-f0-9]{64}$")
 
 class CatalogError(ValueError):
-    pass
+    """Invalid Release bytes/metadata; stop before training."""
 
-def digest(path: Path) -> str:
+def _digest(path: Path) -> str:
     h = hashlib.sha256()
-    with path.open("rb") as f:
-        for block in iter(lambda: f.read(1048576), b""):
-            h.update(block)
+    with path.open("rb") as stream:
+        for chunk in iter(lambda: stream.read(1048576), b""):
+            h.update(chunk)
     return h.hexdigest()
 
 def validate_catalog(raw: dict) -> dict:
-    if not isinstance(raw, dict) or raw.get("schema") != 1 or not isinstance(raw.get("models"), list):
-        raise CatalogError("Invalid catalog schema")
-    indexed = {}
-    for entry in raw["models"]:
-        if not isinstance(entry, dict):
-            raise CatalogError("Invalid model entry")
-        name = entry.get("id")
-        if not isinstance(name, str) or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]{0,99}", name):
-            raise CatalogError("Invalid model ID")
-        if name in indexed:
-            raise CatalogError("Duplicate model ID")
-        if entry.get("role") not in ROLES or entry.get("engine") != ENGINE:
-            raise CatalogError("Invalid role or engine fingerprint")
-        if type(entry.get("total_timesteps")) is not int or entry["total_timesteps"] < 0:
-            raise CatalogError("Invalid training step count")
-        if not isinstance(entry.get("architecture"), str) or not entry["architecture"]:
-            raise CatalogError("Missing architecture")
-        for key in ("download_verified", "load_verified", "resume_verified",
-                    "full_match_verified", "paired_improvement_verified"):
-            if type(entry.get(key)) is not bool:
-                raise CatalogError("Missing verification flag " + key)
-        assets = entry.get("assets")
-        if not isinstance(assets, dict) or set(assets) != {"weights", "metadata"}:
-            raise CatalogError("Missing asset manifest")
-        for asset in assets.values():
-            if not isinstance(asset, dict) or not isinstance(asset.get("url"), str):
-                raise CatalogError("Missing asset URL")
-            if not asset["url"].startswith(RELEASE) or not HEX.fullmatch(str(asset.get("sha256", ""))):
-                raise CatalogError("Bad release origin or digest")
-        if entry["resume_verified"] and not entry["load_verified"]:
-            raise CatalogError("Resume requires load verification")
-        indexed[name] = entry
-    for entry in raw["models"]:
-        parent = entry.get("parent")
-        if parent is not None:
-            if parent not in indexed or parent == entry["id"]:
-                raise CatalogError("Invalid parent model")
-            if indexed[parent]["total_timesteps"] >= entry["total_timesteps"]:
-                raise CatalogError("Steps do not advance from parent")
-    for pointer in ("champion", "latest"):
-        if raw.get(pointer) is not None and raw[pointer] not in indexed:
-            raise CatalogError("Pointer references missing model")
-    if raw.get("latest") is not None:
-        e = indexed[raw["latest"]]
-        if not (e["download_verified"] and e["load_verified"] and e["resume_verified"]):
-            raise CatalogError("Unverified model cannot be Latest")
-    if raw.get("champion") is not None:
-        e = indexed[raw["champion"]]
-        required = ("download_verified", "load_verified", "resume_verified",
-                    "full_match_verified", "paired_improvement_verified")
-        if not all(e[k] for k in required):
-            raise CatalogError("Unverified model cannot be Champion")
+    """Re-use main's single canonical schema; never create a second registry."""
+    try:
+        validate_registry(raw)
+    except (ValueError, TypeError, KeyError) as exc:
+        raise CatalogError(str(exc)) from exc
+    indexed = {entry["id"]: entry for entry in raw["candidates"]}
+    for model_id, value in METADATA_SHA256.items():
+        if not HEX.fullmatch(value):
+            raise CatalogError("Bad metadata digest: " + model_id)
+    if raw.get("best") is not None or raw.get("champion") is not None:
+        raise CatalogError("Unproven Champion/Best")
     return indexed
 
-def verify_files(entry: dict, weights: Path, metadata: Path) -> dict:
-    """Check exact bytes, zip CRCs and metadata; never deserialize a PPO model."""
+def verify_files(entry: dict, weights: Path, metadata: Path,
+                 expected_metadata_sha256: str) -> dict:
+    """Verify checkpoint+metadata digests, ZIP CRC, timesteps and engine shape."""
     if not weights.is_file() or not metadata.is_file():
-        raise CatalogError("Both asset files are required")
-    for key, path in (("weights", weights), ("metadata", metadata)):
-        if digest(path) != entry["assets"][key]["sha256"]:
-            raise CatalogError(key + " SHA256 mismatch")
+        raise CatalogError("Both Release asset files are required")
+    if not isinstance(expected_metadata_sha256, str) or not HEX.fullmatch(expected_metadata_sha256):
+        raise CatalogError("Missing expected metadata digest")
+    try:
+        verify_checkpoint(weights, entry["checkpoint_sha256"])
+    except (ValueError, OSError) as exc:
+        raise CatalogError("Weights SHA256 mismatch") from exc
+    if _digest(metadata) != expected_metadata_sha256:
+        raise CatalogError("Metadata SHA256 mismatch")
     if not zipfile.is_zipfile(weights):
         raise CatalogError("Weights not a ZIP")
     try:
-        with zipfile.ZipFile(weights) as z:
-            if not z.namelist() or z.testzip() is not None:
-                raise CatalogError("Corrupt ZIP")
-    except (zipfile.BadZipFile, OSError) as ex:
-        raise CatalogError("Unreadable checkpoint ZIP") from ex
+        with zipfile.ZipFile(weights) as archive:
+            if not archive.namelist() or archive.testzip() is not None:
+                raise CatalogError("Corrupt checkpoint ZIP")
+    except (zipfile.BadZipFile, OSError) as exc:
+        raise CatalogError("Unreadable checkpoint ZIP") from exc
     try:
         info = json.loads(metadata.read_text(encoding="utf-8"))
-    except (ValueError, UnicodeError) as ex:
-        raise CatalogError("Unreadable metadata") from ex
+    except (UnicodeError, ValueError) as exc:
+        raise CatalogError("Invalid model metadata") from exc
     if not isinstance(info, dict) or info.get("algorithm") != "MaskablePPO":
-        raise CatalogError("Incompatible algorithm")
-    if info.get("total_timesteps") != entry["total_timesteps"]:
-        raise CatalogError("Step count mismatch")
-    engine = info.get("engine")
-    if not isinstance(engine, dict) or any(engine.get(k) != v for k, v in ENGINE.items()):
-        raise CatalogError("Incompatible engine / action vocabulary")
-    return {"id": entry["id"], "sha256_verified": True, "zip_crc_verified": True,
-            "metadata_verified": True, "model_load_tested": False,
-            "optimizer_resume_tested": False, "real_match_tested": False}
+        raise CatalogError("Wrong checkpoint algorithm")
+    if info.get("total_timesteps") != entry["training_steps"]:
+        raise CatalogError("Checkpoint step count mismatch")
+    state = info.get("engine")
+    if not isinstance(state, dict) or any(state.get(k) != v for k, v in ENGINE.items()):
+        raise CatalogError("Checkpoint engine or action vocabulary mismatch")
+    return {"model_id": entry["id"], "sha256_verified": True,
+            "zip_crc_verified": True, "metadata_contract_verified": True,
+            "model_deserialized": False, "optimizer_resume_tested": False,
+            "model_only_full_game_tested": False}
 
-def main():
-    parser = argparse.ArgumentParser()
+def main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--catalog", type=Path, default=Path("models/registry.json"))
     parser.add_argument("--model-id")
     parser.add_argument("--weights", type=Path)
     parser.add_argument("--metadata", type=Path)
     args = parser.parse_args()
-    registry = json.loads(args.catalog.read_text(encoding="utf-8"))
-    records = validate_catalog(registry)
+    raw = json.loads(args.catalog.read_text(encoding="utf-8"))
+    index = validate_catalog(raw)
     if args.model_id is None:
         if args.weights is not None or args.metadata is not None:
-            parser.error("Files require model id")
-        out = {"entries": len(records), "champion": registry.get("champion"),
-               "latest": registry.get("latest"), "ids": sorted(records)}
+            parser.error("Local files require --model-id")
+        output = {"candidates": len(index), "best": None,
+                  "latest_experimental_unpromoted": raw["latest"]["id"],
+                  "actual_checkpoint_bytes_checked": False}
     else:
-        if args.model_id not in records or args.weights is None or args.metadata is None:
-            parser.error("Known model id and two files required")
-        out = verify_files(records[args.model_id], args.weights, args.metadata)
-    print(json.dumps(out, indent=2))
+        if args.model_id not in index or args.weights is None or args.metadata is None:
+            parser.error("Known model ID and both files required")
+        if args.model_id not in METADATA_SHA256:
+            parser.error("No pinned metadata Release digest for this model")
+        output = verify_files(index[args.model_id], args.weights, args.metadata,
+                              METADATA_SHA256[args.model_id])
+    print(json.dumps(output, indent=2))
 
 if __name__ == "__main__":
     main()
