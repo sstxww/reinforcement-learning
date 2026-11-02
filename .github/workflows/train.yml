@@ -135,6 +135,18 @@ jobs:
           path: publish/
           if-no-files-found: error
           retention-days: 30
+      - name: Quarantine failed candidate weights for bounded diagnostics only
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v5-failed-candidate-${{ github.run_id }}
+          path: |
+            checkpoints/candidate.zip
+            checkpoints/candidate.metadata.json
+            artifacts/trained-canary.json
+            artifacts/evaluation.json
+          if-no-files-found: ignore
+          retention-days: 30
       - name: Supplementary diagnostics (not durable storage)
         if: always()
         uses: actions/upload-artifact@v4
