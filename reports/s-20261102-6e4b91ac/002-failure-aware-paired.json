@@ -1,0 +1,254 @@
+{
+  "schema": 1,
+  "session_id": "s-20261102-6e4b91ac",
+  "source_release": "v5-s-20261102-6e4b91ac-resume128",
+  "checkpoint_sha256": "3e576d92459186a91a52940a59be0c782e8afa95fdd3323de015ab708c21db7a",
+  "pinned_engine_hash": "6d8712c93022ba11",
+  "intended_seeds": [
+    86410,
+    86411,
+    86412,
+    86413
+  ],
+  "tested_seeds": [
+    86410,
+    86411,
+    86412,
+    86413
+  ],
+  "mode": "real_eight_seat_games_with_failure_accounting",
+  "no_policy_guard_or_fallback": true,
+  "paired": [
+    {
+      "seed": 86410,
+      "model": {
+        "completed": false,
+        "failure_code": "real_game_safety_limit_exceeded",
+        "exception_type": "RuntimeError",
+        "placement": null,
+        "receipt": null,
+        "not_a_complete_match": true
+      },
+      "baseline": {
+        "completed": true,
+        "placement": 8,
+        "receipt": {
+          "schema": 1,
+          "timestamp": "2026-11-02T13:31:12.006904+00:00",
+          "environment": "TavernGym",
+          "engine_source_hash": "6d8712c93022ba11",
+          "engine_version": "1.1.0",
+          "agent_id": "s-20261102-6e4b91ac",
+          "policy": "baseline",
+          "seed": 86410,
+          "completed": true,
+          "turns": 14,
+          "decisions": 47,
+          "placements": [
+            8,
+            1,
+            7,
+            2,
+            5,
+            3,
+            4,
+            6
+          ],
+          "truncated_combats": 0,
+          "turn_limit_end": false,
+          "git_sha": "a320957fe2068875089ff70f9a4a2b9ed4a42436",
+          "model_sha256": null
+        }
+      }
+    },
+    {
+      "seed": 86411,
+      "model": {
+        "completed": true,
+        "placement": 8,
+        "receipt": {
+          "schema": 1,
+          "timestamp": "2026-11-02T13:31:12.163684+00:00",
+          "environment": "TavernGym",
+          "engine_source_hash": "6d8712c93022ba11",
+          "engine_version": "1.1.0",
+          "agent_id": "s-20261102-6e4b91ac",
+          "policy": "model",
+          "seed": 86411,
+          "completed": true,
+          "turns": 16,
+          "decisions": 123,
+          "placements": [
+            8,
+            7,
+            1,
+            5,
+            2,
+            6,
+            3,
+            4
+          ],
+          "truncated_combats": 0,
+          "turn_limit_end": false,
+          "git_sha": "a320957fe2068875089ff70f9a4a2b9ed4a42436",
+          "model_sha256": "3e576d92459186a91a52940a59be0c782e8afa95fdd3323de015ab708c21db7a"
+        }
+      },
+      "baseline": {
+        "completed": true,
+        "placement": 7,
+        "receipt": {
+          "schema": 1,
+          "timestamp": "2026-11-02T13:31:12.190953+00:00",
+          "environment": "TavernGym",
+          "engine_source_hash": "6d8712c93022ba11",
+          "engine_version": "1.1.0",
+          "agent_id": "s-20261102-6e4b91ac",
+          "policy": "baseline",
+          "seed": 86411,
+          "completed": true,
+          "turns": 17,
+          "decisions": 50,
+          "placements": [
+            7,
+            8,
+            3,
+            1,
+            6,
+            2,
+            4,
+            5
+          ],
+          "truncated_combats": 0,
+          "turn_limit_end": false,
+          "git_sha": "a320957fe2068875089ff70f9a4a2b9ed4a42436",
+          "model_sha256": null
+        }
+      }
+    },
+    {
+      "seed": 86412,
+      "model": {
+        "completed": true,
+        "placement": 8,
+        "receipt": {
+          "schema": 1,
+          "timestamp": "2026-11-02T13:31:12.338049+00:00",
+          "environment": "TavernGym",
+          "engine_source_hash": "6d8712c93022ba11",
+          "engine_version": "1.1.0",
+          "agent_id": "s-20261102-6e4b91ac",
+          "policy": "model",
+          "seed": 86412,
+          "completed": true,
+          "turns": 16,
+          "decisions": 116,
+          "placements": [
+            8,
+            2,
+            1,
+            3,
+            5,
+            4,
+            7,
+            6
+          ],
+          "truncated_combats": 0,
+          "turn_limit_end": false,
+          "git_sha": "a320957fe2068875089ff70f9a4a2b9ed4a42436",
+          "model_sha256": "3e576d92459186a91a52940a59be0c782e8afa95fdd3323de015ab708c21db7a"
+        }
+      },
+      "baseline": {
+        "completed": true,
+        "placement": 8,
+        "receipt": {
+          "schema": 1,
+          "timestamp": "2026-11-02T13:31:12.358590+00:00",
+          "environment": "TavernGym",
+          "engine_source_hash": "6d8712c93022ba11",
+          "engine_version": "1.1.0",
+          "agent_id": "s-20261102-6e4b91ac",
+          "policy": "baseline",
+          "seed": 86412,
+          "completed": true,
+          "turns": 20,
+          "decisions": 41,
+          "placements": [
+            8,
+            2,
+            7,
+            3,
+            4,
+            1,
+            5,
+            6
+          ],
+          "truncated_combats": 0,
+          "turn_limit_end": false,
+          "git_sha": "a320957fe2068875089ff70f9a4a2b9ed4a42436",
+          "model_sha256": null
+        }
+      }
+    },
+    {
+      "seed": 86413,
+      "model": {
+        "completed": false,
+        "failure_code": "real_game_safety_limit_exceeded",
+        "exception_type": "RuntimeError",
+        "placement": null,
+        "receipt": null,
+        "not_a_complete_match": true
+      },
+      "baseline": {
+        "completed": true,
+        "placement": 8,
+        "receipt": {
+          "schema": 1,
+          "timestamp": "2026-11-02T13:31:35.065624+00:00",
+          "environment": "TavernGym",
+          "engine_source_hash": "6d8712c93022ba11",
+          "engine_version": "1.1.0",
+          "agent_id": "s-20261102-6e4b91ac",
+          "policy": "baseline",
+          "seed": 86413,
+          "completed": true,
+          "turns": 14,
+          "decisions": 51,
+          "placements": [
+            8,
+            4,
+            2,
+            1,
+            6,
+            7,
+            5,
+            3
+          ],
+          "truncated_combats": 0,
+          "turn_limit_end": false,
+          "git_sha": "a320957fe2068875089ff70f9a4a2b9ed4a42436",
+          "model_sha256": null
+        }
+      }
+    }
+  ],
+  "summary": {
+    "attempted_pairs": 4,
+    "complete_pairs": 2,
+    "failed_model_seeds": [
+      86410,
+      86413
+    ],
+    "all_model_games_completed": false,
+    "mean_rank_model_complete_pairs_only": 8,
+    "mean_rank_baseline_complete_pairs_only": 7.5,
+    "mean_paired_rank_delta_complete_pairs_only": 0.5,
+    "unconditional_four_game_mean_is_valid": false,
+    "champion_eligible": false,
+    "no_competitive_improvement_claim": true,
+    "incomplete_game_is_never_ranked_eighth": true
+  },
+  "limitations": "Four or fewer seeds, fixed seat 0, seven scripted bots; any incomplete game has NO placement and is excluded from all mean ranks. No causal root-cause or strength claim."
+}
