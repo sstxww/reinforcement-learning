@@ -11,9 +11,48 @@
     "source_hash": "6d8712c93022ba11"
   },
   "best": null,
-  "latest": null,
-  "candidates": [],
-  "status": "256 actual PPO steps completed; full model game failed; no reliable durable checkpoint/Best/Candidate promotion",
+  "latest": {
+    "id": "v1-learning-9eada5801f99",
+    "role": "experimental_unpromoted",
+    "storage_type": "github_release",
+    "durable_asset_verified": true,
+    "release": "https://github.com/sstxww/reinforcement-learning/releases/tag/v1-learning-9eada5801f99",
+    "model_asset": "https://github.com/sstxww/reinforcement-learning/releases/download/v1-learning-9eada5801f99/model.zip",
+    "metadata_asset": "https://github.com/sstxww/reinforcement-learning/releases/download/v1-learning-9eada5801f99/model.metadata.json",
+    "checkpoint_sha256": "dc5195658995358e70c0d565a979b9cf05ccc5e47ae7adaa0a2f078f01cad917",
+    "training_steps": 256,
+    "training_seed": 42,
+    "engine_source_hash": "6d8712c93022ba11",
+    "engine_version": "1.1.0",
+    "observation": "observe2",
+    "model_game_receipt": "experiments/learning/v1-model-match.json",
+    "full_model_game_passed": true,
+    "full_model_game_seed": 1302,
+    "full_model_game_placement": 8,
+    "full_model_game_decisions": 149,
+    "heldout_eval_seeds": [
+      24000,
+      24001,
+      24002
+    ],
+    "heldout_mean_placement": 8,
+    "heldout_top4_rate": 0,
+    "heldout_first_place_rate": 0,
+    "independent_paired_improvement_verified": false,
+    "resume_training_verified": false,
+    "promoted_to_best": false,
+    "source_run": "https://github.com/sstxww/reinforcement-learning/actions/runs/41412362662",
+    "source_commit": "9eada5801f99c4f725d6503a6d603a9cb2a269e3"
+  },
+  "candidates": [
+    {
+      "id": "v1-learning-9eada5801f99",
+      "status": "unpromoted_candidate_for_diagnostic_testing",
+      "reason": "3/3 heldout games ended in 8th place; no paired improvement evidence",
+      "release": "https://github.com/sstxww/reinforcement-learning/releases/tag/v1-learning-9eada5801f99"
+    }
+  ],
+  "status": "One durable experimental Latest checkpoint in GitHub Release; no confirmed Best. Model game passes but n=3 all 8th; resume-from-release training unverified.",
   "release_tag_prefix": "v1-main-",
   "learning_release_tag_prefix": "v1-learning-",
   "promotion_policy": "Paired held-out evaluation and verified checkpoint read/inference are required; never auto-promote.",
@@ -44,5 +83,10 @@
       "release_attempt": "https://github.com/sstxww/reinforcement-learning/actions/runs/41412807456",
       "release_error": "HTTP 403: Resource not accessible by integration"
     }
+  ],
+  "storage_warnings": [
+    "Do not silently resume from temporary Actions artifacts when a versioned Release is available.",
+    "Before claiming reliable resumption, download Release assets, verify SHA-256, load policy and perform an actual continued PPO training step.",
+    "Current release is an experimental candidate, not a validated Best."
   ]
 }
