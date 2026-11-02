@@ -1,0 +1,121 @@
+name: V5 verified Release resume s-20261102-70d8074c
+
+on:
+  push:
+    branches:
+      - agent/s-20261102-70d8074c/optimization-001
+    paths:
+      - .github/workflows/verified-resume-s-20261102-70d8074c.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: v5-verified-resume-s-20261102-70d8074c
+  cancel-in-progress: false
+
+jobs:
+  verified-resume-and-real-match:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      GH_TOKEN: ${{ github.token }}
+      SOURCE_ID: v5-s-20261102-68099929-1408-41428692617
+      SESSION_ID: s-20261102-70d8074c
+      RELEASE_TAG: v5-s-20261102-70d8074c-resume1536-001
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install tests and actual CPU PPO dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[train,test]'
+      - name: Run fail-closed source/resume unit regression
+        run: python -m pytest -q tests/test_verified_resume_70d8074c.py
+      - name: Install exact pinned TavernGym 1.1 engine
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Run original complete eight-seat baseline match
+        run: |
+          python -m tavern_ai.canary --agent-id "$SESSION_ID" --seed 73021 --policy baseline --receipt "experiments/$SESSION_ID/001-baseline-73021.json"
+          python -m tavern_ai.validate_receipt "experiments/$SESSION_ID/001-baseline-73021.json"
+      - name: Preserve only genuine original baseline receipt on own branch
+        shell: bash
+        run: |
+          test "$GITHUB_REF_NAME" = "agent/$SESSION_ID/optimization-001"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "experiments/$SESSION_ID/001-baseline-73021.json"
+          if ! git diff --cached --quiet; then
+            git commit -m "test(v5): archive authentic original eight-seat resume gate receipt"
+            git push origin "HEAD:refs/heads/agent/$SESSION_ID/optimization-001"
+          fi
+      - name: Download original versioned durable checkpoint and metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p checkpoints/source
+          gh release download "$SOURCE_ID" --repo "$GITHUB_REPOSITORY" --pattern model.zip --dir checkpoints/source
+          gh release download "$SOURCE_ID" --repo "$GITHUB_REPOSITORY" --pattern model.metadata.json --dir checkpoints/source
+          test -s checkpoints/source/model.zip
+          test -s checkpoints/source/model.metadata.json
+      - name: Strict verify then genuinely resume PPO 1408 to 1536 steps
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m tavern_ai.verified_resume_70d8074c \
+            --model-id "$SOURCE_ID" \
+            --weights checkpoints/source/model.zip \
+            --metadata checkpoints/source/model.metadata.json \
+            --steps 128 --seed 73022 \
+            --out checkpoints/resumed/model.zip \
+            --report "reports/$SESSION_ID/001-resume.json" \
+            --probe-inference
+      - name: Raw resumed model must finish a real eight-seat match
+        run: |
+          python -m tavern_ai.canary --agent-id "$SESSION_ID" --seed 73023 --policy model --model checkpoints/resumed/model.zip --receipt "experiments/$SESSION_ID/001-model-73023.json"
+          python -m tavern_ai.validate_receipt "experiments/$SESSION_ID/001-model-73023.json"
+      - name: Independent small paired model-versus-baseline evaluation
+        run: |
+          python -m tavern_ai.evaluate --policy model --model checkpoints/resumed/model.zip --games 2 --start-seed 73050 --compare-baseline --out "reports/$SESSION_ID/001-paired.json"
+      - name: Publish only a traceable unpromoted model as durable prerelease
+        shell: bash
+        run: |
+          set -euo pipefail
+          if gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo 'Release tag already exists: refusing overwrite'; exit 1
+          fi
+          mkdir -p dist
+          cp checkpoints/resumed/model.zip dist/model.zip
+          cp checkpoints/resumed/model.metadata.json dist/model.metadata.json
+          cp "reports/$SESSION_ID/001-resume.json" dist/001-resume.json
+          cp "reports/$SESSION_ID/001-paired.json" dist/001-paired.json
+          cp "experiments/$SESSION_ID/001-model-73023.json" dist/001-model-73023.json
+          sha256sum dist/model.zip dist/model.metadata.json
+          gh release create "$RELEASE_TAG" dist/* \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$GITHUB_SHA" --prerelease \
+            --title "Unpromoted isolated V5 1536-step PPO recovery" \
+            --notes "Source: $SOURCE_ID; real 128-step continuation; genuine model match; 2 paired heldout seeds. Unpromoted experimental checkpoint, NOT a Champion and NOT evidence of competitive gain. Restore only after SHA/ABI checks."
+      - name: Commit only original model receipt and compact evidence to own branch
+        shell: bash
+        run: |
+          test "$GITHUB_REF_NAME" = "agent/$SESSION_ID/optimization-001"
+          git add "experiments/$SESSION_ID/001-model-73023.json" "reports/$SESSION_ID/001-resume.json" "reports/$SESSION_ID/001-paired.json"
+          git commit -m "evidence(v5): genuine bounded Release resume and model match"
+          git push origin "HEAD:refs/heads/agent/$SESSION_ID/optimization-001"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v5-verified-resume-70d8074c
+          path: |
+            checkpoints/resumed/
+            experiments/s-20261102-70d8074c/*.json
+            reports/s-20261102-70d8074c/*.json
+          if-no-files-found: ignore
+          retention-days: 30
