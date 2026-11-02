@@ -1,17 +1,15 @@
-# Session s-20261102-2830ac4a — STATUS
+# Session s-20261102-2830ac4a — Round 001 FINAL STATUS
 
-- **State:** second/final code-isolation correction submitted; latest valid result pending rerun and CI. Earlier rerun proved extra non-magnetize differences and is not a clean causal ablation.
-- **Branch:** `agent/s-20261102-2830ac4a/optimization-001`, base main `315b068bac5ab6d8403c3c9b18f8c101c0cded5d`.
-- **PR:** https://github.com/sstxww/reinforcement-learning/pull/28 (draft).
-- **Original run:** https://github.com/sstxww/reinforcement-learning/actions/runs/41415008425; seven fully completed TavernGym 1.1.0 games; baseline and candidate ranks [7,8,8] vs [7,8,8], with no verified improvement. Candidate own seed 34200 rank 8, 44 decisions, all eight ranks [8,5,7,1,3,6,4,2].
-- **Core correction:** actions 16–22 are **Sell**, 126–195 are **Magnetize** (upstream actions.rs @ fb61201). Old run labeled 'hold_sell' is genuine but did not test selling; must not be cited as sell-policy evidence.
-- **Repair:** legacy path `tavern_ai/hold_sell_experiment.py` now houses `AvoidMagnetizePolicy`, reports optional magnetize exposure and shadow baseline disagreements; engine-action-name regression added to branch-scoped Actions. Re-execution evidence pending.
-- **Environment:** TavernGym 1.1.0, source hash `6d8712c93022ba11`, 4017/447/245 observe2; source SHA and source-policy hash recorded in receipts.
-- **Training:** 0 MaskablePPO steps; deterministic rules only. Model checkpoint absent/not applicable; no candidate promoted to Best.
-- **Original JSON receipts:** `experiments/s-20261102-2830ac4a/*.json` with original policy label; corrected run will update receipts under own path, with previous Git revisions preserved.
-- **Original evidence artifact:** ID `13127795190`, 30-day retention until 2026-12-02 08:44:36 UTC. This is not model durability.
-- **Failure report:** `research/sessions/s-20261102-2830ac4a/failures/001-action-encoding.md`.
-- **Next step:** read new workflow logs + real action exposure counts; update report and knowledge proposal; check PR #28 final-head CI. If no exposure, do not assert candidate/baseline functional equivalence on all game states.
-
-- **Corrected first rerun:** https://github.com/sstxww/reinforcement-learning/actions/runs/41416193318 success with action-name checks, seven full games; original baseline and candidate ranks [7,8,8] both, but 1 non-magnetize disagreement occurred on seed 34202 and acceptance seed 34200 also had one.
-- **Second isolation fix:** preserve original 85 action cap and fallback tavern Upgrade priority, assert all candidate/control differences are omitted Magnetize actions. Re-evaluation pending.
+- **Status:** research and code-side validation completed; **negative result** (not stronger), PR **draft for integrator review**. Final-head CI must be checked against the latest docs commit; an automated results-only commit caused an `action_required` no-job CI event.
+- **PR:** https://github.com/sstxww/reinforcement-learning/pull/28
+- **Branch:** `agent/s-20261102-2830ac4a/optimization-001`, original main base `315b068bac5ab6d8403c3c9b18f8c101c0cded5d`; corrected code commit `9eddd5f6dbbb1e4a79384461b03fed6705384c6e`.
+- **Verified real-engine run:** https://github.com/sstxww/reinforcement-learning/actions/runs/41416718109 — SUCCESS; original action-code correction run https://github.com/sstxww/reinforcement-learning/actions/runs/41416193318 — SUCCESS but confounded; original misnamed pilot https://github.com/sstxww/reinforcement-learning/actions/runs/41415008425 — SUCCESS but mislabeled.
+- **Correct interpretation:** pinned TavernGym 1.1.0 actions 16–22 Sell, 126–195 Magnetize. Study is `avoid_magnetize_v1`, not hold-sell (legacy path `hold_sell_experiment.py` preserved for history).
+- **Training:** deterministic rules only; 0 PPO steps; no model checkpoint, no model promotion. Source policy SHA256 `00173f264d2e300220e2e8a64f1d6f1ab26caedbfbff35d46a10657b8652334a`.
+- **Own required full game:** `experiments/s-20261102-2830ac4a/001-34200.json`; seed 34200, rank 8, 48 decisions, placements [8,1,5,7,2,3,4,6], completed true, 0 illegal moves, no truncated combats or turn-limit guard, 11 baseline magnetizations skipped.
+- **Held-out 3 paired seeds:** baseline [7,8,8], candidate [7,8,8]; means 7.6667 vs 7.6667, first/top4 0/3; candidate action disagreement exclusively magnetization on one seed (34203: three skipped). No significant gain established.
+- **Report:** `reports/s-20261102-2830ac4a/hold-sell-paired.json`; seven genuine eight-seat game receipts in `experiments/s-20261102-2830ac4a/`.
+- **Artifact:** `magnetize-s-s-20261102-2830ac4a-41416718109`, ID `13128445688`, expires 2026-12-02T08:58:25Z. Match JSON committed to Git; no model weights to restore.
+- **Fault closed-loop:** initial action-code misread, followed by confounding fallback-upgrade and turn cap, fixed in two targeted changes with regression tests and real games; evidence `research/sessions/s-20261102-2830ac4a/failures/001-action-encoding.md`.
+- **CI:** corrected code commit `9eddd5f` passed [CI #41416725855](https://github.com/sstxww/reinforcement-learning/actions/runs/41416725855); workflow evidence auto-commit `60c0ae0` triggered [action_required CI #41416959093](https://github.com/sstxww/reinforcement-learning/actions/runs/41416959093) with no job. Verify final branch head after this status commit; do not call action_required successful.
+- **Next round:** conditioned magnetization or action-exposure optimization with independent predeclared seeds and action provenance before larger compute. Avoid repeating ineffective blind PPO short-step changes.
