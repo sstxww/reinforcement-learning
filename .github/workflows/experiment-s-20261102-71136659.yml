@@ -1,0 +1,79 @@
+name: V5 isolated paired gate and 128-step resume s-20261102-71136659
+
+on:
+  push:
+    branches:
+      - agent/s-20261102-71136659/optimization-001
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: s-20261102-71136659-r001
+  cancel-in-progress: false
+
+jobs:
+  verify-resume:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install training and test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[train,test]'
+          python -m pytest -q tests/test_paired_evidence_s71136659.py
+      - name: Bootstrap the pinned genuine TavernGym engine
+        run: bash scripts/bootstrap_engine.sh
+      - name: Real independent eight-seat baseline receipt
+        run: |
+          mkdir -p outputs
+          python -m tavern_ai.contract
+          python -m tavern_ai.canary --agent-id s-20261102-71136659 --seed 99371 --policy baseline --receipt outputs/001-99371.json
+          python -m tavern_ai.validate_receipt outputs/001-99371.json
+      - name: Download and SHA-verify published 1408-step candidate
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p source
+          gh release download v5-s-20261102-68099929-1408-41428692617 \
+            --repo sstxww/reinforcement-learning \
+            --pattern model.zip --pattern model.metadata.json --dir source
+          echo 'a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632  source/model.zip' | sha256sum -c -
+      - name: Actual bounded 128-step optimizer continuation
+        run: |
+          python -m tavern_ai.train --resume source/model.zip --steps 128 --seed 99372 --out outputs/model.zip
+          python -m tavern_ai.model_registry --registry models/release_inventory_v5.json
+          sha256sum outputs/model.zip > outputs/model.sha256
+      - name: True resumed-model full eight-seat game and one paired baseline
+        run: |
+          python -m tavern_ai.canary --agent-id s-20261102-71136659 --seed 99373 --policy model --model outputs/model.zip --receipt outputs/001-model-99373.json
+          python -m tavern_ai.validate_receipt outputs/001-model-99373.json
+          python -m tavern_ai.canary --agent-id s-20261102-71136659 --seed 99373 --policy baseline --receipt outputs/001-baseline-99373.json
+          python -m tavern_ai.validate_receipt outputs/001-baseline-99373.json
+          python -m tavern_ai.paired_evidence_s71136659 \
+            --model-receipts outputs/001-model-99373.json \
+            --baseline-receipts outputs/001-baseline-99373.json \
+            --out outputs/001-paired-report.json
+      - name: Publish only validated, unpromoted, durable candidate
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create v5-smoke-s-20261102-71136659-r001 \
+            --repo sstxww/reinforcement-learning --target "$GITHUB_SHA" \
+            --prerelease --title 'V5 isolated 128-step resume candidate (unpromoted)' \
+            --notes 'Parent v5-s-20261102-68099929-1408-41428692617; 128 real PPO steps. Statistical screen is descriptive only; one paired game cannot establish a rank improvement. This is NOT Champion.' \
+            outputs/model.zip outputs/model.metadata.json outputs/model.sha256 \
+            outputs/001-model-99373.json outputs/001-baseline-99373.json outputs/001-paired-report.json
+      - name: Keep source-of-truth run artifacts for audit
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: s-20261102-71136659-r001-evidence
+          path: outputs/
+          if-no-files-found: ignore
+          retention-days: 30
