@@ -1,4 +1,5 @@
 name: V5 strict eight-seat receipt integration s-20261102-bdd18671
+# Rerun after expected legacy duplicate-rank regression was updated.
 
 on:
   push:
