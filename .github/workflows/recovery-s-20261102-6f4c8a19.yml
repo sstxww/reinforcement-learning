@@ -2,6 +2,11 @@ name: V5 isolated Release recovery and 128-step smoke - s-20261102-6f4c8a19
 on:
   push:
     branches: ['agent/s-20261102-6f4c8a19/optimization-001']
+    paths:
+      - '.github/workflows/recovery-s-20261102-6f4c8a19.yml'
+      - 'tavern_ai/recovery_v5_6f4c8a19.py'
+      - 'tests/test_recovery_v5_6f4c8a19.py'
+      - 'models/registry-v5-s-20261102-6f4c8a19.json'
   workflow_dispatch:
 permissions:
   contents: write
