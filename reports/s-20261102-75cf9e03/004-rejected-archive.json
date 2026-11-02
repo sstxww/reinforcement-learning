@@ -1,0 +1,28 @@
+{
+  "schema": 1,
+  "session_id": "s-20261102-75cf9e03",
+  "model_role": "rejected_diagnostic_only",
+  "champion_promoted": false,
+  "source_release": "v2-learning-41413557445",
+  "source_training_steps": 1280,
+  "added_actual_ppo_steps": 128,
+  "total_timesteps": 1408,
+  "model_sha256": "7eac498b502a233f7ca04b351200429f2ea8142dbec47c421f7b8f3544646a8b",
+  "model_metadata_schema": 1,
+  "engine": {
+    "version": "1.1.0",
+    "source_hash": "6d8712c93022ba11",
+    "features": 4017,
+    "cards": 447,
+    "actions": 245,
+    "n_cards": 3984
+  },
+  "source_training_run": "https://github.com/sstxww/reinforcement-learning/actions/runs/41428024110",
+  "sha256_zip_optimizer_inference_validation_run": "https://github.com/sstxww/reinforcement-learning/actions/runs/41429113481",
+  "strict_model_game": "failed_full_game_safety_limit",
+  "complete_raw_game_receipt": false,
+  "rank": null,
+  "guarded_trace": "failed_illegal_end_turn_guard_no_placement",
+  "paired_strength_gain_verified": false,
+  "release_tag": "v5-rejected-s-20261102-75cf9e03-41430345890"
+}
