@@ -62,7 +62,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: "mechanics-ada5c379-\${{ github.run_id }}"
+          name: mechanics-ada5c379-catalog
           path: |
             outputs/s-20261102-ada5c379-catalog.json
             reports/s-20261102-ada5c379/*.json
