@@ -13,3 +13,10 @@
 - Additional control: CI full-game baseline match is only **infrastructure evidence**, not raw PPO proof or strength improvement. Do not launch large PPO or ranked Arena from this PR.
 - A live integration audit and blockers were saved in [Issue #3](https://github.com/sstxww/reinforcement-learning/issues/3#issuecomment-6586013449).
 - Next validation: check exact head GitHub Actions CI, independently verify own receipt and pinned engine, review current main for conflicts, and integrate only after code-owner review. Selectively reconcile overlapping #121/#147/#149 rather than merge all.
+
+
+## Final evidence and disposition — 2026-11-03 (+08:00)
+- [Own isolated Action #41508263674](https://github.com/sstxww/reinforcement-learning/actions/runs/41508263674) **SUCCESS**. New restore-gate regressions **7 passed**; complete repository suite **308 passed, 1 skipped**; pinned TavernGym engine installed.
+- [Own authentic baseline receipt](https://github.com/sstxww/reinforcement-learning/blob/agent/s-20261103-bf44b161/optimization-001/experiments/s-20261103-bf44b161/001-98631.json): TavernGym source `6d8712c93022ba11`, seed 98631, 14 turns, 62 decisions, player-0 rank **2**, full placements `[2,6,5,3,7,1,4,8]`, `completed=true`, no truncation, no turn-limit end. Baseline match is not PPO ability evidence.
+- [PR #160](https://github.com/sstxww/reinforcement-learning/pull/160) initially submitted for an unsafe pre-merge main. **While validating, another integrator merged PR #117**, replacing the main trainer with fail-closed registered Release restore/manual-only workflow; #125 concurrently hardened SHA-bound staging. Our original train.yml patch is now redundant/conflicts with newer main and should not be merged.
+- Supersession action: close PR #160 without merge, preserve own branch/proof and pivot to round-002 **minimal Release-publish failure checkpoint custody** against current main. The old branch does not update production.
