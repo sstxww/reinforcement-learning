@@ -1,4 +1,4 @@
-"""Isolated TavernGym A/B: prefer a legal tavern-tier upgrade before buying.
+"""Isolated TavernGym A/B: prefer buying before an otherwise selected tier upgrade.
 
 This is a rule-policy ablation, NOT PPO training. Uses the genuine canary
 game driver, pinned TavernGym and seven upstream bots, no fake simulator.
@@ -17,13 +17,13 @@ from . import canary
 from .baseline import BaselinePolicy
 from .validate_receipt import validate
 
-POLICY = "upgrade-priority-before-buy-v1"
+POLICY = "planned-turn-buy-before-upgrade-v1"
 SESSION = "s-20261102-9c034841"
 UPGRADE_TURNS = frozenset((2, 5, 7, 9, 11))
 
 
 class UpgradePriorityPolicy(BaselinePolicy):
-    """Only change the priority of action 3 when a planned upgrade is legal."""
+    """On planned turns replace a chosen upgrade with a legal purchase."""
 
     def act(self, observation: dict, context: dict | None = None) -> int:
         context = context or {}
@@ -32,9 +32,14 @@ class UpgradePriorityPolicy(BaselinePolicy):
             raise ValueError("Expected 245-action nonempty mask")
         turn = int(context.get("turn", 0))
         used = int(context.get("actions_used", 0))
-        if turn in UPGRADE_TURNS and used < 3 and mask[3]:
-            return 3
-        return super().act(observation, context)
+        baseline_action = super().act(observation, context)
+        # Preserve higher-priority discovery/playing decisions. Only override
+        # an upgrade that baseline actually selected, when a buy is legal.
+        if baseline_action == 3 and turn in UPGRADE_TURNS and used < 3:
+            buy = np.flatnonzero(mask[8:16])
+            if buy.size:
+                return int(buy[0] + 8)
+        return baseline_action
 
 
 def real_match(seed: int, candidate: bool) -> dict:

@@ -11,8 +11,8 @@ def obs(*actions):
     return {"action_mask": mask, "features": np.zeros(4017), "cards": np.zeros(447)}
 
 
-def test_planned_turn_prefers_legal_upgrade_to_buy():
-    assert UpgradePriorityPolicy().act(obs(0, 3, 8), {"turn": 2, "actions_used": 0}) == 3
+def test_planned_turn_prefers_legal_buy_to_upgrade():
+    assert UpgradePriorityPolicy().act(obs(0, 3, 8), {"turn": 2, "actions_used": 0}) == 8
 
 
 def test_off_schedule_preserves_baseline_buy_priority():
@@ -24,7 +24,7 @@ def test_upgrade_only_when_legal():
 
 
 def test_after_three_actions_returns_to_base_policy():
-    assert UpgradePriorityPolicy().act(obs(0, 3, 8), {"turn": 5, "actions_used": 3}) == 8
+    assert UpgradePriorityPolicy().act(obs(0, 3, 8), {"turn": 5, "actions_used": 3}) == 3
 
 
 @pytest.mark.parametrize("mask", [[], list(range(246))])
@@ -34,4 +34,4 @@ def test_mask_contract_fails_closed(mask):
 
 
 def test_provenance_name_explicit():
-    assert POLICY == "upgrade-priority-before-buy-v1"
+    assert POLICY == "planned-turn-buy-before-upgrade-v1"
