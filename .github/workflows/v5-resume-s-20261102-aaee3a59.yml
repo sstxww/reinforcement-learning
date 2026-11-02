@@ -59,6 +59,7 @@ jobs:
                   raise RuntimeError("Baseline replay mismatch: " + key)
           print("Real baseline replay agrees with logged/archived complete game")
           PY
+          git restore experiments/s-20261102-aaee3a59/001-94431.json
       - name: Download exact registered unpromoted Release
         shell: bash
         run: |
