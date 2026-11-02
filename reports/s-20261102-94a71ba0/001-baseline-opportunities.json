@@ -1,0 +1,178 @@
+{
+  "schema": 1,
+  "session_id": "s-20261102-94a71ba0",
+  "seed": 83501,
+  "policy": "baseline",
+  "guard_cap": 0,
+  "performance_class": "baseline_with_internal_cap",
+  "model_release": null,
+  "engine": {
+    "version": "1.1.0",
+    "source_hash": "6d8712c93022ba11",
+    "features": 4017,
+    "cards": 447,
+    "actions": 245,
+    "n_cards": 3984
+  },
+  "summary": {
+    "decisions": 63,
+    "buy_legal_decisions": 34,
+    "selected_buys": 16,
+    "model_proposed_ends": 12,
+    "model_end_while_buy_legal": 0,
+    "guard_forced_ends": 0,
+    "max_identical_action_streak": 5,
+    "proposed_action_kinds": {
+      "mandatory_choice": 6,
+      "buy": 16,
+      "play": 23,
+      "end_turn": 12,
+      "upgrade": 5,
+      "other": 1
+    },
+    "executed_action_kinds": {
+      "mandatory_choice": 6,
+      "buy": 16,
+      "play": 23,
+      "end_turn": 12,
+      "upgrade": 5,
+      "other": 1
+    },
+    "raw_action_ids": {
+      "30": 6,
+      "8": 15,
+      "46": 8,
+      "0": 12,
+      "3": 5,
+      "11": 1,
+      "54": 4,
+      "62": 4,
+      "170": 1,
+      "94": 4,
+      "102": 3
+    },
+    "turns_with_legal_buy": 10,
+    "turns_with_selected_buy": 8
+  },
+  "turns": [
+    {
+      "turn": 0,
+      "decisions": 1,
+      "legal_buy_decisions": 0,
+      "selected_buys": 0,
+      "model_end_while_buy_legal": 0,
+      "forced_ends": 0,
+      "proposed_end_turns": 0
+    },
+    {
+      "turn": 1,
+      "decisions": 3,
+      "legal_buy_decisions": 1,
+      "selected_buys": 1,
+      "model_end_while_buy_legal": 0,
+      "forced_ends": 0,
+      "proposed_end_turns": 1
+    },
+    {
+      "turn": 2,
+      "decisions": 2,
+      "legal_buy_decisions": 1,
+      "selected_buys": 0,
+      "model_end_while_buy_legal": 0,
+      "forced_ends": 0,
+      "proposed_end_turns": 1
+    },
+    {
+      "turn": 3,
+      "decisions": 6,
+      "legal_buy_decisions": 3,
+      "selected_buys": 2,
+      "model_end_while_buy_legal": 0,
+      "forced_ends": 0,
+      "proposed_end_turns": 1
+    },
+    {
+      "turn": 4,
+      "decisions": 5,
+      "legal_buy_decisions": 3,
+      "selected_buys": 2,
+      "model_end_while_buy_legal": 0,
+      "forced_ends": 0,
+      "proposed_end_turns": 1
+    },
+    {
+      "turn": 5,
+      "decisions": 5,
+      "legal_buy_decisions": 2,
+      "selected_buys": 1,
+      "model_end_while_buy_legal": 0,
+      "forced_ends": 0,
+      "proposed_end_turns": 1
+    },
+    {
+      "turn": 6,
+      "decisions": 5,
+      "legal_buy_decisions": 3,
+      "selected_buys": 2,
+      "model_end_while_buy_legal": 0,
+      "forced_ends": 0,
+      "proposed_end_turns": 1
+    },
+    {
+      "turn": 7,
+      "decisions": 7,
+      "legal_buy_decisions": 6,
+      "selected_buys": 1,
+      "model_end_while_buy_legal": 0,
+      "forced_ends": 0,
+      "proposed_end_turns": 1
+    },
+    {
+      "turn": 8,
+      "decisions": 12,
+      "legal_buy_decisions": 9,
+      "selected_buys": 5,
+      "model_end_while_buy_legal": 0,
+      "forced_ends": 0,
+      "proposed_end_turns": 1
+    },
+    {
+      "turn": 9,
+      "decisions": 8,
+      "legal_buy_decisions": 3,
+      "selected_buys": 0,
+      "model_end_while_buy_legal": 0,
+      "forced_ends": 0,
+      "proposed_end_turns": 1
+    },
+    {
+      "turn": 10,
+      "decisions": 6,
+      "legal_buy_decisions": 3,
+      "selected_buys": 2,
+      "model_end_while_buy_legal": 0,
+      "forced_ends": 0,
+      "proposed_end_turns": 1
+    },
+    {
+      "turn": 11,
+      "decisions": 2,
+      "legal_buy_decisions": 0,
+      "selected_buys": 0,
+      "model_end_while_buy_legal": 0,
+      "forced_ends": 0,
+      "proposed_end_turns": 1
+    },
+    {
+      "turn": 12,
+      "decisions": 1,
+      "legal_buy_decisions": 0,
+      "selected_buys": 0,
+      "model_end_while_buy_legal": 0,
+      "forced_ends": 0,
+      "proposed_end_turns": 1
+    }
+  ],
+  "receipt_placement": 3,
+  "interpretation": "Legal purchase opportunities are decision states, not proofs that a purchase was economically optimal. A guard-influenced result is not a raw model rank."
+}
