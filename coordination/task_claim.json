@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "task_key": "train/schema2-prelearn-compatibility-gate",
+  "session_id": "s-20261103-b7c493e2",
+  "round": 1,
+  "role": "REPAIRER",
+  "state": "claimed",
+  "base_main_sha": "c1b828734527bae6141805581693d890cc3bff94",
+  "owned_paths": [
+    "tavern_ai/train.py",
+    "tests/test_resume_prelearn_b7c493e2.py",
+    ".github/workflows/v7-prelearn-b7c493e2.yml",
+    "research/sessions/s-20261103-b7c493e2/"
+  ],
+  "integration_lease": false,
+  "notes": "Task claim is atomic creation of its ref only; NOT global merge lock. Release claim at handoff; if any conflicting owner emerges, pause shared-file writes."
+}
