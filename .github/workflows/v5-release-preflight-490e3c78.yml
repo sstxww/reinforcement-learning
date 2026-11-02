@@ -1,0 +1,66 @@
+name: V5 Release ZIP + metadata audit s-20261102-490e3c78
+on:
+  push:
+    branches:
+      - agent/s-20261102-490e3c78/optimization-002
+    paths:
+      - 'tavern_ai/release_preflight_490e3c78.py'
+      - 'tests/test_release_preflight_490e3c78.py'
+      - '.github/workflows/v5-release-preflight-490e3c78.yml'
+permissions:
+  contents: read
+concurrency:
+  group: v5-release-preflight-490e3c78
+  cancel-in-progress: false
+jobs:
+  verify-public-release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 65
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run fail-closed local metadata and ZIP tests
+        run: |
+          python -m pip install -e '.[test]'
+          python -m pytest -q tests/test_release_preflight_490e3c78.py
+      - name: Independently download latest unpromoted V2 Release assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p checkpoints/v5-preflight
+          gh release download v2-learning-41413557445 \
+            --repo sstxww/reinforcement-learning \
+            --pattern model.zip --pattern model.metadata.json \
+            --dir checkpoints/v5-preflight
+          test -s checkpoints/v5-preflight/model.zip
+          test -s checkpoints/v5-preflight/model.metadata.json
+      - name: Verify downloaded bytes, ZIP CRC and training metadata
+        run: |
+          mkdir -p reports/s-20261102-490e3c78
+          python -m tavern_ai.release_preflight_490e3c78 \
+            --registry models/registry.json \
+            --model-id v2-learning-41413557445 \
+            --model checkpoints/v5-preflight/model.zip \
+            --metadata checkpoints/v5-preflight/model.metadata.json \
+            | tee reports/s-20261102-490e3c78/002-release-preflight.json
+      - name: Play independent real eight-seat baseline canary
+        run: |
+          bash scripts/bootstrap_engine.sh
+          mkdir -p experiments/s-20261102-490e3c78
+          python -m tavern_ai.canary \
+            --agent-id s-20261102-490e3c78 --seed 59002 \
+            --policy baseline \
+            --receipt experiments/s-20261102-490e3c78/002-59002.json
+          python -m tavern_ai.validate_receipt experiments/s-20261102-490e3c78/002-59002.json
+      - name: Preserve evidence, not the heavyweight model
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v5-preflight-490e3c78-${{ github.run_id }}
+          path: |
+            reports/s-20261102-490e3c78/*.json
+            experiments/s-20261102-490e3c78/002-59002.json
+          if-no-files-found: ignore
+          retention-days: 30
