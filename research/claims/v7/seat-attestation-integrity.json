@@ -3,7 +3,7 @@
   "session_id": "s-20261103-f6994f077b",
   "task_key": "v7/seat-attestation-integrity",
   "role": "REPAIRER",
-  "status": "running",
+  "status": "ready_for_integration__claim_released_for_handoff",
   "claim_ref": "refs/heads/claims/v7/seat-attestation-integrity",
   "claim_primitive": "exclusive create-ref succeeded; no global integrator lease claimed",
   "base_main_sha": "c1b828734527bae6141805581693d890cc3bff94",
@@ -22,5 +22,20 @@
   ],
   "proof_run": "https://github.com/sstxww/reinforcement-learning/actions/runs/41512909874",
   "release_policy": "No model changes, promotion, or training claimed",
-  "handoff": "Check run #41512909874 and authenticate seat-3 real-game receipt; commit exact receipt to own work branch; create reviewed PR and verify latest-head CI. Integrator must use independent serial merge gate."
+  "handoff": "Check run #41512909874 and authenticate seat-3 real-game receipt; commit exact receipt to own work branch; create reviewed PR and verify latest-head CI. Integrator must use independent serial merge gate.",
+  "claim_ownership_released": true,
+  "final_pr_url": "https://github.com/sstxww/reinforcement-learning/pull/213",
+  "final_pr_expected_head_sha": "04523f8613114a639dad67ae86f24596ce0a0330",
+  "latest_head_ci": {
+    "url": "https://github.com/sstxww/reinforcement-learning/actions/runs/41514154868",
+    "conclusion": "success",
+    "passed": 405,
+    "skipped": 1,
+    "independent_eight_seat_game": true
+  },
+  "game_receipt": "experiments/s-20261103-f6994f077b/001-99841-seat3-baseline.json",
+  "game_run": "https://github.com/sstxww/reinforcement-learning/actions/runs/41512909874",
+  "failure_run": "https://github.com/sstxww/reinforcement-learning/actions/runs/41513738257",
+  "failure_fix": "04523f8613114a639dad67ae86f24596ce0a0330",
+  "outstanding": "No exclusive main integration lease: final reviewer/integrator must check current main SHA, required reviews/branch rules, claim exclusive queue/lease, merge with exact expected head, then confirm main CI. No model or training claim."
 }
