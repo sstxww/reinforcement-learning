@@ -19,7 +19,7 @@ on:
     - cron: '13 4 * * 1'
 
 permissions:
-  contents: write # publish verified, unpromoted checkpoints as durable Releases
+  contents: read
   actions: read
 
 concurrency:
@@ -103,6 +103,15 @@ jobs:
           python -m tavern_ai.evaluate --model checkpoints/model.zip \
             --games "$EVAL_GAMES" --start-seed 24000 \
             --out artifacts/evaluation.json
+      - name: Validate checkpoint bytes and CPU inference without write permission
+        shell: bash
+        run: |
+          set -euo pipefail
+          sha256sum checkpoints/model.zip > artifacts/checkpoint.sha256
+          python -m tavern_ai.checkpoint_preflight \
+            --model checkpoints/model.zip --metadata checkpoints/model.metadata.json \
+            --expected-sha256 "$(cut -d' ' -f1 artifacts/checkpoint.sha256)" \
+            --probe-inference
       - name: Save resumable checkpoint and evidence
         uses: actions/upload-artifact@v4
         with:
@@ -112,18 +121,43 @@ jobs:
             checkpoints/model.metadata.json
             artifacts/trained-canary.json
             artifacts/evaluation.json
+            artifacts/checkpoint.sha256
           if-no-files-found: error
           retention-days: 90
 
+  publish:
+    needs: train
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    # GitHub write token is isolated from untrusted training dependencies.
+    permissions:
+      contents: write
+      actions: read
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Restore validated checkpoint and genuine results from this exact run
+        uses: actions/download-artifact@v4
+        with:
+          name: v1-model
+          path: .
       - name: Publish durable unpromoted Release and verify downloaded bytes
         shell: bash
         run: |
           set -euo pipefail
+          test -s checkpoints/model.zip
+          test -s checkpoints/model.metadata.json
+          test -s artifacts/trained-canary.json
+          test -s artifacts/evaluation.json
+          test -s artifacts/checkpoint.sha256
+          sha256sum -c artifacts/checkpoint.sha256
+          jq -e '(.completed == true) and (.policy == "model") and (.truncated_combats == 0) and (.turn_limit_end == false)' artifacts/trained-canary.json
+          jq -e '.candidate.games >= 1 and .candidate.mean_placement >= 1' artifacts/evaluation.json
           TAG="v5-main-${GITHUB_RUN_ID}"
-          sha256sum checkpoints/model.zip > artifacts/checkpoint.sha256
           gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --prerelease \
             --title "Unpromoted main training checkpoint $TAG" \
-            --notes "Experimental only; no Champion promotion. Source run: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}. The full game and evaluation passed before publication." \
+            --notes "Experimental only, no Champion promotion. Source run: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}. Full model game and evaluation passed in isolated, read-only train job." \
             checkpoints/model.zip checkpoints/model.metadata.json \
             artifacts/trained-canary.json artifacts/evaluation.json artifacts/checkpoint.sha256
           mkdir -p "$RUNNER_TEMP/release-roundtrip"
@@ -132,8 +166,4 @@ jobs:
             --dir "$RUNNER_TEMP/release-roundtrip"
           cmp checkpoints/model.zip "$RUNNER_TEMP/release-roundtrip/model.zip"
           cmp checkpoints/model.metadata.json "$RUNNER_TEMP/release-roundtrip/model.metadata.json"
-          python -m tavern_ai.checkpoint_preflight \
-            --model "$RUNNER_TEMP/release-roundtrip/model.zip" \
-            --metadata "$RUNNER_TEMP/release-roundtrip/model.metadata.json" \
-            --expected-sha256 "$(cut -d' ' -f1 artifacts/checkpoint.sha256)" \
-            --probe-inference
+          unzip -t "$RUNNER_TEMP/release-roundtrip/model.zip" >/dev/null
