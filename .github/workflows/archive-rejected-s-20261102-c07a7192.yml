@@ -92,7 +92,7 @@ jobs:
             'explanation':'Model loaded/resumed/finished authentic eight-seat game but remains rank 8; archive for reproducibility, do not choose as champion or main latest.'
           }
           assert report['model_sha256']==os.environ['MODEL_SHA256']
-          (d/'archive-attestation.json').write_text(json.dumps(report,indent=2,sort_keys=True)+'\\n')
+          (d/'archive-attestation.json').write_text(json.dumps(report,indent=2,sort_keys=True)+chr(10))
           PY
       - name: Publish unique immutable rejected prerelease and verify actual published bytes
         shell: bash
