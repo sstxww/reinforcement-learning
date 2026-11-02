@@ -47,9 +47,21 @@
     "heldout_top4_rate": 0,
     "heldout_first_place_rate": 0,
     "paired_improvement_vs_256_step_model_verified": false,
-    "independent_release_resume_tested": false,
+    "independent_release_resume_tested": true,
     "promoted_to_best": false,
-    "note": "A durable latest release was published, but automatic main-workflow recovery from it remains to be validated."
+    "note": "A durable latest release was published, but automatic main-workflow recovery from it remains to be validated.",
+    "resume_verification": {
+      "outcome": "passed",
+      "actions_run": "https://github.com/sstxww/reinforcement-learning/actions/runs/41427360022",
+      "downloaded_release_tag": "v2-learning-41413557445",
+      "checkpoint_sha256_verified": "73bde2666426cecce39f135980a897bb2cd4a7d70783ba04c9c0d29477a6664a",
+      "model_loaded_saved_steps": 1280,
+      "additional_real_ppo_steps": 128,
+      "resulting_total_timesteps": 1408,
+      "resulting_weight_durable": false,
+      "model_controlled_full_match_in_this_resume_run": false,
+      "note": "A genuine PPO resume smoke test succeeded. The 1408-step probe weight was not published. The independent baseline full-match receipt in the run is not a PPO model match."
+    }
   },
   "candidates": [
     {
@@ -152,7 +164,7 @@
     "v2_four_seed_mean_placement": 8,
     "improvement_claimed": false,
     "v1_release_resume_verified": true,
-    "v2_release_resume_verified": false,
+    "v2_release_resume_verified": true,
     "warning": "An initial resumed checkpoint Release upload returned 404, but a subsequent independent GitHub Release was published with the matching SHA256. Earlier full-game guard failures remain recorded.",
     "recovered_384_step_weight_durable": true,
     "recovered_384_release": "https://github.com/sstxww/reinforcement-learning/releases/tag/v1-learning-resume-41413508653"
@@ -177,8 +189,8 @@
   ],
   "storage_warnings": [
     "Do not silently resume from temporary Actions artifacts when a versioned Release is available.",
-    "Before claiming reliable resumption, download Release assets, verify SHA-256, load policy and perform an actual continued PPO training step.",
-    "Current release is an experimental candidate, not a validated Best."
+    "Current release is an experimental candidate, not a validated Best.",
+    "V2 Release SHA/load/128-step resume verified in Actions 41427360022; the resumed 1408-step probe weight was NOT durably archived. Production main train.yml still lacks verified Release-based automatic continuation."
   ],
   "champion": null,
   "registry_provenance": {
@@ -186,7 +198,8 @@
     "snapshot_date": "2026-11-02",
     "release_assets_seen_in_github_api": true,
     "release_asset_bytes_verified_in_this_session": false,
-    "latest_release_resume_tested": false,
-    "notes": "Source PR reports verified V1-to-384-step continuation, but latest 1280-step Release has not passed independent download+resume. No model promotion is implied."
+    "latest_release_resume_tested": true,
+    "notes": "Source PR reports verified V1-to-384-step continuation, but latest 1280-step Release has not passed independent download+resume. No model promotion is implied.",
+    "release_resume_evidence_run": "https://github.com/sstxww/reinforcement-learning/actions/runs/41427360022"
   }
 }
