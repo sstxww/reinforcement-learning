@@ -1,6 +1,6 @@
 # Session s-20261102-8555759e — Round 001
 
-**Status:** completed experiment; negative result; awaiting PR review.  
+**Status:** completed experiment; negative result; draft PR #38 awaiting latest-head CI / review.  
 **Research question:** Does the positional tie-break among legal choice actions 30–45 affect full-game results?  
 **Hypothesis:** A fixed first-legal-choice preference may bias decisions; selecting the last legal choice could change outcomes. This is a screening experiment, not a proposed production replacement.
 
@@ -58,6 +58,6 @@ All candidate receipts: `experiments/s-20261102-8555759e/001-{855570..855575}.js
 
 No code/test/game or Actions error occurred during this round. The independent workflow finished successfully. Its uploaded Artifact is a **30-day temporary backup**, not persistent checkpoint storage; textual experiment metrics and 12 original JSON receipts are committed in Git. No caches, models, rollouts, or large logs were committed.
 
-## Next bounded hypothesis
+**Pull request:** https://github.com/sstxww/reinforcement-learning/pull/38 (draft; no merge).\n\n## Next bounded hypothesis
 
 An action index alone lacks card value information. A follow-up should examine whether the choice range represents hero/discover option types and condition the tie-break on observable candidate identity or board synergy. It should first verify the TavernGym action semantics and then use held-out paired seeds; it must remain opt-in and not modify shared baseline. Do not repeat the same fixed-last strategy as though this failure were inconclusive for the tested six seeds.

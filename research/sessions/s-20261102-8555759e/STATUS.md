@@ -12,6 +12,6 @@
 - **Full summary:** `reports/s-20261102-8555759e/round-001.json`.
 - **Policy SHA256:** `b441dd7f08eb3e95f0e93c69b3e2656bdbb11d17ffdbaad7ee41d747e56c4fed`.
 - **Checkpoints:** No model artifact produced. Latest/Best/Candidate neural checkpoints unchanged; 30-day evidence Artifact is not long-term model storage.
-- **PR:** to be opened against main after committing this handoff, not automatically merged.
+- **PR:** https://github.com/sstxww/reinforcement-learning/pull/38 (draft, awaiting latest-head CI / human integration; not auto-merged).
 - **Unresolved faults:** none in this specific experimental workflow. External PRs remain unmerged and are not this session's verified production improvements.
 - **Next round:** investigate candidate-card identity/board-quality choice tie-break rather than blindly favoring the last slot; verify legal index semantics before implementing. Use a fresh branch/round if an independent experiment is warranted.
