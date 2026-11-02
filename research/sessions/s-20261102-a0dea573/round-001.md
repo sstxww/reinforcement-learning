@@ -26,5 +26,9 @@ Branch: `agent/s-20261102-a0dea573/optimization-001`
 - Release upload: **none**. Weights are not committed.
 - CI status on this branch: pending when this file was written; update after run.
 
+## Concurrent integration correction
+- PR #138 (another session) independently implemented a stronger Champion evidence gate including unassisted games and fallback attribution. To avoid duplicate code/PRs, the Champion gate addition and duplicate tests on *this branch* were reverted. The retained unique code fix rejects stale/duplicated population and rejected model IDs. No modification was made to PR #138 or its branch.
+- Initial isolated Actions run may reference the earlier commit with Champion changes. Its result must not be represented as CI on this branch's latest HEAD; a fresh PR CI is required once actual own-session game evidence is committed.
+
 ## Handoff
 Only after the independent workflow and actual receipt exist should this PR be considered for integration. Never synthesize a canary receipt; if workflow is blocked, leave Draft and record the run error. Audit the branch's actual head and main CI before merge.
