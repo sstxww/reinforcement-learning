@@ -49,6 +49,10 @@ jobs:
             echo "Receipt already committed; no new commit"
           else
             git commit -m "test(v5): preserve genuine s-20261102-d5349678 eight-seat match"
+            # An independent auditor may append session notes during the game.
+            # Rebase only our generated receipt commit; never overwrite remote work.
+            git fetch origin "$GITHUB_REF_NAME"
+            git rebase "origin/$GITHUB_REF_NAME"
             git push origin HEAD:refs/heads/agent/s-20261102-d5349678/optimization-001
           fi
       - name: Retain receipt artifact for independent review
