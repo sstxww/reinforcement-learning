@@ -1,7 +1,7 @@
 """Mechanism-safety and metric tests for independent masked BC pilot."""
 import numpy as np
 import pytest
-import torch
+torch = pytest.importorskip("torch", reason="BC experiment requires optional torch")
 
 from tavern_ai.bc_session_661adf61 import MaskedBC, choose_legal, stack, summarize
 from tavern_ai.contract import FEATURES, CARDS, ACTIONS
