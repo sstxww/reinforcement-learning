@@ -1,0 +1,58 @@
+name: V6.1 isolated matched raw PPO probe s-20261103-84543686
+
+on:
+  push:
+    branches:
+      - agent/s-20261103-84543686/optimization-001
+    paths:
+      - .github/workflows/experiment-s-20261103-84543686.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: v61-s-20261103-84543686-raw-paired
+  cancel-in-progress: false
+
+jobs:
+  fixed-seed-evidence:
+    runs-on: ubuntu-latest
+    timeout-minutes: 65
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned Python dependencies
+        run: |
+          python -m pip install -e '.[train,test]'
+      - name: Check offline resume and BUY-opportunity regressions
+        run: |
+          python -m pytest -q tests/test_checkpoint_writer_s_20261102_001b7da1.py tests/test_buy_opportunity_68099929.py
+      - name: Bootstrap exact approved TavernGym engine
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Same-seed independent baseline real eight-seat game
+        run: |
+          python -m tavern_ai.canary --agent-id s-20261103-84543686 --seed 99407 --policy baseline --receipt outputs/s-20261103-84543686-baseline-99407.json
+          python -m tavern_ai.validate_receipt outputs/s-20261103-84543686-baseline-99407.json
+      - name: Download immutable 1408-step unpromoted Release and verify bytes
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p checkpoints
+          gh release download v5-s-20261102-68099929-1408-41428692617 --repo "${GITHUB_REPOSITORY}" --pattern model.zip --dir checkpoints
+          echo 'a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632  checkpoints/model.zip' | sha256sum --check
+      - name: Unassisted raw PPO same-seed actual full-game and public BUY masks
+        run: |
+          python -m tavern_ai.buy_opportunity_68099929 --agent-id s-20261103-84543686 --seed 99407 --policy model --model checkpoints/model.zip --out outputs/s-20261103-84543686-raw-99407.json
+      - name: Preserve original signed-by-workflow game evidence as temporary artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: s-20261103-84543686-real-game-99407
+          path: outputs/*.json
+          if-no-files-found: warn
+          retention-days: 30
