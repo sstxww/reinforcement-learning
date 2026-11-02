@@ -1,0 +1,21 @@
+# STATUS — s-20261103-db1986b8 (round 001)
+
+**PR:** [#164](https://github.com/sstxww/reinforcement-learning/pull/164), integration review state at authoring; verify live PR status separately. Own isolated head, no direct push to main. Reconciled concurrent main changes through `c5edec2e3261dacdf3908796ebfe0457fb76c02e`; preserves #161 digest-bound pre-deserialization guard. This PR's final intended production diff changes only `tavern_ai/train.py` plus synthetic tests, authentic receipt, handoff and rejected manifest; session-specific temporary workflow files were removed from the production PR tree.
+
+## P0 shared integration
+Initial main `9685cc33`; initially 115 open PRs, 114 Draft, only non-Draft #15 stacked on #9. Other integrators merged #116/#117/#125/#138/#154/#161/#162/#166 during this session. **We do not claim those mergers.** They already established manual Release restore, staged SHA-bound save, Champion evidence and rejected-on-publish safety. Our stale train.yml replacement was withdrawn rather than overwrite their work.
+
+## Genuine results
+- Baseline own original pinned eight-seat TavernGym game [Actions #41507827256](https://github.com/sstxww/reinforcement-learning/actions/runs/41507827256): `experiments/s-20261103-db1986b8/001-931281.json` SHA256 `ff9c0c8489884955d59a54874c6fa8f596551a410780cf6630e3714d7c64133d`, seed 931281, rank 6, turns 15, decisions 55, 0 truncated combats. Infrastructure only.
+- Actual **real** PPO source Release `v2-learning-41413557445`, SHA256 `73bde2666426cecce39f135980a897bb2cd4a7d70783ba04c9c0d29477a6664a`, 1280 cumulative steps, schema-2. Independent [Actions #41509839883](https://github.com/sstxww/reinforcement-learning/actions/runs/41509839883) SUCCESS: true optimizer continued **128 steps**, child **1408 cumulative**, schema-2 engine/catalog/patch/ruleset/upstream and parent SHA preserved; child SHA256 `f488738b738708380f3d4bc2e607843f8f2931b4aac3883d775c5d9ae090d762`, ZIP CRC/optimizer, CPU inference and digest passed.
+- Raw candidate seed 931282: **FAILED to finish eight-seat game**, `RuntimeError: Full-game safety limit exceeded` (exit 1). No valid PPO rank, no performance gain proof. Failure evidence: `research/sessions/s-20261103-db1986b8/failures/001-model-fullgame-safety-limit.md`. Never promote.
+- Candidate archived permanently as **REJECTED prerelease** [v5-rejected-s-20261103-db1986b8-schema2-1408-41509839883](https://github.com/sstxww/reinforcement-learning/releases/tag/v5-rejected-s-20261103-db1986b8-schema2-1408-41509839883), 8 assets, model.zip 17,525,156 bytes; actual GitHub API digest `f488738b738708380f3d4bc2e607843f8f2931b4aac3883d775c5d9ae090d762`; publisher [Actions #41510761629](https://github.com/sstxww/reinforcement-learning/actions/runs/41510761629) SUCCESS including redownload byte-identical check. Distinct from existing 1408-step unpromoted V5 release SHA a73d24..., and intentionally NOT registry latest/Champion. Index: `models/rejected/v5-rejected-s-20261103-db1986b8-schema2-1408-41509839883.json`.
+
+## P1 implementation
+`build_checkpoint_metadata` prevents losing schema-2 provenance on genuine PPO resume; rejects malformed parent, schema version or non-increasing cumulative steps. Tested with synthetic unit ZIP and **real** schema-2 1280→1408 optimizer resume. Shared main's #161 `require_verified_resume` remains intact. Exact latest-head CI to verify before merge.
+
+## P2 rank-eight
+#162 logs raw V2/V5 0 buys despite legal opportunities (V2 0/74, V5 0/35 and 0/38 exposures) and raw V2 incomplete hero-power/cancel repetitions. #107 forced 46 buys across three games yet each placed eighth. This session's candidate failed the full-game limit; no final rank can be assigned. Next attempt should inspect phase-by-phase state progress and legal-mask action loops; do not blindly increase PPO budget.
+
+## Safe handoff
+No ranked Arena, no model promotion, no modification to upstream TavernGym. This session **did** execute 128 genuine PPO steps and save rejected child weights in durable Release. One successful independent baseline game; no complete new raw PPO game. Model strength not established, Best and Champion remain null. Preserve old Release and do not auto-select rejected child for production continuation.

@@ -24,6 +24,53 @@ def require_verified_resume(resume: Path, metadata: dict) -> str:
     return sha256_file(resume)
 
 
+def build_checkpoint_metadata(
+    *, engine: dict, seed: int, total_timesteps: int,
+    parent: dict | None = None, parent_sha256: str | None = None,
+) -> dict:
+    """Preserve schema-2 optimizer/engine provenance across actual PPO resumes.
+
+    This is pure metadata construction, not evidence of completed training.
+    The checkpoint writer binds the new child SHA256 after saving the ZIP.
+    """
+    if type(total_timesteps) is not int or total_timesteps < 1:
+        raise ValueError("Invalid resumed training step counter")
+    if (parent is None) != (parent_sha256 is None):
+        raise ValueError("Parent metadata and verified parent digest must agree")
+    meta = {
+        "schema": 1, "engine": engine,
+        "total_timesteps": total_timesteps,
+        "training_seed": seed, "algorithm": "MaskablePPO",
+        "notes": "CPU single-seat versus seven TavernGym scripted bots",
+    }
+    if parent is None:
+        return meta
+    if not isinstance(parent, dict) or parent.get("engine") != engine:
+        raise ValueError("Incompatible parent engine")
+    previous = parent.get("total_timesteps")
+    if type(previous) is not int or previous < 1 or total_timesteps <= previous:
+        raise ValueError("Missing or non-increasing cumulative PPO steps")
+    from .checkpoint_writer import _SHA256
+    if not isinstance(parent_sha256, str) or not _SHA256.fullmatch(parent_sha256):
+        raise ValueError("Invalid verified parent checkpoint digest")
+    meta["parent_checkpoint_sha256"] = parent_sha256
+    if parent.get("schema") == 1:
+        return meta
+    if parent.get("schema") != 2:
+        raise ValueError("Unknown parent checkpoint schema (refusing downgrade)")
+    from .contract import CATALOG_SHA256, PATCH_SHA256, RULESET_ID, UPSTREAM_COMMIT
+    expected = {
+        "engine": engine, "catalog_sha256": CATALOG_SHA256,
+        "patch_sha256": PATCH_SHA256, "ruleset_id": RULESET_ID,
+        "upstream_commit": UPSTREAM_COMMIT,
+    }
+    if parent.get("compatibility") != expected:
+        raise ValueError("Parent schema-2 compatibility provenance mismatch")
+    meta["schema"] = 2
+    meta["compatibility"] = expected
+    meta["increment_timesteps"] = total_timesteps - previous
+    return meta
+
 def run(steps: int, seed: int, model_out: Path, resume: Path | None = None):
     from sb3_contrib import MaskablePPO
     from .model import TavernExtractor
@@ -34,6 +81,7 @@ def run(steps: int, seed: int, model_out: Path, resume: Path | None = None):
     env = TavernEnv(seed=seed)
     try:
         parent_sha256 = None
+        prev = None
         if resume is not None:
             if not resume.is_file():
                 raise FileNotFoundError(resume)
@@ -62,16 +110,10 @@ def run(steps: int, seed: int, model_out: Path, resume: Path | None = None):
                 },
             )
         model.learn(total_timesteps=steps, reset_num_timesteps=False)
-        meta = {
-            "schema": 1,
-            "engine": engine,
-            "total_timesteps": int(model.num_timesteps),
-            "training_seed": seed,
-            "algorithm": "MaskablePPO",
-            "notes": "V1 CPU single-seat vs seven scripted bots",
-        }
-        if parent_sha256 is not None:
-            meta["parent_checkpoint_sha256"] = parent_sha256
+        meta = build_checkpoint_metadata(
+            engine=engine, seed=seed, total_timesteps=int(model.num_timesteps),
+            parent=prev, parent_sha256=parent_sha256,
+        )
         return save_checkpoint(model, model_out, meta)
     finally:
         env.close()
