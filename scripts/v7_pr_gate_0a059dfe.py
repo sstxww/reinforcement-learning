@@ -112,7 +112,11 @@ def main() -> None:
     main_sha = api_get(args.repo, "branches/main")["commit"]["sha"]
     run_data = api_get(args.repo, f"actions/runs?head_sha={quote(args.expected_head)}&event=pull_request&per_page=100")
     matching = [r for r in run_data.get("workflow_runs", []) if r.get("head_sha") == args.expected_head
-                and r.get("event") == "pull_request" and r.get("name") == "CI - full-match gate"]
+                and r.get("event") == "pull_request" and r.get("name") == "CI - full-match gate"
+                and any(link.get("number") == args.pr
+                        and link.get("head", {}).get("sha") == args.expected_head
+                        and link.get("base", {}).get("sha") == main_sha
+                        for link in r.get("pull_requests", []))]
     latest = max(matching, key=lambda r: (r.get("created_at") or "", r.get("id") or 0), default=None)
     jobs = api_get(args.repo, f"actions/runs/{latest['id']}/jobs?per_page=100") if latest else None
     result = validate(args.repo, pr, main_sha, args.expected_head, run_data.get("workflow_runs", []), jobs)
