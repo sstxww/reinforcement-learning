@@ -1,0 +1,52 @@
+name: V7 rollback ownership test and real baseline - s-20261103-ab083974
+
+on:
+  push:
+    branches:
+      - agent/s-20261103-ab083974/optimization-001
+    paths:
+      - .github/workflows/v7-review-s-20261103-ab083974.yml
+      - tests/test_v7_restore_rollback_race_ab083974.py
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: v7-review-s-20261103-ab083974
+  cancel-in-progress: false
+
+jobs:
+  review-evidence:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install offline regression test dependencies
+        run: |
+          python -m pip install -e '.[test]'
+      - name: Test rollback ownership negative and safe controls
+        run: python -m pytest -q tests/test_v7_restore_rollback_race_ab083974.py
+      - name: Install and verify pinned TavernGym
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Real complete eight-seat baseline only, never PPO performance
+        run: |
+          mkdir -p outputs
+          python -m tavern_ai.canary \
+            --agent-id s-20261103-ab083974 --policy baseline --seed 99641 \
+            --receipt outputs/001-99641.json
+          python -m tavern_ai.validate_receipt outputs/001-99641.json
+          sha256sum outputs/001-99641.json > outputs/001-99641.sha256
+      - name: Preserve authentic game receipt (temporary, not a model Release)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v7-review-s-20261103-ab083974-${{ github.run_id }}
+          path: outputs/*
+          if-no-files-found: ignore
+          retention-days: 30
