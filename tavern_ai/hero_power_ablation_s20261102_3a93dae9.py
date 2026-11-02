@@ -1,4 +1,4 @@
-"""Session-local, real-TavernGym free hero-power ablation. Never used in ranked play."""
+"""Session-local, real-TavernGym affordable hero-power ablation. Never used in ranked play."""
 from __future__ import annotations
 
 import argparse
@@ -19,14 +19,15 @@ SESSION_ID = "s-20261102-3a93dae9"
 SEEDS = (18021, 18022)
 
 
-class FreeHeroPowerPolicy:
-    """Ablate one free hero power per turn; otherwise use unchanged V0 baseline."""
+class AffordableHeroPowerPolicy:
+    """Ablate one affordable hero power per turn with gold reserve; otherwise use unchanged V0 baseline."""
 
     def __init__(self):
         self.baseline = BaselinePolicy()
         self.turn = None
         self.used_this_turn = False
         self.hero_actions = 0
+        self.available_power_turns = set()
 
     def act(self, observation: dict, context: dict) -> int:
         mask = np.asarray(observation["action_mask"], dtype=bool)
@@ -39,14 +40,19 @@ class FreeHeroPowerPolicy:
         # Every outstanding hero selection, Discover or target choice blocks ordinary actions.
         if mask[30:46].any():
             return self.baseline.act(observation, context)
+        if mask[4:6].any():
+            self.available_power_turns.add(turn)
         if not self.used_this_turn:
             f = np.asarray(observation["features"], dtype=np.float32)
             if f.shape != (FEATURES,):
                 raise ValueError("Unexpected observe2 feature layout")
-            # Pinned upstream obs.rs: hero-power prices at feature indices 17 and 20,
-            # divided by five; legal mask at actions 4 and 5 guards target availability.
+            # Pinned upstream obs.rs: gold is feature 7 / 10, hero-power prices
+            # are features 17 / 20 divided by five. Legal mask guards targets.
+            gold = float(f[7]) * 10.0
             for action, price_index in ((4, 17), (5, 20)):
-                if mask[action] and np.isfinite(f[price_index]) and f[price_index] == 0:
+                price = float(f[price_index]) * 5.0
+                if (turn >= 3 and mask[action] and np.isfinite(price)
+                        and 0 <= price <= 3.00001 and gold + 1e-5 >= price + 3):
                     self.used_this_turn = True
                     self.hero_actions += 1
                     return action
@@ -60,7 +66,7 @@ def run_candidate(seed: int, agent_id: str = SESSION_ID) -> dict:
         raise ValueError("Session identity mismatch")
     engine = verify_engine()
     game = taverngym.Game(seed=seed)
-    policy = FreeHeroPowerPolicy()
+    policy = AffordableHeroPowerPolicy()
     decisions = 0
     actions_this_turn = 0
     last_turn = -1
@@ -119,6 +125,7 @@ def run_candidate(seed: int, agent_id: str = SESSION_ID) -> dict:
         "model_sha256": None,
         "policy_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
         "hero_power_actions": policy.hero_actions,
+        "available_hero_power_turns": len(policy.available_power_turns),
         "illegal_actions": 0,
         "game_is_over": bool(game.is_over()),
     }
@@ -153,15 +160,16 @@ def run_paired(seeds: tuple[int, ...] = SEEDS, out_root: Path | None = None) -> 
         baseline.append(b)
     result = {
         "session_id": SESSION_ID,
-        "hypothesis": "Use one zero-cost legal hero power per turn before baseline shop actions",
+        "hypothesis": "Once per turn at turn >=3, use legal hero power costing <=3 while reserving 3 gold",
         "seeds": list(seeds),
         "candidate": summary(candidate),
         "baseline": summary(baseline),
         "hero_power_actions_per_game": [x["hero_power_actions"] for x in candidate],
+        "available_hero_power_turns_per_game": [x["available_hero_power_turns"] for x in candidate],
         "paired_mean_placement_delta": (
             summary(candidate)["mean_placement"] - summary(baseline)["mean_placement"]
         ),
-        "interpretation": "Exploratory sample; no validated strength improvement claimed",
+        "interpretation": "Active intervention only if hero_power_actions > 0; small sample never proves improvement",
     }
     report = Path("research") / "sessions" / SESSION_ID / "paired-results.json"
     report.parent.mkdir(parents=True, exist_ok=True)
