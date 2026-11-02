@@ -50,3 +50,11 @@ def test_symlinks_are_not_traversed_or_deleted(tmp_path: Path):
 def test_invalid_root_fails_closed(tmp_path: Path):
     with pytest.raises(ValueError, match="Not a directory"):
         clean(tmp_path / "missing", apply=True)
+
+
+def test_explicit_protected_root_is_rejected(tmp_path: Path):
+    protected = tmp_path / "models" / "subdir"
+    (protected / "__pycache__").mkdir(parents=True)
+    with pytest.raises(ValueError, match="protected directory"):
+        clean(protected, apply=True)
+    assert (protected / "__pycache__").is_dir()
