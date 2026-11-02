@@ -70,8 +70,6 @@ def save_checkpoint(model: object, model_path: Path, metadata: dict) -> dict:
         raise ValueError("Checkpoint path must have a .zip suffix")
     model_path.parent.mkdir(parents=True, exist_ok=True)
     metadata_path = model_path.with_suffix(".metadata.json")
-    if os.path.lexists(model_path) or os.path.lexists(metadata_path):
-        raise FileExistsError("Refusing to replace an existing checkpoint or metadata")
     fd, tmp_zip = tempfile.mkstemp(prefix=".checkpoint-", suffix=".zip", dir=model_path.parent)
     os.close(fd)
     fd, tmp_meta = tempfile.mkstemp(prefix=".checkpoint-", suffix=".json", dir=model_path.parent)
