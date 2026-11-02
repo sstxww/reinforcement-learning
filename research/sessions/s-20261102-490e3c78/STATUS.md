@@ -6,5 +6,5 @@
 - Own branch: `agent/s-20261102-490e3c78/optimization-001`.
 - Model registry: selective extraction from PR #8, with separate hash-and-compatibility preflight and synthetic tests.
 - No new verified Champion. No own PPO gradient updates. Do not auto-promote Latest.
-- Own real baseline canary: pending isolated workflow; only mark complete after seeing real Actions evidence.
-- Next: verify test and full-match job; check latest Release model.zip download integrity and independent PPO load/optimizer resume; then build opportunity-aware economic telemetry (legal BUY denominators).
+- Own real baseline canary: VERIFIED at [Actions 41427592476](https://github.com/sstxww/reinforcement-learning/actions/runs/41427592476), completed success; actual committed receipt `experiments/s-20261102-490e3c78/001-59001.json`, seed 59001, baseline rank 8, 16 turns, 39 controlled decisions, zero combat truncation / game turn-limit ending. Full pytest and registry integrity tests passed.
+- Next: await independent latest-PR-head CI, review integration conflicts with concurrent PR #87 and checkpoint PRs #79–#86; verify Release model.zip download integrity and independent PPO load/optimizer resume before any scaled training; then add opportunity-aware economic telemetry (legal BUY denominators).
