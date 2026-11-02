@@ -5,7 +5,7 @@
 - Base main SHA: 6ac59235b8238196a0e6462de77b72413c829372
 - Code experiment commit: e4af555a2f6687765988b4d2ae7a118a728ba1f3
 - Genuine results commit: 23f3b298ababea09c294b31a101a43f56b6f3534
-- PR to main: pending creation following evidence commit.
+- PR to main: https://github.com/sstxww/reinforcement-learning/pull/16 (draft, reviewer/CI validation pending).
 - Workflow: https://github.com/sstxww/reinforcement-learning/actions/runs/41413477918 (success).
 - Completed real PPO steps: 256 total; 128 per entropy configuration. Independent training seed 70141.
 - Mandatory completed full match: experiments/s-20261102-7f4c9a62/001-31041.json, agent seat 0 rank 8, 153 decisions, seed 31041, no guard truncation.

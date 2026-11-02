@@ -7,7 +7,7 @@
 - Experiment implementation commit: e4af555a2f6687765988b4d2ae7a118a728ba1f3
 - GitHub Actions generated genuine receipts commit: 23f3b298ababea09c294b31a101a43f56b6f3534
 - Real experiment run: https://github.com/sstxww/reinforcement-learning/actions/runs/41413477918 (success)
-- PR: to be created after submission of this evidence; no main merge attempted.
+- PR: https://github.com/sstxww/reinforcement-learning/pull/16 (draft; no main merge attempted).
 
 ## Research hypothesis
 Under equal initial seeds, environments and 128-step PPO budgets, action-masked entropy coefficient 0.02 may improve exploration and thus mean placement relative to coefficient 0.0. This is an exploratory smoke experiment, NOT an adequacy claim about 128-step training. Lower mean placement is better.
