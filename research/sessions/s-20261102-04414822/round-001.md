@@ -23,4 +23,5 @@
 - What did not work: any per-seed failures above. Otherwise no failure demonstrated; lack of power prevents positive claim.
 - Clean-up: no weights, rollout, caches or virtual environments committed; retain run artifact while valid.
 - Next: >=20 paired seeds, confidence intervals, investigate normalization/padding semantics separately before wider changes.
-- PR: pending reviewer; never merge automatically.
+- PR: https://github.com/sstxww/reinforcement-learning/pull/13 (draft); never merge automatically.
+- Core failure to investigate: the d8 checkpoint repeatedly hits the canary 30,000-iteration safety guard on both seeds; collect per-action frequencies before changing policy or crediting card width. This is not evidence of an illegal action, and gives no valid d8 placement.
