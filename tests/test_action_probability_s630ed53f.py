@@ -82,3 +82,9 @@ def test_pinned_action_family_boundaries(id_expected):
 def test_out_of_range_action_rejected(bad):
     with pytest.raises(ValueError):
         family(bad)
+
+def test_all_245_ids_match_pinned_engine_audited_action_taxonomy():
+    from tavern_ai.mechanics_audit_f3af3b4d import action_family as audited
+    for action in range(ACTIONS):
+        expected = audited(action)
+        assert family(action) == ("end_turn" if expected == "end" else expected)
