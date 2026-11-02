@@ -36,7 +36,7 @@ jobs:
           mkdir -p experiments/evaluation reports/evaluation
           python -m tavern_ai.canary --agent-id evaluation --seed 1303 --policy baseline --receipt experiments/evaluation/v1-full-match.json
           python -m tavern_ai.validate_receipt experiments/evaluation/v1-full-match.json
-          python -m tavern_ai.evaluate --policy baseline --games 4 --start-seed 24000 --out reports/evaluation/v1-baseline.json
+          python -m tavern_ai.evaluate --games 4 --start-seed 24000 --out reports/evaluation/v1-baseline.json
       - name: Commit only actual match receipts and compact metrics
         shell: bash
         run: |
