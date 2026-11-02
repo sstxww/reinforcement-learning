@@ -84,7 +84,7 @@ def resume_verified(
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--registry", type=Path, default=Path("models/registry.json"))
+    parser.add_argument("--registry", type=Path, default=Path("models/sessions/s-20261102-decfc670/registry.json"))
     parser.add_argument("--source", type=Path, required=True)
     parser.add_argument("--metadata", type=Path, required=True)
     parser.add_argument("--out", type=Path, required=True)
