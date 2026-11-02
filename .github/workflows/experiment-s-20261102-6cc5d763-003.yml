@@ -1,0 +1,71 @@
+name: "Frozen prebuy refresh extension R003 s-20261102-6cc5d763"
+on:
+  push:
+    branches:
+      - "agent/s-20261102-6cc5d763/optimization-003"
+    paths:
+      - ".github/workflows/experiment-s-20261102-6cc5d763-003.yml"
+      - "tavern_ai/prebuy_extension.py"
+      - "tests/test_prebuy_extension.py"
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: "frozen-prebuy-s-20261102-6cc5d763-r003"
+  cancel-in-progress: false
+jobs:
+  real-16-seed-extension:
+    runs-on: ubuntu-latest
+    timeout-minutes: 80
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Test unchanged policy and extension validation
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[test]'
+          python -m pytest
+      - name: Install pinned real TavernGym and check contract
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Mandatory game plus sixteen frozen-policy paired complete matches
+        run: |
+          python -m tavern_ai.prebuy_extension --mandatory-seed 36520 --start-seed 36521 --games 16
+          python -m tavern_ai.validate_receipt experiments/s-20261102-6cc5d763/003-36520.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=json.loads(Path("reports/s-20261102-6cc5d763/round-003.json").read_text())
+          assert p["frozen_policy_identical_to_R002"]
+          assert p["baseline"]["games"] == p["candidate"]["games"] == 16
+          assert p["intervention_valid"] and p["ppo_training_steps"] == 0
+          assert len(p["paired_candidate_minus_baseline"]) == 16
+          print("COMPLETE_EIGHT_SEAT_GAMES", 33)
+          print("REFRESH_INTERVENTIONS", p["total_refreshes"])
+          PY
+      - name: Commit only this session's true R003 evidence
+        if: success()
+        shell: bash
+        run: |
+          test "$GITHUB_REF_NAME" = "agent/s-20261102-6cc5d763/optimization-003"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "experiments/s-20261102-6cc5d763" "reports/s-20261102-6cc5d763"
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "results(s-20261102-6cc5d763): preserve 33 R003 complete matches on unseen seeds"
+          git pull --rebase origin "$GITHUB_REF_NAME"
+          git push origin "HEAD:$GITHUB_REF_NAME"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: "frozen-prebuy-s-20261102-6cc5d763-${{ github.run_id }}"
+          path: |
+            experiments/s-20261102-6cc5d763/*.json
+            reports/s-20261102-6cc5d763/*.json
+          if-no-files-found: ignore
+          retention-days: 30
