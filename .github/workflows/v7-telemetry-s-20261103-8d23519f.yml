@@ -1,0 +1,45 @@
+name: V7 s-20261103-8d23519f real telemetry receipt verification
+on:
+  push:
+    branches:
+      - agent/s-20261103-8d23519f/optimization-001
+    paths:
+      - .github/workflows/v7-telemetry-s-20261103-8d23519f.yml
+permissions:
+  contents: read
+concurrency:
+  group: v7-telemetry-s-20261103-8d23519f
+  cancel-in-progress: false
+jobs:
+  game-and-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install Python dependencies
+        run: |
+          python -m pip install -e '.[train,test]'
+      - name: Synthetic regression for fail-closed public opportunity telemetry
+        run: |
+          python -m pytest -q tests/test_opportunity_receipt_gate_s8d23519f.py
+      - name: Install and verify pinned TavernGym
+        run: bash scripts/bootstrap_engine.sh
+      - name: Real full eight-seat baseline game with public trace and exact receipt
+        run: |
+          mkdir -p experiments/s-20261103-8d23519f
+          python -m tavern_ai.buy_opportunity_68099929 --agent-id s-20261103-8d23519f --seed 97821 --policy baseline --out experiments/s-20261103-8d23519f/001-97821-baseline.json
+          python -m tavern_ai.validate_receipt experiments/s-20261103-8d23519f/001-97821-baseline.json
+          python -m tavern_ai.opportunity_receipt_gate_s8d23519f experiments/s-20261103-8d23519f/001-97821-baseline.json | tee v7-telemetry-audit.json
+      - name: Upload original match receipt and generated audit
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v7-s-20261103-8d23519f-001
+          path: |
+            experiments/s-20261103-8d23519f/*.json
+            v7-telemetry-audit.json
+          if-no-files-found: ignore
+          retention-days: 14
