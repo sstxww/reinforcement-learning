@@ -1,0 +1,123 @@
+{
+  "session_id": "s-20261102-bd90a20b",
+  "study": "non-invasive mask recurrence diagnostics",
+  "engine": {
+    "version": "1.1.0",
+    "source_hash": "6d8712c93022ba11",
+    "features": 4017,
+    "cards": 447,
+    "actions": 245,
+    "n_cards": 3984
+  },
+  "policy": "original baseline; no new gameplay strategy",
+  "training_steps": 0,
+  "games": 3,
+  "mean_rank": 6.666666666666667,
+  "first_place_rate": 0.0,
+  "top4_rate": 0.0,
+  "paired_replay_identical": true,
+  "rows": [
+    {
+      "seed": 48101,
+      "rank": 8,
+      "decisions": 34,
+      "same_as_uninstrumented_baseline": true,
+      "differences": {},
+      "mask_trace": {
+        "mask_checks": 34,
+        "minimum_legal_actions": 1,
+        "maximum_legal_actions": 61,
+        "mean_legal_actions": 23.5,
+        "revisited_observations": 0,
+        "max_identical_observation_visits": 1,
+        "max_own_decisions_in_turn": 6,
+        "action_buckets": {
+          "000-007": 11,
+          "008-015": 11,
+          "030-045": 4,
+          "046-125": 8
+        },
+        "action_ids": {
+          "0": 8,
+          "11": 1,
+          "3": 3,
+          "30": 4,
+          "46": 8,
+          "8": 10
+        }
+      },
+      "receipt": "experiments/s-20261102-bd90a20b/001-48101.json",
+      "control_receipt": "experiments/s-20261102-bd90a20b/control-48101.json"
+    },
+    {
+      "seed": 48102,
+      "rank": 7,
+      "decisions": 44,
+      "same_as_uninstrumented_baseline": true,
+      "differences": {},
+      "mask_trace": {
+        "mask_checks": 44,
+        "minimum_legal_actions": 2,
+        "maximum_legal_actions": 62,
+        "mean_legal_actions": 27.65909090909091,
+        "revisited_observations": 0,
+        "max_identical_observation_visits": 1,
+        "max_own_decisions_in_turn": 6,
+        "action_buckets": {
+          "000-007": 13,
+          "008-015": 11,
+          "030-045": 8,
+          "046-125": 11,
+          "126-195": 1
+        },
+        "action_ids": {
+          "0": 9,
+          "11": 1,
+          "127": 1,
+          "3": 4,
+          "30": 8,
+          "46": 10,
+          "70": 1,
+          "8": 10
+        }
+      },
+      "receipt": "experiments/s-20261102-bd90a20b/001-48102.json",
+      "control_receipt": "experiments/s-20261102-bd90a20b/control-48102.json"
+    },
+    {
+      "seed": 48103,
+      "rank": 5,
+      "decisions": 49,
+      "same_as_uninstrumented_baseline": true,
+      "differences": {},
+      "mask_trace": {
+        "mask_checks": 49,
+        "minimum_legal_actions": 2,
+        "maximum_legal_actions": 61,
+        "mean_legal_actions": 33.08163265306123,
+        "revisited_observations": 0,
+        "max_identical_observation_visits": 1,
+        "max_own_decisions_in_turn": 7,
+        "action_buckets": {
+          "000-007": 17,
+          "008-015": 18,
+          "030-045": 5,
+          "046-125": 9
+        },
+        "action_ids": {
+          "0": 12,
+          "10": 1,
+          "11": 1,
+          "3": 5,
+          "30": 5,
+          "46": 8,
+          "8": 16,
+          "86": 1
+        }
+      },
+      "receipt": "experiments/s-20261102-bd90a20b/001-48103.json",
+      "control_receipt": "experiments/s-20261102-bd90a20b/control-48103.json"
+    }
+  ],
+  "competitive_improvement": "not tested"
+}
