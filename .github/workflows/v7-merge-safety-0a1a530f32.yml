@@ -1,0 +1,53 @@
+name: V7 isolated merge-safety regression and real game s-20261103-0a1a530f32
+
+on:
+  push:
+    branches:
+      - agent/s-20261103-0a1a530f32/optimization-001
+    paths:
+      - .github/workflows/v7-merge-safety-0a1a530f32.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: v7-merge-safety-0a1a530f32
+  cancel-in-progress: false
+
+jobs:
+  read-only-evidence:
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install project test dependencies
+        run: python -m pip install -e '.[test]'
+      - name: Run genuine safety regression
+        run: python -m pytest -q tests/test_v7_merge_safety_0a1a530f32.py
+      - name: Install pinned TavernGym engine
+        run: bash scripts/bootstrap_engine.sh
+      - name: Verify real engine contract
+        run: python -m tavern_ai.contract
+      - name: Run complete eight-seat baseline match
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p outputs
+          python -m tavern_ai.canary --agent-id s-20261103-0a1a530f32 \
+            --seed 998803 --policy baseline \
+            --receipt outputs/v7-guard-998803.json
+          python -m tavern_ai.validate_receipt outputs/v7-guard-998803.json
+          echo 'V7_OWN_AUTHENTIC_BASELINE_RECEIPT_START'
+          cat outputs/v7-guard-998803.json
+          echo 'V7_OWN_AUTHENTIC_BASELINE_RECEIPT_END'
+      - name: Preserve authentic runner output
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v7-merge-safety-0a1a530f32-${{ github.run_id }}
+          path: outputs/*.json
+          retention-days: 30
+          if-no-files-found: ignore
