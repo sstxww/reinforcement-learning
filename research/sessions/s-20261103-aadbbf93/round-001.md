@@ -17,3 +17,11 @@ Implemented `scripts/v7_merge_gate_aadbbf93.py` and synthetic mutation regressio
 
 ## Next test
 Open own PR against current main, inspect actual own workflow and PR CI. Do not merge based on this document or synthetic tests. If a complete baseline artifact is generated, validate and commit the original unchanged and verify final HEAD CI. Follow up with read-only audit of PR #176 to assist the real integrator.
+
+## Verified own run and CI failure diagnosis (after PR #184)
+
+- **Own real complete TavernGym eight-seat baseline**, authenticated [run 41512218951](https://github.com/sstxww/reinforcement-learning/actions/runs/41512218951) **completed/success**, job 125506666383: pinned engine installed, V7 regression tests passed, `Game.is_over()` true, independent baseline seed **99673**, controlled seat 0 rank **7**, placements `[7,2,1,3,8,5,4,6]`, **16** turns and **43** decisions, `truncated_combats=0`, `turn_limit_end=false`. No PPO weights were used; new training steps remain zero.
+- Original artifact [13173676456](https://github.com/sstxww/reinforcement-learning/actions/runs/41512218951/artifacts/13173676456) downloaded independently; ZIP SHA256 `65e353644d2426b315c8a6affc1cd26d8ee5905f315e3eb107928f9a400ddac6`; contained genuine `001-99673.json` **516 bytes**, SHA256 `17f6ed79b982123e2e04cb9df6af8b96e60d074591643a659dfe5a1ded4c775e`, committed without modification at `experiments/s-20261103-aadbbf93/001-99673.json` in commit `d86404a044ee56bb1db758dd87a25fb158b93ca3`.
+- **Actual first PR CI failure:** [run 41512463850](https://github.com/sstxww/reinforcement-learning/actions/runs/41512463850) on HEAD `74f01cd613f3209881382c5ca9c6138ceb2f47e1` completed with failure at `scripts/check_pr_evidence.py` because `Missing independent agent game receipt`; unit tests themselves reported **393 passed, 1 skipped**. This expected evidence gap was repaired by committing the original Action artifact. Do not call this earlier red run green. New latest-head CI must be checked after final report commits.
+- Concurrent sequential branch pushes caused pending review workflow runs to be cancelled (not successful games). Only completed run **41512218951** counts as own independent true game evidence.
+- No model training, candidate Release, Best/Champion promotion, main merge or postmerge CI verification occurred in this session yet.
