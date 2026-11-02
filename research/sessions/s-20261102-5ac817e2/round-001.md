@@ -22,3 +22,9 @@ The existing `.github/workflows/train.yml` silently removed the checkpoint and r
 
 ## Next integration gate
 Inspect exact-head PR CI and own game receipt, main concurrent changes and review ownership. The main workflow still needs a deliberate, externally SHA-pinned Release fallback integration before claiming unattended long-term resumability; do not automatically select an unpromoted latest candidate as Champion.
+
+## Confirmed own independent full-match gate
+- [Actions #41450119376](https://github.com/sstxww/reinforcement-learning/actions/runs/41450119376): **SUCCESS** on workflow head `00879b4bae8197557a2ef6b43f2b5e414eb33356`. Remote preflight tests, pinned engine bootstrap and complete 8-player TavernGym game all passed.
+- Authentic own baseline receipt: `experiments/s-20261102-5ac817e2/001-95131.json`, derived from the real runner log and validated in the runner; seed **95131**, 16 turns, 62 own decisions, placements `[8,1,5,7,2,3,6,4]`, seat0 rank8, `completed=true`, 0 truncated combats, `turn_limit_end=false`.
+- This was **BaselinePolicy**, not PPO-controlled and not a new trained model. Source workflow test used head `00879b4...`, committed receipt later at `fe1d75c06220c83b0b56d44d3938b93055732934`.
+- Exact-final-head PR CI after receipt/documentation commits must pass independently. The main workflow change remains unmerged, with **0 new PPO steps and no new model Release**.
