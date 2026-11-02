@@ -9,3 +9,10 @@
 - **Working hypothesis to falsify:** disproportionate non-buy selections under legal Buy opportunity and Play–Cancel/Refresh cycles contribute to rank 8. Distinguish actual economic loss from legal but strategically poor purchases; inspect turn-level trajectories and trained-policy logits before reward modifications.
 - No new training steps, no new checkpoint, no Champion, and no claim of performance improvement. Dedicated true-game verification will be linked after workflow completion. All regression fixtures are synthetic and must never be represented as game receipts.
 - **Next gate:** exact-head PR CI, own authentic complete-game receipt, reviewer diff/security review, and compatibility with evolving main before potential merge. Resume training only after verified checkpoint & root-cause-specific controlled study.
+
+
+## Own-session genuine verification (completed)
+
+Bounded dedicated workflow [41449702034](https://github.com/sstxww/reinforcement-learning/actions/runs/41449702034) **SUCCESS**, code/run SHA `e0ad8f0c68c83ab50980185856e74ed944f0eb46`. Pinned engine TavernGym 1.1.0 source 6d8712c93022ba11; complete genuine eight-seat seed 99218, agent `s-20261102-82d0fbbb`, seat0 rank **6**, 14 turns / 73 decisions, full placements **[6,3,7,8,2,5,1,4]**, zero truncated combats, `turn_limit_end=false`, `Game.is_over()` true. Verified evidence in `experiments/s-20261102-82d0fbbb/001-99218.json` copied from run Artifact **13144247175** (no fabricated receipt). Same workflow ran corrected canonical evaluator on another full baseline game seed 99219, rank **8**, artifact summary `reports/s-20261102-82d0fbbb/002-strict-eval-smoke.json`. Negative synthetic integrity tests were green; fixtures not game receipts.
+
+**Provenance and limitations:** no model download, no PPO training steps, no checkpoint, no Champion promotion, no Arena. Two baseline games are **not** a model improvement study. Final PR HEAD will differ because we subsequently committed action outputs; independent latest-HEAD PR CI and reviewer compatibility review are required before merge.
