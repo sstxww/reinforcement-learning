@@ -1,0 +1,57 @@
+{
+  "schema": 1,
+  "kind": "read_only_aggregation_of_existing_main_source_reports_not_new_games",
+  "session": "s-20261103-5638d3bc",
+  "round": 1,
+  "model_release": "v5-s-20261102-68099929-1408-41428692617",
+  "model_sha256": "a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632",
+  "sources": [
+    {
+      "path": "reports/s-20261102-a0dea573/001-published-v5-raw-99231.json",
+      "workflow_run": "https://github.com/sstxww/reinforcement-learning/actions/runs/41450329264",
+      "seed": 99231,
+      "source_kind": "original source-session run report linked to committed genuine receipts",
+      "completed": true,
+      "rank": 8,
+      "decisions": 122,
+      "refresh": 42,
+      "freeze": 70,
+      "buy_legal_decision_exposures": 38,
+      "buys": 0,
+      "fallback_actions": 0
+    },
+    {
+      "path": "reports/s-20261103-b642f1d8/001-raw-model-diagnostic-99384-verified-summary.json",
+      "workflow_run": "https://github.com/sstxww/reinforcement-learning/actions/runs/41508443101",
+      "seed": 99384,
+      "source_kind": "derived from actual GitHub job stdout; not a signed full-game receipt",
+      "completed": true,
+      "rank": 8,
+      "decisions": 111,
+      "refresh": 28,
+      "freeze": 70,
+      "buy_legal_decision_exposures": 27,
+      "buys": 0,
+      "fallback_actions": 0
+    }
+  ],
+  "descriptive_totals": {
+    "actual_played_games_in_sources_not_new": 2,
+    "total_model_decisions": 233,
+    "refresh_and_freeze": 210,
+    "refresh_and_freeze_fraction": 0.9012875536480687,
+    "buy_legal_decision_exposures": 65,
+    "model_buys": 0,
+    "raw_model_rank_eight_games": 2,
+    "independent_source_games": 2,
+    "statistical_independence_of_65_opportunities": false
+  },
+  "known_limitations": [
+    "Source 99384 is a derived stdout report and must not be passed off as original signed canary receipt.",
+    "A mask-legal BUY exposure does not prove affordability/utility or an independent purchasing decision opportunity.",
+    "Two chosen diagnostic seeds cannot establish causal rank-eight root or generalized model strength.",
+    "Mask/opportunity telemetry and state transitions can confirm action id semantics; do not alter raw model with forced-buy guard and claim raw improvement.",
+    "This session added 0 PPO steps and has 0 new completed model games at report creation."
+  ],
+  "falsifiable_next_step": "Compare raw BUY opportunity mask, gold, public state hashes and action-family probabilities before and after REFRESH/FREEZE, with an exact same-seed baseline; do not infer no progress solely from repeated action IDs."
+}
