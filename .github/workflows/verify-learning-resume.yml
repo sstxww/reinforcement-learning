@@ -42,7 +42,7 @@ jobs:
             --pattern 'model.zip' \
             --pattern 'model.metadata.json' \
             --dir checkpoints
-          printf '%s  %s\\n' \
+          printf '%s  %s\n' \
             dc5195658995358e70c0d565a979b9cf05ccc5e47ae7adaa0a2f078f01cad917 \
             checkpoints/model.zip | sha256sum -c -
           python - <<'PY'
@@ -80,7 +80,7 @@ jobs:
               "engine": metadata["engine"],
               "note": "Independent GitHub runner Release download, load, and 128-step continuation; not a skill improvement."
           }
-          Path("outputs/learning-resume-verification.json").write_text(json.dumps(data, indent=2)+"\\n")
+          Path("outputs/learning-resume-verification.json").write_text(json.dumps(data, indent=2)+"\n")
           print(json.dumps(data))
           PY
       - name: Save compact verification receipt, never publish resumed weight by default
