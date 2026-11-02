@@ -1,0 +1,125 @@
+name: "Verify archived V2 PPO and raw legal-opportunity gameplay"
+
+on:
+  push:
+    branches:
+      - agent/s-20261102-6b4eaf12/optimization-001
+    paths:
+      - .github/workflows/verify-v2-opportunity-6b4eaf12.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: model-v2-opportunity-s-20261102-6b4eaf12
+  cancel-in-progress: false
+
+jobs:
+  release-restore-and-full-match:
+    runs-on: ubuntu-latest
+    timeout-minutes: 100
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Unit tests and pinned simulator
+        run: |
+          python -m pip install -e '.[train,test]'
+          python -m pytest
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Download actual V2 Release and verify its archived hash and metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p checkpoints/v2
+          gh release download v2-learning-41413557445 --repo "$GITHUB_REPOSITORY" \
+            --pattern model.zip --pattern model.metadata.json --dir checkpoints/v2
+          printf '%s  %s\n' \
+            '73bde2666426cecce39f135980a897bb2cd4a7d70783ba04c9c0d29477a6664a' \
+            checkpoints/v2/model.zip | sha256sum --check -
+          python -m tavern_ai.model_registry \
+            --model-id v2-learning-41413557445 \
+            --checkpoint checkpoints/v2/model.zip \
+            --metadata checkpoints/v2/model.metadata.json
+      - name: Trusted model deserialization and inference smoke
+        shell: bash
+        run: |
+          python - <<'PY'
+          import numpy as np
+          from sb3_contrib import MaskablePPO
+          from tavern_ai.env import TavernEnv
+          model=MaskablePPO.load("checkpoints/v2/model.zip",device="cpu")
+          assert int(model.num_timesteps)==1280
+          env=TavernEnv(seed=88132)
+          try:
+              obs,_=env.reset(seed=88132)
+              mask=env.action_masks()
+              action,_=model.predict(obs,action_masks=mask,deterministic=True)
+              action=int(np.asarray(action).item())
+              assert mask[action]
+              print("VERIFIED_RELEASE_MODEL_LOADED_AND_LEGAL_INFERENCE=True",action)
+          finally:
+              env.close()
+          PY
+      - name: Raw PPO authentic eight-seat match with legal-opportunity instrumentation
+        run: |
+          python -m tavern_ai.opportunity_6b4eaf12 --seed 88132 \
+            --model checkpoints/v2/model.zip \
+            --receipt experiments/s-20261102-6b4eaf12/002-v2-88132.json \
+            --report reports/s-20261102-6b4eaf12/002-opportunity.json
+          python -m tavern_ai.validate_receipt \
+            experiments/s-20261102-6b4eaf12/002-v2-88132.json
+      - name: Paired original baseline complete game on the same fresh seed
+        run: |
+          python -m tavern_ai.canary --agent-id s-20261102-6b4eaf12 \
+            --seed 88132 --policy baseline \
+            --receipt experiments/s-20261102-6b4eaf12/002-baseline-88132.json
+          python -m tavern_ai.validate_receipt \
+            experiments/s-20261102-6b4eaf12/002-baseline-88132.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          root=Path("experiments/s-20261102-6b4eaf12")
+          model=json.loads((root/"002-v2-88132.json").read_text())
+          base=json.loads((root/"002-baseline-88132.json").read_text())
+          assert model["seed"]==base["seed"]==88132
+          report={"schema":1,"seed":88132,"n_per_arm":1,
+                  "v2_rank":model["placements"][0],
+                  "baseline_rank":base["placements"][0],
+                  "delta_v2_minus_baseline":model["placements"][0]-base["placements"][0],
+                  "new_ppo_steps":0,"v2_raw_no_fallback":True,
+                  "evidence_level":"single-seed exploratory, not a strength claim"}
+          dest=Path("reports/s-20261102-6b4eaf12/002-paired.json")
+          dest.parent.mkdir(parents=True,exist_ok=True)
+          dest.write_text(json.dumps(report,indent=2)+"\n")
+          print(json.dumps(report))
+          PY
+      - name: Commit only real independently generated results to own branch
+        if: success()
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = "agent/s-20261102-6b4eaf12/optimization-001"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add experiments/s-20261102-6b4eaf12/002-*.json \
+            reports/s-20261102-6b4eaf12/002-*.json
+          if ! git diff --cached --quiet; then
+            git commit -m "[s-20261102-6b4eaf12] store genuine V2 Release restore and paired full-game evidence"
+            git pull --rebase origin "$GITHUB_REF_NAME"
+            git push origin "HEAD:$GITHUB_REF_NAME"
+          fi
+      - name: Preserve independently generated evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v2-opportunity-s-20261102-6b4eaf12-${{ github.run_id }}
+          path: |
+            experiments/s-20261102-6b4eaf12/002-*.json
+            reports/s-20261102-6b4eaf12/002-*.json
+          if-no-files-found: ignore
+          retention-days: 30
