@@ -1,0 +1,61 @@
+{
+  "schema": 1,
+  "experiment_type": "guarded_model_play_cancel_blacklist_not_pure_PPO",
+  "model_sha256": "503c527492d3a43ff2be9996c4865d2af8be55a981a5a0308b4dccb316598e8e",
+  "seed": 927106,
+  "engine": {
+    "version": "1.1.0",
+    "source_hash": "6d8712c93022ba11",
+    "features": 4017,
+    "cards": 447,
+    "actions": 245,
+    "n_cards": 3984
+  },
+  "completed": true,
+  "failure_reason": null,
+  "policy_model_unchanged": true,
+  "inference_action_mask_intervention": true,
+  "best_or_champion_promoted": false,
+  "model_controls_seat": 0,
+  "opponents": "seven official TavernGym bots",
+  "turns": 17,
+  "decisions": 116,
+  "placements": [
+    8,
+    2,
+    3,
+    4,
+    5,
+    7,
+    1,
+    6
+  ],
+  "guarded_mask_decisions": 33,
+  "total_removed_legally_available_play_indices": 33,
+  "cancel_immediately_after_play": 2,
+  "distinct_blacklisted_play_action_ids": [
+    46
+  ],
+  "native_legal_buy_decisions": 36,
+  "buy_actions": 1,
+  "decisions_with_legal_buy_but_no_buy": 35,
+  "model_selected_end_turn_actions": 7,
+  "action_id_counts": {
+    "0": 7,
+    "1": 24,
+    "2": 70,
+    "3": 3,
+    "6": 1,
+    "7": 2,
+    "12": 1,
+    "16": 1,
+    "30": 1,
+    "32": 2,
+    "46": 3,
+    "54": 1
+  },
+  "truncated_combats": 0,
+  "turn_limit_end": false,
+  "git_sha": "422d2e04b65beb71873f20b6fa362928579f4ed0",
+  "comparison_note": "Experimental changed-action-mask guarded policy, NOT unmodified PPO. A completed game is not a valid pure-model receipt. One or two games cannot establish competitive rank gains."
+}
