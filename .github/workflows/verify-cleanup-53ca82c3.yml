@@ -1,0 +1,49 @@
+name: V5 P0 selective integration smoke s-20261102-53ca82c3
+
+on:
+  push:
+    branches:
+      - agent/s-20261102-53ca82c3/optimization-001
+    paths:
+      - .github/workflows/verify-cleanup-53ca82c3.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: v5-integration-smoke-s-20261102-53ca82c3
+  cancel-in-progress: false
+
+jobs:
+  cleanup-and-authentic-match:
+    runs-on: ubuntu-latest
+    timeout-minutes: 70
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install unit-test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[test]'
+      - name: Test safe cleanup subset
+        run: python -m pytest -q tests/test_cleanup_temporary.py
+      - name: Install pinned real TavernGym engine
+        run: bash scripts/bootstrap_engine.sh
+      - name: Verify pinned engine layout
+        run: python -m tavern_ai.contract
+      - name: Play one actual complete eight-seat game
+        run: |
+          python -m tavern_ai.canary --agent-id s-20261102-53ca82c3 --seed 53182 --policy baseline --receipt outputs/001-53182.json
+          python -m tavern_ai.validate_receipt outputs/001-53182.json
+          cat outputs/001-53182.json
+      - name: Preserve exact independent receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v5-cleanup-53ca82c3-${{ github.run_id }}
+          path: outputs/001-53182.json
+          if-no-files-found: ignore
+          retention-days: 30
