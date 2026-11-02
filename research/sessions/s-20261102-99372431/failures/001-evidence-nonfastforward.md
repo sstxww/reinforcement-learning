@@ -1,0 +1,8 @@
+# Failure 001 — genuine Action evidence push rejected (non-fast-forward)
+
+- Session: s-20261102-99372431; failure on https://github.com/sstxww/reinforcement-learning/actions/runs/41449843877, job 125292049316, final step `Commit genuine evidence only on this isolated branch`.
+- Log: `[rejected] HEAD -> agent/s-20261102-99372431/optimization-001 (fetch first)`; remote head moved because owner session added its own round-001/status/proposal and PR while the isolated job was executing.
+- Important separation: actual model resumed **1408→1536** with SHA256 `0f2c9705fb1078815f3c74d511aa3a770550b2348d1528072920f1bec02539f8`; own baseline rank7 and raw candidate rank8 games genuinely completed; Release upload succeeded. The overall job failed only later while pushing evidence, not in model training, game or Release.
+- Recovery: extract exact 4 machine-generated JSON records from completed job logs (not new fabricated receipts) and commit these to the original isolated branch under `experiments/s-20261102-99372431/` and `reports/s-20261102-99372431/`. Source Artifact 13143847982 is kept as independent temporary raw evidence; the checkpoint is durably in the versioned Release.
+- Prevention: workflow updated to `git pull --rebase origin "$GITHUB_REF_NAME"` before pushing own evidence; no `--force`. Automated expensive workflow no longer triggers from editing its own YAML; future run requires explicit session-owned trigger marker, and a new Release download/readback verification is added.
+- Verification limits: prevention changes have not been rerun; do not call post-patch workflow success. Check latest-head full-match PR CI after evidence recovery. No Champion.
