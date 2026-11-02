@@ -14,3 +14,9 @@
 12. **Concrete handoff:** inspect own PR exact head and `CI - full-match gate` latest run/jobs/receipt; perform independent code/security review; require enforced single merge entry before safe final merge. Integrate only if those gates pass, verify new main SHA CI. For global compute cost, configure an actual enforced quota/reservation; this preflight alone is insufficient.
 
 A one-time branch-push engine canary workflow has been intentionally retired after its successful original execution to avoid rerunning the same seed on future documentation-only commits. Source/test files remain for PR CI and future adoption.
+
+## R001 live-API follow-up regression (same task, no model claim)
+
+- After original Actions success and PR #229 creation, read-only provider GET queried all six initial filters at 2026-11-02 19:56–19:57 UTC. **Found a real semantic mismatch:** `status=action_required` returned 53 historical runs with `run.status != action_required`; this filter selects a **conclusion**, not a currently running status. Preflight would always fail on this historical population even without genuine load. Initial synthetic suite did not cover it.
+- Corrective commit removes `action_required` from the active status filters and adds a regression that prohibits including completed conclusion rows as active. Conservative coverage and count mismatch rejection are unchanged. `queued` API also transiently returned `total_count=24` vs 21 rows, confirming high-churn snapshot inconsistency; **fail closed**, do not guess missing jobs.
+- Original run #41513647561 and seed99697 receipt remain genuine and unchanged, but cover the previous HEAD. New PR HEAD full CI must run again; do not count previous green tests as post-fix verification. No real training/Release and no exclusive main ownership.

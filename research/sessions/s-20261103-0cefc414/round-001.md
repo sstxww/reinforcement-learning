@@ -9,3 +9,7 @@
 **Training/model:** zero PPO steps, no checkpoint or Release, no optimizer restoration, no paired comparison, no Best/Champion. Historical registered V5 1408 source SHA256 a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632 was **not loaded**.
 
 **Integration:** live main `c1b828734527bae6141805581693d890cc3bff94` had successful exact main CI #41512315964. #185 was separately reviewed for unauthorized outsider approval and earlier missing own receipt. No main merge attempted, global serial lease unproven due #182. Next: open scoped non-Draft PR, require own exact-head CI and authentic receipt, external substantive review and enforced integration queue. Retire one-shot workflow after success to avoid push replays.
+
+### Corrective regression from live GitHub API (same R001)
+
+Read-only GitHub API initially returned 53 historical records from `status=action_required` with actual `run.status=completed`; the parameter filters conclusion not an active state. Initial six-filter implementation would systematically reject this history. Removed that filter, added a targeted negative regression, and retained conservative rejection of inconsistent page totals (observed queue `total_count=24` vs 21 returned during concurrent activity). This is a real repaired integration-semantic defect, **not** evidence of budget enforcement or PPO progress. Post-fix latest-head PR CI must be checked separately.

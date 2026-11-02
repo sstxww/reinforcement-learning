@@ -56,3 +56,16 @@ def test_reject_invalid_thresholds_and_missing_runs():
     p["in_progress"] = {"total_count": 1}
     with pytest.raises(BudgetError, match="workflow_runs"):
         summarize(p)
+
+
+def test_action_required_is_completed_conclusion_not_active_status():
+    # Live GitHub API status=action_required returned historical completed runs.
+    # Do not poll it as an active-status bucket or count them as slot consumers.
+    assert "action_required" not in ACTIVE
+    p = pages([(31, "in_progress", "CI")])
+    p["action_required"] = {"total_count": 1, "workflow_runs": [
+        {"id": 77, "status": "completed", "conclusion": "action_required", "name": "old"}]}
+    with pytest.raises(BudgetError, match="coverage"):
+        summarize(p)
+    del p["action_required"]
+    assert summarize(p)["active_total"] == 1

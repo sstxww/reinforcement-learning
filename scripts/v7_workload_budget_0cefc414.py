@@ -9,7 +9,9 @@ import sys
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
-ACTIVE = ("queued", "in_progress", "waiting", "requested", "pending", "action_required")
+# GitHub "action_required" is a workflow CONCLUSION filter, not an active run status.
+# Including it would count completed runs and make an advisory permanently fail.
+ACTIVE = ("queued", "in_progress", "waiting", "requested", "pending")
 HEAVY = re.compile(r"(?:^|[\s_/-])(?:train(?:ing)?|ppo|resume|continuation|self[-_ ]?play)(?:$|[\s_/-])", re.I)
 
 class BudgetError(RuntimeError):
