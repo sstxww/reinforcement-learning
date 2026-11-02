@@ -13,8 +13,36 @@
   "best": null,
   "latest": null,
   "candidates": [],
-  "status": "No independently validated durable checkpoint index recorded as of 2026-11-02",
+  "status": "256 actual PPO steps completed; full model game failed; no reliable durable checkpoint/Best/Candidate promotion",
   "release_tag_prefix": "v1-main-",
   "learning_release_tag_prefix": "v1-learning-",
-  "promotion_policy": "Paired held-out evaluation and verified checkpoint read/inference are required; never auto-promote."
+  "promotion_policy": "Paired held-out evaluation and verified checkpoint read/inference are required; never auto-promote.",
+  "training_progress": {
+    "verified_ppo_steps": 256,
+    "training_seed": 42,
+    "algorithm": "MaskablePPO",
+    "source_run": "https://github.com/sstxww/reinforcement-learning/actions/runs/41412048034",
+    "source_commit": "9b53e35797b6d448454d21dc3f2157a0c725ac05",
+    "model_full_game_passed": false,
+    "failure": "RuntimeError: Full-game safety limit exceeded",
+    "heldout_model_metrics_available": false
+  },
+  "diagnostic_checkpoints": [
+    {
+      "id": "ppo256-run41412048034",
+      "role": "failed_game_diagnostic_only",
+      "checkpoint_sha256": "59b7bb16e9e52225e5f8573dec1eee73f2b18c6504b4ade6900776fffc34483d",
+      "storage_type": "temporary_GitHub_Actions_artifact",
+      "storage_durable": false,
+      "storage_url": "https://github.com/sstxww/reinforcement-learning/actions/runs/41412048034/artifacts/13125827803",
+      "expires_at": "2026-12-02T08:22:15Z",
+      "hash_verified": true,
+      "load_verified": true,
+      "inference_verified": true,
+      "resume_training_verified": false,
+      "independent_model_evaluation_verified": false,
+      "release_attempt": "https://github.com/sstxww/reinforcement-learning/actions/runs/41412807456",
+      "release_error": "HTTP 403: Resource not accessible by integration"
+    }
+  ]
 }
