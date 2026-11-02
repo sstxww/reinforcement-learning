@@ -1,0 +1,140 @@
+name: V5 post-resume paired evaluation s-7d32b871
+on:
+  push:
+    branches:
+      - agent/s-20261102-7d32b871/optimization-001
+    paths:
+      - '.github/workflows/v5-postresume-s-20261102-7d32b871.yml'
+permissions:
+  contents: write
+  actions: read
+concurrency:
+  group: v5-postresume-s-20261102-7d32b871
+  cancel-in-progress: false
+jobs:
+  paired-holdout:
+    if: github.repository == 'sstxww/reinforcement-learning' && github.ref == 'refs/heads/agent/s-20261102-7d32b871/optimization-001'
+    runs-on: ubuntu-latest
+    timeout-minutes: 100
+    env:
+      GH_TOKEN: ${{ github.token }}
+      SESSION_ID: s-20261102-7d32b871
+      MODEL_SHA256: f8554c0e901651a1b0e394ca3df3b096b010d9f63d567b86d1df931a3ead389c
+      MODEL_SOURCE_RUN: '41449758493'
+      MODEL_ARTIFACT: v5-readiness-s-7d32b871-41449758493
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run tests and pinned engine
+        run: |
+          set -euo pipefail
+          python -m pip install -e '.[train,test]'
+          python -m pytest
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Recover exact prior own 1536-step optimizer smoke model from explicit artifact
+        run: |
+          set -euo pipefail
+          mkdir -p restore
+          test "$(gh run view "$MODEL_SOURCE_RUN" --repo "$GITHUB_REPOSITORY" --json conclusion --jq .conclusion)" = success
+          gh run download "$MODEL_SOURCE_RUN" --repo "$GITHUB_REPOSITORY" --name "$MODEL_ARTIFACT" --dir restore
+          test -s restore/smoke/resumed.zip
+          test -s restore/smoke/resumed.metadata.json
+          printf '%s  %s\n' "$MODEL_SHA256" restore/smoke/resumed.zip | sha256sum -c -
+          python - <<'PY'
+          import json
+          from sb3_contrib import MaskablePPO
+          from tavern_ai.contract import verify_engine
+          from pathlib import Path
+          import torch
+          torch.set_num_threads(1)
+          metadata = json.loads(Path('restore/smoke/resumed.metadata.json').read_text())
+          assert metadata['total_timesteps'] == 1536
+          assert metadata['engine'] == verify_engine()
+          model = MaskablePPO.load('restore/smoke/resumed.zip', device='cpu')
+          assert model.num_timesteps == 1536
+          assert model.action_space.n == 245
+          PY
+      - name: Two NEW matched full eight-seat evaluation seeds, no guard or fallback
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "experiments/$SESSION_ID" "reports/$SESSION_ID"
+          for seed in 99661 99662; do
+            timeout 480s python -m tavern_ai.buy_opportunity_68099929 --agent-id "$SESSION_ID" --seed "$seed" --policy baseline --out "experiments/$SESSION_ID/002-baseline-$seed.json"
+            python -m tavern_ai.validate_receipt "experiments/$SESSION_ID/002-baseline-$seed.json"
+            if ! timeout 480s python -m tavern_ai.buy_opportunity_68099929 --agent-id "$SESSION_ID" --seed "$seed" --policy model --model restore/smoke/resumed.zip --out "experiments/$SESSION_ID/002-model-$seed.json"; then
+              echo "Raw 1536 model did NOT finish full seed $seed; do not count or promote" > "reports/$SESSION_ID/002-model-failure-$seed.txt"
+              exit 3
+            fi
+            python -m tavern_ai.validate_receipt "experiments/$SESSION_ID/002-model-$seed.json"
+          done
+      - name: Verify real-game provenance and paired descriptive statistics
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json,os,statistics,hashlib
+          from pathlib import Path
+          from tavern_ai.validate_receipt import validate
+          sid=os.environ['SESSION_ID']
+          root=Path('experiments')/sid
+          seeds=[99661,99662]
+          controls=[json.loads((root/f'002-baseline-{seed}.json').read_text()) for seed in seeds]
+          candidates=[json.loads((root/f'002-model-{seed}.json').read_text()) for seed in seeds]
+          for seed,b,m in zip(seeds,controls,candidates):
+              validate(b);validate(m)
+              assert b['seed']==m['seed']==seed
+              assert b['completed'] and m['completed'] and b['policy']=='baseline' and m['policy']=='model'
+              assert b['truncated_combats']==m['truncated_combats']==0
+              assert not b['turn_limit_end'] and not m['turn_limit_end']
+              assert m['model_sha256']==os.environ['MODEL_SHA256']
+              assert m['model_guard_forced_end']==0
+              assert sorted(b['placements'])==sorted(m['placements'])==list(range(1,9))
+          cr=[r['placements'][0] for r in candidates]
+          br=[r['placements'][0] for r in controls]
+          total_buy_legal=sum(r['opportunity_summary']['buy_legal_decisions'] for r in candidates)
+          total_buys=sum(r['opportunity_summary']['buy_chosen'] for r in candidates)
+          result={'schema':1,'session_id':sid,'source_model_artifact_run':int(os.environ['MODEL_SOURCE_RUN']),
+                  'source_model_sha256':os.environ['MODEL_SHA256'],'source_model_steps':1536,
+                  'new_training_steps':0,'seeds':seeds,'real_games_per_arm':len(seeds),
+                  'candidate_ranks':cr,'baseline_ranks':br,
+                  'candidate_mean_rank':statistics.mean(cr),'baseline_mean_rank':statistics.mean(br),
+                  'paired_delta_rank_candidate_minus_baseline':statistics.mean([a-b for a,b in zip(cr,br)]),
+                  'candidate_top4_rate':sum(a<=4 for a in cr)/len(cr),
+                  'candidate_buy_legal_decision_exposures':total_buy_legal,
+                  'candidate_actual_buys':total_buys,
+                  'all_raw_model_games_completed':True,'guard_interventions':0,
+                  'promote_to_champion':False,'new_release_published':False,
+                  'note':'n=2 heldout paired seat0 games, descriptive only; no significance or Arena rank claim.'}
+          path=Path('reports')/sid/'002-paired-resume-eval.json'
+          path.write_text(json.dumps(result,indent=2)+'\n')
+          print(json.dumps(result))
+          PY
+      - name: Commit only own evidence, including honest partial failure if present
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = 'agent/s-20261102-7d32b871/optimization-001'
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          if [[ -d "experiments/$SESSION_ID" ]]; then git add "experiments/$SESSION_ID"; fi
+          if [[ -d "reports/$SESSION_ID" ]]; then git add "reports/$SESSION_ID"; fi
+          git diff --cached --quiet && exit 0
+          git commit -m 'evidence(7d32b871): independent 1536-step paired full-game evaluation'
+          git pull --rebase origin "$GITHUB_REF_NAME"
+          git push origin "HEAD:$GITHUB_REF_NAME"
+      - name: Preserve receipt evidence, never infer success from artifact alone
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v5-postresume-s-7d32b871-${{ github.run_id }}
+          path: |
+            experiments/s-20261102-7d32b871/002-*.json
+            reports/s-20261102-7d32b871/002-*
+          if-no-files-found: ignore
+          retention-days: 30
