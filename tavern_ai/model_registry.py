@@ -63,7 +63,8 @@ def verify_release_bytes(registry: dict, model_id: str, model: Path,
     if len(matches) != 1:
         raise ValueError("Unknown model ID")
     row = matches[0]
-    digest = hashlib.file_digest(model.open("rb"), "sha256").hexdigest()
+    with model.open("rb") as handle:
+        digest = hashlib.file_digest(handle, "sha256").hexdigest()
     if digest != row["checkpoint_sha256"]:
         raise ValueError("Downloaded checkpoint SHA256 mismatch")
     if not zipfile.is_zipfile(model):
