@@ -10,3 +10,8 @@
 8. Next: add tests on *one* selected integration branch, obtain fresh own full-game receipt/CI, then integrator serially merge. Do not create redundant third canonical gate PR.
 
 This report is source review and coordination evidence, **not** training or genuine original game receipt evidence.
+
+## Authentic own baseline canary after initial review
+- Completed [own workflow 41512975936](https://github.com/sstxww/reinforcement-learning/actions/runs/41512975936), head `8205e8cbb0488cdf43cbc1d51ba7bd556bc28651`, **SUCCESS**. Checked original [Artifact 13174276957](https://github.com/sstxww/reinforcement-learning/actions/runs/41512975936/artifacts/13174276957) ZIP SHA256 `dccbc02e81b2309c42ae21bab6d134fb2320d081f9a226bc7c63b5a26538dbf6`; JSON entry SHA256 `e1854320a1cd290e5832162866ce25252486b2a8d11b0b5da189e30eed025789`.
+- Committed original valid **baseline** full eight-seat receipt `experiments/s-20261103-6f99c2a1/001-99847.json`: seed 99847, 0 seat, complete, rank 8, placements [8,3,7,2,6,1,5,4], 15 turns/49 decisions, no truncation, model hash null; no raw candidate model or strength claim.
+- Provenance commit for game source `8205e8c...`; artifact receipt committed `4eb34c00b156baa0fa581b816d35215191eb6bbb`. No PPO steps, no Release/model, no merge. Next: exact-head PR CI and exclusive integrator review.
