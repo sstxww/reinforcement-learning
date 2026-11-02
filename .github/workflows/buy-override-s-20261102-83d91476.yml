@@ -1,0 +1,54 @@
+name: P2 buy-override ablation s-20261102-83d91476
+on:
+  push:
+    branches:
+      - agent/s-20261102-83d91476/optimization-002
+    paths:
+      - 'tavern_ai/buy_override_83d91476.py'
+      - 'tests/test_buy_override_83d91476.py'
+      - '.github/workflows/buy-override-s-20261102-83d91476.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: buy-override-s-20261102-83d91476
+  cancel-in-progress: false
+
+jobs:
+  finite-ablation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 100
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install project, run synthetic tests
+        run: |
+          python -m pip install -e '.[train,test]'
+          python -m pytest -q tests/test_buy_override_83d91476.py tests/test_buy_opportunities_83d91476.py
+      - name: Verify pinned engine
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Restore immutable V2 Release checkpoint
+        run: |
+          mkdir -p checkpoints
+          gh release download v2-learning-41413557445 --repo "$GITHUB_REPOSITORY" --pattern 'model.zip' --dir checkpoints
+          echo '73bde2666426cecce39f135980a897bb2cd4a7d70783ba04c9c0d29477a6664a  checkpoints/model.zip' | sha256sum -c -
+      - name: Four genuine triple-arm seed-paired 8-seat experiments
+        run: |
+          python -m tavern_ai.buy_override_83d91476 --model checkpoints/model.zip \
+            --seeds 45113 45114 45115 45116 --out outputs/buy-override-r002.json
+      - name: Keep full model/intervention receipts, no model weight artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: buy-override-s-20261102-83d91476-${{ github.run_id }}
+          path: outputs/buy-override-r002.json
+          if-no-files-found: ignore
+          retention-days: 30
