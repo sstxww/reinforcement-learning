@@ -1,0 +1,60 @@
+{
+  "session_id": "s-20261102-9c463177",
+  "hypothesis": "Rightmost mandatory choice changes real-game outcomes vs first legal",
+  "environment": "real pinned TavernGym engine via tavern_ai.canary.run",
+  "engine_version": "1.1.0",
+  "engine_source_hash": "6d8712c93022ba11",
+  "source_sha": "9c6e97b9717fd3113a158444c56ae27d780d3d74",
+  "run_url": "https://github.com/sstxww/reinforcement-learning/actions/runs/41415579630",
+  "policy": "rightmost-mandatory-v1 vs unchanged main baseline",
+  "actual_training_steps": 0,
+  "experiment_type": "pure policy ablation",
+  "candidate": {
+    "games": 4,
+    "mean_placement": 6.5,
+    "first_place_rate": 0.0,
+    "top4_rate": 0.0,
+    "placements": [
+      8,
+      7,
+      6,
+      5
+    ],
+    "seeds": [
+      39001,
+      39002,
+      39003,
+      39004
+    ]
+  },
+  "baseline": {
+    "games": 4,
+    "mean_placement": 6.75,
+    "first_place_rate": 0.0,
+    "top4_rate": 0.0,
+    "placements": [
+      5,
+      8,
+      7,
+      7
+    ],
+    "seeds": [
+      39001,
+      39002,
+      39003,
+      39004
+    ]
+  },
+  "paired_rank_deltas": [
+    3,
+    -1,
+    -1,
+    -2
+  ],
+  "paired_mean_placement_delta": -0.25,
+  "total_altered_decisions": 21,
+  "total_multiple_choice_events": 21,
+  "performance_conclusion": "unverified; small paired sample, no significance claim",
+  "candidate_model_sha256": null,
+  "notes": "Uses exact same seed per paired match; bot RNG can diverge after altered actions."
+}
