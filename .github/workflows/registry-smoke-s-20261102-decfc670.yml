@@ -1,0 +1,80 @@
+name: Release checkpoint registry smoke - s-20261102-decfc670
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: registry-smoke-s-20261102-decfc670
+  cancel-in-progress: false
+
+jobs:
+  verify-release-and-real-game:
+    runs-on: ubuntu-latest
+    timeout-minutes: 80
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install CPU inference and test dependencies
+        run: |
+          python -m pip install -e '.[train,test]'
+      - name: Registry invariants and existing unit tests
+        run: |
+          python -m pytest
+          python -m tavern_ai.checkpoint_registry --registry models/sessions/s-20261102-decfc670/registry.json
+      - name: Bootstrap pinned real TavernGym
+        run: bash scripts/bootstrap_engine.sh
+      - name: Our own complete eight-seat baseline match
+        run: |
+          python -m tavern_ai.canary --agent-id s-20261102-decfc670 \
+            --seed 86241 --policy baseline \
+            --receipt experiments/s-20261102-decfc670/001-86241.json
+          python -m tavern_ai.validate_receipt experiments/s-20261102-decfc670/001-86241.json
+      - name: Download permanent published V2 checkpoint
+        run: |
+          mkdir -p outputs/s-20261102-decfc670
+          gh release download v2-learning-41413557445 \
+            --repo "${GITHUB_REPOSITORY}" \
+            --pattern model.zip --pattern model.metadata.json \
+            --dir outputs/s-20261102-decfc670
+          test -s outputs/s-20261102-decfc670/model.zip
+          test -s outputs/s-20261102-decfc670/model.metadata.json
+      - name: Independently verify Release bytes, metadata and CPU masked action
+        run: |
+          python -m tavern_ai.checkpoint_registry \
+            --registry models/sessions/s-20261102-decfc670/registry.json \
+            --model-id v2-learning-41413557445 \
+            --model outputs/s-20261102-decfc670/model.zip \
+            --metadata outputs/s-20261102-decfc670/model.metadata.json \
+            --cpu-smoke \
+            --out reports/s-20261102-decfc670/001-release-verification.json
+      - name: Upload only compact verification report and actual game receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: registry-smoke-s-20261102-decfc670-${{ github.run_id }}
+          path: |
+            experiments/s-20261102-decfc670/*.json
+            reports/s-20261102-decfc670/*.json
+          if-no-files-found: ignore
+          retention-days: 30
+      - name: Persist own genuine evidence to own branch
+        if: success()
+        run: |
+          test "$GITHUB_REF_NAME" = "agent/s-20261102-decfc670/optimization-001"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add experiments/s-20261102-decfc670/ reports/s-20261102-decfc670/
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "results(s-20261102-decfc670): verified Release and genuine baseline game"
+          git pull --rebase origin "$GITHUB_REF_NAME"
+          git push origin "HEAD:$GITHUB_REF_NAME"

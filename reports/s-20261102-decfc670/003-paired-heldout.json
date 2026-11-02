@@ -1,0 +1,47 @@
+{
+  "schema": 1,
+  "kind": "paired_guarded_real_full_game_heldout",
+  "seeds": [
+    86271,
+    86272
+  ],
+  "n_pairs": 2,
+  "old_model_sha256": "73bde2666426cecce39f135980a897bb2cd4a7d70783ba04c9c0d29477a6664a",
+  "resumed_model_sha256": "2a2212a9abb400f844bc05c625c41f4f57db7d8227e1f37c44f8a7470b977754",
+  "old": {
+    "placements": [
+      8,
+      8
+    ],
+    "mean_placement": 8,
+    "top4_rate": 0.0,
+    "win_rate": 0.0,
+    "actual_buys": 0,
+    "legal_buy_opportunities": 78,
+    "model_end_when_buy_legal": 0,
+    "guard_forced_ends": 0,
+    "total_actions": 244
+  },
+  "resumed": {
+    "placements": [
+      8,
+      8
+    ],
+    "mean_placement": 8,
+    "top4_rate": 0.0,
+    "win_rate": 0.0,
+    "actual_buys": 0,
+    "legal_buy_opportunities": 78,
+    "model_end_when_buy_legal": 0,
+    "guard_forced_ends": 0,
+    "total_actions": 244
+  },
+  "paired_rank_delta_resumed_minus_old": [
+    0,
+    0
+  ],
+  "paired_mean_rank_delta": 0,
+  "proven_competitive_improvement": false,
+  "champion_promoted": false,
+  "interpretation": "Exploratory, only two paired full games with guard interventions tracked separately. No Arena MMR, no promotion."
+}
