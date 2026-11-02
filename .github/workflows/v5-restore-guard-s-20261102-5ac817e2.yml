@@ -1,0 +1,52 @@
+name: V5 isolated restore guard and true-game proof s-20261102-5ac817e2
+
+on:
+  push:
+    branches:
+      - agent/s-20261102-5ac817e2/optimization-001
+    paths:
+      - .github/workflows/v5-restore-guard-s-20261102-5ac817e2.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: v5-restore-guard-s-20261102-5ac817e2
+  cancel-in-progress: false
+
+jobs:
+  test-and-true-game:
+    runs-on: ubuntu-latest
+    timeout-minutes: 70
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run fail-closed restore preflight unit tests
+        run: |
+          python -m pip install -e '.[test]'
+          python -m pytest tests/test_guard_checkpoint_restore.py
+      - name: Bootstrap real pinned TavernGym
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Complete own eight-seat game and emit original receipt
+        run: |
+          mkdir -p experiments/s-20261102-5ac817e2
+          python -m tavern_ai.canary --agent-id s-20261102-5ac817e2 \
+            --seed 95131 --policy baseline \
+            --receipt experiments/s-20261102-5ac817e2/001-95131.json
+          python -m tavern_ai.validate_receipt experiments/s-20261102-5ac817e2/001-95131.json
+          echo 'AUTOTAVERN_RECEIPT_BEGIN'
+          cat experiments/s-20261102-5ac817e2/001-95131.json
+          echo 'AUTOTAVERN_RECEIPT_END'
+      - name: Preserve authentic receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v5-restore-guard-s-20261102-5ac817e2-${{ github.run_id }}
+          path: experiments/s-20261102-5ac817e2/*.json
+          if-no-files-found: ignore
+          retention-days: 30
