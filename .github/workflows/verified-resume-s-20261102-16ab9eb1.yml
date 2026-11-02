@@ -53,10 +53,13 @@ jobs:
             --metadata checkpoints/model.metadata.json \
             > reports/s-20261102-16ab9eb1/001-release-preflight.json
           SHA="$(python -c 'import json; d=json.load(open("models/registry.json")); print(d["latest"]["checkpoint_sha256"])')"
+          # SB3 prints wrapper diagnostics before the final JSON. Preserve only
+          # the explicit last JSON line; pipefail retains inference error status.
           python -m tavern_ai.checkpoint_preflight \
             --model checkpoints/model.zip --metadata checkpoints/model.metadata.json \
             --expected-sha256 "$SHA" --probe-inference \
-            > reports/s-20261102-16ab9eb1/001-cpu-load.json
+            | tail -n 1 > reports/s-20261102-16ab9eb1/001-cpu-load.json
+          python -m json.tool reports/s-20261102-16ab9eb1/001-cpu-load.json > /dev/null
       - name: New complete eight-seat TavernGym canary (engineering baseline)
         run: |
           python -m tavern_ai.canary \
