@@ -44,6 +44,10 @@ for f in experiments/s-20261102-2b0d8089/*.json; do [[ "$f" == *summary.json ]] 
 
 **Cumulative executed PPO timesteps across all attempts:** 1024, of which 512 form the complete, comparable successful run. Failed-run checkpoints are not mixed with successful-run results.
 
+## CI integration learning
+
+The first PR-specific CI (run 41414790091) failed because the main-branch `scripts/check_pr_evidence.py` validates **every** `experiments/<session>/*.json` as a complete game receipt. Our aggregated metrics `001-summary.json` was not a match receipt. Rather than touch the concurrently-owned checker (#8), moved the aggregated summary into `research/sessions/s-20261102-2b0d8089/001-summary.json` and updated the *session-specific* experiment runner/workflow output. The six genuine game JSONs remain at `experiments/s-20261102-2b0d8089/*.json`, exclusively. This metadata-only fix was not represented as a new training result.
+
 ## Complete real-game evidence (seat 0 rank)
 
 | Policy | Seed 27001 | Seed 27002 | Mean rank | Top-4 | First |
