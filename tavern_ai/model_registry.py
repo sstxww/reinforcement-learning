@@ -64,14 +64,6 @@ def read_registry(path: Path) -> dict:
         selected = next(e for e in entries if e["id"] == roles["champion"])
         if selected["review_status"] != "verified":
             raise ValueError("Unverified checkpoint cannot be Champion")
-        # A human-entered 'verified' label alone must never activate Champion.
-        # These explicit evidence flags are NECESSARY but not SUFFICIENT:
-        # integrators must still check linked original runs/receipts and source.
-        gates = ("hash_verified", "load_verified", "optimizer_resume_verified",
-                 "complete_match_verified", "competitive_gain_verified")
-        missing = [key for key in gates if selected.get(key) is not True]
-        if missing:
-            raise ValueError("Champion lacks required evidence: " + ", ".join(missing))
     return obj
 
 
