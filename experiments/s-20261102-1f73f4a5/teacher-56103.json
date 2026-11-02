@@ -21,7 +21,7 @@
   ],
   "truncated_combats": 0,
   "turn_limit_end": false,
-  "git_sha": "d3a1df791e35169bb986f77a4e66da8445c1b391",
+  "git_sha": "eccf2112018bd2ad75692caab8c4faf03d3105f1",
   "model_sha256": null,
   "safety_forced_ends": 0,
   "guard_enabled": true
