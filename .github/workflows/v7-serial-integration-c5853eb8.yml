@@ -1,0 +1,76 @@
+name: V7 serial integration (manual verified merge)
+
+on:
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: 'Reviewed PR number'
+        required: true
+        type: number
+      expected_pr_head:
+        description: 'Exact 40-character reviewed PR head SHA'
+        required: true
+        type: string
+      expected_main_head:
+        description: 'Exact current main SHA / PR base SHA'
+        required: true
+        type: string
+      exact_ci_run:
+        description: 'Exact PR CI run ID with successful full eight-seat job'
+        required: true
+        type: number
+
+permissions:
+  contents: write
+  pull-requests: write
+  actions: read
+
+concurrency:
+  group: autotavern-main-integrate
+  cancel-in-progress: false
+
+jobs:
+  integrate:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      GH_TOKEN: ${{ github.token }}
+      V7_SERIAL_INTEGRATOR: 'true'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Fail closed on stale head, base, CI, full game and independent review
+        id: merge
+        env:
+          PR_NUMBER: ${{ inputs.pr_number }}
+          EXPECTED_HEAD: ${{ inputs.expected_pr_head }}
+          EXPECTED_MAIN: ${{ inputs.expected_main_head }}
+          CI_RUN: ${{ inputs.exact_ci_run }}
+        run: |
+          set -euo pipefail
+          python scripts/v7_serial_merge_gate_c5853eb8.py \
+            --number "$PR_NUMBER" --head "$EXPECTED_HEAD" \
+            --main "$EXPECTED_MAIN" --ci-run "$CI_RUN" --merge | tee gate.log
+          merged_sha=$(tail -n 1 gate.log | jq -er '.sha')
+          test "${#merged_sha}" -eq 40
+          echo "merged_sha=$merged_sha" >> "$GITHUB_OUTPUT"
+      - name: Verify real main-head CI (not PR CI)
+        env:
+          MERGED_SHA: ${{ steps.merge.outputs.merged_sha }}
+        run: |
+          set -euo pipefail
+          for i in $(seq 1 50); do
+            state=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs?head_sha=$MERGED_SHA&event=push&per_page=30" \
+              --jq '[.workflow_runs[] | select(.name == "CI - full-match gate")][0] | if . == null then "missing" else (.status + ":" + (.conclusion // "pending")) end')
+            echo "Exact merged main ${MERGED_SHA}: ${state}"
+            case "$state" in
+              completed:success) exit 0 ;;
+              completed:failure|completed:cancelled|completed:timed_out|completed:action_required)
+                echo "Postmerge main CI did not pass"; exit 1 ;;
+            esac
+            sleep 30
+          done
+          echo "Postmerge CI unverified within bounded polling window"; exit 1
