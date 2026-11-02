@@ -3,7 +3,7 @@
   "champion": null,
   "latest": null,
   "population": [],
-  "notes": "Isolated V5 audit manifest; NOT the project's authoritative registry. No verified Champion. Candidate source claims MUST be independently tested.",
+  "notes": "Isolated V5 audit manifest; NOT the project's authoritative registry. No verified Champion. Candidate source claims MUST be independently tested. V2 Release metadata is schema 2 with additional compatibility fingerprint and embedded checkpoint digest.",
   "candidates": [
     {
       "id": "ppo-v2-1280-41413557445",
@@ -20,7 +20,8 @@
         "source_hash": "6d8712c93022ba11",
         "features": 4017,
         "cards": 447,
-        "actions": 245
+        "actions": 245,
+        "n_cards": 3984
       },
       "resume_verified_in_session": false,
       "full_match_verified_in_session": false,

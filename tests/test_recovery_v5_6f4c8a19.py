@@ -6,6 +6,7 @@ from pathlib import Path
 import pytest
 
 from tavern_ai.recovery_v5_6f4c8a19 import audit_release, sha256_file
+from tavern_ai.contract import CATALOG_SHA256, PATCH_SHA256, RULESET_ID, UPSTREAM_COMMIT
 
 
 ENGINE = {"version": "1.1.0", "source_hash": "6d8712c93022ba11",
@@ -72,4 +73,57 @@ def test_ambiguous_or_promoted_entry_fails_closed(tmp_path):
     parsed["champion"] = "synthetic"
     registry.write_text(json.dumps(parsed))
     with pytest.raises(ValueError, match="Champion"):
+        audit_release(registry, "synthetic", model, metadata)
+
+
+def fixture_schema2(registry, model, metadata):
+    parsed = json.loads(metadata.read_text())
+    parsed["schema"] = 2
+    parsed["checkpoint_sha256"] = sha256_file(model)
+    parsed["engine"]["n_cards"] = 3984
+    parsed["compatibility"] = {
+        "engine": dict(parsed["engine"]),
+        "catalog_sha256": CATALOG_SHA256,
+        "ruleset_id": RULESET_ID,
+        "patch_sha256": PATCH_SHA256,
+        "upstream_commit": UPSTREAM_COMMIT,
+    }
+    metadata.write_text(json.dumps(parsed), encoding="utf-8")
+    return parsed
+
+
+def test_real_v2_schema_shape_accepts_full_compatibility(tmp_path):
+    registry, model, metadata = fixture_files(tmp_path)
+    fixture_schema2(registry, model, metadata)
+    result = audit_release(registry, "synthetic", model, metadata)
+    assert result["metadata_schema"] == 2
+    assert result["v2_compatibility_verified"] is True
+    assert result["eligible_for_champion"] is False
+
+
+def test_v2_embedded_hash_tampering_rejected(tmp_path):
+    registry, model, metadata = fixture_files(tmp_path)
+    parsed = fixture_schema2(registry, model, metadata)
+    parsed["checkpoint_sha256"] = "0" * 64
+    metadata.write_text(json.dumps(parsed))
+    with pytest.raises(ValueError, match="embedded checkpoint SHA256 mismatch"):
+        audit_release(registry, "synthetic", model, metadata)
+
+
+def test_v2_catalog_mismatch_rejected(tmp_path):
+    registry, model, metadata = fixture_files(tmp_path)
+    parsed = fixture_schema2(registry, model, metadata)
+    parsed["compatibility"]["catalog_sha256"] = "f" * 64
+    metadata.write_text(json.dumps(parsed))
+    with pytest.raises(ValueError, match="compatibility fingerprint mismatch"):
+        audit_release(registry, "synthetic", model, metadata)
+
+
+def test_v2_engine_vocabulary_mismatch_rejected(tmp_path):
+    registry, model, metadata = fixture_files(tmp_path)
+    parsed = fixture_schema2(registry, model, metadata)
+    parsed["engine"]["n_cards"] = 124
+    parsed["compatibility"]["engine"]["n_cards"] = 124
+    metadata.write_text(json.dumps(parsed))
+    with pytest.raises(ValueError, match="card vocabulary mismatch"):
         audit_release(registry, "synthetic", model, metadata)

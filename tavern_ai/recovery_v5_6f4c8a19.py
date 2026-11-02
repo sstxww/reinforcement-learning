@@ -11,6 +11,8 @@ import json
 from datetime import datetime, timezone
 from pathlib import Path
 
+from .contract import CATALOG_SHA256, PATCH_SHA256, RULESET_ID, UPSTREAM_COMMIT
+
 REQUIRED_ENGINE_KEYS = ("version", "source_hash", "features", "cards", "actions")
 
 
@@ -40,7 +42,8 @@ def audit_release(registry_path: Path, model_id: str, model_path: Path,
     if actual_sha != expected_sha:
         raise ValueError(f"Checkpoint SHA256 mismatch: expected {expected_sha}, got {actual_sha}")
     metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
-    if metadata.get("schema") != 1 or metadata.get("algorithm") != "MaskablePPO":
+    schema = metadata.get("schema")
+    if type(schema) is not int or schema not in (1, 2) or metadata.get("algorithm") != "MaskablePPO":
         raise ValueError("Incompatible checkpoint metadata schema/algorithm")
     if type(metadata.get("total_timesteps")) is not int or metadata["total_timesteps"] != entry["training_steps"]:
         raise ValueError("Training step count differs from registry")
@@ -51,6 +54,25 @@ def audit_release(registry_path: Path, model_id: str, model_path: Path,
     for key in REQUIRED_ENGINE_KEYS:
         if saved_engine.get(key) != expected_engine.get(key):
             raise ValueError(f"Checkpoint engine mismatch in {key}")
+    # Actual V2 Release metadata is schema 2. This is a stricter, not weaker,
+    # compatibility contract than the old schema-1 training checkpoint.
+    if schema == 2:
+        if metadata.get("checkpoint_sha256") != actual_sha:
+            raise ValueError("V2 embedded checkpoint SHA256 mismatch")
+        if saved_engine.get("n_cards") != 3984:
+            raise ValueError("V2 card vocabulary mismatch")
+        compatibility = metadata.get("compatibility")
+        if not isinstance(compatibility, dict) or compatibility.get("engine") != saved_engine:
+            raise ValueError("V2 compatibility engine mismatch")
+        fingerprints = {
+            "catalog_sha256": CATALOG_SHA256,
+            "ruleset_id": RULESET_ID,
+            "patch_sha256": PATCH_SHA256,
+            "upstream_commit": UPSTREAM_COMMIT,
+        }
+        for key, expected in fingerprints.items():
+            if compatibility.get(key) != expected:
+                raise ValueError(f"V2 compatibility fingerprint mismatch in {key}")
     optimizer_state = "not_tested"
     if runtime:
         from .contract import verify_engine
@@ -58,6 +80,8 @@ def audit_release(registry_path: Path, model_id: str, model_path: Path,
         for key in REQUIRED_ENGINE_KEYS:
             if current_engine.get(key) != expected_engine[key]:
                 raise ValueError(f"Runtime engine mismatch in {key}")
+        if schema == 2 and current_engine.get("n_cards") != saved_engine.get("n_cards"):
+            raise ValueError("Runtime card vocabulary mismatch")
         from sb3_contrib import MaskablePPO
         model = MaskablePPO.load(str(model_path), device="cpu")
         if int(model.num_timesteps) != entry["training_steps"]:
@@ -78,6 +102,7 @@ def audit_release(registry_path: Path, model_id: str, model_path: Path,
         "model_id": model_id, "role": "challenger", "sha256": actual_sha,
         "release_tag": entry["release_tag"], "source_commit": entry["source_commit"],
         "total_timesteps": metadata["total_timesteps"], "engine": expected_engine,
+        "metadata_schema": schema, "v2_compatibility_verified": schema == 2,
         "optimizer_state": optimizer_state,
         "status": "load_and_optimizer_verified" if runtime else "file_and_metadata_verified",
         "eligible_for_champion": False,
