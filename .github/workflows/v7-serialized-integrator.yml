@@ -1,0 +1,63 @@
+name: V7 - serialized reviewed main integration
+
+on:
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: "Non-Draft PR number (main base; independent GitHub approval required)"
+        required: true
+        type: number
+      expected_head_sha:
+        description: "Exact 40-hex PR head"
+        required: true
+        type: string
+      expected_main_sha:
+        description: "Exact 40-hex main commit"
+        required: true
+        type: string
+      execute_merge:
+        description: "False: dry-run only. True: merge if every safety check passes."
+        required: true
+        default: false
+        type: boolean
+
+permissions: {}
+concurrency:
+  group: autotavern-main-integrate
+  cancel-in-progress: false
+
+jobs:
+  verify-and-integrate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    permissions:
+      contents: write
+      pull-requests: write
+      actions: read
+      checks: read
+    steps:
+      - name: Trusted main-only gate source, not PR code
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: V7 serial gate regression tests
+        run: |
+          python -m pip install pytest
+          python -m pytest -q tests/test_v7_serial_integrator_d3d410f5.py
+      - name: Exact-SHA reviewed PR gate and postmerge main CI
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          INPUT_PR: ${{ inputs.pr_number }}
+          INPUT_HEAD: ${{ inputs.expected_head_sha }}
+          INPUT_MAIN: ${{ inputs.expected_main_sha }}
+          EXECUTE_MERGE: ${{ inputs.execute_merge }}
+        shell: bash
+        run: |
+          extra=""
+          if [ "$EXECUTE_MERGE" = "true" ]; then extra="--apply"; fi
+          python scripts/v7_serial_integrator.py \
+            --pr "$INPUT_PR" --head "$INPUT_HEAD" --main "$INPUT_MAIN" $extra
