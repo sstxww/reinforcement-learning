@@ -1,0 +1,53 @@
+name: V5 exact integration gate s-20261102-847b6d4e
+on:
+  push:
+    branches:
+      - agent/s-20261102-847b6d4e/optimization-001
+    paths:
+      - .github/workflows/validate-integration-s-20261102-847b6d4e.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: v5-integration-s-20261102-847b6d4e
+  cancel-in-progress: false
+
+jobs:
+  strict-release-and-real-game:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Unit tests for integrated Release preflight
+        run: |
+          python -m pip install -e '.[test]'
+          python -m pytest tests/test_release_asset_verifier.py tests/test_checkpoint_preflight.py
+          python -m tavern_ai.release_asset_verifier
+      - name: Install exact TavernGym engine
+        run: bash scripts/bootstrap_engine.sh
+      - name: Exact engine and own authentic eight-seat game
+        run: |
+          python -m tavern_ai.contract
+          python -m tavern_ai.canary --agent-id s-20261102-847b6d4e --seed 84761 --policy baseline --receipt experiments/s-20261102-847b6d4e/001-84761.json
+          python -m tavern_ai.validate_receipt experiments/s-20261102-847b6d4e/001-84761.json
+      - name: Commit authentic own receipt only to owned branch
+        run: |
+          test "$GITHUB_REF_NAME" = "agent/s-20261102-847b6d4e/optimization-001"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add experiments/s-20261102-847b6d4e/001-84761.json
+          git diff --cached --quiet && { echo "Missing newly generated receipt"; exit 1; }
+          git commit -m "test(s-20261102-847b6d4e): archive validated genuine eight-seat canary"
+          git push origin HEAD:refs/heads/agent/s-20261102-847b6d4e/optimization-001
+      - name: Preserve audit evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v5-integration-s-20261102-847b6d4e
+          path: experiments/s-20261102-847b6d4e/*.json
+          if-no-files-found: ignore
+          retention-days: 30
