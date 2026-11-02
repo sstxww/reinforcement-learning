@@ -1,0 +1,110 @@
+name: V5 archive rejected schema-2 diagnostic candidate db1986b8
+
+on:
+  push:
+    branches: [agent/s-20261103-db1986b8/optimization-001]
+    paths:
+      - .github/workflows/v5-archive-rejected-s-20261103-db1986b8.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: s-20261103-db1986b8-rejected-model-release
+  cancel-in-progress: false
+
+jobs:
+  release-rejected-only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write
+      actions: read
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Fetch immutable previously successful isolated training run
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p payload
+          gh run download 41509839883 --repo "$GITHUB_REPOSITORY" \
+            --name s-20261103-db1986b8-schema2-128-real-resume --dir payload
+      - name: Verify diagnostic weights, provenance and failure without executing them
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import hashlib, json, shutil, zipfile
+          from pathlib import Path
+          root=Path("payload")
+          archive=root/"checkpoints/schema2-child.zip"
+          metadata=json.loads((root/"checkpoints/schema2-child.metadata.json").read_text())
+          continuity=json.loads((root/"outputs/continuity.json").read_text())
+          raw=json.loads((root/"outputs/raw-model-status.json").read_text())
+          def digest(path):
+              h=hashlib.sha256()
+              with path.open("rb") as f:
+                  for chunk in iter(lambda:f.read(1024*1024),b""):
+                      h.update(chunk)
+              return h.hexdigest()
+          expected="f488738b738708380f3d4bc2e607843f8f2931b4aac3883d775c5d9ae090d762"
+          parent="73bde2666426cecce39f135980a897bb2cd4a7d70783ba04c9c0d29477a6664a"
+          assert archive.is_file() and 0 < archive.stat().st_size < 200000000
+          assert digest(archive)==metadata["checkpoint_sha256"]==continuity["child_sha256"]==expected
+          assert metadata["schema"]==2 and metadata["total_timesteps"]==1408
+          assert metadata["increment_timesteps"]==128 and metadata["parent_checkpoint_sha256"]==parent
+          assert metadata["compatibility"]["engine"]==metadata["engine"]
+          assert continuity["real_optimizer_continuation"] is True
+          assert continuity["source_steps"]==1280 and continuity["child_steps"]==1408
+          assert continuity["schema_2_preserved"] is True
+          assert raw["attempted"] is True and raw["full_game_completed"] is False
+          assert raw["exit_code"] != 0, "Do not mislabel a complete game as rejected"
+          with zipfile.ZipFile(archive) as z:
+              assert {"data","policy.pth","policy.optimizer.pth"}.issubset(z.namelist())
+              assert z.testzip() is None
+          dest=Path("publish")
+          dest.mkdir()
+          shutil.copy2(archive,dest/"model.zip")
+          shutil.copy2(root/"checkpoints/schema2-child.metadata.json",dest/"model.metadata.json")
+          for name in ("continuity.json","raw-model-status.json","raw-model-game.log","release-restore.json","child-preflight.json"):
+              shutil.copy2(root/"outputs"/name,dest/name)
+          (dest/"checksums.sha256").write_text(
+              digest(dest/"model.zip")+"  model.zip\n"+
+              digest(dest/"model.metadata.json")+"  model.metadata.json\n"
+          )
+          (dest/"REJECTED-NOTES.md").write_text(
+              "REJECTED DIAGNOSTIC ONLY. Real 1280->1408 MaskablePPO continuation verified. "
+              "Raw model full eight-player game seed 931282 failed with Full-game safety limit exceeded; "
+              "NO completion, NO placement, NO improvement claim, NO Champion promotion. "
+              "Do not auto-select as registry Latest or resume production training from this candidate. "
+              "Training run: https://github.com/sstxww/reinforcement-learning/actions/runs/41509839883\n"
+          )
+          print(json.dumps({"model_sha256":expected,"schema":2,"steps":1408,
+                            "full_game_completed":False,"safe_to_promote":False}))
+          PY
+      - name: Publish immutable REJECTED research prerelease and verify downloaded bytes
+        shell: bash
+        run: |
+          set -euo pipefail
+          TAG="v5-rejected-s-20261103-db1986b8-schema2-1408-41509839883"
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "::error::Tag already exists; refusing to overwrite immutable model"
+            exit 2
+          fi
+          gh release create "$TAG" --repo "$GITHUB_REPOSITORY" \
+            --target "$GITHUB_SHA" --prerelease \
+            --title "REJECTED diagnostic schema2 1280-to-1408 ($TAG)" \
+            --notes-file publish/REJECTED-NOTES.md \
+            publish/model.zip publish/model.metadata.json \
+            publish/continuity.json publish/raw-model-status.json \
+            publish/raw-model-game.log publish/release-restore.json \
+            publish/child-preflight.json publish/checksums.sha256
+          mkdir -p verification
+          gh release download "$TAG" --repo "$GITHUB_REPOSITORY" \
+            --pattern model.zip --pattern model.metadata.json \
+            --dir verification
+          cmp publish/model.zip verification/model.zip
+          cmp publish/model.metadata.json verification/model.metadata.json
+          (cd verification && sha256sum --check ../publish/checksums.sha256)
+          echo "Saved immutable REJECTED diagnostic, byte-verified, not promoted."
