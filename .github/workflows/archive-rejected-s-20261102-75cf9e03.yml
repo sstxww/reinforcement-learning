@@ -1,0 +1,103 @@
+name: Preserve real rejected PPO checkpoint s-20261102-75cf9e03
+on:
+  push:
+    branches:
+      - agent/s-20261102-75cf9e03/optimization-001
+    paths:
+      - .github/workflows/archive-rejected-s-20261102-75cf9e03.yml
+permissions:
+  contents: write
+  actions: read
+concurrency:
+  group: archive-rejected-s-20261102-75cf9e03
+  cancel-in-progress: false
+jobs:
+  rejected-checkpoint-release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      GH_TOKEN: ${{ github.token }}
+      EXPECTED_SHA: 7eac498b502a233f7ca04b351200429f2ea8142dbec47c421f7b8f3544646a8b
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Independently recover authentic failed-match model
+        run: |
+          set -euo pipefail
+          mkdir -p recovered reports/s-20261102-75cf9e03
+          gh run download 41428024110 --repo "$GITHUB_REPOSITORY" \
+            --name resume-smoke-s-20261102-75cf9e03-41428024110 \
+            --dir recovered
+          test -s recovered/checkpoints/next/model.zip
+          test -s recovered/checkpoints/next/model.metadata.json
+          echo "$EXPECTED_SHA  recovered/checkpoints/next/model.zip" | sha256sum -c -
+      - name: Validate pinned model metadata and record explicit rejection
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          model=Path('recovered/checkpoints/next/model.zip')
+          meta=json.loads(Path('recovered/checkpoints/next/model.metadata.json').read_text())
+          digest=hashlib.sha256(model.read_bytes()).hexdigest()
+          if digest!=os.environ['EXPECTED_SHA']:
+              raise SystemExit('Rejected model SHA256 mismatch')
+          if (type(meta.get('schema')) is not int or meta['schema']!=1
+              or meta.get('algorithm')!='MaskablePPO'
+              or type(meta.get('total_timesteps')) is not int
+              or meta['total_timesteps']!=1408):
+              raise SystemExit('Unsupported recovered model or cumulative PPO steps')
+          contract={'version':'1.1.0','source_hash':'6d8712c93022ba11',
+                    'features':4017,'cards':447,'actions':245,'n_cards':3984}
+          if meta.get('engine') != contract:
+              raise SystemExit('Unexpected TavernGym contract')
+          p=Path('reports/s-20261102-75cf9e03/004-rejected-archive.json')
+          row={
+              'schema':1,'session_id':'s-20261102-75cf9e03',
+              'model_role':'rejected_diagnostic_only','champion_promoted':False,
+              'source_release':'v2-learning-41413557445',
+              'source_training_steps':1280,'added_actual_ppo_steps':128,
+              'total_timesteps':1408,'model_sha256':digest,'model_metadata_schema':1,
+              'engine':contract,
+              'source_training_run':'https://github.com/sstxww/reinforcement-learning/actions/runs/41428024110',
+              'sha256_zip_optimizer_inference_validation_run':'https://github.com/sstxww/reinforcement-learning/actions/runs/41429113481',
+              'strict_model_game':'failed_full_game_safety_limit',
+              'complete_raw_game_receipt':False,'rank':None,
+              'guarded_trace':'failed_illegal_end_turn_guard_no_placement',
+              'paired_strength_gain_verified':False,
+              'release_tag':'v5-rejected-s-20261102-75cf9e03-'+os.environ['GITHUB_RUN_ID']
+          }
+          p.write_text(json.dumps(row,ensure_ascii=False,indent=2)+'\n')
+          print(json.dumps(row,sort_keys=True))
+          PY
+      - name: Publish durable rejected prerelease without gameplay claim
+        run: |
+          set -euo pipefail
+          TAG="v5-rejected-s-20261102-75cf9e03-${GITHUB_RUN_ID}"
+          gh release create "$TAG" \
+            recovered/checkpoints/next/model.zip \
+            recovered/checkpoints/next/model.metadata.json \
+            reports/s-20261102-75cf9e03/004-rejected-archive.json \
+            --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --prerelease \
+            --title "Rejected 1408-step PPO: strict full-match failed" \
+            --notes "DIAGNOSTIC ONLY, NEVER CHAMPION. Authentic V2 Release 1280->1408 PPO continuation was performed (run 41428024110). Unguarded model game failed the full-game safety limit. Exact ZIP digest $EXPECTED_SHA plus engine/metadata verified; full ZIP optimizer and masked one-action inference also independently passed in run 41429113481. No valid pure model rank, no paired improvement. Guard-assisted analysis separately failed because END_TURN was not legal; no simulated replacement receipt is claimed."
+      - name: Commit only machine-readable archival provenance
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add reports/s-20261102-75cf9e03/004-rejected-archive.json
+          git diff --cached --quiet && exit 0
+          git commit -m "evidence(s-20261102-75cf9e03): archive rejected 1408-step PPO model"
+          git pull --rebase origin "$GITHUB_REF_NAME"
+          git push origin "HEAD:$GITHUB_REF_NAME"
+      - name: Preserve report even if Release API fails
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rejected-archive-s-20261102-75cf9e03-${{ github.run_id }}
+          path: |
+            reports/s-20261102-75cf9e03/004-rejected-archive.json
+          if-no-files-found: ignore
+          retention-days: 30
