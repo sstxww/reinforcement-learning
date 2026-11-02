@@ -1,0 +1,15 @@
+{
+  "training_steps": 256,
+  "checkpoint_sha256": "dc5195658995358e70c0d565a979b9cf05ccc5e47ae7adaa0a2f078f01cad917",
+  "model_match_placement": 8,
+  "model_decisions": 149,
+  "engine": {
+    "version": "1.1.0",
+    "source_hash": "6d8712c93022ba11",
+    "features": 4017,
+    "cards": 447,
+    "actions": 245,
+    "n_cards": 3984
+  },
+  "claim": "no performance improvement claimed without matched-seed baseline"
+}
