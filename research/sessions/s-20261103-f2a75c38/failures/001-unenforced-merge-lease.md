@@ -1,0 +1,7 @@
+# Failure/coordination blocker 001 — exclusive integration lease not globally enforced
+
+- **Signature:** `integration_lease_exclusivity_unproven`, NOT a source-code or test failure in our branch.
+- **Evidence:** [coord/autotavern-main-integrate: coordination/merge_lease.json](https://github.com/sstxww/reinforcement-learning/blob/coord/autotavern-main-integrate/coordination/merge_lease.json), observed at ref head `d3ea7b4b5c03829bf8cd6bf579b19911564a53d8`. Its own persisted `coordination_gap` says, "A merge happened despite this held lease; cannot assert it is globally enforced". The lease was released by `s-20261103-d0e7ebb090` after concurrent #164 merge. Other sessions advanced main after our branch start. Read-only branch-protection endpoint returned connector 403, so required protection checks are not directly inspectable by this session.
+- **Impact:** no claim of exclusive INTEGRATOR authority; avoid using GitHub merge API, force push, bypassing reviews, or guessing a lease merely because its JSON says released.
+- **Remedy:** adopt a single globally honored protected Merge Queue / serialized integration workflow or enforced CAS coordinator with all participants; re-read current main SHA, PR head, current CI and rules before any merge transaction. Do not merge in this session until evidence proves exclusive execution rights.
+- **Attempts:** 0 merge attempts, no unauthorized merge or model promotion; no repeated deterministic run.

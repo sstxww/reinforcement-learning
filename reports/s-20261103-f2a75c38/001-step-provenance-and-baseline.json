@@ -1,0 +1,64 @@
+{
+  "schema": 1,
+  "session_id": "s-20261103-f2a75c38",
+  "round": "001",
+  "task_key": "audit/legacy-release-loaded-timesteps",
+  "base_main_sha": "990acd21d598a34a554a80c50089a8f1a9423ac4",
+  "original_workflow_head_sha": "236c6f2aebd45920dce2857e8d1d13a916bf4f1f",
+  "original_workflow_run": "https://github.com/sstxww/reinforcement-learning/actions/runs/41512333870",
+  "original_workflow_job_id": 125507063599,
+  "original_artifact_id": 13173537220,
+  "original_artifact_sha256": "03de4f520391607a38745773e2206664661fe3751718680608f726e206983cae",
+  "original_artifact_member": "001-998237.json",
+  "artifact_expires_at": "2026-12-02T19:44:05Z",
+  "engine": {
+    "name": "TavernGym",
+    "version": "1.1.0",
+    "source_hash": "6d8712c93022ba11",
+    "observation": "observe2",
+    "float_features": 4017,
+    "card_slots": 447,
+    "masked_actions": 245
+  },
+  "test_status": "all steps passed in original Actions run; synthetic offline step-lineage regressions",
+  "test_scope": "tests/test_release_step_audit_s_f2a75c38.py and tests/test_model_registry.py",
+  "match": {
+    "policy": "baseline",
+    "seed": 998237,
+    "controlled_seat": 0,
+    "completed": true,
+    "placements": [
+      8,
+      1,
+      5,
+      3,
+      6,
+      4,
+      2,
+      7
+    ],
+    "rank": 8,
+    "turns": 18,
+    "decisions": 40,
+    "truncated_combats": 0,
+    "turn_limit_end": false,
+    "receipt_path": "experiments/s-20261103-f2a75c38/001-998237.json"
+  },
+  "model": {
+    "inherited_read_only_registry_release": "v5-s-20261102-68099929-1408-41428692617",
+    "inherited_model_sha256": "a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632",
+    "new_training_steps": 0,
+    "optimizer_resume_executed": false,
+    "model_controlled_games": 0,
+    "model_release_published": false,
+    "model_promotion": false
+  },
+  "provenance_summary": "Original valid baseline JSON downloaded from Actions artifact and checked SHA256; matches printed Actions job receipt; it is not a PPO evaluation.",
+  "limitations": [
+    "The SB3 loaded-steps check was tested with synthetic fake SB3 model, not a new real Release download/load/resume.",
+    "A baseline rank 8 is not a PPO rank.",
+    "Temporary Actions Artifact is not permanent model custody.",
+    "Integration CAS ref currently documents a concurrent merge despite held lease; no proven globally enforced exclusive merge right."
+  ],
+  "merge_safety_observed_ref": "https://github.com/sstxww/reinforcement-learning/blob/coord/autotavern-main-integrate/coordination/merge_lease.json"
+}
