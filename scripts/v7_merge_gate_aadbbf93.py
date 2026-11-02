@@ -20,6 +20,8 @@ from tavern_ai.receipt_integrity import validate_integrity
 
 REPO = "sstxww/reinforcement-learning"
 CI_NAME = "CI - full-match gate"
+CI_PATH = ".github/workflows/ci.yml"
+CI_WORKFLOW_ID = 404236977  # GitHub workflow ID verified against live run 41512463850
 ENGINE_HASH = "6d8712c93022ba11"
 
 
@@ -47,11 +49,32 @@ def full_game_receipt(record: dict, agent_id: str) -> None:
         raise ValueError("Raw model identity is missing")
     if record.get("raw_model_only") is False or record.get("guarded") is True:
         raise ValueError("Assisted or guarded model receipt")
-    for key in ("guard_forced_end", "guard_forced_ends", "fallback_actions",
-                "fallback_count", "guard_interventions", "forced_end_count"):
+    for key in ("guard_forced_end", "guard_forced_ends", "model_guard_forced_end",
+                "fallback_actions", "fallback_count", "safety_fallback_count",
+                "guard_interventions", "forced_end_count"):
         value = record.get(key, 0)
         if type(value) is not int or value != 0:
             raise ValueError("Guard/fallback activity must be zero: " + key)
+
+
+    variant = record.get("policy_variant")
+    if variant not in (None, "raw", "raw_model", "baseline"):
+        raise ValueError("Unverified policy variant / possible intervention")
+    if record.get("assisted") is True or record.get("fallback_used") is True:
+        raise ValueError("Assisted/fallback policy provenance")
+    diagnostics = record.get("opportunity_diagnostics", {})
+    if diagnostics is None:
+        diagnostics = {}
+    if not isinstance(diagnostics, dict):
+        raise ValueError("Invalid opportunity diagnostics")
+    nested = diagnostics.get("counts", {})
+    if not isinstance(nested, dict):
+        raise ValueError("Invalid opportunity action counts")
+    for key in ("guard_forced_end", "guard_forced_ends", "fallback_actions",
+                "fallback_count", "guard_interventions"):
+        value = nested.get(key, 0)
+        if type(value) is not int or value != 0:
+            raise ValueError("Nested guard/fallback activity must be zero: " + key)
 
 
 def assess(pr: dict, main_sha: str, expected_main: str, expected_head: str,
@@ -85,6 +108,7 @@ def assess(pr: dict, main_sha: str, expected_main: str, expected_head: str,
             "Receipt must be a valid JSON path")
     require(receipt_path in changed_files, "Independent receipt is absent from PR diff")
     require(len(changed_files) > 0, "PR has no changes")
+    require(CI_PATH not in changed_files, "PR changes the trust-root CI workflow")
     require(not any(f.endswith((".zip", ".pt", ".pth", ".pkl")) for f in changed_files),
             "Large model weights / pickle files must not enter Git history")
     try:
@@ -94,7 +118,8 @@ def assess(pr: dict, main_sha: str, expected_main: str, expected_head: str,
 
     matching_runs = [r for r in runs if r.get("name") == CI_NAME
                      and r.get("head_sha") == expected_head
-                     and r.get("event") == "pull_request"]
+                     and r.get("event") == "pull_request"
+                     and r.get("path") == CI_PATH and r.get("workflow_id") == CI_WORKFLOW_ID]
     # Never substitute a green older run for a later failed/pending run.
     matching_runs.sort(key=lambda r: (r.get("created_at") or "", r.get("id") or 0), reverse=True)
     selected = matching_runs[0] if matching_runs else None
@@ -139,7 +164,8 @@ def run_check(pr_number: int, expected_main: str, expected_head: str, receipt_pa
         raise ValueError("Receipt bytes not supplied by GitHub")
     receipt = json.loads(base64.b64decode(data["content"]).decode("utf-8"))
     candidates = [r for r in runs.get("workflow_runs", []) if r.get("name") == CI_NAME
-                  and r.get("head_sha") == expected_head and r.get("event") == "pull_request"]
+                  and r.get("head_sha") == expected_head and r.get("event") == "pull_request"
+                  and r.get("path") == CI_PATH and r.get("workflow_id") == CI_WORKFLOW_ID]
     latest = max(candidates, key=lambda r: (r.get("created_at") or "", r.get("id") or 0),
                  default=None)
     jobs = {}
