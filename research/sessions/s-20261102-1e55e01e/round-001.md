@@ -38,3 +38,10 @@ Offline tests added: tests/test_v5_train_release_source_1e55e01e.py. Independent
 - Once safe and merged, run bounded 128-step Release-backed main training. Do not scale if model remains rank 8 or relies on guard. No ranked Arena is authorized.
 
 No other sessions' files, results, or checkpoints were modified. No main write. No new Champion.
+
+## Verified real-game evidence and CI race fix (2026-11-02)
+
+- Genuine seed-95001 full eight-seat baseline game completed in Actions run 41450170855 on pinned TavernGym 1.1.0 (source hash 6d8712c93022ba11). Actual downloaded artifact 13144577744: seat 0 rank 8, placements [8,6,4,2,5,1,3,7], 15 turns, 47 decisions, zero truncated combats and no turn-limit termination. Genuine receipt recovered and committed at experiments/s-20261102-1e55e01e/001-95001.json (commit 3595ca762827a747546f0b4a736891b9d37cbde0). This is infrastructure proof, NOT a model-strength result.
+- Independent workflow 41450170855 ended failure solely at Git push due to a stale checkout after new session commits; game, offline tests, pinned engine and receipt validator steps succeeded. Initial PR CI 41450357947 passed 244 tests (1 skipped) but failed because own receipt had not arrived yet.
+- Fixed by removing stale-branch push step and reducing session proof workflow permission to contents:read; recovered the actual receipt from the archived Artifact rather than fabricating another game. New independent proof workflow 41450910725 requested; exact final-head PR CI still required. No new PPO weight or Champion was created.
+
