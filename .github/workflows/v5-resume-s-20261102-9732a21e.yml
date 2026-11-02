@@ -1,0 +1,141 @@
+name: V5 bounded release-resume smoke s-20261102-9732a21e
+on:
+  push:
+    branches:
+      - 'agent/s-20261102-9732a21e/optimization-001'
+    paths:
+      - '.github/workflows/v5-resume-s-20261102-9732a21e.yml'
+permissions:
+  contents: write
+concurrency:
+  group: v5-release-resume-s-20261102-9732a21e
+  cancel-in-progress: false
+jobs:
+  release-resume:
+    if: github.repository == 'sstxww/reinforcement-learning'
+    runs-on: ubuntu-latest
+    timeout-minutes: 80
+    env:
+      GH_TOKEN: ${{ github.token }}
+      SESSION_ID: s-20261102-9732a21e
+      RELEASE_TAG: v5-resume-smoke-s-20261102-9732a21e-r001
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned training and test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[train,test]'
+          python -m pytest -q
+      - name: Build and verify TavernGym contract
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Download fixed unpromoted V2 Release and verify exact bytes
+        run: |
+          mkdir -p checkpoints artifacts "experiments/$SESSION_ID" "reports/$SESSION_ID"
+          gh release download v2-learning-41413557445 --repo "$GITHUB_REPOSITORY" --pattern 'model*' --dir checkpoints
+          echo '73bde2666426cecce39f135980a897bb2cd4a7d70783ba04c9c0d29477a6664a  checkpoints/model.zip' | sha256sum -c -
+          echo '6f0b433191a8242dcedc627f6be49d1551a82788ce7bfd8e60416ede8146acc0  checkpoints/model.metadata.json' | sha256sum -c -
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from tavern_ai.contract import verify_engine
+          meta=json.loads(Path("checkpoints/model.metadata.json").read_text())
+          if meta.get("engine") != verify_engine():
+              raise SystemExit("Release checkpoint incompatible with current pinned engine")
+          print("source_total_timesteps",meta.get("total_timesteps"))
+          PY
+      - name: Bounded 128-step smoke continuation (NOT model promotion)
+        run: |
+          python -m tavern_ai.train --steps 128 --seed 20261102 --resume checkpoints/model.zip --out checkpoints/candidate.zip
+          test -s checkpoints/candidate.zip
+          test -s checkpoints/candidate.metadata.json
+      - name: Candidate-only real eight-seat full game
+        run: |
+          python -m tavern_ai.canary --agent-id "$SESSION_ID" --seed 83601 --policy model --model checkpoints/candidate.zip --receipt "experiments/$SESSION_ID/001-83601.json"
+          python -m tavern_ai.validate_receipt "experiments/$SESSION_ID/001-83601.json"
+      - name: Paired independent heldout (exploratory only)
+        run: |
+          python -m tavern_ai.evaluate --policy model --model checkpoints/candidate.zip --compare-baseline --games 2 --start-seed 83701 --out "reports/$SESSION_ID/001-paired-evaluation.json"
+      - name: Save hash-and-lineage manifest
+        run: |
+          python - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          base=Path("checkpoints")
+          old=json.loads((base/"model.metadata.json").read_text())
+          new=json.loads((base/"candidate.metadata.json").read_text())
+          receipt=json.loads(Path(f"experiments/{os.environ['SESSION_ID']}/001-83601.json").read_text())
+          ev=json.loads(Path(f"reports/{os.environ['SESSION_ID']}/001-paired-evaluation.json").read_text())
+          sha=lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
+          if not receipt.get("completed") or receipt.get("policy")!="model":
+              raise SystemExit("Model itself did not finish full game")
+          if new.get("total_timesteps",0) <= old.get("total_timesteps",0):
+              raise SystemExit("No verified increment in training steps")
+          m={"schema":1,"model_status":"challenger_unpromoted","session_id":os.environ["SESSION_ID"],
+             "source_release":"v2-learning-41413557445","source_weight_sha256":sha(base/"model.zip"),
+             "source_steps":old["total_timesteps"],"candidate_steps":new["total_timesteps"],
+             "additional_requested_steps":128,"candidate_weight_sha256":sha(base/"candidate.zip"),
+             "candidate_metadata_sha256":sha(base/"candidate.metadata.json"),
+             "engine":new["engine"],"source_commit":os.environ["GITHUB_SHA"],
+             "full_game_seed":83601,"full_game_placement":receipt["placements"][0],
+             "independent_paired_seeds":[83701,83702],
+             "paired_model_minus_baseline_mean_placement":ev.get("paired_mean_placement_delta"),
+             "model_promotion":False,"evaluations_are_exploratory":True,
+             "checkpoint_persistence":"pending_release_roundtrip"}
+          Path(f"reports/{os.environ['SESSION_ID']}/001-model-lineage.json").write_text(json.dumps(m,indent=2))
+          print(json.dumps(m))
+          PY
+      - name: Publish persistent unpromoted candidate Release
+        run: |
+          cat > /tmp/v5-release-notes.txt <<'TXT'
+          Unpromoted candidate; verification-only 128-step bounded continuation of V2 Release, not Champion.
+          Real TavernGym 1.1.0 complete model-controlled game and two paired heldout seeds required before publication.
+          All SHA256 and lineage information in 001-model-lineage.json. No ranked Arena play.
+          The holdout sample is too small to establish any competitiveness improvement.
+          TXT
+          gh release create "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --prerelease \
+            --title "UNPROMOTED V5 release-resume smoke $SESSION_ID" --notes-file /tmp/v5-release-notes.txt \
+            checkpoints/candidate.zip checkpoints/candidate.metadata.json \
+            "experiments/$SESSION_ID/001-83601.json" \
+            "reports/$SESSION_ID/001-paired-evaluation.json" \
+            "reports/$SESSION_ID/001-model-lineage.json"
+          mkdir -p release-roundtrip
+          gh release download "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --pattern 'candidate*' --dir release-roundtrip
+          cmp checkpoints/candidate.zip release-roundtrip/candidate.zip
+          cmp checkpoints/candidate.metadata.json release-roundtrip/candidate.metadata.json
+      - name: Commit only verified concise evidence to this session branch
+        run: |
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          p=Path(f"reports/{os.environ['SESSION_ID']}/001-model-lineage.json")
+          m=json.loads(p.read_text())
+          m["checkpoint_persistence"]="verified_release_roundtrip"
+          p.write_text(json.dumps(m,indent=2)+"\n")
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "experiments/$SESSION_ID/001-83601.json" "reports/$SESSION_ID/001-paired-evaluation.json" "reports/$SESSION_ID/001-model-lineage.json"
+          git diff --cached --quiet && exit 0
+          git commit -m "evidence($SESSION_ID): real model recovery, continuation and release roundtrip"
+          git pull --rebase origin "$GITHUB_REF_NAME"
+          git push origin "HEAD:$GITHUB_REF_NAME"
+      - name: Upload diagnostics and nonpermanent safety backup
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v5-resume-s-20261102-9732a21e-${{ github.run_id }}
+          path: |
+            checkpoints/candidate.zip
+            checkpoints/candidate.metadata.json
+            experiments/s-20261102-9732a21e/*.json
+            reports/s-20261102-9732a21e/*.json
+          if-no-files-found: ignore
+          retention-days: 30
