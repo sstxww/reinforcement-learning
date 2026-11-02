@@ -1,0 +1,176 @@
+{
+  "actual_training_games": 8,
+  "catalog_sha256": "c4c42e6ce5060e1b79fbcd5f4edbf6d17495f0f52690072481d690610f7ef6d7",
+  "checkpoint": "reports/s-20261102-aca5a929/001-weights.json",
+  "checkpoint_sha256": "971acb6755401e700b26caf251d390903df4fbb67cf1b6015e956b270439bcc4",
+  "gradient_steps": 0,
+  "heldout_baseline": {
+    "changed_buys": 0,
+    "completed": 4,
+    "first_rate": 0.0,
+    "guard_interventions": 0,
+    "mean_rank": 7.25,
+    "n": 4,
+    "ranks": [
+      6,
+      8,
+      8,
+      7
+    ],
+    "seeds": [
+      79220,
+      79221,
+      79222,
+      79223
+    ],
+    "top4_rate": 0.0
+  },
+  "heldout_challenger": {
+    "changed_buys": 31,
+    "completed": 4,
+    "first_rate": 0.0,
+    "guard_interventions": 0,
+    "mean_rank": 7.25,
+    "n": 4,
+    "ranks": [
+      8,
+      8,
+      7,
+      6
+    ],
+    "seeds": [
+      79220,
+      79221,
+      79222,
+      79223
+    ],
+    "top4_rate": 0.0
+  },
+  "inference": "Only four heldout paired seeds: descriptive, not evidence of superiority",
+  "method": "4-grid black-box parameter search",
+  "paired_mean_delta": 0,
+  "paired_rank_deltas": [
+    2,
+    0,
+    -1,
+    -1
+  ],
+  "ppo_steps": 0,
+  "promote": false,
+  "rules_version": {
+    "actions": 245,
+    "cards": 447,
+    "features": 4017,
+    "n_cards": 3984,
+    "source_hash": "6d8712c93022ba11",
+    "version": "1.1.0"
+  },
+  "selected_index": 0,
+  "session": "s-20261102-aca5a929",
+  "train_trials": [
+    {
+      "index": 0,
+      "performance": {
+        "changed_buys": 15,
+        "completed": 2,
+        "first_rate": 0.0,
+        "guard_interventions": 0,
+        "mean_rank": 6.5,
+        "n": 2,
+        "ranks": [
+          6,
+          7
+        ],
+        "seeds": [
+          79110,
+          79111
+        ],
+        "top4_rate": 0.0
+      },
+      "weights": {
+        "pair": 0.0,
+        "race": 0.0,
+        "stat": 1.0,
+        "tier": 0.5
+      }
+    },
+    {
+      "index": 1,
+      "performance": {
+        "changed_buys": 17,
+        "completed": 2,
+        "first_rate": 0.0,
+        "guard_interventions": 0,
+        "mean_rank": 7,
+        "n": 2,
+        "ranks": [
+          6,
+          8
+        ],
+        "seeds": [
+          79110,
+          79111
+        ],
+        "top4_rate": 0.0
+      },
+      "weights": {
+        "pair": 0.0,
+        "race": 0.7,
+        "stat": 1.0,
+        "tier": 0.5
+      }
+    },
+    {
+      "index": 2,
+      "performance": {
+        "changed_buys": 18,
+        "completed": 2,
+        "first_rate": 0.0,
+        "guard_interventions": 0,
+        "mean_rank": 7,
+        "n": 2,
+        "ranks": [
+          6,
+          8
+        ],
+        "seeds": [
+          79110,
+          79111
+        ],
+        "top4_rate": 0.0
+      },
+      "weights": {
+        "pair": 0.0,
+        "race": 1.8,
+        "stat": 1.0,
+        "tier": 0.5
+      }
+    },
+    {
+      "index": 3,
+      "performance": {
+        "changed_buys": 18,
+        "completed": 2,
+        "first_rate": 0.0,
+        "guard_interventions": 0,
+        "mean_rank": 7,
+        "n": 2,
+        "ranks": [
+          6,
+          8
+        ],
+        "seeds": [
+          79110,
+          79111
+        ],
+        "top4_rate": 0.0
+      },
+      "weights": {
+        "pair": 3.5,
+        "race": 0.7,
+        "stat": 1.0,
+        "tier": 0.5
+      }
+    }
+  ]
+}
