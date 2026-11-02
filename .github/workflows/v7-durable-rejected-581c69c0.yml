@@ -1,0 +1,173 @@
+name: V7 verified rejected model custody s-20261103-581c69c0
+
+on:
+  push:
+    branches:
+      - agent/s-20261103-581c69c0/optimization-001
+    paths:
+      - .github/workflows/v7-durable-rejected-581c69c0.yml
+
+concurrency:
+  group: v7-rejected-custody-s-20261103-581c69c0-r001
+  cancel-in-progress: false
+
+jobs:
+  verified-custody-and-pairing:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    permissions:
+      contents: read
+      actions: read
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install model load dependencies
+        run: python -m pip install -e '.[train,test]'
+      - name: Install and verify pinned TavernGym
+        run: bash scripts/bootstrap_engine.sh
+      - name: Fetch original 128-step candidate from exact successful run (read only)
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p recovered
+          gh run download 41512678144 --repo "$GITHUB_REPOSITORY" \
+            --name v7-s-20261103-581c69c0-r001-unpromoted-resume --dir recovered
+          test -s recovered/checkpoints/candidate.zip
+          test -s recovered/checkpoints/candidate.metadata.json
+          test -s recovered/artifacts/001-raw-model-97832.json
+      - name: Strict SHA, archive, optimizer, CPU and source-lineage verification
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m tavern_ai.checkpoint_preflight \
+            --model recovered/checkpoints/candidate.zip \
+            --metadata recovered/checkpoints/candidate.metadata.json \
+            --expected-sha256 d6771d4439d1deb64231edd4caaf9ebbc8cd2f8db667c94b19a8c144b968b096 \
+            --probe-inference
+          python - <<'PY'
+          import hashlib,json
+          from pathlib import Path
+          root=Path("recovered/checkpoints")
+          m=root/"candidate.metadata.json"
+          z=root/"candidate.zip"
+          d=json.loads(m.read_text())
+          assert d["schema"]==1 and d["algorithm"]=="MaskablePPO",d
+          assert d["total_timesteps"]==1536 and d["parent_checkpoint_sha256"]=="a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632",d
+          assert d["checkpoint_sha256"]==hashlib.sha256(z.read_bytes()).hexdigest(),d
+          assert d["engine"]["version"]=="1.1.0" and d["engine"]["source_hash"]=="6d8712c93022ba11",d
+          print("V7_VERIFIED_CANDIDATE_LINEAGE",json.dumps({"parent_steps":1408,"child_steps":d["total_timesteps"],"parent_sha256":d["parent_checkpoint_sha256"],"model_sha256":d["checkpoint_sha256"]}))
+          PY
+      - name: New same-seed baseline plus model-only heldout smoke
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p evidence
+          python -m tavern_ai.canary --agent-id s-20261103-581c69c0 \
+            --policy baseline --seed 97832 --receipt evidence/002-97832-baseline.json
+          python -m tavern_ai.validate_receipt evidence/002-97832-baseline.json
+          python -m tavern_ai.canary --agent-id s-20261103-581c69c0 \
+            --policy baseline --seed 97833 --receipt evidence/002-97833-baseline.json
+          python -m tavern_ai.validate_receipt evidence/002-97833-baseline.json
+          set +e
+          timeout 300s python -m tavern_ai.canary --agent-id s-20261103-581c69c0 \
+            --policy model --model recovered/checkpoints/candidate.zip --seed 97833 \
+            --receipt evidence/002-97833-raw-model.json
+          rc=$?
+          set -e
+          echo "model_seed_97833_exit_code=$rc" | tee evidence/002-97833-model-status.txt
+          if (( rc == 0 )); then
+            python -m tavern_ai.validate_receipt evidence/002-97833-raw-model.json
+          else
+            echo 'Raw game incomplete; no placement may be assigned.' | tee -a evidence/002-97833-model-status.txt
+          fi
+      - name: Compute authentic bounded paired evidence, never promote
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json,hashlib
+          from pathlib import Path
+          base=Path("evidence")
+          prior=Path("experiments/s-20261103-581c69c0/001-97832-raw-model.json")
+          def load(path):
+              obj=json.loads(path.read_text())
+              assert obj["completed"] is True and obj["truncated_combats"]==0 and obj["turn_limit_end"] is False,obj
+              assert obj["engine_version"]=="1.1.0" and obj["engine_source_hash"]=="6d8712c93022ba11",obj
+              assert sorted(obj["placements"])==list(range(1,9)),obj
+              assert obj["agent_id"]=="s-20261103-581c69c0",obj
+              return obj
+          pairs=[]
+          for seed in [97832,97833]:
+              baseline=load(base/f"002-{seed}-baseline.json")
+              path=prior if seed==97832 else base/f"002-{seed}-raw-model.json"
+              if not path.exists(): continue
+              model=load(path)
+              assert baseline["seed"]==model["seed"]==seed,seed
+              assert baseline["policy"]=="baseline" and model["policy"]=="model",seed
+              assert model["model_sha256"]=="d6771d4439d1deb64231edd4caaf9ebbc8cd2f8db667c94b19a8c144b968b096",model
+              pairs.append({"seed":seed,"seat":0,"model_placement":model["placements"][0],"baseline_placement":baseline["placements"][0],"rank_delta_model_minus_baseline":model["placements"][0]-baseline["placements"][0],"raw_model_only":True})
+          assert len(pairs)>=1
+          report={"schema":1,"session_id":"s-20261103-581c69c0","source_training_run":"https://github.com/sstxww/reinforcement-learning/actions/runs/41512678144","model_sha256":"d6771d4439d1deb64231edd4caaf9ebbc8cd2f8db667c94b19a8c144b968b096","parent_sha256":"a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632","source_steps":1408,"trained_steps":1536,"actual_added_steps":128,"engine":"TavernGym 1.1.0","engine_source_hash":"6d8712c93022ba11","model_vs_baseline_same_seed_pairs":pairs,"games_per_arm":len(pairs),"paired_mean_rank_delta":sum(p["rank_delta_model_minus_baseline"] for p in pairs)/len(pairs),"model_promotion_authorized":False,"champion_eligible":False,"registered_as_latest":False,"storage_status":"pending_rejected_release_publication","limits":"Small matched seed sample, fixed seat 0, seven scripted opponents, no statistically supported skill gain; incomplete model games are excluded and separately diagnosed."}
+          (base/"002-paired-evaluation.json").write_text(json.dumps(report,indent=2,sort_keys=True)+"\n")
+          print("V7_PAIRED_EVIDENCE_BEGIN")
+          print(json.dumps(report,sort_keys=True))
+          print("V7_PAIRED_EVIDENCE_END")
+          PY
+          cp recovered/artifacts/001-raw-model-97832.json evidence/001-97832-raw-model.json
+          cp recovered/checkpoints/candidate.zip evidence/model.zip
+          cp recovered/checkpoints/candidate.metadata.json evidence/model.metadata.json
+          (cd evidence && sha256sum model.zip model.metadata.json > checksums.sha256)
+      - name: Archive checked evidence for least-privilege publisher
+        uses: actions/upload-artifact@v4
+        with:
+          name: v7-s-20261103-581c69c0-r001-verified-rejected
+          path: evidence/
+          if-no-files-found: error
+          retention-days: 30
+
+  publish-rejected-release:
+    needs: verified-custody-and-pairing
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: v7-s-20261103-581c69c0-r001-verified-rejected
+          path: evidence
+      - name: Publish UNIQUE rejected research checkpoint (not Latest/Best/Champion)
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag=v7-rejected-s-20261103-581c69c0-r001-d6771d4439d1
+          test -s evidence/model.zip
+          test -s evidence/model.metadata.json
+          (cd evidence && sha256sum --check checksums.sha256)
+          if gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "Refusing to overwrite existing rejected Release $tag"; exit 2
+          fi
+          gh release create "$tag" --repo "$GITHUB_REPOSITORY" \
+            --target "$GITHUB_SHA" --prerelease \
+            --title "REJECTED experiment: 1536-step raw PPO rank-eight $tag" \
+            --notes "Failed to show strength improvement; source 1408-step SHA a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632, +128 real PPO steps to 1536, child SHA d6771d4439d1deb64231edd4caaf9ebbc8cd2f8db667c94b19a8c144b968b096; original run 41512678144; true raw eight-seat seed 97832 rank8. Matching follow-up is small-n diagnostic only. NOT Latest, Best, Champion, or Arena." \
+            evidence/model.zip evidence/model.metadata.json evidence/checksums.sha256 \
+            evidence/001-97832-raw-model.json evidence/002-97832-baseline.json \
+            evidence/002-97833-baseline.json evidence/002-97833-model-status.txt \
+            evidence/002-paired-evaluation.json
+          if [[ -s evidence/002-97833-raw-model.json ]]; then
+            gh release upload "$tag" --repo "$GITHUB_REPOSITORY" evidence/002-97833-raw-model.json
+          fi
+          mkdir -p redownload
+          gh release download "$tag" --repo "$GITHUB_REPOSITORY" \
+            --pattern model.zip --pattern model.metadata.json --dir redownload
+          cmp evidence/model.zip redownload/model.zip
+          cmp evidence/model.metadata.json redownload/model.metadata.json
+          sha256sum redownload/model.zip redownload/model.metadata.json
+          echo "V7_REJECTED_RELEASE_VERIFIED https://github.com/$GITHUB_REPOSITORY/releases/tag/$tag"
