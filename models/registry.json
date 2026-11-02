@@ -14,6 +14,7 @@
   "latest": null,
   "candidates": [],
   "status": "No independently validated durable checkpoint index recorded as of 2026-11-02",
-  "release_tag_prefix": "autotavern-v1-candidate-",
+  "release_tag_prefix": "v1-main-",
+  "learning_release_tag_prefix": "v1-learning-",
   "promotion_policy": "Paired held-out evaluation and verified checkpoint read/inference are required; never auto-promote."
 }
