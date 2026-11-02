@@ -1,0 +1,110 @@
+name: V5 isolated Release recovery and 128-step smoke - s-20261102-6f4c8a19
+on:
+  push:
+    branches: ['agent/s-20261102-6f4c8a19/optimization-001']
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: recovery-s-20261102-6f4c8a19
+  cancel-in-progress: false
+jobs:
+  verify-train-and-evaluate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned training and test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[train,test]'
+      - name: Unit regression tests
+        run: python -m pytest
+      - name: Install and verify pinned real TavernGym 1.1.0
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Download historical V2 Release without trusting it yet
+        run: |
+          mkdir -p checkpoints reports/s-20261102-6f4c8a19 experiments/s-20261102-6f4c8a19
+          gh release download v2-learning-41413557445 -R "$GITHUB_REPOSITORY" \
+            -p model.zip -p model.metadata.json -D checkpoints
+          test -s checkpoints/model.zip
+          test -s checkpoints/model.metadata.json
+      - name: Verify exact byte hash, environment, loaded PPO and optimizer
+        run: |
+          python -m tavern_ai.recovery_v5_6f4c8a19 \
+            --registry models/registry-v5-s-20261102-6f4c8a19.json \
+            --id ppo-v2-1280-41413557445 \
+            --model checkpoints/model.zip \
+            --metadata checkpoints/model.metadata.json \
+            --runtime --out reports/s-20261102-6f4c8a19/001-restore-audit.json
+      - name: Only after verification, resume for 128 actual PPO steps
+        run: |
+          python -m tavern_ai.train --steps 128 --seed 68110 \
+            --resume checkpoints/model.zip --out checkpoints/resumed.zip
+          test -s checkpoints/resumed.zip
+          test -s checkpoints/resumed.metadata.json
+          sha256sum checkpoints/resumed.zip > reports/s-20261102-6f4c8a19/001-resumed.sha256
+      - name: Complete mandatory true baseline and model-controlled eight-seat matches
+        run: |
+          python -m tavern_ai.canary --agent-id s-20261102-6f4c8a19 \
+            --seed 68111 --policy baseline \
+            --receipt experiments/s-20261102-6f4c8a19/001-68111-baseline.json
+          python -m tavern_ai.validate_receipt experiments/s-20261102-6f4c8a19/001-68111-baseline.json
+          python -m tavern_ai.canary --agent-id s-20261102-6f4c8a19 \
+            --seed 68112 --policy model --model checkpoints/resumed.zip \
+            --receipt experiments/s-20261102-6f4c8a19/001-68112-model.json
+          python -m tavern_ai.validate_receipt experiments/s-20261102-6f4c8a19/001-68112-model.json
+          python -c 'import json; from tavern_ai.receipt_integrity import validate_integrity; from pathlib import Path; [validate_integrity(json.loads(p.read_text())) for p in Path("experiments/s-20261102-6f4c8a19").glob("*.json")]'
+      - name: Small paired held-out two-seed comparison, not promotion
+        run: |
+          python -m tavern_ai.evaluate --policy model \
+            --model checkpoints/resumed.zip --compare-baseline \
+            --games 2 --start-seed 68121 \
+            --out reports/s-20261102-6f4c8a19/001-paired.json
+      - name: Preserve only true session receipts and compact metrics
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          test "$GITHUB_REF_NAME" = 'agent/s-20261102-6f4c8a19/optimization-001'
+          git add experiments/s-20261102-6f4c8a19/ reports/s-20261102-6f4c8a19/
+          if ! git diff --cached --quiet; then
+            git commit -m "evidence(v5): store verified recovery and complete-match receipts"
+            git pull --rebase origin "$GITHUB_REF_NAME"
+            git push origin "HEAD:$GITHUB_REF_NAME"
+          fi
+      - name: Preserve resumable candidate in immutable-tagged experimental prerelease
+        shell: bash
+        run: |
+          TAG="v5-s-20261102-6f4c8a19-${GITHUB_RUN_ID}"
+          cp checkpoints/resumed.zip checkpoints/v5-candidate.zip
+          cp checkpoints/resumed.metadata.json checkpoints/v5-candidate.metadata.json
+          gh release create "$TAG" \
+            checkpoints/v5-candidate.zip checkpoints/v5-candidate.metadata.json \
+            reports/s-20261102-6f4c8a19/001-restore-audit.json \
+            reports/s-20261102-6f4c8a19/001-resumed.sha256 \
+            reports/s-20261102-6f4c8a19/001-paired.json \
+            --title "Experimental V5 128-step resume ($TAG)" --prerelease \
+            --notes "Recovery-audited unpromoted Challenger, NOT Champion. Original Release V2 1280 PPO steps; attempt +128 steps. Read actual paired metrics before any promotion."
+      - name: Backup bounded results and checkpoints as temporary Actions Artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: recovery-s-20261102-6f4c8a19-${{ github.run_id }}
+          path: |
+            checkpoints/*.zip
+            checkpoints/*.json
+            experiments/s-20261102-6f4c8a19/*.json
+            reports/s-20261102-6f4c8a19/*
+          if-no-files-found: ignore
+          retention-days: 30
