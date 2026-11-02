@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "seed": 88132,
+  "n_per_arm": 1,
+  "v2_rank": 8,
+  "baseline_rank": 5,
+  "delta_v2_minus_baseline": 3,
+  "new_ppo_steps": 0,
+  "v2_guarded": true,
+  "v2_raw_no_fallback": false,
+  "evidence_level": "single-seed GUARDED policy only; raw model aborted"
+}
