@@ -1,0 +1,128 @@
+{
+  "schema": 1,
+  "timestamp": "2026-11-02T08:32:58.841751+00:00",
+  "session_id": "s-20261102-7f4c9a62",
+  "base_main_sha": "6ac59235b8238196a0e6462de77b72413c829372",
+  "workflow_run_id": "41413477918",
+  "workflow_source_sha": "e4af555a2f6687765988b4d2ae7a118a728ba1f3",
+  "environment": "TavernGym",
+  "engine": {
+    "version": "1.1.0",
+    "source_hash": "6d8712c93022ba11",
+    "features": 4017,
+    "cards": 447,
+    "actions": 245,
+    "n_cards": 3984
+  },
+  "training_seed": 70141,
+  "steps_per_variant": 128,
+  "total_training_steps": 256,
+  "eval_start_seed": 31041,
+  "games_per_variant": 2,
+  "models": {
+    "zero": {
+      "name": "zero",
+      "ent_coef": 0.0,
+      "seed": 70141,
+      "steps": 128,
+      "engine": {
+        "version": "1.1.0",
+        "source_hash": "6d8712c93022ba11",
+        "features": 4017,
+        "cards": 447,
+        "actions": 245,
+        "n_cards": 3984
+      },
+      "path": "checkpoints/s-20261102-7f4c9a62/zero/model.zip",
+      "sha256": "6c0f145d1e96cc878ebc729d59567e90a44548deacfcac53c82827a8e94d2ae1",
+      "n_steps": 128,
+      "batch_size": 64,
+      "n_epochs": 4,
+      "learning_rate": 0.0003,
+      "gamma": 0.99,
+      "gae_lambda": 0.95
+    },
+    "regularized": {
+      "name": "regularized",
+      "ent_coef": 0.02,
+      "seed": 70141,
+      "steps": 128,
+      "engine": {
+        "version": "1.1.0",
+        "source_hash": "6d8712c93022ba11",
+        "features": 4017,
+        "cards": 447,
+        "actions": 245,
+        "n_cards": 3984
+      },
+      "path": "checkpoints/s-20261102-7f4c9a62/regularized/model.zip",
+      "sha256": "a31b0098abc1f285a7aa11b9ada9c827c9d2ba319666f60324a7153315ca6d9f",
+      "n_steps": 128,
+      "batch_size": 64,
+      "n_epochs": 4,
+      "learning_rate": 0.0003,
+      "gamma": 0.99,
+      "gae_lambda": 0.95
+    }
+  },
+  "results": {
+    "baseline": {
+      "games": 2,
+      "seeds": [
+        31041,
+        31042
+      ],
+      "placements": [
+        8,
+        6
+      ],
+      "mean_placement": 7,
+      "top4_rate": 0.0,
+      "first_place_rate": 0.0,
+      "decisions": [
+        84,
+        96
+      ],
+      "truncated_combats": 0
+    },
+    "zero": {
+      "games": 2,
+      "seeds": [
+        31041,
+        31042
+      ],
+      "placements": [
+        8,
+        8
+      ],
+      "mean_placement": 8,
+      "top4_rate": 0.0,
+      "first_place_rate": 0.0,
+      "decisions": [
+        153,
+        101
+      ],
+      "truncated_combats": 0
+    },
+    "regularized": {
+      "games": 2,
+      "seeds": [
+        31041,
+        31042
+      ],
+      "placements": [
+        8,
+        8
+      ],
+      "mean_placement": 8,
+      "top4_rate": 0.0,
+      "first_place_rate": 0.0,
+      "decisions": [
+        153,
+        101
+      ],
+      "truncated_combats": 0
+    }
+  },
+  "limitation": "Exploratory N<=3; not evidence of an improvement or Arena Elo."
+}
