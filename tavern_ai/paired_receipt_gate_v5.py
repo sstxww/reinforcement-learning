@@ -26,13 +26,21 @@ def _guard_count(row: dict) -> int:
     counts = raw.get("counts", {})
     if not isinstance(counts, dict):
         raise ValueError("Malformed action counts")
-    fields = (
-        row.get("guard_forced_end", 0),
-        row.get("forced_end_count", 0),
-        row.get("fallback_count", 0),
-        row.get("safety_fallback_count", 0),
-        counts.get("guard_forced_end", 0),
+    # Known real probes and receipts use several distinct names for an
+    # assisted action. Missing one silently launders guarded play as raw PPO.
+    summary = row.get("opportunity_summary", {})
+    if summary is None:
+        summary = {}
+    if not isinstance(summary, dict):
+        raise ValueError("Malformed opportunity summary")
+    names = (
+        "guard_forced_end", "guard_forced_ends", "forced_end_count",
+        "fallback_count", "fallback_actions", "safety_fallback_count",
+        "guard_interventions", "model_guard_forced_end",
+        "safety_override_count", "guard_override_count",
     )
+    fields = tuple(source.get(name, 0)
+                   for source in (row, counts, summary) for name in names)
     if any(type(v) is not int or v < 0 for v in fields):
         raise ValueError("Invalid guard/fallback counter")
     return max(fields)
@@ -42,7 +50,13 @@ def _checked(row: dict, arm: str) -> tuple[tuple[int, int], int, bool]:
     if not isinstance(row, dict):
         raise ValueError("Receipt must be an object")
     policy = row.get("policy")
-    guarded = policy == "model_guarded" or row.get("guarded") is True
+    variant = row.get("policy_variant")
+    if variant is not None and (not isinstance(variant, str) or not variant.strip()):
+        raise ValueError("Malformed policy variant")
+    # A declared guard-enabled variant stays separate even if its recorded
+    # intervention count is zero in this particular finished game.
+    assisted_variant = variant is not None and variant not in ("raw_ppo_model", "baseline")
+    guarded = policy == "model_guarded" or row.get("guarded") is True or assisted_variant
     n_guard = _guard_count(row)
     if arm == "baseline":
         if policy != "baseline" or guarded or n_guard:
