@@ -1,10 +1,21 @@
-# Session s-20261102-c6c2196f — Status
+# s-20261102-c6c2196f — Status after independently verified real-engine experiment
 
-- State: **pending real-engine experiment**. No completed games, training, benchmark scores or CI success claimed at authoring time.
-- Working branch: `agent/s-20261102-c6c2196f/optimization-001`.
-- Base main commit: `315b068bac5ab6d8403c3c9b18f8c101c0cded5d`.
-- Hypothesis: an isolated strict receipt validator can close demonstrable eight-seat evidence gaps without modifying shared production validation.
-- Scope: new validator, real-engine experiment runner, unit regressions, unique Actions workflow; excludes other agents' code.
-- Experiment command: `python -m tavern_ai.receipt_audit_experiment --agent-id s-20261102-c6c2196f --seed-start 36001 --games 3 --out-dir experiments/s-20261102-c6c2196f --report reports/s-20261102-c6c2196f/receipt-integrity.json`.
-- Checkpoints: none; this is an engineering test of **baseline** receipts, not PPO training.
-- Next: check Actions execution; if games end, audit receipts and metrics, then create PR and update this record.
+- **State:** `completed_for_review`; engineering verification succeeded, gameplay improvement **not** claimed. PR CI still needs latest-head verification.
+- **Session:** `s-20261102-c6c2196f`
+- **Branch:** `agent/s-20261102-c6c2196f/optimization-001`
+- **PR:** https://github.com/sstxww/reinforcement-learning/pull/25 (draft; integrator review)
+- **Base main SHA:** `315b068bac5ab6d8403c3c9b18f8c101c0cded5d`
+- **Source commit:** `af50a0a18bc308d67099bd2992e6bd88ce7ecb4e`
+- **Evidence commit:** `5ccbd2b868b0194afc92dc76c0093418b43f5a15`
+- **Actual engine run:** https://github.com/sstxww/reinforcement-learning/actions/runs/41414984419 — successful (12 targeted tests, 3 complete TavernGym eight-seat games)
+- **Pinned engine:** TavernGym 1.1.0, hash `6d8712c93022ba11`; 4017 floats / 447 card IDs / 245 actions
+- **Game policy:** existing rule `baseline` in seat 0, seven simulator bots; **no PPO training**. PPO steps=0; checkpoint/model SHA=none.
+- **Seeds:** 36001/36002/36003. Ranks 8/8/7; decisions 47/43/52; turns 14/15/18; mean rank 7.6667; first/top-four rates 0/3 each.
+- **Guards:** 0 truncated combats, 0 turn-limit endings in all three completed real games.
+- **Receipts:** `experiments/s-20261102-c6c2196f/001-{36001,36002,36003}.json`
+- **Metrics:** `reports/s-20261102-c6c2196f/receipt-integrity.json`
+- **Evidence audit:** six synthetic corrupted receipts were accepted by existing legacy validator; all six rejected by isolated strict validator.
+- **Unit regression:** 12 tests passed within the real GitHub Actions run. Global PR test suite/CI must also pass before merge.
+- **Model state:** Best unchanged/none established; Candidate none; Latest none. No checkpoint or recovery steps for this engineering experiment.
+- **Important limitations:** this does not repair PPO infinite action loops and does not prove better gameplay. Strict validator is opt-in for this experiment; integrating it with production receipt checks requires review.
+- **Next hypothesis:** use independently measured action-progress telemetry in a future isolated model-evaluation experiment, preserving baseline/model identity and legal action-mask evidence.
