@@ -10,8 +10,11 @@ from tavern_ai.model_gate_s9450775f import action_family, archive_gate
 @pytest.mark.parametrize("action,expected", [
     (0, "end_turn"), (1, "refresh"), (3, "upgrade"),
     (8, "buy"), (15, "buy"), (16, "sell"), (22, "sell"),
-    (30, "choose"), (45, "choose"), (46, "play"), (125, "play"),
-    (126, "other"), (244, "other"),
+    (2, "freeze"), (4, "hero_power"), (5, "hero_power"),
+    (6, "dark_gift"), (7, "cancel"), (23, "activate"),
+    (29, "activate"), (30, "choose"), (45, "choose"),
+    (46, "play"), (125, "play"), (126, "magnetize"),
+    (195, "magnetize"), (196, "move"), (244, "move"),
 ])
 def test_pinned_action_bands(action, expected):
     assert action_family(action) == expected
@@ -67,3 +70,18 @@ def test_reject_false_steps(tmp_path, monkeypatch):
     meta.write_text(json.dumps(m))
     with pytest.raises(ValueError, match="step count"):
         archive_gate(path, meta, digest)
+
+
+@pytest.mark.parametrize("invalid", [-1, 245, 246, 8.0, True, None])
+def test_action_family_rejects_out_of_contract(invalid):
+    with pytest.raises(ValueError, match="Illegal"):
+        action_family(invalid)
+
+
+def test_total_action_partition():
+    from collections import Counter
+    observed = Counter(action_family(action) for action in range(245))
+    assert sum(observed.values()) == 245
+    assert observed["buy"] == 8
+    assert observed["magnetize"] == 70
+    assert observed["move"] == 49
