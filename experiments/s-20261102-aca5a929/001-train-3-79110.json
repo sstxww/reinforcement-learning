@@ -1,0 +1,31 @@
+{
+  "agent_id": "s-20261102-aca5a929",
+  "buy_opportunities": 19,
+  "catalog_sha256": "c4c42e6ce5060e1b79fbcd5f4edbf6d17495f0f52690072481d690610f7ef6d7",
+  "changed_buys": 12,
+  "completed": true,
+  "decisions": 72,
+  "engine_source_hash": "6d8712c93022ba11",
+  "engine_version": "1.1.0",
+  "environment": "TavernGym",
+  "git_sha": "2fd46064290c772e79318fbe75c442ff31851506",
+  "guard_interventions": 0,
+  "model_sha256": null,
+  "placements": [
+    6,
+    5,
+    3,
+    8,
+    1,
+    2,
+    7,
+    4
+  ],
+  "policy": "card_aware_train_3",
+  "schema": 1,
+  "seed": 79110,
+  "timestamp": "2026-11-02T09:40:24.159810+00:00",
+  "truncated_combats": 0,
+  "turn_limit_end": false,
+  "turns": 16
+}
