@@ -1,11 +1,10 @@
-# s-20261102-ba09e2d4 — Round 001: integration-first checkpoint gate
+# s-20261102-ba09e2d4 — Round 001 executed status
 
-- Session: `s-20261102-ba09e2d4`; independent branch `agent/s-20261102-ba09e2d4/optimization-001`; base main `f29a0a6e99161aca4163e51427f6bfabbe02f76f`.
-- Objective: P0 gate review; P1 versioned model registry and structural checkpoint verification; P2 evidence preservation.
-- P0: audited 68 open PRs at initial listing (many Draft), six Releases and latest main CI success at initial inspection. PR #43 merged concurrently; #15 depends on #9. No PR blindly merged by this session.
-- Candidate reports: PR #15 says old/new PPO ranks [8,8,8,8] on four paired seeds; PR #60 gives zero buys with low LR and insufficient legal-opportunity evidence.
-- Changes: new opt-in checkpoint-audit module with SHA256, pinned engine metadata, optimizer ZIP members; hermetic regression tests; unpromoted Release registry; branch-only authentic-game workflow.
-- Training this round: **0 PPO steps**. Model checkpoint produced: **none**. Model weights independently restored: **none**. No Champion.
-- Complete eight-seat game this session: **pending** branch-only Actions; no rank claim until receipt appears and validates.
-- Explicit blocker: this container cannot resolve github.com, so model download, Torch restore and local TavernGym match cannot be truthfully claimed.
-- Merge gate: remain Draft until independent real receipt, current-head CI and review are green. Followup P1: independent Release download/hash/load/resume and model-controlled game. Followup P2: record legal BUY opportunities, gold, END_TURN decisions; then test behavioral repair rather than blindly train more.
+- Initial main: `f29a0a6e99161aca4163e51427f6bfabbe02f76f`. Other independent sessions merged PRs during audit.
+- Initial GitHub audit: 68 open PRs, six Releases, current CI success. Relevant #9 Draft dependency, #15 depends on #9; #25 strict receipt validation Draft; #43 subsequently merged elsewhere.
+- Implemented and pushed opt-in SHA256/metadata/optimizer checkpoint structure gate, tests, unpromoted model registry, documentation and finite Actions workflow.
+- Actual own baseline full eight-seat TavernGym game: [Actions 41427340311](https://github.com/sstxww/reinforcement-learning/actions/runs/41427340311) completed SUCCESS, seed 87101, rank 7, 47 decisions, 15 turns, zero truncations and zero turn-limit guard. True receipt in `experiments/s-20261102-ba09e2d4/001-87101.json`.
+- First-run model training: 0 steps. No new weights/checkpoint. No Champion.
+- PR #60 provides reason to test legal BUY opportunities in model-controlled runs, not enough to conclude low learning rate is causal.
+- Follow-up implementation: isolated real-model action-opportunity probe, release hash verification, paired same-seed baseline in a separate finite branch-only workflow. Outcome pending, not represented as verified yet.
+- Full PR #80 stays Draft until independent latest-head PR CI and compatibility review. 

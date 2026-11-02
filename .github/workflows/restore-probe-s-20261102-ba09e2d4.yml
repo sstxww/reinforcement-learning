@@ -1,0 +1,80 @@
+name: "V5 genuine PPO restore and action opportunity probe s-20261102-ba09e2d4"
+on:
+  push:
+    branches: ['agent/s-20261102-ba09e2d4/optimization-001']
+    paths:
+      - 'tavern_ai/behavior_probe_ba09e2d4.py'
+      - 'tests/test_behavior_probe_ba09e2d4.py'
+      - '.github/workflows/restore-probe-s-20261102-ba09e2d4.yml'
+permissions:
+  contents: write
+
+concurrency:
+  group: v5-restoration-s-20261102-ba09e2d4
+  cancel-in-progress: false
+
+jobs:
+  restore-and-observe-real-model:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install model/test dependencies and regressions
+        run: |
+          python -m pip install -e '.[train,test]'
+          python -m pytest
+      - name: Install exact TavernGym engine
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Download immutable published candidate (not Champion)
+        run: |
+          mkdir -p checkpoints
+          gh release download v2-learning-41413557445 --repo "${GITHUB_REPOSITORY}" --pattern model.zip --pattern model.metadata.json --dir checkpoints
+      - name: Validate downloaded bytes and optimizer archive
+        run: |
+          python -m tavern_ai.checkpoint_audit_ba09e2d4 \
+            --checkpoint checkpoints/model.zip --metadata checkpoints/model.metadata.json \
+            --expected-sha256 73bde2666426cecce39f135980a897bb2cd4a7d70783ba04c9c0d29477a6664a \
+            --out reports/s-20261102-ba09e2d4/002-release-audit.json
+      - name: Independent genuine model-controlled eight-seat game and opportunity telemetry
+        run: |
+          python -m tavern_ai.behavior_probe_ba09e2d4 \
+            --agent-id s-20261102-ba09e2d4 --seed 87102 --model checkpoints/model.zip \
+            --receipt experiments/s-20261102-ba09e2d4/002-87102-model.json \
+            --metrics reports/s-20261102-ba09e2d4/002-action-opportunities.json
+          python -m tavern_ai.validate_receipt experiments/s-20261102-ba09e2d4/002-87102-model.json
+      - name: Same-seed original baseline comparator
+        run: |
+          python -m tavern_ai.canary --agent-id s-20261102-ba09e2d4 --seed 87102 --policy baseline --receipt experiments/s-20261102-ba09e2d4/002-87102-baseline.json
+          python -m tavern_ai.validate_receipt experiments/s-20261102-ba09e2d4/002-87102-baseline.json
+      - name: Persist only own genuine receipts and concise telemetry
+        shell: bash
+        run: |
+          test "${GITHUB_REF_NAME}" = 'agent/s-20261102-ba09e2d4/optimization-001'
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- experiments/s-20261102-ba09e2d4/002-87102-model.json experiments/s-20261102-ba09e2d4/002-87102-baseline.json reports/s-20261102-ba09e2d4/002-action-opportunities.json reports/s-20261102-ba09e2d4/002-release-audit.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'evidence(s-20261102-ba09e2d4): real published PPO and paired baseline opportunities'
+            git pull --rebase origin 'agent/s-20261102-ba09e2d4/optimization-001'
+            git push origin HEAD:'agent/s-20261102-ba09e2d4/optimization-001'
+          fi
+      - name: Upload audit and genuine-game evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: model-restore-probe-s-20261102-ba09e2d4-${{ github.run_id }}
+          path: |
+            experiments/s-20261102-ba09e2d4/002-*.json
+            reports/s-20261102-ba09e2d4/002-*.json
+          if-no-files-found: ignore
+          retention-days: 30
