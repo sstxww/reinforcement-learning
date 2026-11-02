@@ -7,7 +7,8 @@ from tavern_ai.paired_receipt_gate_v5 import compare
 
 def make_row(seed=100, seat=0, rank=8, policy="baseline", guarded=False):
     positions = list(range(1, 9))
-    positions[seat], positions[positions.index(rank)] = rank, positions[seat]
+    rank_slot = positions.index(rank)
+    positions[seat], positions[rank_slot] = positions[rank_slot], positions[seat]
     return {
         "schema": 1, "environment": "TavernGym", "completed": True,
         "engine_version": "1.1.0", "engine_source_hash": "6d8712c93022ba11",
