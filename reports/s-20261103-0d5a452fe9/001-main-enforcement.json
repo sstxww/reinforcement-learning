@@ -1,0 +1,9 @@
+{
+  "active_ruleset_ids": [],
+  "branch_protected": false,
+  "globally_exclusive_merge_permission": false,
+  "main_sha": "c1b828734527bae6141805581693d890cc3bff94",
+  "reason": "No branch protection or active ruleset; direct REST merge bypasses Actions concurrency",
+  "repository_branch": "main",
+  "verdict": "BLOCKED_UNPROTECTED_MAIN"
+}
