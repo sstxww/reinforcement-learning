@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "hypothesis": "1024 additional PPO steps improve fixed-seed placements",
+  "source_release": "v1-learning-9eada5801f99",
+  "previous_steps": 256,
+  "added_steps": 1024,
+  "total_steps": 1280,
+  "checkpoint_sha256": "73bde2666426cecce39f135980a897bb2cd4a7d70783ba04c9c0d29477a6664a",
+  "seeds": [
+    24000,
+    24001,
+    24002,
+    24003
+  ],
+  "v1": {
+    "placements": [
+      8,
+      8,
+      8,
+      8
+    ],
+    "mean_placement": 8,
+    "first_place_rate": 0.0,
+    "top4_rate": 0.0
+  },
+  "v2": {
+    "placements": [
+      8,
+      8,
+      8,
+      8
+    ],
+    "mean_placement": 8,
+    "first_place_rate": 0.0,
+    "top4_rate": 0.0
+  },
+  "scripted_baseline": {
+    "placements": [
+      7,
+      6,
+      8,
+      8
+    ],
+    "mean_placement": 7.25,
+    "first_place_rate": 0.0,
+    "top4_rate": 0.0
+  },
+  "paired_mean_delta_v2_minus_v1": 0,
+  "model_full_game_seed": 23002,
+  "model_full_game_placement": 8,
+  "claimed_improvement": false,
+  "caution": "n=4 is exploratory and insufficient for claiming significant improvement or Best promotion"
+}

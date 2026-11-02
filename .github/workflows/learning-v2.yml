@@ -1,0 +1,167 @@
+name: Learning V2 - resumable paired PPO experiment
+
+on:
+  push:
+    branches: ['agent/learning/v2']
+    paths: ['.github/workflows/learning-v2.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: autotavern-learning-v2
+  cancel-in-progress: false
+
+jobs:
+  resume-and-compare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 110
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install and test
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[train,test]'
+          python -m pytest
+      - name: Bootstrap real pinned TavernGym
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Restore V1 verified model release and check SHA-256
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p checkpoints reports/learning experiments/learning
+          gh release download v1-learning-9eada5801f99 --repo "$GITHUB_REPOSITORY" \
+            --pattern model.zip --pattern model.metadata.json --dir checkpoints
+          python - <<'PY'
+          import hashlib,json
+          from pathlib import Path
+          meta=json.loads(Path("checkpoints/model.metadata.json").read_text())
+          digest=hashlib.sha256(Path("checkpoints/model.zip").read_bytes()).hexdigest()
+          assert digest=="dc5195658995358e70c0d565a979b9cf05ccc5e47ae7adaa0a2f078f01cad917"
+          assert meta["checkpoint_sha256"]==digest
+          assert meta["total_timesteps"]==256
+          print("Verified real V1 model and 256 saved PPO steps",digest)
+          PY
+      - name: Independently replay prior V1 on four fixed seeds
+        run: |
+          python -m tavern_ai.evaluate --model checkpoints/model.zip \
+            --games 4 --start-seed 24000 \
+            --out reports/learning/v1-replay-heldout.json
+      - name: Resume bounded PPO for another 1024 steps
+        run: |
+          python -m tavern_ai.train --steps 1024 --seed 42 \
+            --resume checkpoints/model.zip --out checkpoints/model.zip
+      - name: New model completes a full genuine eight-seat game
+        run: |
+          python -m tavern_ai.canary --agent-id learning \
+            --seed 23002 --policy model --model checkpoints/model.zip \
+            --receipt experiments/learning/v2-model-match.json
+          python -m tavern_ai.validate_receipt experiments/learning/v2-model-match.json
+      - name: Re-evaluate new model using paired held-out seeds
+        run: |
+          python -m tavern_ai.evaluate --model checkpoints/model.zip \
+            --games 4 --start-seed 24000 \
+            --out reports/learning/v2-heldout.json
+      - name: Run scripted baseline on exact same four seeds
+        run: |
+          python - <<'PY'
+          import json,statistics
+          from pathlib import Path
+          from tavern_ai.canary import run
+          results=[run(i,"learning","baseline") for i in range(24000,24004)]
+          places=[r["placements"][0] for r in results]
+          out={"policy":"baseline","games":len(results),"seeds":[r["seed"] for r in results],
+               "placements":places,"mean_placement":statistics.mean(places),
+               "first_place_rate":sum(x==1 for x in places)/len(places),
+               "top4_rate":sum(x<=4 for x in places)/len(places),
+               "receipts":results}
+          Path("reports/learning/v2-baseline-heldout.json").write_text(json.dumps(out,indent=2)+"\n")
+          print({k:v for k,v in out.items() if k!="receipts"})
+          PY
+      - name: Record paired comparison without automatic Best promotion
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          base=Path("reports/learning")
+          get=lambda name:json.loads((base/name).read_text())
+          v1=get("v1-replay-heldout.json")
+          v2=get("v2-heldout.json")
+          baseline=get("v2-baseline-heldout.json")
+          meta=json.loads(Path("checkpoints/model.metadata.json").read_text())
+          receipt=json.loads(Path("experiments/learning/v2-model-match.json").read_text())
+          assert meta["total_timesteps"]==1280,meta
+          assert receipt["model_sha256"]==meta["checkpoint_sha256"]
+          assert len(v1["placements"])==len(v2["placements"])==len(baseline["placements"])==4
+          record={
+              "schema":1,"hypothesis":"1024 additional PPO steps improve fixed-seed placements",
+              "source_release":"v1-learning-9eada5801f99",
+              "previous_steps":256,"added_steps":1024,
+              "total_steps":meta["total_timesteps"],
+              "checkpoint_sha256":meta["checkpoint_sha256"],
+              "seeds":[24000,24001,24002,24003],
+              "v1":{"placements":v1["placements"],"mean_placement":v1["mean_placement"],"first_place_rate":v1["first_place_rate"],"top4_rate":v1["top4_rate"]},
+              "v2":{"placements":v2["placements"],"mean_placement":v2["mean_placement"],"first_place_rate":v2["first_place_rate"],"top4_rate":v2["top4_rate"]},
+              "scripted_baseline":{"placements":baseline["placements"],"mean_placement":baseline["mean_placement"],"first_place_rate":baseline["first_place_rate"],"top4_rate":baseline["top4_rate"]},
+              "paired_mean_delta_v2_minus_v1":v2["mean_placement"]-v1["mean_placement"],
+              "model_full_game_seed":receipt["seed"],
+              "model_full_game_placement":receipt["placements"][0],
+              "claimed_improvement":False,
+              "caution":"n=4 is exploratory and insufficient for claiming significant improvement or Best promotion"
+          }
+          (base/"v2-comparison.json").write_text(json.dumps(record,indent=2)+"\n")
+          print(json.dumps(record))
+          PY
+      - name: Commit genuine receipts and compact metrics to V2 only
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add experiments/learning/v2-model-match.json reports/learning/v1-replay-heldout.json \
+            reports/learning/v2-heldout.json reports/learning/v2-baseline-heldout.json \
+            reports/learning/v2-comparison.json
+          if ! git diff --cached --quiet; then
+            git commit -m "results(learning): record genuine 1280-step V2 and paired eight-seat games"
+            test "$GITHUB_REF_NAME" = "agent/learning/v2"
+            git pull --rebase origin "$GITHUB_REF_NAME"
+            git push origin HEAD:"$GITHUB_REF_NAME"
+          fi
+      - name: Publish independent resumable checkpoint Release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          TAG="v2-learning-${GITHUB_RUN_ID}"
+          gh release create "$TAG" \
+            checkpoints/model.zip checkpoints/model.metadata.json \
+            experiments/learning/v2-model-match.json \
+            reports/learning/v2-comparison.json reports/learning/v2-heldout.json \
+            --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --prerelease \
+            --title "AutoTavern experimental PPO V2 $TAG" \
+            --notes "Resumed V1 for 1024 more genuine PPO steps; model played a complete TavernGym game. Candidate only, NOT automatically promoted to Best."
+      - name: Preserve evidence for audit
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v2-learning-${{ github.run_id }}
+          path: |
+            checkpoints/model.zip
+            checkpoints/model.metadata.json
+            experiments/learning/v2-model-match.json
+            reports/learning/*heldout.json
+            reports/learning/v2-comparison.json
+          if-no-files-found: ignore
+          retention-days: 30

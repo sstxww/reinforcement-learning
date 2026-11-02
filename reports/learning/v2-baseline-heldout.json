@@ -1,0 +1,129 @@
+{
+  "policy": "baseline",
+  "games": 4,
+  "seeds": [
+    24000,
+    24001,
+    24002,
+    24003
+  ],
+  "placements": [
+    7,
+    6,
+    8,
+    8
+  ],
+  "mean_placement": 7.25,
+  "first_place_rate": 0.0,
+  "top4_rate": 0.0,
+  "receipts": [
+    {
+      "schema": 1,
+      "timestamp": "2026-11-02T08:33:56.890494+00:00",
+      "environment": "TavernGym",
+      "engine_source_hash": "6d8712c93022ba11",
+      "engine_version": "1.1.0",
+      "agent_id": "learning",
+      "policy": "baseline",
+      "seed": 24000,
+      "completed": true,
+      "turns": 14,
+      "decisions": 51,
+      "placements": [
+        7,
+        5,
+        3,
+        4,
+        6,
+        2,
+        8,
+        1
+      ],
+      "truncated_combats": 0,
+      "turn_limit_end": false,
+      "git_sha": "e37bd7e3a4bf95576ca1b27867df05af86ddab71",
+      "model_sha256": null
+    },
+    {
+      "schema": 1,
+      "timestamp": "2026-11-02T08:33:56.899919+00:00",
+      "environment": "TavernGym",
+      "engine_source_hash": "6d8712c93022ba11",
+      "engine_version": "1.1.0",
+      "agent_id": "learning",
+      "policy": "baseline",
+      "seed": 24001,
+      "completed": true,
+      "turns": 14,
+      "decisions": 78,
+      "placements": [
+        6,
+        7,
+        8,
+        2,
+        4,
+        3,
+        1,
+        5
+      ],
+      "truncated_combats": 0,
+      "turn_limit_end": false,
+      "git_sha": "e37bd7e3a4bf95576ca1b27867df05af86ddab71",
+      "model_sha256": null
+    },
+    {
+      "schema": 1,
+      "timestamp": "2026-11-02T08:33:56.906264+00:00",
+      "environment": "TavernGym",
+      "engine_source_hash": "6d8712c93022ba11",
+      "engine_version": "1.1.0",
+      "agent_id": "learning",
+      "policy": "baseline",
+      "seed": 24002,
+      "completed": true,
+      "turns": 13,
+      "decisions": 43,
+      "placements": [
+        8,
+        4,
+        3,
+        6,
+        1,
+        5,
+        2,
+        7
+      ],
+      "truncated_combats": 0,
+      "turn_limit_end": false,
+      "git_sha": "e37bd7e3a4bf95576ca1b27867df05af86ddab71",
+      "model_sha256": null
+    },
+    {
+      "schema": 1,
+      "timestamp": "2026-11-02T08:33:56.915244+00:00",
+      "environment": "TavernGym",
+      "engine_source_hash": "6d8712c93022ba11",
+      "engine_version": "1.1.0",
+      "agent_id": "learning",
+      "policy": "baseline",
+      "seed": 24003,
+      "completed": true,
+      "turns": 16,
+      "decisions": 62,
+      "placements": [
+        8,
+        3,
+        5,
+        4,
+        7,
+        2,
+        1,
+        6
+      ],
+      "truncated_combats": 0,
+      "turn_limit_end": false,
+      "git_sha": "e37bd7e3a4bf95576ca1b27867df05af86ddab71",
+      "model_sha256": null
+    }
+  ]
+}
