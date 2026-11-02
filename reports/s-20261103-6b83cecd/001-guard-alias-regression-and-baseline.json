@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "session_id": "s-20261103-6b83cecd",
+  "role": "WORKER",
+  "task_key": "evaluation/raw-assistance-alias-bypass",
+  "source": "actual GitHub Actions job logs + committed TavernGym receipt, not synthetic game data",
+  "action_run": "https://github.com/sstxww/reinforcement-learning/actions/runs/41510061335",
+  "action_job": "https://github.com/sstxww/reinforcement-learning/actions/runs/41510061335/job/125499288558",
+  "tested_head": "250869ead9c7850a6d8e117f25dce133aad3ed71",
+  "workflow_conclusion": "success",
+  "focused_regressions": "success",
+  "engine_contract": "TavernGym 1.1.0 / 6d8712c93022ba11 / observe2 4017 447 245",
+  "receipt_path": "experiments/s-20261103-6b83cecd/001-99631.json",
+  "receipt_commit": "ebc77f5589046731846f65ebf5b7a7263c98116c",
+  "complete_eight_seat_games": 1,
+  "raw_model_games": 0,
+  "baseline_games": 1,
+  "baseline": {
+    "seed": 99631,
+    "seat": 0,
+    "placement": 3,
+    "all_placements": [
+      3,
+      4,
+      8,
+      6,
+      5,
+      2,
+      1,
+      7
+    ],
+    "decisions": 57,
+    "turns": 13,
+    "completed": true,
+    "truncated_combats": 0,
+    "turn_limit_end": false
+  },
+  "new_ppo_training_steps": 0,
+  "new_model_release": null,
+  "model_promotion": false,
+  "tested_hypothesis": "positive fallback_actions/guard_forced_ends (including nested counters) must never enter raw paired evidence",
+  "value_claim": "Safety regression only; no claim of PPO improvement"
+}
