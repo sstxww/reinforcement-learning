@@ -1,0 +1,139 @@
+name: V5 archive rejected raw-game checkpoint s-20261102-70d8074c
+
+on:
+  push:
+    branches:
+      - agent/s-20261102-70d8074c/optimization-001
+    paths:
+      - .github/workflows/archive-rejected-s-20261102-70d8074c.yml
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: v5-rejected-model-archive-70d8074c
+  cancel-in-progress: false
+
+jobs:
+  persist-verified-unpromoted-checkpoint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      GH_TOKEN: ${{ github.token }}
+      ORIGIN_RUN: "41451343470"
+      ORIGINAL_ARTIFACT: v5-verified-resume-70d8074c
+      MODEL_SHA: ba0b0fef382f4e277f55e606e5f5e0e64ec3659da9bde68a5130f72882fffada
+      METADATA_SHA: cf25c7ff092d2b21a6af0cb85f4e8c06ada154671a52d4b3a3599d25d2b0362b
+      TAG: v5-rejected-s-20261102-70d8074c-resume1536-41451343470
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Restore real optimizer output from completed, FAILED raw-model run
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh run download "$ORIGIN_RUN" --repo "$GITHUB_REPOSITORY" --name "$ORIGINAL_ARTIFACT" --dir recovered
+          test -s recovered/checkpoints/resumed/model.zip
+          test -s recovered/checkpoints/resumed/model.metadata.json
+          test -s recovered/reports/s-20261102-70d8074c/001-resume.json
+      - name: Verify actual bytes against recorded original job receipt
+        shell: bash
+        run: |
+          set -euo pipefail
+          printf '%s  %s\n' "$MODEL_SHA" recovered/checkpoints/resumed/model.zip | sha256sum --check --status
+          printf '%s  %s\n' "$METADATA_SHA" recovered/checkpoints/resumed/model.metadata.json | sha256sum --check --status
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from tavern_ai.checkpoint_preflight import audit_archive
+          root=Path("recovered")
+          weights=root/"checkpoints/resumed/model.zip"
+          metadata=root/"checkpoints/resumed/model.metadata.json"
+          report=json.loads((root/"reports/s-20261102-70d8074c/001-resume.json").read_text())
+          assert report["session_id"] == "s-20261102-70d8074c"
+          assert report["source_steps"] == 1408
+          assert report["new_steps"] == 1536
+          assert report["actual_additional_steps"] == 128
+          assert report["parent"]["source_sha256"] == "a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632"
+          assert report["new_sha256"] == "ba0b0fef382f4e277f55e606e5f5e0e64ec3659da9bde68a5130f72882fffada"
+          assert report["new_metadata_sha256"] == "cf25c7ff092d2b21a6af0cb85f4e8c06ada154671a52d4b3a3599d25d2b0362b"
+          result=audit_archive(weights,metadata,report["new_sha256"])
+          assert result["total_timesteps"] == 1536
+          assert result["archive_integrity"] == "passed"
+          print(json.dumps({"source_run":41451343470, "weights_sha256":report["new_sha256"], "steps":1536, "status":"archive_verified_rejected_not_champion"},sort_keys=True))
+          PY
+      - name: Confirm actual CPU model load on the pinned TavernGym engine
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install -e '.[train,test]'
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+          python -m tavern_ai.checkpoint_preflight \
+            --model recovered/checkpoints/resumed/model.zip \
+            --metadata recovered/checkpoints/resumed/model.metadata.json \
+            --expected-sha256 "$MODEL_SHA" --probe-inference
+      - name: Prepare explicit failure status rather than fabricated model-game receipt
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+          cp recovered/checkpoints/resumed/model.zip dist/model.zip
+          cp recovered/checkpoints/resumed/model.metadata.json dist/model.metadata.json
+          cp recovered/reports/s-20261102-70d8074c/001-resume.json dist/001-resume.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          obj={
+            "schema":1,
+            "session_id":"s-20261102-70d8074c",
+            "source_run":"https://github.com/sstxww/reinforcement-learning/actions/runs/41451343470",
+            "source_artifact_id":13144677554,
+            "model_sha256":"ba0b0fef382f4e277f55e606e5f5e0e64ec3659da9bde68a5130f72882fffada",
+            "metadata_sha256":"cf25c7ff092d2b21a6af0cb85f4e8c06ada154671a52d4b3a3599d25d2b0362b",
+            "parent_id":"v5-s-20261102-68099929-1408-41428692617",
+            "cumulative_steps":1536,
+            "additional_steps":128,
+            "raw_model_game_seed":73023,
+            "raw_model_game_completed":False,
+            "raw_model_failure":"Full-game safety limit exceeded",
+            "raw_model_placement":None,
+            "paired_evaluation_completed":False,
+            "strength_gain_verified":False,
+            "champion_promoted":False,
+            "archive_status":"REJECTED_UNPROMOTED_VALID_CHECKPOINT",
+          }
+          Path("dist/001-rejection.json").write_text(json.dumps(obj,indent=2,sort_keys=True)+"\n")
+          PY
+      - name: Publish immutable REJECTED prerelease only after full SHA/CPU verification
+        shell: bash
+        run: |
+          set -euo pipefail
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" > /dev/null 2>&1; then
+            echo "Refusing to overwrite existing release $TAG"; exit 1
+          fi
+          gh release create "$TAG" dist/* --repo "$GITHUB_REPOSITORY" \
+            --target "$GITHUB_SHA" --prerelease \
+            --title "REJECTED unpromoted 1536-step PPO checkpoint (raw-game timeout)" \
+            --notes "Genuine 1408->1536 PPO continuation, source run 41451343470, verified by model+metadata SHA256 and CPU inference. RAW model failed eight-seat TavernGym on seed 73023: Full-game safety limit exceeded. NO placement, NO paired performance evaluation, NO Champion. Weights are archived solely for reproducible diagnosis, never for automatic promotion."
+      - name: Re-download published Release and compare both actual hashes
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p roundtrip
+          gh release download "$TAG" --repo "$GITHUB_REPOSITORY" --pattern model.zip --pattern model.metadata.json --dir roundtrip
+          printf '%s  %s\n' "$MODEL_SHA" roundtrip/model.zip | sha256sum --check --status
+          printf '%s  %s\n' "$METADATA_SHA" roundtrip/model.metadata.json | sha256sum --check --status
+          echo "Published REJECTED checkpoint restored with both SHA256 values matching."
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rejected-v5-model-audit-70d8074c
+          path: |
+            dist/001-resume.json
+            dist/001-rejection.json
+          if-no-files-found: ignore
+          retention-days: 30
