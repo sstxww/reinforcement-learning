@@ -40,23 +40,16 @@ jobs:
           python -m pip install -e '.[train,test]'
       - name: Install pinned TavernGym 1.1 engine
         run: bash scripts/bootstrap_engine.sh
-      - name: Restore last successful compatible model
+      - name: Restore durable registered Release (fail closed; no fresh model)
         shell: bash
         run: |
-          mkdir -p checkpoints
-          RUN_ID="$(gh api "repos/${GITHUB_REPOSITORY}/actions/workflows/train.yml/runs?branch=main&status=success&per_page=1" --jq '.workflow_runs[0].id // empty' || true)"
-          if [[ -n "$RUN_ID" ]]; then
-            if gh run download "$RUN_ID" --repo "$GITHUB_REPOSITORY" --name v1-model --dir checkpoints; then
-              test -f checkpoints/model.zip
-              test -f checkpoints/model.metadata.json
-            else
-              echo "No compatible prior artifact; initializing a fresh checkpoint"
-              rm -f checkpoints/model.zip checkpoints/model.metadata.json
-            fi
-          else
-            echo "First run; training from scratch"
-          fi
-      - name: Incremental Maskable PPO
+          mkdir -p artifacts
+          python -m tavern_ai.release_restore --output-dir checkpoints --probe-inference \
+            | tee artifacts/restore-attestation.json
+          test -s checkpoints/model.zip
+          test -s checkpoints/model.metadata.json
+          test -s checkpoints/restore-attestation.json
+      - name: Incremental Maskable PPO (verified lineage only)
         shell: bash
         env:
           STEPS: ${{ github.event.inputs.steps || '2048' }}
@@ -64,11 +57,8 @@ jobs:
           if [[ ! "$STEPS" =~ ^[0-9]+$ ]] || (( STEPS < 128 || STEPS > 20000 )); then
             echo 'steps must be 128..20000'; exit 2
           fi
-          args=(--steps "$STEPS" --seed 42 --out checkpoints/model.zip)
-          if [[ -f checkpoints/model.zip ]]; then
-            args+=(--resume checkpoints/model.zip)
-          fi
-          python -m tavern_ai.train "${args[@]}"
+          python -m tavern_ai.train --steps "$STEPS" --seed 42 \
+            --out checkpoints/model.zip --resume checkpoints/model.zip
       - name: Model plays full eight-seat game
         run: |
           python -m tavern_ai.canary --agent-id training-v1 \
@@ -93,6 +83,7 @@ jobs:
           path: |
             checkpoints/model.zip
             checkpoints/model.metadata.json
+            checkpoints/restore-attestation.json
             artifacts/trained-canary.json
             artifacts/evaluation.json
           if-no-files-found: error
