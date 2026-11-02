@@ -1,0 +1,109 @@
+name: V7 paired raw BUY receipt gate s-20261103-023cd77e
+
+# One bounded session-only run, no writes/pushes/Release promotion.
+on:
+  push:
+    branches:
+      - agent/s-20261103-023cd77e/optimization-001
+    paths:
+      - .github/workflows/v7-paired-buy-s-20261103-023cd77e.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: v7-paired-buy-s-20261103-023cd77e
+  cancel-in-progress: false
+
+jobs:
+  real-evidence:
+    runs-on: ubuntu-latest
+    timeout-minutes: 70
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned project dependencies
+        run: |
+          python -m pip install -e '.[train,test]'
+          python -m pytest -q tests/test_paired_buy_gate_023cd77e.py tests/test_freeze_family_s_20261103_4fd17801.py
+      - name: Install source-verified TavernGym engine
+        run: bash scripts/bootstrap_engine.sh
+      - name: Restore exact unpromoted 1408-step source (without token during deserialization)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          python -m tavern_ai.release_restore_entry \
+            --model-id v5-s-20261102-68099929-1408-41428692617 \
+            --out-dir checkpoints --skip-load
+          echo 'a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632  checkpoints/model.zip' | sha256sum -c -
+      - name: Load restored original source model without GitHub token
+        run: |
+          python - <<'PY'
+          from sb3_contrib import MaskablePPO
+          model = MaskablePPO.load('checkpoints/model.zip', device='cpu')
+          assert model is not None
+          print('Verified independent tokenless CPU model load')
+          PY
+      - name: True eight-seat baseline with public BUY telemetry, seed 99711
+        run: |
+          mkdir -p evidence
+          python -m tavern_ai.buy_opportunity_68099929 \
+            --agent-id s-20261103-023cd77e --seed 99711 --policy baseline \
+            --out evidence/001-baseline-99711.json
+          python -m tavern_ai.validate_receipt evidence/001-baseline-99711.json
+      - name: Raw model itself plays eight seats, preserving any failure separately
+        run: |
+          set +e
+          python -m tavern_ai.buy_opportunity_68099929 \
+            --agent-id s-20261103-023cd77e --seed 99711 --policy model \
+            --model checkpoints/model.zip --out evidence/002-model-99711.json \
+            > evidence/model-stdout.log 2> evidence/model-stderr.log
+          rc=$?
+          if [ "$rc" -ne 0 ]; then
+            RAW_EXIT_CODE="$rc" python - <<'PY'
+          import json, os
+          from pathlib import Path
+          Path('evidence/002-model-failure-99711.json').write_text(json.dumps({
+              'status': 'failed_not_a_game_receipt',
+              'seed': 99711, 'controlled_seat': 0,
+              'policy': 'raw_model',
+              'model_sha256': 'a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632',
+              'exit_code': int(os.environ['RAW_EXIT_CODE']),
+              'placement': None,
+              'reason': 'Inspect model-stderr.log; never map failure to rank eight'
+          }, indent=2) + '\n')
+          PY
+          fi
+          cat evidence/model-stdout.log || true
+          cat evidence/model-stderr.log || true
+          exit 0
+      - name: Validate original full games and conditional BUY metrics when available
+        run: |
+          set -euo pipefail
+          if [ -s evidence/002-model-99711.json ]; then
+            python -m tavern_ai.validate_receipt evidence/002-model-99711.json
+            python -m tavern_ai.paired_buy_gate_023cd77e \
+              --baseline evidence/001-baseline-99711.json \
+              --candidate evidence/002-model-99711.json \
+              --model-sha a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632 \
+              --out evidence/003-paired-99711.json
+          else
+            echo "Raw model did not finish; separate failure JSON, no invented rank"
+          fi
+      - name: Upload original read-only evidence regardless of model outcome
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v7-s-20261103-023cd77e-raw-99711-${{ github.run_id }}
+          path: evidence/
+          retention-days: 14
+          if-no-files-found: warn
+      - name: Fail job if the original raw model did not finish
+        if: always()
+        run: |
+          test -s evidence/001-baseline-99711.json
+          test -s evidence/002-model-99711.json
+          test -s evidence/003-paired-99711.json
