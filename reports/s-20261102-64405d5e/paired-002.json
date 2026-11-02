@@ -1,0 +1,269 @@
+{
+  "pairs": 20,
+  "baseline_ranks": [
+    8,
+    7,
+    8,
+    8,
+    8,
+    8,
+    8,
+    7,
+    8,
+    8,
+    6,
+    8,
+    8,
+    8,
+    7,
+    7,
+    8,
+    8,
+    7,
+    8
+  ],
+  "candidate_ranks": [
+    8,
+    7,
+    8,
+    8,
+    8,
+    5,
+    8,
+    7,
+    8,
+    8,
+    6,
+    8,
+    8,
+    8,
+    7,
+    7,
+    8,
+    8,
+    6,
+    8
+  ],
+  "baseline_mean_rank": 7.65,
+  "candidate_mean_rank": 7.45,
+  "paired_mean_rank_delta": -0.2,
+  "paired_bootstrap_95pct_interval": [
+    -0.55,
+    0
+  ],
+  "baseline_first_rate": 0.0,
+  "candidate_first_rate": 0.0,
+  "baseline_top4_rate": 0.0,
+  "candidate_top4_rate": 0.0,
+  "candidate_better_games": 2,
+  "candidate_worse_games": 0,
+  "equal_rank_games": 18,
+  "candidate_interventions": 118,
+  "paired_rows": [
+    {
+      "seed": 41101,
+      "baseline_rank": 8,
+      "candidate_rank": 8,
+      "candidate_interventions": 3,
+      "baseline_decisions": 36,
+      "candidate_decisions": 36,
+      "candidate_turns": 15
+    },
+    {
+      "seed": 41102,
+      "baseline_rank": 7,
+      "candidate_rank": 7,
+      "candidate_interventions": 6,
+      "baseline_decisions": 48,
+      "candidate_decisions": 50,
+      "candidate_turns": 18
+    },
+    {
+      "seed": 41103,
+      "baseline_rank": 8,
+      "candidate_rank": 8,
+      "candidate_interventions": 7,
+      "baseline_decisions": 48,
+      "candidate_decisions": 48,
+      "candidate_turns": 13
+    },
+    {
+      "seed": 41104,
+      "baseline_rank": 8,
+      "candidate_rank": 8,
+      "candidate_interventions": 3,
+      "baseline_decisions": 40,
+      "candidate_decisions": 40,
+      "candidate_turns": 14
+    },
+    {
+      "seed": 41105,
+      "baseline_rank": 8,
+      "candidate_rank": 8,
+      "candidate_interventions": 9,
+      "baseline_decisions": 43,
+      "candidate_decisions": 42,
+      "candidate_turns": 16
+    },
+    {
+      "seed": 41106,
+      "baseline_rank": 8,
+      "candidate_rank": 5,
+      "candidate_interventions": 12,
+      "baseline_decisions": 54,
+      "candidate_decisions": 56,
+      "candidate_turns": 15
+    },
+    {
+      "seed": 41107,
+      "baseline_rank": 8,
+      "candidate_rank": 8,
+      "candidate_interventions": 3,
+      "baseline_decisions": 41,
+      "candidate_decisions": 41,
+      "candidate_turns": 16
+    },
+    {
+      "seed": 41108,
+      "baseline_rank": 7,
+      "candidate_rank": 7,
+      "candidate_interventions": 6,
+      "baseline_decisions": 40,
+      "candidate_decisions": 40,
+      "candidate_turns": 16
+    },
+    {
+      "seed": 41109,
+      "baseline_rank": 8,
+      "candidate_rank": 8,
+      "candidate_interventions": 6,
+      "baseline_decisions": 51,
+      "candidate_decisions": 43,
+      "candidate_turns": 14
+    },
+    {
+      "seed": 41110,
+      "baseline_rank": 8,
+      "candidate_rank": 8,
+      "candidate_interventions": 7,
+      "baseline_decisions": 53,
+      "candidate_decisions": 53,
+      "candidate_turns": 20
+    },
+    {
+      "seed": 41111,
+      "baseline_rank": 6,
+      "candidate_rank": 6,
+      "candidate_interventions": 3,
+      "baseline_decisions": 40,
+      "candidate_decisions": 40,
+      "candidate_turns": 14
+    },
+    {
+      "seed": 41112,
+      "baseline_rank": 8,
+      "candidate_rank": 8,
+      "candidate_interventions": 5,
+      "baseline_decisions": 43,
+      "candidate_decisions": 44,
+      "candidate_turns": 13
+    },
+    {
+      "seed": 41113,
+      "baseline_rank": 8,
+      "candidate_rank": 8,
+      "candidate_interventions": 4,
+      "baseline_decisions": 40,
+      "candidate_decisions": 40,
+      "candidate_turns": 16
+    },
+    {
+      "seed": 41114,
+      "baseline_rank": 8,
+      "candidate_rank": 8,
+      "candidate_interventions": 4,
+      "baseline_decisions": 36,
+      "candidate_decisions": 36,
+      "candidate_turns": 15
+    },
+    {
+      "seed": 41115,
+      "baseline_rank": 7,
+      "candidate_rank": 7,
+      "candidate_interventions": 6,
+      "baseline_decisions": 44,
+      "candidate_decisions": 44,
+      "candidate_turns": 15
+    },
+    {
+      "seed": 41116,
+      "baseline_rank": 7,
+      "candidate_rank": 7,
+      "candidate_interventions": 3,
+      "baseline_decisions": 46,
+      "candidate_decisions": 46,
+      "candidate_turns": 14
+    },
+    {
+      "seed": 41117,
+      "baseline_rank": 8,
+      "candidate_rank": 8,
+      "candidate_interventions": 10,
+      "baseline_decisions": 51,
+      "candidate_decisions": 62,
+      "candidate_turns": 16
+    },
+    {
+      "seed": 41118,
+      "baseline_rank": 8,
+      "candidate_rank": 8,
+      "candidate_interventions": 4,
+      "baseline_decisions": 40,
+      "candidate_decisions": 40,
+      "candidate_turns": 16
+    },
+    {
+      "seed": 41119,
+      "baseline_rank": 7,
+      "candidate_rank": 6,
+      "candidate_interventions": 15,
+      "baseline_decisions": 72,
+      "candidate_decisions": 65,
+      "candidate_turns": 18
+    },
+    {
+      "seed": 41120,
+      "baseline_rank": 8,
+      "candidate_rank": 8,
+      "candidate_interventions": 2,
+      "baseline_decisions": 42,
+      "candidate_decisions": 42,
+      "candidate_turns": 14
+    }
+  ],
+  "interval_note": "Exploratory paired percentile bootstrap; not proof of policy generalization.",
+  "session_id": "s-20261102-64405d5e",
+  "round": 2,
+  "hypothesis": "First-round small ranking advantage survives fresh independent seeds",
+  "primary_seed": 41100,
+  "primary_rank": 7,
+  "primary_decisions": 50,
+  "primary_completed": true,
+  "primary_placements": [
+    7,
+    4,
+    6,
+    3,
+    8,
+    1,
+    2,
+    5
+  ],
+  "engine_version": "1.1.0",
+  "engine_source_hash": "6d8712c93022ba11",
+  "policy_sha256": "60592c03c965631d2227528529ee389b3bccfde4d21f76ee68dd03221ca7edbc",
+  "evaluation_source_sha256": "d10e681ec40408824a16e0d81e3fcd656197fd5dfb09ad7fd8640e3eae82bca1",
+  "training_steps": 0,
+  "model_sha256": null,
+  "interpretation": "Independent confirmation required before any claim of strength gain."
+}
