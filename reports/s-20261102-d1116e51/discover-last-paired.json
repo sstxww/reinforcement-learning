@@ -1,0 +1,57 @@
+{
+  "session": "s-20261102-d1116e51",
+  "hypothesis": "Choose last rather than first legal 30..45 choice action",
+  "seed_canary": 49001,
+  "candidate_canary_rank": 7,
+  "candidate_canary_decisions": 56,
+  "candidate_canary_completed": true,
+  "candidate_canary_interventions": 10,
+  "baseline": {
+    "games": 3,
+    "seeds": [
+      49002,
+      49003,
+      49004
+    ],
+    "rankings": [
+      7,
+      7,
+      7
+    ],
+    "mean_placement": 7,
+    "first_place_rate": 0,
+    "top4_rate": 0,
+    "choice_opportunities": 31,
+    "candidate_choice_interventions": 0
+  },
+  "candidate": {
+    "games": 3,
+    "seeds": [
+      49002,
+      49003,
+      49004
+    ],
+    "rankings": [
+      8,
+      8,
+      8
+    ],
+    "mean_placement": 8,
+    "first_place_rate": 0,
+    "top4_rate": 0,
+    "choice_opportunities": 27,
+    "candidate_choice_interventions": 27
+  },
+  "paired_rank_delta": [
+    1,
+    1,
+    1
+  ],
+  "paired_mean_placement_delta": 1,
+  "engine": "TavernGym 1.1.0",
+  "engine_source_hash": "6d8712c93022ba11",
+  "policy_source_sha256": "6af8b2266c3b5ca0f477846ed82b41680d78c8d080d14d913fee93cfdb4c6619",
+  "ppo_training_steps": 0,
+  "best_promoted": false,
+  "uncertainty": "Descriptive paired sample only. Zero interventions means no causal exposure."
+}
