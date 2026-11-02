@@ -2,13 +2,18 @@
 from __future__ import annotations
 
 import argparse
+import os
 import hashlib
+from datetime import datetime, timezone
 import json
 import statistics
 import time
 from pathlib import Path
 
-from .canary import run as run_full_game
+import numpy as np
+
+from .baseline import BaselinePolicy
+from .validate_receipt import validate as validate_receipt
 from .contract import ACTIONS, CARDS, FEATURES, verify_engine
 from .env import TavernEnv
 from .potential_reward import GAMMA, PotentialRewardWrapper
@@ -63,11 +68,109 @@ def train_arm(name: str, alpha: float, steps: int, seed: int, output: Path):
         env.close()
 
 
+
+def capped_action(model_action: int, mask: np.ndarray, actions_used: int,
+                  fallback_action: int, limit: int = 48) -> tuple[int, bool]:
+    """A fixed, common safety layer; prevents untrained PPO no-op loops.
+
+    End turn (action 0) is forced when legal; otherwise use the deterministic
+    rule policy for a pending mandatory choice. Both arms use identical logic.
+    """
+    if mask.shape != (ACTIONS,) or not mask.any():
+        raise RuntimeError("Invalid legal action mask in full-game driver")
+    if model_action < 0 or model_action >= ACTIONS or not mask[model_action]:
+        raise ValueError("Model proposed illegal action")
+    if actions_used < limit:
+        return model_action, False
+    choice = 0 if mask[0] else fallback_action
+    if choice < 0 or choice >= ACTIONS or not mask[choice]:
+        raise ValueError("Fallback proposed illegal action")
+    return choice, True
+
+
+def run_capped_full_game(seed: int, model_path: Path) -> dict:
+    """Drive REAL original TavernGym Game until is_over(), not a replay/mock.
+
+    The scripted seven seats are untouched. The model controls seat 0 with a
+    deterministic, disclosed 48-action per-turn safety fallback.
+    """
+    import taverngym
+    from sb3_contrib import MaskablePPO
+
+    engine = verify_engine()
+    game = taverngym.Game(seed=seed)
+    model = MaskablePPO.load(str(model_path), device="cpu")
+    rules = BaselinePolicy()
+    decisions = 0
+    safety_fallbacks = 0
+    actions_this_turn = 0
+    last_turn = -1
+    illegal_count = 0
+    for _ in range(30000):
+        if game.is_over():
+            break
+        turn = int(game.turn)
+        if turn != last_turn:
+            last_turn, actions_this_turn = turn, 0
+        progressed = False
+        for seat in range(game.num_players):
+            if not game.needs_action(seat):
+                continue
+            progressed = True
+            if seat != 0:
+                game.bot_play(seat)
+                continue
+            fbytes, cbytes = game.observe2(0)
+            features = np.frombuffer(fbytes, dtype="<f4").copy()
+            cards = np.frombuffer(cbytes, dtype="<i4").copy()
+            mask = np.frombuffer(game.legal_mask(0), dtype=np.uint8).astype(bool)
+            if features.shape != (FEATURES,) or cards.shape != (CARDS,) or mask.shape != (ACTIONS,):
+                raise ValueError("Unexpected observe2 contract in real game")
+            obs = {"features": features, "cards": cards, "action_mask": mask}
+            proposed, _ = model.predict(
+                {"features": features, "cards": cards},
+                action_masks=mask, deterministic=True,
+            )
+            rules_action = rules.act(obs, {"turn": turn, "actions_used": actions_this_turn})
+            chosen, guarded = capped_action(
+                int(proposed), mask, actions_this_turn, rules_action
+            )
+            safety_fallbacks += int(guarded)
+            if not mask[chosen]:
+                illegal_count += 1
+                raise ValueError("Illegal selected game action")
+            game.step(0, int(chosen))
+            actions_this_turn += 1
+            decisions += 1
+        if not progressed and not game.is_over():
+            raise RuntimeError("Real game stalled")
+    if not game.is_over():
+        raise RuntimeError("Real game did not finish in 30000 driver cycles")
+    result = {
+        "schema": 1, "timestamp": datetime.now(timezone.utc).isoformat(),
+        "environment": "TavernGym", "engine_version": engine["version"],
+        "engine_source_hash": engine["source_hash"],
+        "agent_id": SESSION_ID, "policy": "model-capped-48",
+        "seed": seed, "completed": bool(game.is_over()),
+        "turns": int(game.turn), "decisions": decisions,
+        "placements": [int(x) for x in game.placements()],
+        "truncated_combats": int(game.truncated_combats),
+        "turn_limit_end": bool(game.turn_limit_end),
+        "git_sha": os.getenv("GITHUB_SHA", ""),
+        "model_sha256": hashlib.sha256(model_path.read_bytes()).hexdigest(),
+        "safety_fallback_actions": safety_fallbacks,
+        "invalid_model_actions": illegal_count,
+        "action_cap_per_turn": 48,
+    }
+    validate_receipt(result)
+    return result
+
+
 def evaluate_arm(name: str, model_path: Path, seeds: tuple[int, ...],
                  receipt_dir: Path | None):
     records = []
     for seed in seeds:
-        result = run_full_game(seed, SESSION_ID, "model", str(model_path))
+        result = run_capped_full_game(seed, model_path)
         if receipt_dir is not None:
             receipt_dir.mkdir(parents=True, exist_ok=True)
             target = receipt_dir / f"001-{seed}.json"
@@ -80,6 +183,8 @@ def evaluate_arm(name: str, model_path: Path, seeds: tuple[int, ...],
         "placements_for_seat_zero": ranks,
         "all_placements": [r["placements"] for r in records],
         "decisions": [r["decisions"] for r in records],
+        "safety_fallback_actions": [r["safety_fallback_actions"] for r in records],
+        "invalid_model_actions": [r["invalid_model_actions"] for r in records],
         "mean_placement": statistics.mean(ranks),
         "top4_rate": sum(rank <= 4 for rank in ranks) / len(ranks),
         "first_place_rate": sum(rank == 1 for rank in ranks) / len(ranks),

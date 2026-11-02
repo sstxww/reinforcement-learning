@@ -2,8 +2,8 @@
 
 - Base: `6ac59235b8238196a0e6462de77b72413c829372`
 - Branch: `agent/s-20261102-bedfc382/optimization-001`
-- PR: not opened until real receipt exists.
-- Training: queued to isolated workflow by branch push; 0 steps verified at document creation.
+- PR: https://github.com/sstxww/reinforcement-learning/pull/12 (draft, not mergeable until receipts).
+- Training: first run #41413209781 reached trained 256+256-step checkpoints then failed during unguarded model match; corrected capped game driver is queued to rerun. No completed independent match yet.
 - Best verified score: not yet available.
 - Pending receipts: `experiments/s-20261102-bedfc382/001-31011.json`, `001-31012.json`, `001-31013.json`
 - Metrics: `research/sessions/s-20261102-bedfc382/metrics-001.json` (written by experiment only).

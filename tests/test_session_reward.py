@@ -64,3 +64,14 @@ def test_terminal_and_control():
     assert shaped.terminal_count == 1
     with pytest.raises(ValueError):
         baseline.step(1)
+
+def test_cap_guards_noop_loops_and_rejects_illegal_choices():
+    from tavern_ai.reward_experiment import capped_action
+    mask = np.zeros(245, dtype=bool)
+    mask[0] = mask[3] = True
+    assert capped_action(3, mask, 47, 0) == (3, False)
+    assert capped_action(3, mask, 48, 3) == (0, True)
+    mask[0] = False
+    assert capped_action(3, mask, 48, 3) == (3, True)
+    with pytest.raises(ValueError):
+        capped_action(1, mask, 3, 3)

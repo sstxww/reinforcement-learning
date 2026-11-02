@@ -16,3 +16,11 @@
 - **Pending evidence:** expected from session workflow (not the shared CI); no fabricated receipts or performance claims.
 - **Reusable idea:** potential shaping with terminal-zero potential preserves discounted returns up to the episode's initial-state constant, assuming matching gamma and full episodes; must still test finite PPO performance.
 - **Next round:** inspect actual logs, diagnose failures, compare larger evaluation seeds; only consider larger steps if experiment is stable.
+
+
+## Initial real run failure and correction
+- First session run [41413209781](https://github.com/sstxww/reinforcement-learning/actions/runs/41413209781) verified simulator `1.1.0 / 6d8712c93022ba11 / 4017×447×245`, passed reward unit tests, and trained both 256-step PPO arms sufficiently to save both checkpoints; **the first unguarded model evaluation did not complete**.
+- Failure: original `canary.run(model)` allowed untrained deterministic model to repeat optional actions indefinitely, raising `RuntimeError: Full-game safety limit exceeded` in `canary.py:54` after its 30,000-cycle safety limit. No successful receipt was produced from this run.
+- Fix within session-owned file: evaluate both arms using a dedicated genuine `Game` driver with identical deterministic 48-actions-per-turn cap; prefer legal end-turn action 0, fall back to official baseline for mandatory choices; validate action mask before each step. Record forced fallback count, zero/actual illegal actions and eight placements in real receipts.
+- Initial run model artifact `s-20261102-bedfc382-models-41413209781` is temporary (30 days); rerun re-trains both arms to preserve standalone reproducibility.
+- This is an engineering stability repair, **not evidence that reward shaping improves placements**.
