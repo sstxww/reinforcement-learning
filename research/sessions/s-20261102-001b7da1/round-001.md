@@ -26,3 +26,6 @@ Supported diagnosis: legal-buy avoidance and action-loop pathology have direct b
 - Local regression tests: 5 passed.
 - New game receipts: pending branch-scoped Actions workflow at initial report; do not synthesize.
 - Further expansion blocked until session CI, actual own receipt, and strict restore/full-game safety are proven.
+
+## Own independent pinned-engine evidence obtained
+[Actions #41449696658](https://github.com/sstxww/reinforcement-learning/actions/runs/41449696658) completed successfully. Downloaded its immutable artifact #13142974966 and transcribed the actual, validated `001-91801.json` into our own `experiments/s-20261102-001b7da1/` directory. Baseline controlled seat 0, seed 91801: complete 8-seat match; rank 7, 18 turns, 46 decisions, 0 combat truncations, no turn-limit ending. Source workflow head `89598b743dc04a5387f70a795e2b8b5fe3943755`. Strict distinction: this is an *infrastructure* baseline receipt; no PPO model was trained, resumed, tested or claimed improved here. Targeted local tests 7 passed. The current PR head's full-match CI is not inferred from this earlier workflow.
