@@ -1,0 +1,45 @@
+name: V7 CI-definition trust and baseline canary s-20261103-223b16589f
+
+on:
+  push:
+    branches:
+      - agent/s-20261103-223b16589f/optimization-001
+
+permissions:
+  contents: read
+
+concurrency:
+  group: v7-ci-definition-223b16589f
+  cancel-in-progress: false
+
+jobs:
+  regression-and-real-baseline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install bounded baseline and test dependencies
+        run: |
+          python -m pip install -e '.[test]'
+      - name: Regression for CI-definition tamper and SHA races
+        run: python -m pytest -q tests/test_v7_ci_definition_guard_223b16589f.py
+      - name: Install pinned engine
+        run: bash scripts/bootstrap_engine.sh
+      - name: Check engine contract
+        run: python -m tavern_ai.contract
+      - name: Genuine eight-seat baseline game (not PPO)
+        run: |
+          mkdir -p outputs
+          python -m tavern_ai.canary --agent-id s-20261103-223b16589f --policy baseline --seed 99681 --receipt outputs/001-99681.json
+          python -m tavern_ai.validate_receipt outputs/001-99681.json
+      - name: Preserve original baseline receipt or diagnostic
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v7-ci-definition-223b16589f-original-game
+          path: outputs/*.json
+          if-no-files-found: ignore
+          retention-days: 30
