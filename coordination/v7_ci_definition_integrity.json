@@ -3,7 +3,7 @@
   "task_key": "integrate/ci-workflow-definition-integrity",
   "session_id": "s-20261103-223b16589f",
   "role": "REPAIRER",
-  "state": "held",
+  "state": "released_handoff_no_duplicate_pr",
   "base_main_sha": "c1b828734527bae6141805581693d890cc3bff94",
   "branch": "agent/s-20261103-223b16589f/optimization-001",
   "scope": [
@@ -14,5 +14,9 @@
     "research/knowledge/proposals/s-20261103-223b16589f-001.md"
   ],
   "prohibits_main_merge": true,
-  "notes": "Exclusive task claim ref only. NOT an integrator lease. Runtime has no globally enforced merge mutex. Claim will be marked released/ready on exit."
+  "notes": "Previously existing live PR #219 is almost identical; do NOT merge duplicate branch. Own isolated Actions run remains queued; preserve evidence if it completes. Claim release is task-only, never an integrator lease.",
+  "handoff_pr": "https://github.com/sstxww/reinforcement-learning/pull/219",
+  "handoff_comment": "https://github.com/sstxww/reinforcement-learning/pull/219#issuecomment-6586957449",
+  "own_run": "https://github.com/sstxww/reinforcement-learning/actions/runs/41513747112",
+  "own_run_status_at_release": "queued"
 }
