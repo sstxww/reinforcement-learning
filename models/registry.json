@@ -50,9 +50,47 @@
       "status": "unpromoted_candidate_for_diagnostic_testing",
       "reason": "3/3 heldout games ended in 8th place; no paired improvement evidence",
       "release": "https://github.com/sstxww/reinforcement-learning/releases/tag/v1-learning-9eada5801f99"
+    },
+    {
+      "id": "ppo256-learning-9eada5801f99",
+      "role": "candidate_only",
+      "training_steps": 256,
+      "training_seed": 42,
+      "algorithm": "MaskablePPO",
+      "source_commit": "9eada5801f99c4f725d6503a6d603a9cb2a269e3",
+      "source_run": "https://github.com/sstxww/reinforcement-learning/actions/runs/41412362662",
+      "durable_storage": "GitHub Release prerelease",
+      "release_tag": "v1-learning-9eada5801f99",
+      "release_url": "https://github.com/sstxww/reinforcement-learning/releases/tag/v1-learning-9eada5801f99",
+      "model_asset": "model.zip",
+      "metadata_asset": "model.metadata.json",
+      "model_sha256": "dc5195658995358e70c0d565a979b9cf05ccc5e47ae7adaa0a2f078f01cad917",
+      "release_asset_digest_matches_receipt": true,
+      "independent_download_load_resume_tested": false,
+      "model_full_game": {
+        "seed": 1302,
+        "completed": true,
+        "placement": 8,
+        "decisions": 149,
+        "turns": 13,
+        "receipt_path": "experiments/learning/v1-model-match.json"
+      },
+      "heldout": {
+        "seed_start": 24000,
+        "games": 3,
+        "placements": [
+          8,
+          8,
+          8
+        ],
+        "mean_placement": 8,
+        "top4_rate": 0,
+        "first_place_rate": 0
+      },
+      "promoted": false
     }
   ],
-  "status": "One durable experimental Latest checkpoint in GitHub Release; no confirmed Best. Model game passes but n=3 all 8th; resume-from-release training unverified.",
+  "status": "Candidate release verified 2026-11-02: 256-step learning PPO completed model game and three held-out matches; no evidence of strategy improvement; best and automatic latest remain unset",
   "release_tag_prefix": "v1-main-",
   "learning_release_tag_prefix": "v1-learning-",
   "promotion_policy": "Paired held-out evaluation and verified checkpoint read/inference are required; never auto-promote.",
@@ -60,11 +98,11 @@
     "verified_ppo_steps": 256,
     "training_seed": 42,
     "algorithm": "MaskablePPO",
-    "source_run": "https://github.com/sstxww/reinforcement-learning/actions/runs/41412048034",
-    "source_commit": "9b53e35797b6d448454d21dc3f2157a0c725ac05",
-    "model_full_game_passed": false,
-    "failure": "RuntimeError: Full-game safety limit exceeded",
-    "heldout_model_metrics_available": false
+    "source_run": "https://github.com/sstxww/reinforcement-learning/actions/runs/41412362662",
+    "source_commit": "9eada5801f99c4f725d6503a6d603a9cb2a269e3",
+    "model_full_game_passed": true,
+    "heldout_model_metrics_available": true,
+    "warning": "Earlier 256-step run 41412048034 failed the full-game guard; newer 41412362662 passed and published a different checkpoint. Do not conflate their model hashes."
   },
   "diagnostic_checkpoints": [
     {
