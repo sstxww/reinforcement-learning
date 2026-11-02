@@ -1,0 +1,51 @@
+name: V6.1 isolated PR conflict gate s-20261103-70349465
+on:
+  push:
+    branches:
+      - agent/s-20261103-70349465/optimization-001
+    paths:
+      - scripts/v61_pr_path_overlap_70349465.py
+      - tests/test_v61_pr_path_overlap_70349465.py
+      - .github/workflows/v61-pr-overlap-s-20261103-70349465.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+  pull-requests: read
+concurrency:
+  group: v61-pr-overlap-s-20261103-70349465
+  cancel-in-progress: false
+jobs:
+  review-and-own-baseline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Offline unit tests
+        run: |
+          python -m pip install -e '.[test]'
+          python -m pytest -q tests/test_v61_pr_path_overlap_70349465.py
+      - name: Read-only LIVE PR changed-file intersections
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python scripts/v61_pr_path_overlap_70349465.py --github-target 165 --against 149 --output outputs/pr165-vs149.json
+          python scripts/v61_pr_path_overlap_70349465.py --github-target 164 --against 161 --output outputs/pr164-vs161.json
+      - name: Install pinned TavernGym and verify source contract
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Own real complete eight-seat baseline game, not PPO strength
+        run: |
+          python -m tavern_ai.canary --agent-id s-20261103-70349465 --policy baseline --seed 938521 --receipt outputs/001-938521.json
+          python -m tavern_ai.validate_receipt outputs/001-938521.json
+      - name: Retain immutable run diagnostics; NOT persistent model custody
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v61-pr-overlap-s-20261103-70349465-${{ github.run_id }}
+          path: outputs/*.json
+          if-no-files-found: warn
+          retention-days: 30

@@ -1,0 +1,10 @@
+# Failure 001 — PR evidence gate missing own real-game receipt
+
+- Session: `s-20261103-70349465`; task: `P0/pr-overlap-path-ownership`; role: WORKER.
+- First failing PR CI: [run 41510875811](https://github.com/sstxww/reinforcement-learning/actions/runs/41510875811), job 125502082337, original source/head `a86fb23c9303e73363e189577254cf0d229db41d`.
+- **Exact failure signature:** `Missing independent agent game receipt` in `scripts/check_pr_evidence.py`, after `375 passed, 1 skipped` in Python pytest. The CI engine install and eight-seat canary were skipped due to this gate. This was **not** a model-loss result, not a simulated game, and not nine unit test failures.
+- **Root cause:** the draft PR was initially opened before the independently executed original TavernGym eight-seat run had finished and before its authentic receipt was committed. The gate correctly rejected missing evidence.
+- **Actual corrective action (not a weakened validator):** own isolated Actions [run 41510800661](https://github.com/sstxww/reinforcement-learning/actions/runs/41510800661) completed successfully, generating the genuine original baseline seed 938521 game (rank8, 14 turns, 35 decisions, no truncation). Downloaded Artifact [13172468354](https://github.com/sstxww/reinforcement-learning/actions/runs/41510800661/artifacts/13172468354), preserved exact original source JSON and two live PR audit reports in [commit 61f7eda](https://github.com/sstxww/reinforcement-learning/commit/61f7edaac592e93f720d93d75278c8938af037c3).
+- Receipt path: `experiments/s-20261103-70349465/001-938521.json`, SHA256 `ad737087eb3a7d7c1bc8d8df06d38e3a5371a43a3aba10fd1b6e43f5001d0659`.
+- **Retest:** subsequent [exact-head PR CI 41512068829](https://github.com/sstxww/reinforcement-learning/actions/runs/41512068829) already passed `Unit tests and PR evidence` (the previously failing step) at the time of this report; full pinned-engine and complete-match CI was not finished at that inspection. Only a completed run can close the whole gate.
+- Model PPO steps 0; baseline-only game, no Champion or Release. Do not retest identical original head/seed or mark an incomplete CI successful.
