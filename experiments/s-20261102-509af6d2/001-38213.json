@@ -1,0 +1,29 @@
+{
+  "schema": 1,
+  "timestamp": "2026-11-02T08:49:12.245156+00:00",
+  "environment": "TavernGym",
+  "engine_version": "1.1.0",
+  "engine_source_hash": "6d8712c93022ba11",
+  "agent_id": "s-20261102-509af6d2",
+  "policy": "delay-opening-upgrade-v1",
+  "policy_sha256": "7620db9bb2925336114ff133fd99af7e5f5afbc38b599006be2fb9ffa88ba692",
+  "model_sha256": null,
+  "seed": 38213,
+  "completed": true,
+  "turns": 14,
+  "decisions": 60,
+  "upgrade_actions": 5,
+  "placements": [
+    1,
+    7,
+    4,
+    8,
+    5,
+    6,
+    3,
+    2
+  ],
+  "truncated_combats": 0,
+  "turn_limit_end": false,
+  "git_sha": "ae4950d8016eeb367e98bcd1893f433632f9e61d"
+}

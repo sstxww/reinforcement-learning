@@ -1,0 +1,58 @@
+{
+  "session_id": "s-20261102-509af6d2",
+  "hypothesis": "Delay opening Tavern upgrade from turn 2 to turn 3",
+  "engine": {
+    "version": "1.1.0",
+    "source_hash": "6d8712c93022ba11",
+    "features": 4017,
+    "cards": 447,
+    "actions": 245,
+    "n_cards": 3984
+  },
+  "baseline": {
+    "games": 4,
+    "seeds": [
+      38101,
+      38102,
+      38103,
+      38104
+    ],
+    "placements": [
+      6,
+      7,
+      7,
+      8
+    ],
+    "mean_rank": 7,
+    "first_place_rate": 0.0,
+    "top_four_rate": 0.0
+  },
+  "candidate": {
+    "games": 4,
+    "seeds": [
+      38101,
+      38102,
+      38103,
+      38104
+    ],
+    "placements": [
+      8,
+      1,
+      8,
+      8
+    ],
+    "mean_rank": 6.25,
+    "first_place_rate": 0.25,
+    "top_four_rate": 0.25
+  },
+  "candidate_minus_baseline_mean_rank": -0.75,
+  "paired_rank_differences": [
+    2,
+    -6,
+    1,
+    0
+  ],
+  "training_steps": 0,
+  "method": "real eight-seat TavernGym Game, seat 0 vs seven official bots",
+  "interpretation": "Descriptive small-sample ablation; no confirmed improvement"
+}
