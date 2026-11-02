@@ -1,16 +1,16 @@
-# s-20261102-24728f13 · Session status
+# s-20261102-24728f13 · Session status after Round 002
 
-- **State:** completed experiment; draft PR under final-head CI review. No Best promotion.
-- **Branch:** `agent/s-20261102-24728f13/optimization-001` (derived from main `315b068bac5ab6d8403c3c9b18f8c101c0cded5d`).
-- **PR:** https://github.com/sstxww/reinforcement-learning/pull/51
-- **Main experiment:** https://github.com/sstxww/reinforcement-learning/actions/runs/41416467100 — success. 512 real PPO steps (256 per learning rate), six genuine eight-seat model-controlled games, all `Game.is_over()`, zero illegal/truncated/turn-limit issues.
-- **Restore test:** https://github.com/sstxww/reinforcement-learning/actions/runs/41417110915 — success. Both SHA256s, CPU model reload and masked legal action confirmed.
-- **CI:** PR #51 Actions for latest head SHA must be checked after final documentation changes.
-- **TavernGym:** 1.1.0; source `6d8712c93022ba11`; observe2 4017 float / 447 cards / 245 actions.
-- **Outcome:** candidate 1e-4 and reference 3e-4 each got [8,8,8], mean 8.0, top-four 0%, first-place 0% (three seeds per arm). **No verified competitive gain**. No promoted Best model in this session.
-- **Real receipt:** `experiments/s-20261102-24728f13/001-42171.json`; all other receipts in same directory.
-- **Metrics:** `reports/s-20261102-24728f13/001-lr-ablation.json`.
-- **Recovery evidence:** `reports/s-20261102-24728f13/001-checkpoint-recovery.json`.
-- **Model restoration:** download Artifact ID `13128665279` from run 41416467100, restore `outputs/s-20261102-24728f13/candidate.zip` (SHA256 `802c65e7da2ba42e26e2f2efb55859b91428f1b792428031947484ce95f42f18`) or `reference.zip` (SHA256 `8450905bdd1d78e6be68175f9943b16ac840fc9ce2882da4e32791ddb078ad0c`); install project + pinned TavernGym, verify source compatibility and hashes before load. Artifact expires December 2, 2026. No permanent storage claim.
-- **Outstanding:** action-quality telemetry; small evaluation n; need durable non-expiring checkpoint storage if prolonged continuation is desired. No own open failures; all historical failure hypotheses require separate verification.
-- **Next round hypothesis:** early end-turn/low economic investment—not learning rate alone—limits these short-run policies; capture decisions and per-turn action breakdown in an isolated seeded probe.
+- **State:** R001 and R002 verified experiments, both draft PRs awaiting independent review/integration. No Best promotion or confirmed competitive gain.
+- **Round 001 branch:** `agent/s-20261102-24728f13/optimization-001`, final report commit `a60fbfbc7133b08d56b58712910689bba58057d9`, [PR #51](https://github.com/sstxww/reinforcement-learning/pull/51); [final-head full-game CI success](https://github.com/sstxww/reinforcement-learning/actions/runs/41417815856).
+- **Round 002 current branch:** `agent/s-20261102-24728f13/optimization-002` based on own R001 commit; [dependent draft PR #60](https://github.com/sstxww/reinforcement-learning/pull/60). **Check latest commit's PR CI** after documentation writes.
+- **Origin main SHA:** `315b068bac5ab6d8403c3c9b18f8c101c0cded5d`.
+- **Proven environment:** TavernGym 1.1.0, source hash `6d8712c93022ba11`, observe2 4017/447/245.
+- **Training:** 512 real PPO steps in R001, 256 for each learning-rate arm. R002 is reloaded-checkpoint real-engine diagnostic evaluation; **0 new training steps**.
+- **Genuine full games:** R001 6/6 completed (run https://github.com/sstxww/reinforcement-learning/actions/runs/41416467100); R002 6/6 completed (run https://github.com/sstxww/reinforcement-learning/actions/runs/41418438337). Total **12 own real eight-seat games**, all validated; all placement/top-four claims limited to three seeds per arm in each round.
+- **R001 outcome:** both arms [8,8,8], mean rank 8; no gain.
+- **R002 outcome:** candidate [8,8,8], mean 8.0, 0 buys / 21 model-selected END_TURN; reference [8,8,7], mean 7.67, 20 buys / 21 forced guards. **Not an improved model**.
+- **Receipts:** `experiments/s-20261102-24728f13/001-42171.json`, `experiments/s-20261102-24728f13/002-42174.json`; all paired full-game receipts under `experiments/s-20261102-24728f13/`.
+- **Compact reports:** `reports/s-20261102-24728f13/001-lr-ablation.json`, `001-checkpoint-recovery.json`, `002-action-telemetry.json`.
+- **Model recovery:** Artifact ID `13128665279` from R001 run 41416467100 includes `outputs/s-20261102-24728f13/candidate.zip` and `reference.zip`. SHA256 candidate `802c65e7da2ba42e26e2f2efb55859b91428f1b792428031947484ce95f42f18`, reference `8450905bdd1d78e6be68175f9943b16ac840fc9ce2882da4e32791ddb078ad0c`. R001 recovery run 41417110915 **passed real CPU reload and legal action checks**. Source Artifact expires Dec 2, 2026; no permanent backing store.
+- **Open problems:** candidate premature end-turn and no purchases; reference repeated-actions/no-progress pattern; no proven boost; small samples. No infrastructure crash during either own run. See `failures/002-action-utilization.md` for diagnostics.
+- **Next round hypothesis:** identify the raw repeated action IDs, legal masks and observed state changes; test targeted candidate behavior only after reliable action-opportunity telemetry, avoid overlapping other Agents' shared strategy modules.
