@@ -1,0 +1,132 @@
+{
+  "schema": 1,
+  "experiment": "paired_process_throughput",
+  "agent_id": "s-20261102-8cfa0c44",
+  "git_sha": "f480ed92d69b8efefdcfa1f59a56faa1b7ba2abb",
+  "run_url": "https://github.com/sstxww/reinforcement-learning/actions/runs/41416657474",
+  "engine": {
+    "version": "1.1.0",
+    "source_hash": "6d8712c93022ba11",
+    "features": 4017,
+    "cards": 447,
+    "actions": 245,
+    "n_cards": 3984
+  },
+  "model": null,
+  "training_steps": 0,
+  "policy": "unmodified V0 baseline",
+  "policy_runner_sha256": "b2f3b47537a4c3ede3859ac5eed5ec3c35f42a4dbf64511f2451bb8bc09bff75",
+  "own_match": {
+    "schema": 1,
+    "timestamp": "2026-11-02T08:58:14.298639+00:00",
+    "environment": "TavernGym",
+    "engine_source_hash": "6d8712c93022ba11",
+    "engine_version": "1.1.0",
+    "agent_id": "s-20261102-8cfa0c44",
+    "policy": "baseline",
+    "seed": 28700,
+    "completed": true,
+    "turns": 13,
+    "decisions": 49,
+    "placements": [
+      8,
+      5,
+      7,
+      6,
+      1,
+      4,
+      3,
+      2
+    ],
+    "truncated_combats": 0,
+    "turn_limit_end": false,
+    "git_sha": "f480ed92d69b8efefdcfa1f59a56faa1b7ba2abb",
+    "model_sha256": null
+  },
+  "seeds": [
+    28701,
+    28702,
+    28703,
+    28704,
+    28705,
+    28706
+  ],
+  "workers": 2,
+  "serial": {
+    "summary": {
+      "games": 6,
+      "mean_placement": 7.5,
+      "top4_rate": 0.0,
+      "first_place_rate": 0.0,
+      "placements": [
+        8,
+        6,
+        7,
+        8,
+        8,
+        8
+      ],
+      "seeds": [
+        28701,
+        28702,
+        28703,
+        28704,
+        28705,
+        28706
+      ]
+    },
+    "elapsed_seconds": 0.04279200900001001,
+    "games_per_second": 140.21309445879479,
+    "worker_pids": [
+      3448
+    ]
+  },
+  "process": {
+    "summary": {
+      "games": 6,
+      "mean_placement": 7.5,
+      "top4_rate": 0.0,
+      "first_place_rate": 0.0,
+      "placements": [
+        8,
+        6,
+        7,
+        8,
+        8,
+        8
+      ],
+      "seeds": [
+        28701,
+        28702,
+        28703,
+        28704,
+        28705,
+        28706
+      ]
+    },
+    "elapsed_seconds": 0.3245384070000057,
+    "games_per_second": 18.487796422812586,
+    "worker_pids": [
+      3453,
+      3456
+    ]
+  },
+  "speedup_serial_over_process": 0.13185499181922483,
+  "identical_replay_fields": [
+    "seed",
+    "environment",
+    "engine_source_hash",
+    "engine_version",
+    "agent_id",
+    "policy",
+    "completed",
+    "turns",
+    "decisions",
+    "placements",
+    "truncated_combats",
+    "turn_limit_end",
+    "model_sha256"
+  ],
+  "all_replays_identical": true,
+  "limitations": "One sequential-first paired run; wall time includes process startup; no strength improvement tested or implied."
+}
