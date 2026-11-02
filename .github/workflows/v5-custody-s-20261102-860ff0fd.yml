@@ -1,0 +1,131 @@
+name: V5 durable-custody s-20261102-860ff0fd
+on:
+  push:
+    branches:
+      - 'agent/s-20261102-860ff0fd/optimization-001'
+    paths:
+      - '.github/workflows/v5-custody-s-20261102-860ff0fd.yml'
+permissions:
+  contents: write
+  actions: read
+concurrency:
+  group: custody-s-20261102-860ff0fd
+  cancel-in-progress: false
+jobs:
+  verify-and-publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 65
+    env:
+      GH_TOKEN: ${{ github.token }}
+      SOURCE_RUN: '41449658176'
+      SOURCE_HEAD: '3bfd517b1a4eb84c96a3a887ebef60065540acf1'
+      EXPECTED_SHA: '2a0aa260c08b087b1bd703a102af7b6a25a1785e17a2b11bbf854ea48f5b99eb'
+      MODEL_TAG: 'v5-s-20261102-860ff0fd-1536-41449658176'
+      SESSION_ID: 's-20261102-860ff0fd'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Download immutable successful run artifact
+        run: |
+          test "$(gh run view "$SOURCE_RUN" --repo "$GITHUB_REPOSITORY" --json conclusion -q '.conclusion')" = 'success'
+          test "$(gh run view "$SOURCE_RUN" --repo "$GITHUB_REPOSITORY" --json headSha -q '.headSha')" = "$SOURCE_HEAD"
+          mkdir -p recovered
+          gh run download "$SOURCE_RUN" --repo "$GITHUB_REPOSITORY" --name "v5-restore-smoke-$SESSION_ID-$SOURCE_RUN" --dir recovered
+          test -s recovered/checkpoints/resumed.zip
+          test -s recovered/checkpoints/resumed.metadata.json
+          test -s "recovered/experiments/$SESSION_ID/001-93873.json"
+      - name: Fail-closed SHA metadata and true-game receipt verification
+        run: |
+          python - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          sha=hashlib.sha256(Path('recovered/checkpoints/resumed.zip').read_bytes()).hexdigest()
+          assert sha==os.environ['EXPECTED_SHA'], 'real model weights differ from source game SHA'
+          meta=json.loads(Path('recovered/checkpoints/resumed.metadata.json').read_text())
+          assert meta.get('algorithm')=='MaskablePPO'
+          assert type(meta.get('total_timesteps')) is int and meta['total_timesteps']==1536
+          assert meta['engine']['source_hash']=='6d8712c93022ba11'
+          assert (meta['engine']['features'],meta['engine']['cards'],meta['engine']['actions'])==(4017,447,245)
+          receipt=json.loads(Path('recovered/experiments/'+os.environ['SESSION_ID']+'/001-93873.json').read_text())
+          assert receipt['completed'] is True and receipt['policy']=='model' and receipt['seed']==93873
+          assert receipt['placements'][0]==8 and receipt['turn_limit_end'] is False and receipt['truncated_combats']==0
+          assert receipt['model_sha256']==sha and receipt['git_sha']==os.environ['SOURCE_HEAD']
+          print(json.dumps({'sha256_verified':sha,'steps':1536,'true_model_game_rank':8}))
+          PY
+      - name: Install pinned engine and verify optimizer-compatible checkpoint
+        run: |
+          python -m pip install -e '.[train,test]'
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.checkpoint_preflight --model recovered/checkpoints/resumed.zip --metadata recovered/checkpoints/resumed.metadata.json --expected-sha256 "$EXPECTED_SHA" --probe-inference
+          python - <<'PY'
+          from sb3_contrib import MaskablePPO
+          m=MaskablePPO.load('recovered/checkpoints/resumed.zip',device='cpu')
+          assert int(m.num_timesteps)==1536, 'saved SB3 counter mismatch'
+          PY
+          python -m tavern_ai.validate_receipt "recovered/experiments/$SESSION_ID/001-93873.json"
+      - name: Two new paired full-game heldout seeds (unpromoted evidence)
+        run: |
+          mkdir -p "reports/$SESSION_ID"
+          python -m tavern_ai.evaluate --model recovered/checkpoints/resumed.zip --compare-baseline --games 2 --start-seed 93874 --out "reports/$SESSION_ID/001-heldout.json"
+      - name: Publish unique unpromoted prerelease only after all gates
+        run: |
+          if gh release view "$MODEL_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo 'Tag already published; never overwrite model Release'; exit 1
+          fi
+          mkdir -p publish
+          cp recovered/checkpoints/resumed.zip publish/model.zip
+          cp recovered/checkpoints/resumed.metadata.json publish/model.metadata.json
+          cp "recovered/experiments/$SESSION_ID/001-93873.json" publish/model-match.json
+          cp "reports/$SESSION_ID/001-heldout.json" publish/heldout.json
+          python - <<'PY'
+          import json,os,hashlib
+          from pathlib import Path
+          meta=Path('publish/model.metadata.json')
+          receipt=Path('publish/model-match.json')
+          obj={'schema':1,'status':'experimental_unpromoted','champion':False,
+            'release_tag':os.environ['MODEL_TAG'],'source_run':int(os.environ['SOURCE_RUN']),
+            'source_head':os.environ['SOURCE_HEAD'],'source_steps':1408,
+            'added_steps':128,'total_timesteps':1536,
+            'model_sha256':os.environ['EXPECTED_SHA'],
+            'metadata_sha256':hashlib.sha256(meta.read_bytes()).hexdigest(),
+            'model_receipt_sha256':hashlib.sha256(receipt.read_bytes()).hexdigest(),
+            'real_model_game_seed':93873,'real_model_game_rank':8,
+            'source_release':'v5-s-20261102-68099929-1408-41428692617',
+            'heldout_seeds':[93874,93875],'note':'No competitive gain or Champion status is asserted.'}
+          Path('publish/lineage.json').write_text(json.dumps(obj,indent=2)+'\n')
+          PY
+          gh release create "$MODEL_TAG" publish/model.zip publish/model.metadata.json publish/model-match.json publish/heldout.json publish/lineage.json --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --prerelease --title "UNPROMOTED 1536-step PPO $SESSION_ID" --notes "Verified 1408-to-1536 PPO continuation. Full model game rank 8, no Champion promotion. This is an experimental durable checkpoint; see lineage and heldout evidence."
+      - name: Independent Release download, exact byte roundtrip
+        run: |
+          mkdir -p redownload
+          gh release download "$MODEL_TAG" --repo "$GITHUB_REPOSITORY" --dir redownload --pattern model.zip --pattern model.metadata.json --pattern lineage.json
+          cmp -s redownload/model.zip publish/model.zip
+          cmp -s redownload/model.metadata.json publish/model.metadata.json
+          test "$(sha256sum redownload/model.zip | cut -d' ' -f1)" = "$EXPECTED_SHA"
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          record=json.loads(Path('redownload/lineage.json').read_text())
+          assert record['model_sha256']==os.environ['EXPECTED_SHA'] and record['total_timesteps']==1536
+          print(json.dumps({'release_tag':os.environ['MODEL_TAG'],'durable_roundtrip_verified':True,'champion':False}))
+          PY
+      - name: Commit real paired evidence and custody receipt to own session only
+        run: |
+          mkdir -p "reports/$SESSION_ID"
+          cp publish/lineage.json "reports/$SESSION_ID/002-release-lineage.json"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "reports/$SESSION_ID/001-heldout.json" "reports/$SESSION_ID/002-release-lineage.json"
+          git diff --cached --quiet || (git commit -m 'evidence: true 1536-step model Release roundtrip and paired games' && git push origin HEAD:"$GITHUB_REF_NAME")
+      - name: Preserve diagnostic paired evidence on any outcome
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v5-custody-s-20261102-860ff0fd-${{ github.run_id }}
+          path: |
+            reports/s-20261102-860ff0fd/001-heldout.json
+            publish/lineage.json
+          if-no-files-found: ignore
+          retention-days: 14

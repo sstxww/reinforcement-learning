@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "session_id": "s-20261102-860ff0fd",
+  "source_run": 41449658176,
+  "verified_model_sha256": "2a0aa260c08b087b1bd703a102af7b6a25a1785e17a2b11bbf854ea48f5b99eb",
+  "completed_model_seed": 93873,
+  "completed_model_rank": 8,
+  "failed_eval_run": 41450970156,
+  "failed_seed": 93874,
+  "error": "RuntimeError: Full-game safety limit exceeded",
+  "phase": "first raw model game in evaluate --compare-baseline --games 2 --start-seed 93874",
+  "paired_scores_available": false,
+  "model_corrupt": false,
+  "optimizer_load_gate_passed": true,
+  "cause": "Model decision/turn progression stalls on independent seed, exact action loop not yet instrumented",
+  "failure_class": "MODEL_BEHAVIOR_NOT_STORAGE",
+  "promotion_allowed": false,
+  "remedial_action": "Archive rejected checkpoint permanently without rerunning same deterministic failed evaluation; use loop diagnostics before next PPO scaling."
+}

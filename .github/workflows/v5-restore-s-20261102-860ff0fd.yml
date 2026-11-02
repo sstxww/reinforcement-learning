@@ -1,0 +1,81 @@
+name: V5 restore-and-smoke s-20261102-860ff0fd
+on:
+  push:
+    branches:
+      - 'agent/s-20261102-860ff0fd/optimization-001'
+    paths:
+      - 'tavern_ai/restore_selector_v5.py'
+      - 'tests/test_restore_selector_v5.py'
+      - '.github/workflows/train.yml'
+      - '.github/workflows/v5-restore-s-20261102-860ff0fd.yml'
+permissions:
+  contents: write
+concurrency:
+  group: v5-restore-s-20261102-860ff0fd
+  cancel-in-progress: false
+jobs:
+  restore-and-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      GH_TOKEN: ${{ github.token }}
+      SESSION_ID: 's-20261102-860ff0fd'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: |
+          python -m pip install -e '.[train,test]'
+          bash scripts/bootstrap_engine.sh
+      - name: Unit tests and release selection
+        id: source
+        run: |
+          python -m pytest tests/test_restore_selector_v5.py -q
+          python -m tavern_ai.restore_selector_v5 --github-output "$GITHUB_OUTPUT"
+      - name: Immutable Release download and real engine/model preflight
+        env:
+          TAG: ${{ steps.source.outputs.tag }}
+          EXPECTED_SHA: ${{ steps.source.outputs.sha256 }}
+        run: |
+          mkdir -p checkpoints
+          gh release download "$TAG" --repo "$GITHUB_REPOSITORY" --pattern 'model.zip' --pattern 'model.metadata.json' --dir checkpoints
+          python -m tavern_ai.checkpoint_preflight --model checkpoints/model.zip --metadata checkpoints/model.metadata.json --expected-sha256 "$EXPECTED_SHA" --probe-inference
+      - name: Own complete baseline game and receipt
+        run: |
+          mkdir -p "experiments/$SESSION_ID"
+          python -m tavern_ai.canary --agent-id "$SESSION_ID" --seed 93871 --policy baseline --receipt "experiments/$SESSION_ID/001-93871.json"
+          python -m tavern_ai.validate_receipt "experiments/$SESSION_ID/001-93871.json"
+      - name: Commit only authentic own-session baseline receipt
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "experiments/$SESSION_ID/001-93871.json"
+          git diff --cached --quiet || (git commit -m "evidence: s-20261102-860ff0fd real baseline full game" && git push origin HEAD:"$GITHUB_REF_NAME")
+      - name: Bounded 128-step PPO continuation from verified Release
+        run: |
+          python -m tavern_ai.train --resume checkpoints/model.zip --steps 128 --seed 93872 --out checkpoints/resumed.zip
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          old=json.loads(Path('checkpoints/model.metadata.json').read_text())
+          new=json.loads(Path('checkpoints/resumed.metadata.json').read_text())
+          assert new['total_timesteps'] > old['total_timesteps'], 'no actual increment'
+          print(json.dumps({'source_steps':old['total_timesteps'],'continued_steps':new['total_timesteps']}))
+          PY
+      - name: Model itself attempts complete real eight-seat game
+        run: |
+          python -m tavern_ai.canary --agent-id "$SESSION_ID" --seed 93873 --policy model --model checkpoints/resumed.zip --receipt "experiments/$SESSION_ID/001-93873.json"
+          python -m tavern_ai.validate_receipt "experiments/$SESSION_ID/001-93873.json"
+      - name: Preserve diagnostic evidence even on failure (not permanent)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v5-restore-smoke-s-20261102-860ff0fd-${{ github.run_id }}
+          path: |
+            checkpoints/resumed.zip
+            checkpoints/resumed.metadata.json
+            experiments/s-20261102-860ff0fd/*.json
+          if-no-files-found: ignore
+          retention-days: 14
