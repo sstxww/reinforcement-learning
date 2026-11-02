@@ -1,0 +1,40 @@
+{
+  "schema": 1,
+  "session_id": "s-20261103-9fb48c19",
+  "task_key": "p0/v7-merge-authority-audit",
+  "run_id": 41514578194,
+  "run_conclusion": "success",
+  "game": {
+    "environment": "TavernGym",
+    "engine_version": "1.1.0",
+    "engine_source_hash": "6d8712c93022ba11",
+    "seed": 99731,
+    "seat": 0,
+    "policy": "baseline",
+    "completed": true,
+    "turns": 15,
+    "decisions": 42,
+    "placement": 8,
+    "placements": [
+      8,
+      5,
+      3,
+      7,
+      2,
+      4,
+      1,
+      6
+    ],
+    "truncated_combats": 0,
+    "turn_limit_end": false,
+    "raw_receipt_sha256": "1c07e2c72498e5c4247d8d45bf5ebee7988376d6305297077581b38b234a3b99",
+    "artifact_id": 13175232382,
+    "receipt_commit": "63e66e7b06b93926b2fc221a22af3dfb8490a4f4"
+  },
+  "new_ppo_steps": 0,
+  "model_game_count": 0,
+  "new_release": null,
+  "champion_promoted": false,
+  "merge_authorized": false,
+  "main_merged": false
+}
