@@ -1,0 +1,66 @@
+name: "Seat robustness s-20261102-107cfc34"
+on:
+  push:
+    branches:
+      - agent/s-20261102-107cfc34/optimization-001
+permissions:
+  contents: read
+concurrency:
+  group: seat-robustness-s-20261102-107cfc34
+  cancel-in-progress: false
+
+jobs:
+  paired-seat-full-games:
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install unit-test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[test]'
+      - name: Run complete unit-test suite
+        run: python -m pytest
+      - name: Install exact pinned real TavernGym engine
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: "Run four complete real eight-seat games, controlled seats 0 and 1"
+        run: |
+          python -m tavern_ai.seat_balance_107cfc34 \
+            --agent-id s-20261102-107cfc34 \
+            --seeds 51101 51102 --seats 0 1 \
+            --out-dir experiments/s-20261102-107cfc34 \
+            --summary reports/s-20261102-107cfc34/seat-paired.json
+          for f in experiments/s-20261102-107cfc34/*.json; do
+            python -m tavern_ai.validate_receipt "$f"
+          done
+      - name: Verify seat-0 implementation against canonical canary
+        run: |
+          python -m tavern_ai.canary \
+            --agent-id s-20261102-107cfc34 --seed 51101 \
+            --policy baseline --receipt outputs/canonical-51101.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          canonical=json.loads(Path("outputs/canonical-51101.json").read_text())
+          probe=json.loads(Path("experiments/s-20261102-107cfc34/001-51101.json").read_text())
+          for field in ("placements","decisions","turns","truncated_combats","turn_limit_end"):
+              assert canonical[field] == probe[field], (field, canonical[field], probe[field])
+          assert probe["controlled_seat"] == 0
+          print("CANONICAL_SEAT_0_MATCH=true")
+          PY
+      - name: Archive real-game receipts and compact evaluation
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: seat-robustness-s-20261102-107cfc34-${{ github.run_id }}
+          path: |
+            experiments/s-20261102-107cfc34/*.json
+            reports/s-20261102-107cfc34/*.json
+            outputs/canonical-51101.json
+          if-no-files-found: ignore
+          retention-days: 30
