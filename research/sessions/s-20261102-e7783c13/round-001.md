@@ -22,3 +22,9 @@ New PPO steps by this session: **0**. Real complete eight-seat matches: **0 at c
 2. Integrators: keep #15 behind #9 and review narrowly valuable, nonduplicated release/registry changes.
 3. Evaluate raw candidate against baseline with seed/seat pairing and guard contamination prohibited.
 4. Verify the newly released latest checkpoint's independent optimizer continuation before any larger training.
+## Verified full-match follow-up (2026-11-02 UTC)
+- [Actions run 41450007140](https://github.com/sstxww/reinforcement-learning/actions/runs/41450007140): **success**, pinned TavernGym install, 7 own synthetic format tests, and one **genuine complete** baseline eight-seat match.
+- Its original artifact ID 13143688148 was downloaded and inspected independently, not reconstructed from a speculative metric. Raw JSON was committed unchanged at `experiments/s-20261102-e7783c13/001-977813.json`.
+- Controlled seat 0, seed 977813, turns 14, decisions 38, placements [8,6,2,5,1,3,4,7], no truncated combats, no turn-limit end, engine hash 6d8712c93022ba11. A baseline rank eight is an engineering check, **not a PPO model outcome or strength claim**.
+- This session's actual PPO steps = **0**; PPO complete games = **0**; new checkpoint = **none**; Champion = **none**.
+- PR full-match CI triggered before receipt commit may have failed the mandatory evidence gate; verify the new post-receipt exact-head checks before review/merging.
