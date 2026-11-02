@@ -3,6 +3,9 @@ on:
   push:
     branches:
       - 'agent/s-20261102-64405d5e/optimization-001'
+    paths:
+      - 'tavern_ai/purchase_before_play_s64405d5e.py'
+      - 'tests/test_purchase_before_play_s64405d5e.py'
   workflow_dispatch:
 
 permissions:
