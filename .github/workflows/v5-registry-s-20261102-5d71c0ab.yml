@@ -1,0 +1,55 @@
+name: V5 model evidence and registry gate s-20261102-5d71c0ab
+
+on:
+  push:
+    branches:
+      - 'agent/s-20261102-5d71c0ab/optimization-001'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: v5-s-20261102-5d71c0ab-bounded
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install test and inference dependencies
+        run: |
+          python -m pip install -e '.[train,test]'
+      - name: Registry unit regressions
+        run: |
+          python -m pytest tests/test_model_registry.py tests/test_model_registry_champion_5d71c0ab.py
+      - name: Bootstrap pinned TavernGym
+        run: bash scripts/bootstrap_engine.sh
+      - name: Full eight-seat baseline match under this session
+        run: |
+          mkdir -p outputs
+          python -m tavern_ai.canary --agent-id s-20261102-5d71c0ab --seed 884631 --policy baseline --receipt outputs/001-884631.json
+          python -m tavern_ai.validate_receipt outputs/001-884631.json
+      - name: Download and preflight durable 1408-step Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p checkpoints outputs
+          gh release download v5-s-20261102-68099929-1408-41428692617 -p model.zip -p model.metadata.json --dir checkpoints --clobber
+          python -m tavern_ai.checkpoint_preflight --model checkpoints/model.zip --metadata checkpoints/model.metadata.json --expected-sha256 a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632 --probe-inference > outputs/checkpoint-preflight.json
+      - name: Two independent-seed buy-opportunity comparisons
+        run: |
+          python -m tavern_ai.buy_opportunities_83d91476 --model checkpoints/model.zip --expected-sha256 a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632 --seeds 884632 884633 --out outputs/opportunities.json
+      - name: Preserve authentic outputs; no model promotion
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: evidence-s-20261102-5d71c0ab-${{ github.run_id }}
+          path: outputs/*.json
+          if-no-files-found: ignore
+          retention-days: 30
