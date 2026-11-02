@@ -1,0 +1,63 @@
+name: Mechanics audit s-20261102-f3af3b4d
+on:
+  push:
+    branches:
+      - 'agent/s-20261102-f3af3b4d/optimization-001'
+    paths:
+      - 'tavern_ai/mechanics_audit_f3af3b4d.py'
+      - 'tests/test_mechanics_audit_f3af3b4d.py'
+      - '.github/workflows/mechanics-audit-s-20261102-f3af3b4d.yml'
+
+permissions:
+  contents: write
+concurrency:
+  group: mechanics-audit-s-20261102-f3af3b4d
+  cancel-in-progress: false
+
+jobs:
+  engine-grounded-capabilities:
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run unit tests on exact branch
+        run: |
+          python -m pip install -e '.[test]'
+          python -m pytest
+      - name: Install pinned real TavernGym and verify binary
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Run controlled actual-engine mechanic probes and full eight-seat canary
+        run: |
+          python -m tavern_ai.mechanics_audit_f3af3b4d \
+            --agent-id s-20261102-f3af3b4d --seed 78101 \
+            --out-dir experiments/s-20261102-f3af3b4d
+          python -m tavern_ai.validate_receipt experiments/s-20261102-f3af3b4d/001-real-eight-seat.json
+      - name: Save only this session's actual evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = 'agent/s-20261102-f3af3b4d/optimization-001'
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add experiments/s-20261102-f3af3b4d/
+          if ! git diff --cached --quiet; then
+            git commit -m 'results(s-20261102-f3af3b4d): pinned-engine mechanics and genuine full-match evidence'
+            git pull --rebase origin "$GITHUB_REF_NAME"
+            git push origin "HEAD:$GITHUB_REF_NAME"
+          fi
+      - name: Keep bounded experiment diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mechanics-audit-s-20261102-f3af3b4d-${{ github.run_id }}
+          path: experiments/s-20261102-f3af3b4d/*.json
+          if-no-files-found: ignore
+          retention-days: 30
