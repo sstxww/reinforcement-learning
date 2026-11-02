@@ -3,7 +3,7 @@
   "session_id": "s-20261103-7c7c11cb",
   "round": 1,
   "task_key": "integrate/postmerge-pr164-schema2-validation",
-  "status": "real-training-and-games-verified; permanent-release-pending",
+  "status": "completed-postmerge-resume-and-raw-games; rejected-Release-published-and-redownloaded",
   "source": {
     "pr": 164,
     "merged_by": "other session",
@@ -39,7 +39,14 @@
     "artifact_retention_days": 30,
     "permanent_release_tag": "v7-rejected-s-20261103-7c7c11cb-1408-1d2d8aa4",
     "release_publisher_run": "https://github.com/sstxww/reinforcement-learning/actions/runs/41513319168",
-    "release_success_verified": false
+    "release_success_verified": true,
+    "permanent_release_url": "https://github.com/sstxww/reinforcement-learning/releases/tag/v7-rejected-s-20261103-7c7c11cb-1408-1d2d8aa4",
+    "release_publisher_run_status": "success",
+    "release_model_sha256_api": "1d2d8aa4dc5210ecead7f75a6d0ca41c6fcbab34461618a05481079dc30100ac",
+    "release_metadata_sha256_api": "92cd480f237675c1a284f946d6244cd2de575de71bbc37c4d0b75490b2622c96",
+    "release_redownload_byte_identical_verified": true,
+    "release_9_assets": true,
+    "model_not_promoted": true
   },
   "games": [
     {
