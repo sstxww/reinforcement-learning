@@ -1,0 +1,108 @@
+name: Bounded V2 PPO continuation and permanent candidate Release - s-20261102-decfc670
+
+on:
+  push:
+    branches:
+      - 'agent/s-20261102-decfc670/optimization-001'
+    paths:
+      - '.github/workflows/resume128-s-20261102-decfc670.yml'
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: resume128-s-20261102-decfc670
+  cancel-in-progress: false
+
+jobs:
+  validated-128-step-continuation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 100
+    env:
+      GH_TOKEN: ${{ github.token }}
+      TAG: s-20261102-decfc670-resume128-001
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Unit and regression suite
+        run: |
+          python -m pip install -e '.[train,test]'
+          python -m pytest
+      - name: Bootstrap immutable TavernGym 1.1
+        run: bash scripts/bootstrap_engine.sh
+      - name: Download pinned V2 parent from permanent Release
+        run: |
+          mkdir -p outputs/s-20261102-decfc670/source
+          gh release download v2-learning-41413557445 \
+            --repo "${GITHUB_REPOSITORY}" \
+            --pattern model.zip --pattern model.metadata.json \
+            --dir outputs/s-20261102-decfc670/source
+          python -m tavern_ai.checkpoint_registry \
+            --registry models/registry.json \
+            --model-id v2-learning-41413557445 \
+            --model outputs/s-20261102-decfc670/source/model.zip \
+            --metadata outputs/s-20261102-decfc670/source/model.metadata.json \
+            --cpu-smoke
+      - name: Real MaskablePPO 128-step continuation with optimizer continuity audit
+        run: |
+          python -m tavern_ai.resume_audit_decfc670 \
+            --registry models/registry.json \
+            --source outputs/s-20261102-decfc670/source/model.zip \
+            --metadata outputs/s-20261102-decfc670/source/model.metadata.json \
+            --out outputs/s-20261102-decfc670/resumed/model.zip \
+            --report reports/s-20261102-decfc670/003-resume128.json \
+            --steps 128 --seed 86253
+      - name: Persist candidate weights to immutable new Release, never Champion
+        run: |
+          if gh release view "$TAG" --repo "${GITHUB_REPOSITORY}" >/dev/null 2>&1; then
+            echo 'Refusing to overwrite preexisting model Release'; exit 1
+          fi
+          gh release create "$TAG" \
+            outputs/s-20261102-decfc670/resumed/model.zip \
+            outputs/s-20261102-decfc670/resumed/model.metadata.json \
+            reports/s-20261102-decfc670/003-resume128.json \
+            --repo "${GITHUB_REPOSITORY}" \
+            --target "${GITHUB_SHA}" \
+            --title "s-20261102-decfc670: 128 PPO steps, research-only challenger" \
+            --notes "Verified bounded PPO continuation experiment, NOT Champion, NOT proven improvement or valid ranked Arena strength. See Git-tracked report and paired full-game receipts."
+          gh release view "$TAG" --repo "${GITHUB_REPOSITORY}" --json assets --jq '.assets[].name'
+      - name: Genuine paired old and resumed model eight-seat games on new seeds
+        run: |
+          python -m tavern_ai.resume_evaluate_decfc670 \
+            --before outputs/s-20261102-decfc670/source/model.zip \
+            --after outputs/s-20261102-decfc670/resumed/model.zip \
+            --training-report reports/s-20261102-decfc670/003-resume128.json \
+            --out-dir experiments/s-20261102-decfc670 \
+            --report reports/s-20261102-decfc670/003-paired-heldout.json
+          for f in experiments/s-20261102-decfc670/003-*.json; do
+            python -m tavern_ai.validate_receipt "$f"
+          done
+      - name: Archive recovery weights and evidence even if paired eval fails
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: resume128-s-20261102-decfc670-${{ github.run_id }}
+          path: |
+            outputs/s-20261102-decfc670/resumed/model.zip
+            outputs/s-20261102-decfc670/resumed/model.metadata.json
+            reports/s-20261102-decfc670/003-*.json
+            experiments/s-20261102-decfc670/003-*.json
+          if-no-files-found: ignore
+          retention-days: 90
+      - name: Commit only compact session reports and real receipts
+        if: success()
+        run: |
+          test "$GITHUB_REF_NAME" = "agent/s-20261102-decfc670/optimization-001"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add experiments/s-20261102-decfc670/ reports/s-20261102-decfc670/
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "results(s-20261102-decfc670): persist actual PPO resume and paired match evidence"
+          git pull --rebase origin "$GITHUB_REF_NAME"
+          git push origin "HEAD:$GITHUB_REF_NAME"
