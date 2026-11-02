@@ -17,6 +17,8 @@ from urllib.request import Request, urlopen
 REPO = "sstxww/reinforcement-learning"
 TRUSTED_EVIDENCE_PATHS = frozenset({
     ".github/workflows/ci.yml",
+    ".github/workflows/v7-serialized-integrator.yml",
+    "scripts/v7_serial_integrator.py",
     "scripts/check_pr_evidence.py",
     "scripts/bootstrap_engine.sh",
     "tavern_ai/canary.py",
@@ -66,6 +68,8 @@ def audit_changed_files(files: list[dict], expected_count: int) -> dict:
         changes.add(changed)
         if status == "renamed":
             changes.add(checked_path(entry.get("previous_filename")))
+    if len(changes) != expected_count:
+        raise TrustBoundaryError("Duplicate or missing PR file paths")
     forbidden = sorted(changes & TRUSTED_EVIDENCE_PATHS)
     if forbidden:
         raise TrustBoundaryError(
