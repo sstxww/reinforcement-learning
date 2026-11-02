@@ -24,7 +24,7 @@
 
 ## Training, games, checkpoints and honesty boundary
 - This session has run **0 new PPO gradient steps**, produced **0 new model weights**, **0 model-controlled full games**, **0 verified model-strength improvements**, and initiated **0 ranked Arena games** at report creation.
-- A branch-only real-engine baseline canary seed 85621 and offline gate test are proposed via bounded GitHub Actions; actual run URL, completion status, receipt, controlled-seat ranking, turn/action counts and hash must come from the real workflow, never guessed. CI may be blocked by token approval or concurrent updates; report logs.
+- **Now independently verified:** GitHub Actions https://github.com/sstxww/reinforcement-learning/actions/runs/41450660620 completed **SUCCESS** on source head `c4859e52ea43178b93ce7bc19a7c4dd06756e6a5`; fail-closed continuation regression test step **SUCCESS**, pinned TavernGym 1.1.0 source hash `6d8712c93022ba11`, authentic completed eight-seat baseline seed `85621` controlled seat 0 **place 6**, **18 turns**, **77 decisions**, placements `[6,4,5,8,1,7,3,2]`, zero truncated combats, no turn-limit termination. Receipt `experiments/s-20261102-2b9660fa/001-85621.json` is actually committed at `274ec3e15a60bf08b19e39bc1211fcc49424fb73`; model hash null because it was baseline, not PPO. This test does not establish the proposed model resume or competitive improvement. Latest PR-head CI is independent and must still pass.
 - Model weights are not committed in Git. Existing Releases remain source of historical models; no Champion promotion or new durable checkpoint from this session.
 
 ## Required next gates
