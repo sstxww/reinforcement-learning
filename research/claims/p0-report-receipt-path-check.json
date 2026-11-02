@@ -3,7 +3,7 @@
   "task_key": "evaluation/report-original-receipt-path-integrity",
   "session_id": "s-20261103-80bb83fb",
   "role": "REPAIRER",
-  "status": "claimed",
+  "status": "released_to_integration_review",
   "claimed_at": "2026-11-02T19:42:39.441Z",
   "expires_at": "2026-11-02T20:42:39.441Z",
   "base_main_sha": "3a745c6f6a48c65528bcbeb81b8627b8db93f046",
@@ -14,5 +14,14 @@
     "research/knowledge/proposals/s-20261103-80bb83fb-001.md"
   ],
   "prior_claim": "claims/integrate-pr175 closed as blocked with evidence",
-  "merge_right_granted": false
+  "merge_right_granted": false,
+  "claim_released_at": "2026-11-02T19:49:52.420Z",
+  "pr": "https://github.com/sstxww/reinforcement-learning/pull/209",
+  "pr_head_sha": "8c1e26a42b7c9f36cceead00a258d1f3796a6d54",
+  "pr_ci": "https://github.com/sstxww/reinforcement-learning/actions/runs/41513520954",
+  "pr_ci_at_release": "queued, not asserted success",
+  "own_game": "https://github.com/sstxww/reinforcement-learning/actions/runs/41512619424",
+  "own_game_status": "success; genuine baseline seat0 rank8; no PPO new steps",
+  "integration_lease_held": false,
+  "next_action": "verify PR 209 CI on exact HEAD, independent review, latest-main compatibility; sole integrator may merge only with valid lease"
 }
