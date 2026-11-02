@@ -14,8 +14,13 @@ def summarize(records: list[dict]) -> dict:
         "placements": placements, "seeds": [r["seed"] for r in records],
     }
 
-def evaluate(policy: str, model: Path | None, games: int, start_seed: int,
+def evaluate(policy: str | int = "baseline", model: Path | int | None = None, games: int | None = None, start_seed: int = 24000,
              compare_baseline: bool = False) -> dict:
+    if isinstance(policy, int):
+        # Compact baseline-only API: evaluate(games, seed). Preserve legacy API.
+        games, start_seed, model, policy = policy, (model if isinstance(model, int) else 24000), None, "baseline"
+    if games is None:
+        games = 3
     if policy not in {"baseline", "model"}:
         raise ValueError("Unknown evaluation policy")
     if not 1 <= games <= 100:
