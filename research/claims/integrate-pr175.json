@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "task_key": "integrate/pr-175",
+  "session_id": "s-20261103-80bb83fb",
+  "role": "REVIEWER",
+  "status": "claimed",
+  "claim_ref": "refs/heads/claims/integrate-pr175",
+  "base_main_sha": "3a745c6f6a48c65528bcbeb81b8627b8db93f046",
+  "issued_at": "2026-11-02T19:38:11.515Z",
+  "expires_at": "2026-11-02T19:53:11.515Z",
+  "scope": "read PR175, verify exact head CI and review, merge only with independent valid integration lease and all gates",
+  "write_scope": [
+    "research/sessions/s-20261103-80bb83fb/",
+    "research/knowledge/proposals/s-20261103-80bb83fb-001.md"
+  ],
+  "merge_right_granted": false
+}
