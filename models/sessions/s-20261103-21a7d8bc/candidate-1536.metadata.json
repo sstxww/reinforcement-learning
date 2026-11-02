@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "engine": {
+    "version": "1.1.0",
+    "source_hash": "6d8712c93022ba11",
+    "features": 4017,
+    "cards": 447,
+    "actions": 245,
+    "n_cards": 3984
+  },
+  "total_timesteps": 1536,
+  "training_seed": 97421,
+  "algorithm": "MaskablePPO",
+  "notes": "V1 CPU single-seat vs seven scripted bots",
+  "parent_checkpoint_sha256": "a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632",
+  "checkpoint_sha256": "cf34d9728dc50d97707c2c65c6095f330c84c07d0763963db675484f2d797d7c"
+}

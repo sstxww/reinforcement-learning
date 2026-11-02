@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "scope": "one matched TavernGym seed; seat zero versus seven scripted bots",
+  "seed": 97421,
+  "seat": 0,
+  "agent_id": "s-20261103-21a7d8bc",
+  "engine_source_hash": "6d8712c93022ba11",
+  "model_sha256": "a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632",
+  "baseline": {
+    "placement": 7,
+    "decisions": 44,
+    "legal_buy_exposures": 23,
+    "buys": 13
+  },
+  "raw_model": {
+    "placement": 8,
+    "decisions": 126,
+    "legal_buy_exposures": 43,
+    "buys": 0
+  },
+  "paired_placement_delta_model_minus_baseline": 1,
+  "model_strength_improved": false,
+  "evidence_limit": "n=1; masked BUY is a legal opportunity, not guaranteed value; no causal inference"
+}

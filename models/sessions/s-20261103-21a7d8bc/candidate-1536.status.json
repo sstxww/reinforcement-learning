@@ -1,0 +1,28 @@
+{
+  "schema": 1,
+  "model_id": "v7-s-20261103-21a7d8bc-1536-run41512015082",
+  "status": "rejected_for_promotion_rank8",
+  "policy": "raw MaskablePPO",
+  "source_release": "https://github.com/sstxww/reinforcement-learning/releases/tag/v5-s-20261102-68099929-1408-41428692617",
+  "source_sha256": "a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632",
+  "candidate_sha256": "cf34d9728dc50d97707c2c65c6095f330c84c07d0763963db675484f2d797d7c",
+  "steps_before": 1408,
+  "steps_added": 128,
+  "steps_after": 1536,
+  "training_seed": 97421,
+  "candidate_game_seed": 97422,
+  "candidate_game_rank": 8,
+  "paired_original_seed": 97421,
+  "paired_original_raw_rank": 8,
+  "paired_baseline_rank": 7,
+  "storage": {
+    "type": "temporary_actions_artifact",
+    "durable": false,
+    "url": "https://github.com/sstxww/reinforcement-learning/actions/runs/41512015082/artifacts/13174595714",
+    "expires_at": "2026-11-16T19:46:23Z"
+  },
+  "model_promoted": false,
+  "engine_source_hash": "6d8712c93022ba11",
+  "evidence_action": "https://github.com/sstxww/reinforcement-learning/actions/runs/41512015082",
+  "note": "Checkpoint ZIP is only in expiring Artifact, NOT a permanent Release; n=1 cannot establish improvement."
+}
