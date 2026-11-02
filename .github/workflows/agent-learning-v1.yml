@@ -2,6 +2,11 @@ name: Agent learning - real V1 experiment
 on:
   push:
     branches: ['agent/learning/v1']
+    paths:
+      - '.github/workflows/agent-learning-v1.yml'
+      - 'tavern_ai/**'
+      - 'tests/**'
+      - 'pyproject.toml'
   workflow_dispatch:
 permissions:
   contents: write
@@ -46,6 +51,11 @@ jobs:
           pathlib.Path("reports/learning/v1-summary.json").write_text(json.dumps(s,indent=2)+"\n")
           print(s)
           PY
+          # Each actual run keeps append-only evidence even if a later run uses
+          # the same seed. Never use a moving v1-model-match.json as sole history.
+          cp experiments/learning/v1-model-match.json "experiments/learning/v1-model-match-${GITHUB_RUN_ID}.json"
+          cp reports/learning/v1-heldout.json "reports/learning/v1-heldout-${GITHUB_RUN_ID}.json"
+          cp reports/learning/v1-summary.json "reports/learning/v1-summary-${GITHUB_RUN_ID}.json"
       - name: Commit only actual match receipts and compact metrics
         shell: bash
         run: |
@@ -62,7 +72,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
-          TAG="v1-learning-${GITHUB_SHA:0:12}"
+          TAG="v1-learning-${GITHUB_RUN_ID}"
           if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Checkpoint release already exists: $TAG"
           else
