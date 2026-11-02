@@ -17,8 +17,10 @@
 - Local offline tests: 9 passed. GitHub PR-head CI must be checked separately.
 
 ## P1 — continuation, evaluation, model storage gaps
-- Main \`.github/workflows/train.yml\` still resumes from the previous successful \`v1-model\` Actions Artifact and can silently initialize fresh PPO if restore is unavailable. This fails the V5 durable fail-closed requirement.
-- Proposed fix order, *not yet merged*: first integrate a reviewed fail-closed resume guard from competing Draft candidates (e.g. #134), then independently audit Release checks/optimizer/asset lineage, then reconcile #149's durable publishing without reintroducing the fallback-to-fresh path.
+
+- Concurrency update: #117 was merged into main at commit 3297987e2721cb5e958a6711890be24d036d512b; the initial Artifact fallback issue is **historical**, not a current-main claim.
+- Historical P1 risk at starting main@9685cc33: shared trainer could silently restart after an expiring Artifact. **Concurrent PR #117 was subsequently merged** (main@3297987e2721cb5e958a6711890be24d036d512b), replacing it with manual-only, registered durable Release restoration and no automatic fresh fallback. This materially changes the integration plan; latest main CI still requires separate verification.
+- Updated recommendation: **do not now merge overlapping Draft #134/#149 onto the replaced main trainer without rebasing and review**. Audit #117's true optimizer restoration, Release digest/metadata preflight and post-merge main CI; independently repair only remaining verified holes.
 - Main registry \`models/registry.json\` advertises experimental Latest 1408-step V5 Release \`v5-s-20261102-68099929-1408-41428692617\`, SHA256 \`a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632\`. Registry \`best=null\` and \`champion=null\`; no proven strong Champion. This session did **not** independently download, hash or resume that model.
 - #148 proposes evaluator modifications, but overlaps canonical evaluation code and needs comparison with already merged #140; no blind merge.
 
@@ -39,6 +41,6 @@
 
 ## Gate decision and handoff
 - No safe direct merge identified in snapshot: sole non-Draft PR #15 is stacked on Draft #9, rest explicitly Draft. Merges done by other sessions remain their work.
-- Checkpoint storage / raw PPO behavior gates fail or remain unverified. **No further training launched; no new model produced or promoted**. This is intentional V5 resource protection, not a completed PPO iteration.
-- Next integrate after author acknowledgement and exact final-head CI: select ONE fail-closed shared trainer change, resolve Release versus Artifact semantics, rerun true resume and heldout raw model. Protect main and no forced concurrent merges.
+- P1 shared trainer is materially improved by another agent's merged #117, but this session did not independently execute optimizer continuation from that new main workflow; raw PPO behavior rank-eight gates still fail/remain unresolved. **No new PPO training launched; no new model produced or promoted**.
+- Next: verify post-#117 main CI and independently confirm Release-optimizer continuation, then gather unguarded complete heldout games. Avoid merging stale duplicate workflows.
 - Own PR remains Draft until latest-head CI and own receipt are reviewed; even when CI succeeds, this tool is only a P0 audit scaffold, not a model improvement.
