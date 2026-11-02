@@ -1,0 +1,95 @@
+name: Persist hash-verified 384-step resumed candidate
+
+on:
+  push:
+    branches: ['agent/learning/v1']
+    paths: ['.github/workflows/publish-resumed-candidate.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: publish-v1-resume-41413508653
+  cancel-in-progress: false
+
+jobs:
+  publish-verified-existing:
+    if: github.repository == 'sstxww/reinforcement-learning' && github.ref == 'refs/heads/agent/learning/v1'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      GH_TOKEN: ${{ github.token }}
+      SOURCE_RUN: '41413508653'
+      VERIFIED_SHA256: 79f90ee56e1bf49eac86e39cb76e0df70e2316a5baf5067515bced15649829e7
+      TAG: v1-learning-resume-41413508653
+    steps:
+      - uses: actions/checkout@v4
+      - name: Recover real 384-step checkpoint from completed continuation job
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p recovered publish
+          gh run download "$SOURCE_RUN" --repo "$GITHUB_REPOSITORY" \
+            --name "release-resume-check-$SOURCE_RUN" --dir recovered
+          source_model="$(find recovered -type f -name model.zip -print -quit)"
+          source_meta="$(find recovered -type f -name model.metadata.json -print -quit)"
+          test -n "$source_model" && test -n "$source_meta"
+          cp "$source_model" publish/model.zip
+          cp "$source_meta" publish/model.metadata.json
+          printf '%s  %s\n' "$VERIFIED_SHA256" publish/model.zip | sha256sum --check -
+      - name: Independently cross-check exact resume, model game, and held-out report
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import hashlib,json,shutil
+          from pathlib import Path
+          run='41413508653'
+          meta=json.loads(Path('publish/model.metadata.json').read_text())
+          report=json.loads(Path(f'reports/learning/release-resume-{run}.json').read_text())
+          game=json.loads(Path(f'experiments/learning/release-resume-{run}.json').read_text())
+          evaluation=json.loads(Path(f'reports/learning/release-resume-heldout-{run}.json').read_text())
+          digest=hashlib.sha256(Path('publish/model.zip').read_bytes()).hexdigest()
+          assert digest=='79f90ee56e1bf49eac86e39cb76e0df70e2316a5baf5067515bced15649829e7'
+          assert meta['checkpoint_sha256']==digest
+          assert meta['total_timesteps']==384 and meta['increment_timesteps']==128
+          assert meta['compatibility']['engine']==meta['engine']
+          assert report['source_release_download_verified'] is True
+          assert report['source_steps']==256 and report['resumed_steps']==384
+          assert report['resumed_model_sha256']==digest
+          assert game['completed'] is True and game['policy']=='model'
+          assert game['seed']==23001 and game['model_sha256']==digest
+          assert sorted(game['placements'])==list(range(1,9))
+          assert not game['truncated_combats'] and not game['turn_limit_end']
+          assert evaluation['games']==3 and evaluation['placements']==[8,8,8]
+          for source,target in [
+             (f'reports/learning/release-resume-{run}.json','publish/resume-summary.json'),
+             (f'experiments/learning/release-resume-{run}.json','publish/full-game-receipt.json'),
+             (f'reports/learning/release-resume-heldout-{run}.json','publish/heldout-evaluation.json')]:
+            shutil.copyfile(source,target)
+          print('Exact 384-step candidate model, metadata, full eight-seat game and held-out evidence verified')
+          PY
+      - name: Publish unpromoted checkpoint with unique Release asset names
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh release create "$TAG" \
+            publish/model.zip publish/model.metadata.json \
+            publish/resume-summary.json publish/full-game-receipt.json \
+            publish/heldout-evaluation.json \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "66e1db7" --prerelease \
+            --title "AutoTavern 384-step verified-resume candidate" \
+            --notes "Genuine 256-to-384-step resumed MaskablePPO. Full eight-seat model game and 3 held-out games completed, all rank 8. This is NOT Best. Original source Release v1-learning-9eada5801f99; source run 41413508653; model sha256 79f90ee56e1bf49eac86e39cb76e0df70e2316a5baf5067515bced15649829e7."
+      - name: Independently redownload Release and compare exact model and metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p redownload
+          gh release download "$TAG" --repo "$GITHUB_REPOSITORY" \
+            --pattern model.zip --pattern model.metadata.json --dir redownload
+          cmp publish/model.zip redownload/model.zip
+          cmp publish/model.metadata.json redownload/model.metadata.json
+          echo "Durable verified candidate Release published: $TAG"
