@@ -19,3 +19,13 @@ No training or model promotion; complete baseline canary and CI to be verified f
 
 ## Work remaining
 Review newest actual results and current main; distill safe infrastructure PRs under conflict ownership; unify Release-based resume, evaluation metrics and model registry only after separate integration approval; instrument legal purchase opportunities vs no-buy and verify eighth-place root; then test small PPO intervention before expansion.
+
+
+## R001 verified GitHub Actions outcome (2026-11-02 UTC)
+- Full [Actions run 41428217708](https://github.com/sstxww/reinforcement-learning/actions/runs/41428217708): **success** across install, isolated gate tests, complete live PR enumeration, pinned TavernGym build, authentic eight-player game, signed-off receipt validation, and Artifact upload.
+- Source-verified receipt `experiments/s-20261102-bb9904e5/001-92031.json`: baseline seed 92031, full-match `completed=true`, seat0 placement **7**, 14 turns, 56 decisions, placements `[7,5,4,6,3,2,1,8]`, no combat truncation or turn-limit end. Run job 125219932593 printed and validated the identical JSON; model SHA null because baseline policy, **not a model victory**.
+- GitHub live audit scanned 76/76 open PRs; produced cautious 53 fix/verify and 23 negative/no-gain triage labels (no autonomous merge approval). Main moved during enumeration: `31dc7c82ad2fcba461706b4f324d743b5c1c2b9e` -> `c85d566cccccf5e2ef7de09b6cc95e1aa506da9c`, so no stale merge assumption.
+- Committed compact audit summary `reports/s-20261102-bb9904e5/001-audit-summary.json`; complete per-PR JSON available in [temporary 30-day Actions Artifact](https://github.com/sstxww/reinforcement-learning/actions/runs/41428217708/artifacts/13133311312).
+- Completed direct PR #75 review as [top-level GitHub comment 6574751195](https://github.com/sstxww/reinforcement-learning/pull/75#issuecomment-6574751195); retained Draft as required by author and because permissions/workflow hardening remain.
+- Appended a source-linked, non-causal model behavior diagnosis in `research/sessions/s-20261102-bb9904e5/eighth-place-evidence.md`: true PR #60 low-LR 256-step candidate had zero BUY and 21/36 own END_TURN across three finished games; reference had 20 BUY, 21 forced END and substantial repeated other actions. No proof that learning rate caused the failure; legal opportunity/observations must be measured next.
+- **No model trained, loaded, resumed, saved, promoted, or evaluated as a new model in this session**; no claim of stronger model.
