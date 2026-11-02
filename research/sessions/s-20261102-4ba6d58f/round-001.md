@@ -12,7 +12,7 @@
 - Added six Release indexes with expected model/metadata SHA256, preserving model lineage where available and marking every actual download/load/resume/full game check false.
 - Added a safe offline verifier (streaming SHA256; pinned 1.1.0 engine + 4017/447/245 contract; strict lineage/Champion/Latest checks), optional SB3 load flag and regression tests. It does not change trainer or release assets.
 - Local pure Python tests: 13 passed; synthetic weights were only fixtures, not trained models.
-- An isolated bounded workflow runs the registry tests, verifies pinned TavernGym and plays one REAL eight-seat baseline engineering canary seed 49123; workflow result and receipt pending actual execution, with no fake metrics.
+- Own isolated GitHub workflow https://github.com/sstxww/reinforcement-learning/actions/runs/41427953637 completed unit + registry checks, verified pinned TavernGym 1.1.0 hash 6d8712c93022ba11, and played an authentic full eight-seat baseline engineering canary seed 49123. Actions log printed completed=true, seat-0 rank 3, turns 14, decisions 56, placements [3,6,1,5,4,8,7,2], truncated_combats=0 and turn_limit_end=false. Exact authentic JSON copied unchanged to experiments/s-20261102-4ba6d58f/001-49123.json. This is BASELINE, NOT trained PPO. Artifact ID 13132638361 is only a temporary extra copy.
 
 ## P2 — ranked-eighth evidence is still causal-hypothesis level
 - Existing PR #15: resumed V1 256 steps to V2 1280, four heldout old/new ranks [8,8,8,8] each, baseline [7,6,8,8]. No observed improvement.
@@ -21,5 +21,7 @@
 
 ## Handoff
 - Branch base: 3c65ffd0380d6269e6b39c7bf1ca2d84281546d8.
-- This session trained 0 PPO steps; completed 0 new model matches; no Champion.
+- This session trained 0 PPO steps; completed 0 new MODEL-controlled matches and 1 new real BASELINE-controlled eight-seat match; no Champion.
+- Public PR CI 41427997340 reported 91 unit tests passed, one skipped, but failed at missing owned game receipt before bootstrap; this update adds genuine game evidence rather than weakening tests. New HEAD CI pending.
 - Receipt and exact CI URLs must be appended only when actual executions return success. No direct main push or Arena ranked execution.
+
