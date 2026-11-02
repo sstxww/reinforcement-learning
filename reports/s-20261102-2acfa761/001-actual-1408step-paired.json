@@ -1,0 +1,45 @@
+{
+  "schema": 1,
+  "source": "complete_eight_seat_taverngym_receipts",
+  "engine_source_hash": "6d8712c93022ba11",
+  "candidate_sha256": "a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632",
+  "policy_provenance": "raw_model",
+  "seeds": [
+    99125,
+    99126,
+    99127
+  ],
+  "games_per_policy": 3,
+  "baseline": {
+    "ranks": [
+      6,
+      8,
+      8
+    ],
+    "mean_rank": 7.333333333333333,
+    "top4_rate": 0.0,
+    "first_place_rate": 0.0
+  },
+  "candidate": {
+    "ranks": [
+      8,
+      8,
+      8
+    ],
+    "mean_rank": 8,
+    "top4_rate": 0.0,
+    "first_place_rate": 0.0
+  },
+  "paired_rank_deltas_candidate_minus_baseline": [
+    2,
+    0,
+    0
+  ],
+  "paired_mean_rank_delta": 0.6666666666666666,
+  "paired_delta_bootstrap_95pct_exploratory": [
+    0,
+    2
+  ],
+  "promotion_eligible": false,
+  "uncertainty_note": "Decision/turn observations are correlated; bootstrap resamples whole matched games, not decisions. This descriptive tool does not establish causal improvement, independent train/test separation or Champion status."
+}
