@@ -10,7 +10,7 @@
   "pr_url": "https://github.com/sstxww/reinforcement-learning/pull/232",
   "latest_pr_head": "268b04274cfa25aac8330984da6189be6d11f06e",
   "latest_head_ci_url": "https://github.com/sstxww/reinforcement-learning/actions/runs/41516124716",
-  "latest_head_ci_status": "in_progress_at_handoff",
+  "latest_head_ci_status": "completed_success",
   "true_train_steps_added": 128,
   "real_full_games": 3,
   "original_game_run": "https://github.com/sstxww/reinforcement-learning/actions/runs/41512015082",
@@ -19,5 +19,8 @@
   "main_merged": false,
   "exclusive_main_integration_lease": false,
   "expires_at": null,
-  "next": "Verify latest exact-head CI; enforce a genuinely global exclusive merge gate before integrating PR #232."
+  "next": "Verify latest exact-head CI; enforce a genuinely global exclusive merge gate before integrating PR #232.",
+  "ready_for_integration_review": true,
+  "integration_blocker": "Global coordination/merge_lease.json explicitly records a concurrent merge during held lease; require effective exclusive queue or globally enforced lease before merge.",
+  "final_pr_head": "268b04274cfa25aac8330984da6189be6d11f06e"
 }
