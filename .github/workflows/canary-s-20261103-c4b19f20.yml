@@ -1,0 +1,48 @@
+name: V5 isolated eight-seat canary s-20261103-c4b19f20
+on:
+  push:
+    branches:
+      - 'agent/s-20261103-c4b19f20/optimization-001'
+    paths:
+      - '.github/workflows/canary-s-20261103-c4b19f20.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: s-20261103-c4b19f20-canary
+  cancel-in-progress: false
+
+jobs:
+  authentic-baseline-full-game:
+    if: github.repository == 'sstxww/reinforcement-learning'
+    runs-on: ubuntu-latest
+    timeout-minutes: 70
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[test]'
+      - name: Install pinned real TavernGym engine
+        run: bash scripts/bootstrap_engine.sh
+      - name: Verify engine contract
+        run: python -m tavern_ai.contract
+      - name: Play real complete eight-seat baseline game
+        run: |
+          python -m tavern_ai.canary --agent-id s-20261103-c4b19f20 \
+            --seed 30721 --policy baseline \
+            --receipt outputs/001-30721.json
+          python -m tavern_ai.validate_receipt outputs/001-30721.json
+      - name: Preserve own genuine receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: s-20261103-c4b19f20-baseline-30721
+          path: outputs/001-30721.json
+          if-no-files-found: ignore
+          retention-days: 30
