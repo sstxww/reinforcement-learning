@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "experiment": "compact-extractor-ablation-001",
+  "engine": {
+    "version": "1.1.0",
+    "source_hash": "6d8712c93022ba11",
+    "features": 4017,
+    "cards": 447,
+    "actions": 245,
+    "n_cards": 3984
+  },
+  "steps_per_variant": 128,
+  "actual_total_steps": 256,
+  "control": {
+    "variant": "control-original",
+    "checkpoint": "outputs/s-20261102-e046f72e/control.zip",
+    "sha256": "d9a777f53f2591441b46e1884d5c8a429881d2221bac523d1162fb7c235e4616",
+    "steps": 128,
+    "seed": 261102,
+    "init_seconds": 1.497,
+    "learn_seconds": 0.268,
+    "policy_parameters": 1449846,
+    "extractor_parameters": 1352320,
+    "initial_legal_actions": 2
+  },
+  "candidate": {
+    "variant": "candidate-compact",
+    "checkpoint": "outputs/s-20261102-e046f72e/candidate.zip",
+    "sha256": "627c71c1e1dc9007aad4014400ee2414689839c9dbc8151692f2cda8a6934e0b",
+    "steps": 128,
+    "seed": 261102,
+    "init_seconds": 0.019,
+    "learn_seconds": 0.2,
+    "policy_parameters": 833014,
+    "extractor_parameters": 751872,
+    "initial_legal_actions": 2
+  },
+  "policy_parameter_reduction_fraction": 0.425447,
+  "wallclock_learn_speedup_fraction": 0.253731,
+  "important": "One timing sample each; no claim of improved win rate."
+}
