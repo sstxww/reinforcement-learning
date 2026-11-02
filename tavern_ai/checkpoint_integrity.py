@@ -30,6 +30,14 @@ def metadata_path(checkpoint: Path) -> Path:
     return checkpoint.with_suffix(".metadata.json")
 
 
+def pinned_compatibility(engine: dict) -> dict:
+    """The stronger schema-2 fingerprint published by the V1/V2 learning work."""
+    from .contract import CATALOG_SHA256, RULESET_ID, PATCH_SHA256, UPSTREAM_COMMIT
+    return {"engine": engine, "catalog_sha256": CATALOG_SHA256,
+            "ruleset_id": RULESET_ID, "patch_sha256": PATCH_SHA256,
+            "upstream_commit": UPSTREAM_COMMIT}
+
+
 def verify_checkpoint(checkpoint: Path, expected_engine: dict | None = None,
                       expected_sha256: str | None = None) -> dict:
     """Reject missing, mismatched or corrupted checkpoints *before* PPO.load()."""
@@ -43,7 +51,7 @@ def verify_checkpoint(checkpoint: Path, expected_engine: dict | None = None,
         meta = json.loads(companion.read_text(encoding="utf-8"))
     except (ValueError, UnicodeError) as exc:
         raise ValueError("Invalid checkpoint metadata JSON") from exc
-    if not isinstance(meta, dict) or type(meta.get("schema")) is not int or meta["schema"] != 1:
+    if not isinstance(meta, dict) or type(meta.get("schema")) is not int or meta["schema"] not in (1, 2):
         raise ValueError("Unsupported checkpoint metadata schema")
     if meta.get("algorithm") != "MaskablePPO":
         raise ValueError("Unexpected model algorithm")
@@ -53,6 +61,8 @@ def verify_checkpoint(checkpoint: Path, expected_engine: dict | None = None,
         raise ValueError("Missing engine fingerprint")
     if expected_engine is not None and meta["engine"] != expected_engine:
         raise ValueError("Checkpoint engine or card vocabulary mismatch")
+    if meta["schema"] == 2 and meta.get("compatibility") != pinned_compatibility(meta["engine"]):
+        raise ValueError("Checkpoint source catalog, ruleset or engine compatibility mismatch")
     digest = meta.get("checkpoint_sha256")
     if not isinstance(digest, str) or not _SHA.fullmatch(digest):
         raise ValueError("Missing or invalid checkpoint SHA256; refuse unverified resume")
@@ -88,7 +98,7 @@ def save_checkpoint(model, destination: Path, metadata: dict) -> dict:
         model.save(str(staged))
         if not staged.is_file():
             raise ValueError("Model did not save a checkpoint")
-        complete = dict(metadata, schema=1, checkpoint_sha256=sha256_file(staged))
+        complete = dict(metadata, schema=metadata.get("schema", 1), checkpoint_sha256=sha256_file(staged))
         staged_meta = metadata_path(staged)
         staged_meta.write_text(json.dumps(complete, indent=2, sort_keys=True) + "\n", encoding="utf-8")
         verify_checkpoint(staged, expected_engine=complete["engine"])
