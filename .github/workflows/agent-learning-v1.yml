@@ -1,0 +1,97 @@
+name: Agent learning - real V1 experiment
+on:
+  push:
+    branches: ['agent/learning/v1']
+    paths:
+      - '.github/workflows/agent-learning-v1.yml'
+      - 'tavern_ai/**'
+      - 'tests/**'
+      - 'pyproject.toml'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: v1-learning-experiment
+  cancel-in-progress: false
+jobs:
+  full-game-experiment:
+    runs-on: ubuntu-latest
+    timeout-minutes: 130
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[train,test]'
+      - name: Unit tests
+        run: python -m pytest
+      - name: Install pinned TavernGym and validate observe2
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Execute real experiment to Game.is_over
+        shell: bash
+        run: |
+          mkdir -p checkpoints experiments/learning reports/learning
+          python -m tavern_ai.train --steps 256 --seed 42 --out checkpoints/model.zip
+          python -m tavern_ai.canary --agent-id learning --seed 1302 --policy model --model checkpoints/model.zip --receipt experiments/learning/v1-model-match.json
+          python -m tavern_ai.validate_receipt experiments/learning/v1-model-match.json
+          python -m tavern_ai.evaluate --model checkpoints/model.zip --games 3 --start-seed 24000 --out reports/learning/v1-heldout.json
+          python - <<'PY'
+          import json,pathlib
+          m=json.loads(pathlib.Path("checkpoints/model.metadata.json").read_text())
+          r=json.loads(pathlib.Path("experiments/learning/v1-model-match.json").read_text())
+          s={"training_steps":m["total_timesteps"],"checkpoint_sha256":m["checkpoint_sha256"],"model_match_placement":r["placements"][0],"model_decisions":r["decisions"],"engine":m["engine"],"claim":"no performance improvement claimed without matched-seed baseline"}
+          pathlib.Path("reports/learning/v1-summary.json").write_text(json.dumps(s,indent=2)+"\n")
+          print(s)
+          PY
+          # Each actual run keeps append-only evidence even if a later run uses
+          # the same seed. Never use a moving v1-model-match.json as sole history.
+          cp experiments/learning/v1-model-match.json "experiments/learning/v1-model-match-${GITHUB_RUN_ID}.json"
+          cp reports/learning/v1-heldout.json "reports/learning/v1-heldout-${GITHUB_RUN_ID}.json"
+          cp reports/learning/v1-summary.json "reports/learning/v1-summary-${GITHUB_RUN_ID}.json"
+      - name: Commit only actual match receipts and compact metrics
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add experiments/learning/ reports/learning/
+          git diff --cached --quiet && exit 0
+          git commit -m "results(learning): record real V1 full-match evidence"
+          test "$GITHUB_REF_NAME" = "agent/learning/v1"
+          git pull --rebase origin "$GITHUB_REF_NAME"
+          git push origin HEAD:"$GITHUB_REF_NAME"
+      - name: Publish durable resumable checkpoint to this repository
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          TAG="v1-learning-${GITHUB_RUN_ID}"
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "Checkpoint release already exists: $TAG"
+          else
+            gh release create "$TAG" \
+              checkpoints/model.zip checkpoints/model.metadata.json \
+              reports/learning/v1-heldout.json \
+              --target "$GITHUB_SHA" --prerelease \
+              --title "AutoTavern PPO checkpoint $TAG" \
+              --notes "Experimental 256-step CPU checkpoint. NOT proven stronger; source branch agent/learning/v1; inspect complete-game receipt and fixed-seed metrics in the branch."
+          fi
+      - name: Upload verification evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: agent-learning-v1-evidence
+          path: |
+            experiments/learning/*.json
+            reports/learning/*.json
+            checkpoints/model.zip
+            checkpoints/model.metadata.json
+          if-no-files-found: ignore
+          retention-days: 30

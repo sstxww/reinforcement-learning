@@ -44,8 +44,19 @@ def run(seed:int,agent_id:str,policy:str="baseline",model_path:str|None=None)->d
                 action=baseline.act({"features":f,"cards":c,"action_mask":mask},
                                     {"turn":turn,"actions_used":actions_this_turn})
             else:
-                action,_=model.predict({"features":f,"cards":c},action_masks=mask,deterministic=True)
-                action=int(action)
+                # An untrained PPO frequently repeats free board moves or other
+                # legal no-op-like actions. Preserve model control, but impose a
+                # legal end-turn fallback so full games cannot spin indefinitely.
+                # Pending choices expose no EndTurn mask, so they are never
+                # bypassed by this guard.
+                if actions_this_turn >= 36 and mask[0]:
+                    action=0
+                else:
+                    action,_=model.predict(
+                        {"features":f,"cards":c},
+                        action_masks=mask,deterministic=True
+                    )
+                    action=int(action)
             if not mask[int(action)]:raise ValueError("Illegal policy action")
             game.step(0,int(action))
             actions_this_turn+=1
