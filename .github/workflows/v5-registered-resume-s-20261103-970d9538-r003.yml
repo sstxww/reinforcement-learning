@@ -30,7 +30,7 @@ jobs:
           python -m pip install -e '.[train,test]'
       - name: Check canonical trainer resume, source and receipt gates
         run: |
-          python -m pytest -q tests/test_checkpoint_writer.py tests/test_registry_integrity.py tests/test_release_asset_verifier.py
+          python -m pytest -q tests/test_checkpoint_writer_s_20261102_001b7da1.py tests/test_registry_integrity.py tests/test_release_asset_verifier.py
           python -m tavern_ai.release_asset_verifier
       - name: Install and verify pinned TavernGym 1.1 engine
         run: |
