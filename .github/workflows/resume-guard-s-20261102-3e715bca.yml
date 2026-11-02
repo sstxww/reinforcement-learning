@@ -1,0 +1,58 @@
+name: V5 resume preflight and authentic canary - s-20261102-3e715bca
+
+on:
+  push:
+    branches:
+      - agent/s-20261102-3e715bca/optimization-001
+    paths:
+      - '.github/workflows/resume-guard-s-20261102-3e715bca.yml'
+      - 'tavern_ai/train.py'
+      - 'tests/test_train_resume_guard_s_3e715bca.py'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: v5-resume-guard-s-20261102-3e715bca
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install and pin engine
+        run: |
+          python -m pip install -e '.[train,test]'
+          bash scripts/bootstrap_engine.sh
+      - name: Isolated resume integrity regressions
+        run: python -m pytest -q tests/test_train_resume_guard_s_3e715bca.py
+      - name: Real complete eight-seat baseline infrastructure canary
+        run: |
+          mkdir -p experiments/s-20261102-3e715bca
+          python -m tavern_ai.canary --agent-id s-20261102-3e715bca \
+            --seed 91130 --policy baseline \
+            --receipt experiments/s-20261102-3e715bca/001-91130.json
+          python -m tavern_ai.validate_receipt experiments/s-20261102-3e715bca/001-91130.json
+      - name: Commit only own genuine receipt; receipt commits do not retrigger
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add experiments/s-20261102-3e715bca/001-91130.json
+          if ! git diff --cached --quiet; then
+            git commit -m "evidence(s-20261102-3e715bca): real baseline eight-seat receipt seed 91130"
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: resume-guard-s-20261102-3e715bca-${{ github.run_id }}
+          path: experiments/s-20261102-3e715bca/*.json
+          if-no-files-found: warn
+          retention-days: 14
