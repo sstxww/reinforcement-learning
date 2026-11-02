@@ -1,0 +1,26 @@
+{
+  "schema": 1,
+  "session_id": "s-20261103-f6994f077b",
+  "task_key": "v7/seat-attestation-integrity",
+  "role": "REPAIRER",
+  "status": "running",
+  "claim_ref": "refs/heads/claims/v7/seat-attestation-integrity",
+  "claim_primitive": "exclusive create-ref succeeded; no global integrator lease claimed",
+  "base_main_sha": "c1b828734527bae6141805581693d890cc3bff94",
+  "work_branch": "agent/s-20261103-f6994f077b/optimization-001",
+  "owned_paths": [
+    "tavern_ai/receipt_integrity.py",
+    "tests/test_receipt_seat_attestation_f6994f077b.py",
+    ".github/workflows/v7-seat-attestation-f6994f077b.yml",
+    "research/sessions/s-20261103-f6994f077b/",
+    "research/knowledge/proposals/s-20261103-f6994f077b-001.md",
+    "experiments/s-20261103-f6994f077b/"
+  ],
+  "assumptions": [
+    "Latest main CI at claim time was green",
+    "No exclusive main merge lease has been acquired"
+  ],
+  "proof_run": "https://github.com/sstxww/reinforcement-learning/actions/runs/41512909874",
+  "release_policy": "No model changes, promotion, or training claimed",
+  "handoff": "Check run #41512909874 and authenticate seat-3 real-game receipt; commit exact receipt to own work branch; create reviewed PR and verify latest-head CI. Integrator must use independent serial merge gate."
+}
