@@ -40,3 +40,16 @@ python -m tavern_ai.resume_smoke_fb6a2c91 --source checkpoints/source/model.zip 
 
 ## Exit gates/knowledge transfer
 No weights are committed to Git. Unique versioned Release is required for child persistence. The job's output/Release results and exact latest-head CI must be verified and documented before considering merge. Branch is Draft; neither latest nor best/champion should change from this research-only smoke.
+
+
+## R001 final verification addendum (supersedes the earlier running-status paragraph)
+
+The full independent GitHub Actions run #41450269678 **COMPLETED SUCCESSFULLY** at 2026-11-02T13:14Z. This is genuine training, not an offline simulation:
+- Successfully redownloaded and byte-SHA checked BOTH existing 1408-step V5 Release assets, CPU-loaded MaskablePPO; pinned engine and environment contract passed.
+- Performed 128 additional true MaskablePPO PPO steps with seed 92361. Parent 1408→child **1536 cumulative timesteps**; parent hash `a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632`; child `d6e27e7ca3cbde0997cc1bdcb7d1a62b3d19ab9d67f7ffcbde37c204cb4ff843`. Model archive retains optimizer checkpoint, metadata total_timesteps=1536. The SHA was independently recalculated against the output ZIP downloaded from authentic Actions artifact #13144104301 and equals the GitHub Release API digest.
+- Actual versioned **experimental, unpromoted** Release successfully published: https://github.com/sstxww/reinforcement-learning/releases/tag/v5-experimental-s-20261102-fb6a2c91-resume128-001 . Contains model.zip, model.metadata.json, 001-lineage.json, 001-model.sha256 and 001-model-game-gate.json. A later independent download/optimizer continuation from this new child tag was not executed, so it remains an experimental restart candidate, **never Best/Champion**.
+- True unassisted **model-controlled** 8-seat game seed 92362: completed, seat0 rank **8**, 16 turns, 129 decisions, zero truncations, model SHA exactly matches child Release. Original receipt `experiments/s-20261102-fb6a2c91/002-92362.json` committed on our branch.
+- True own baseline seed 92360 was also complete, rank8, 14 turns, 55 decisions, receipt `experiments/s-20261102-fb6a2c91/001-92360.json` committed by Actions.
+- Paired unassisted heldout seeds [92370,92371]: model rank [8,8] versus baseline [8,8], mean placement delta **0**, model top4 rate 0/2. Both arms completed. No meaningful improvement claim with n=2. True paired report `reports/s-20261102-fb6a2c91/001-real-resume-and-eval.json` with Action/Release citations and caveats.
+- P2 review remains: V2's legal buying defect is real, but three forced-BUY games in Draft #107 still rank eighth with 46 purchases; Play/Cancel oscillation and economic state progression remain uncorrected. Limit further training until a falsifiable action-loop repair demonstrates superiority.
+- Initial PR CI run #41450393171 failed on early head before genuine session receipt was committed. **Exact latest-head PR CI has to be checked again after evidence and documentation commits**; never promote or merge PR #133 from the successful standalone workflow alone.
