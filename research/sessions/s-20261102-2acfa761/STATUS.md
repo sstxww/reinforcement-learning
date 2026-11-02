@@ -1,9 +1,14 @@
-# s-20261102-2acfa761 · V5 integration / paired evaluation status
+# s-20261102-2acfa761 — V5 P0/P1/P2 integration status
 
-- Base main SHA at branch creation: `1afd8297e3c661bee3117ac5301b1ca08d64869b`.
-- P0: inspected current main, draft PR inventory, exact-head CI and Releases; left a blocking review on PR #93 because its fixed four-model assumptions conflict with an expanded registry and its two-asset audit duplicates main.
-- P1: added isolated `tavern_ai/paired_evidence_v5.py` to compare genuine matched-seed full-game receipts. Fails closed on invalid pairs and discloses assisted/guarded model results.
-- P2: confirmed from registered actual heldout data that the latest 1,408-step candidate placed 8/8/8. PR #103 reports 521 decisions with a legal BUY available and zero chosen BUY in three guarded games; correlation only, not causal diagnosis.
-- Independent model training THIS session: **0 steps**. Model-only games THIS session: **0**. Checkpoint created: **none**. Champion: **none**.
-- Branch-scoped Actions smoke will create an actual complete eight-seat baseline receipt, if it succeeds; do not claim its completion until the evidence is present.
-- No shared training/registry files, other sessions or official Arena modified. No bulk PPO until P0/P1/P2 gates are met.
+**Status:** code and original TavernGym baseline match completed; archived real-model paired analysis completed; **Draft PR #115 awaiting final-head CI/approvals and integration review**, not ready to merge.
+
+- Branch: `agent/s-20261102-2acfa761/optimization-001`, created from main `1afd8297e3c661bee3117ac5301b1ca08d64869b`. Latest branch commit changes as logs/results are committed by this session only.
+- PR: https://github.com/sstxww/reinforcement-learning/pull/115
+- P0: audited live open PRs, exact-head checks, current registry and Releases. Blocked direct merge of Draft PR #93 pending reconciliation of its hard-coded 4-candidate tests with 5-candidate main registry and overlap with `release_asset_verifier.py`; review comment https://github.com/sstxww/reinforcement-learning/pull/93#issuecomment-6577792804. No direct push to main, no merges claimed.
+- P1: new `tavern_ai/paired_evidence_v5.py` with tests, fail-closed on invalid/mismatched receipts, matching seed and model hash requirements, discloses any guard-assisted games; no automatic Champion promotion.
+- Genuine own branch full eight-seat **baseline** game: successful Actions https://github.com/sstxww/reinforcement-learning/actions/runs/41449769964; receipt `experiments/s-20261102-2acfa761/001-96271.json`; seed 96271, seat0 **rank 6**, 15 turns, 52 decisions, no truncation. Isolated unit tests also passed.
+- New **actual source-derived paired evaluation**: successful Actions https://github.com/sstxww/reinforcement-learning/actions/runs/41450465518 using archived real PPO receipts, report `reports/s-20261102-2acfa761/001-actual-1408step-paired.json`, seeds 99125-99127, raw model ranks [8,8,8] vs Baseline [6,8,8], paired mean model-minus-baseline +0.667 rank (worse), game-bootstrap interval [0,2]; not a promotion signal.
+- P2 diagnosis `research/sessions/s-20261102-2acfa761/eighth-place-diagnosis.md`: V2 74 legal-BUY-exposure decisions with 0 buys, 222/248 raw IDs 1/2 (Refresh/Freeze); a 1,408-step newer model 35 legal-BUY decisions / 0 buys in another true game. Not a proven causal PPO fix.
+- Prior exact-head PR CI failure https://github.com/sstxww/reinforcement-learning/actions/runs/41449977814 was **missing receipt before workflow auto-commit**, not test failures (244 passed, 1 skipped). Subsequent bot-commit CI https://github.com/sstxww/reinforcement-learning/actions/runs/41450058813 returned `action_required`, no successful jobs. Must verify final-head full-match CI before merge.
+- **Own PPO gradient steps 0, own model-only games 0, new model checkpoint none, official Champion none, ranked Arena games 0.** Main-only training workflow was not restarted or overwritten because there is no proven behavior fix or model-promotion gate.
+- Follow-up: obtain latest-head PR CI and review; if useful extract unique paired evidence into canonical evaluator after reconciling existing infrastructure; then run isolated action-level state/Buy/Refresh/Freeze intervention on fresh heldout seeds before any larger PPO budget.
