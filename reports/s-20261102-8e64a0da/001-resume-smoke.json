@@ -1,0 +1,33 @@
+{
+  "schema": 1,
+  "session_id": "s-20261102-8e64a0da",
+  "source_release": "v5-s-20261102-68099929-1408-41428692617",
+  "source_sha256": "a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632",
+  "source_steps": 1408,
+  "new_steps": 1536,
+  "actual_ppo_steps": 128,
+  "new_checkpoint_sha256": "c3bc7cd952bbf02fb4a15e3866a13c98bc9f1486eb3de35fd119b1651f81a73a",
+  "old_adam_step_min_max": [
+    88,
+    88
+  ],
+  "new_adam_step_min_max": [
+    96,
+    96
+  ],
+  "optimizer_continuation_tested": true,
+  "candidate_load_tested": true,
+  "new_model_strength_gain_verified": false,
+  "champion_promotion": false,
+  "run_id": "41450146951",
+  "source_commit": "18575411f673bb108467867a4e6b89412e25fdd1",
+  "published_prerelease_tag": "v5-smoke-s-20261102-8e64a0da-resume128",
+  "published_bytes_redownload_verified": true,
+  "raw_model_game": {
+    "schema": 1,
+    "model_raw_full_game_completed": true,
+    "guarded": false,
+    "seed": 90312
+  },
+  "baseline_receipt": "experiments/s-20261102-8e64a0da/001-baseline-90311.json"
+}
