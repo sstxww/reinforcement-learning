@@ -1,0 +1,162 @@
+name: V5 paired legal-BUY audit s-20261102-99372431
+
+on:
+  push:
+    branches: ['agent/s-20261102-99372431/optimization-001']
+    paths: ['.github/workflows/v5-paired-audit-s-20261102-99372431.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: v5-s-20261102-99372431-paired
+  cancel-in-progress: false
+
+jobs:
+  actual-paired-trace:
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Test and load pinned engine
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[train,test]'
+          python -m pytest tests/test_buy_opportunity_68099929.py tests/test_verified_resume_s_20261102_99372431.py
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Restore and verify BOTH immutable Release checkpoints
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p checkpoints/source checkpoints/continued
+          gh release download v5-s-20261102-68099929-1408-41428692617 --repo "$GITHUB_REPOSITORY" \
+            --pattern model.zip --pattern model.metadata.json --dir checkpoints/source
+          gh release download v5-resume-s-20261102-99372431-41449843877 --repo "$GITHUB_REPOSITORY" \
+            --pattern model.zip --pattern model.metadata.json --dir checkpoints/continued
+          python -m tavern_ai.checkpoint_preflight \
+            --model checkpoints/source/model.zip --metadata checkpoints/source/model.metadata.json \
+            --expected-sha256 a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632 --probe-inference
+          python -m tavern_ai.checkpoint_preflight \
+            --model checkpoints/continued/model.zip --metadata checkpoints/continued/model.metadata.json \
+            --expected-sha256 0f2c9705fb1078815f3c74d511aa3a770550b2348d1528072920f1bec02539f8 --probe-inference
+      - name: Two new matched seeds, raw policies only, with bounded failures
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p experiments/s-20261102-99372431 reports/s-20261102-99372431
+          for SEED in 99372450 99372451; do
+            for ARM in baseline source continued; do
+              OUT="experiments/s-20261102-99372431/003-${GITHUB_RUN_ID}-${SEED}-${ARM}.json"
+              if [[ "$ARM" == "baseline" ]]; then
+                POLICY=baseline
+                ARGS=()
+              else
+                POLICY=model
+                ARGS=(--model "checkpoints/${ARM}/model.zip")
+              fi
+              echo "Real unguarded eight-player game seed=${SEED}, arm=${ARM}"
+              if timeout --signal=TERM --kill-after=10s 180s \
+                 python -m tavern_ai.buy_opportunity_68099929 \
+                   --agent-id s-20261102-99372431 --seed "$SEED" \
+                   --policy "$POLICY" "${ARGS[@]}" --out "$OUT" \
+                 && python -m tavern_ai.validate_receipt "$OUT"; then
+                echo "Real complete model/benchmark game for ${SEED} ${ARM}"
+              else
+                STATUS="$?"
+                rm -f "$OUT"
+                printf 'seed=%s\narm=%s\nstatus=%s\nno_valid_full_game=true\n' \
+                  "$SEED" "$ARM" "$STATUS" \
+                  > "reports/s-20261102-99372431/003-${GITHUB_RUN_ID}-${SEED}-${ARM}.failure.txt"
+                echo "No valid completion for ${SEED} ${ARM}, status ${STATUS}; do not invent receipt"
+              fi
+            done
+          done
+      - name: Build fail-closed comparable rank and legal BUY summary
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json, os, pathlib, statistics
+          sid = "s-20261102-99372431"
+          rid = os.environ["GITHUB_RUN_ID"]
+          d = pathlib.Path(f"experiments/{sid}")
+          out = pathlib.Path(f"reports/{sid}/003-{rid}-paired.json")
+          seeds = [99372450, 99372451]
+          arms = ["baseline", "source", "continued"]
+          rows = []
+          complete = []
+          for seed in seeds:
+              values = {}
+              for arm in arms:
+                  p = d / f"003-{rid}-{seed}-{arm}.json"
+                  if not p.is_file():
+                      rows.append(dict(seed=seed, arm=arm, complete=False, rank=None))
+                      continue
+                  r = json.loads(p.read_text())
+                  if r.get("completed") is not True or r.get("seed") != seed:
+                      raise ValueError("Refusing malformed/incomplete real game")
+                  obs = r["opportunity_summary"]
+                  row = dict(seed=seed, arm=arm, complete=True,
+                             rank=r["placements"][0], decisions=r["decisions"],
+                             buy_legal_decisions=obs["buy_legal_decisions"],
+                             buy_chosen=obs["buy_chosen"],
+                             end_while_buy_legal=obs["end_while_buy_legal"],
+                             consecutive_identical_public_observation=obs["consecutive_identical_public_observation"],
+                             action_families=obs["by_action_family"],
+                             model_sha256=r.get("model_sha256"))
+                  rows.append(row)
+                  values[arm] = row
+              if len(values) == 3:
+                  complete.append(dict(seed=seed,
+                      baseline_rank=values["baseline"]["rank"],
+                      source_rank=values["source"]["rank"],
+                      continued_rank=values["continued"]["rank"],
+                      continued_minus_source_rank=values["continued"]["rank"] - values["source"]["rank"]))
+          report = {
+              "schema": 1, "run_id": rid, "session_id": sid,
+              "engine": "TavernGym 1.1.0 observe2", "seeds": seeds,
+              "source_steps": 1408, "continued_steps": 1536,
+              "training_steps_this_workflow": 0,
+              "raw_model_only": True, "forced_turn_ends": 0,
+              "rows": rows, "fully_paired": complete,
+              "fully_paired_seed_count": len(complete),
+              "paired_mean_placement_delta": statistics.mean(
+                  x["continued_minus_source_rank"] for x in complete
+              ) if complete else None,
+              "competitive_gain_verified": False, "champion_promoted": False,
+              "caveat": "Small n and any incomplete raw model games mean no strength claim. Each masked-legal BUY decision exposure is temporally dependent."
+          }
+          out.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n")
+          print(json.dumps(report, sort_keys=True), flush=True)
+          PY
+      - name: Commit immutable real receipts and diagnostic summary to own branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A experiments/s-20261102-99372431 reports/s-20261102-99372431
+          if ! git diff --cached --quiet; then
+            git commit -m "results(v5): save new same-seed rank8 and legal-BUY audit ${GITHUB_RUN_ID}"
+            test "$GITHUB_REF_NAME" = "agent/s-20261102-99372431/optimization-001"
+            git pull --rebase origin "$GITHUB_REF_NAME"
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi
+      - name: Preserve evidence after any failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v5-paired-s-20261102-99372431-${{ github.run_id }}
+          path: |
+            experiments/s-20261102-99372431/003-*.json
+            reports/s-20261102-99372431/003-*
+          if-no-files-found: ignore
+          retention-days: 30
