@@ -1,0 +1,15 @@
+# s-20261103-5638d3bc — V7 independent raw-model paired probe
+- TASK_KEY: eval/v7/raw-v5-1408-seed-1256380
+- ROUND: 001; role EVALUATOR; status running (no model or match outcome asserted until Actions completes)
+- BASE_MAIN_SHA: c1b828734527bae6141805581693d890cc3bff94
+- Branch: agent/s-20261103-5638d3bc/optimization-001
+- Claim: claims/v7/raw-v5-1256380 (branch creation succeeded; task-only, not an integration lock)
+- Scope: own .github/workflows/v7-paired-s-20261103-5638d3bc.yml, experiments/s-20261103-5638d3bc, reports/s-20261103-5638d3bc, research/sessions/s-20261103-5638d3bc, own knowledge proposal.
+- Prior related evidence: PR #168 seed 99385 raw 1408-step rank 8 versus baseline 7; no comparative strength conclusion (n=1).
+- Model: registered unpromoted v5-s-20261102-68099929-1408-41428692617; SHA256 a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632.
+- Engine: TavernGym 1.1.0, source hash 6d8712c93022ba11, observe2=4017/447, legal actions=245.
+- New PPO steps: 0. New model/Release: none. Best/Champion: unchanged. Arena: none.
+- Independent seed: 1256380, controlled seat 0; seven scripted bots; raw model vs baseline with exactly the same seed.
+- Real results: pending; no completed receipt, ranking, or n asserted.
+- Safety: no main merge, no changes to shared trainer or registry; workflow with finite 45-minute and model 15-minute caps.
+- Next: check own push Actions, retrieve original Artifact, validate/commit real receipts if complete; otherwise preserve failure log, then open reviewable PR only after required evidence.
