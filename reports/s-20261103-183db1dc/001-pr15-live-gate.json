@@ -1,0 +1,18 @@
+{
+  "schema": 1,
+  "pr_number": 15,
+  "head_sha": "ad1bf93498ab5a310e0f4557dde1df7a97bf85fb",
+  "base_ref": "agent/learning/v1",
+  "base_sha": "2328f7d19c95b63461afa949a4081281d9d1a8c9",
+  "audited_main_sha": "70c411b64034c8f66618811ff7a98914395735a5",
+  "required_check": "tests-and-full-match",
+  "checked_head_runs": 1,
+  "decision": "blocked",
+  "blockers": [
+    "PR targets a non-main dependency branch",
+    "PR base SHA differs from current main",
+    "Human dependency/receipt review is not confirmed"
+  ],
+  "auto_merge_authorized": false,
+  "scope": "read_only_p0_diagnostic_not_a_merge_decision"
+}
