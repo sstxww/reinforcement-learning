@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "status": "resume_smoke_verified",
+  "source_release_tag": "v2-learning-41413557445",
+  "source_sha256": "73bde2666426cecce39f135980a897bb2cd4a7d70783ba04c9c0d29477a6664a",
+  "source_metadata_sha256": "6f0b433191a8242dcedc627f6be49d1551a82788ce7bfd8e60416ede8146acc0",
+  "resumed_sha256": "503c527492d3a43ff2be9996c4865d2af8be55a981a5a0308b4dccb316598e8e",
+  "initial_total_timesteps": 1280,
+  "final_total_timesteps": 1408,
+  "actual_added_steps": 128,
+  "loaded_and_predicted_legal_action": true,
+  "engine": {
+    "version": "1.1.0",
+    "source_hash": "6d8712c93022ba11",
+    "features": 4017,
+    "cards": 447,
+    "actions": 245,
+    "n_cards": 3984
+  },
+  "temporary_checkpoint": "checkpoints/resumed-902968f5/model.zip",
+  "promoted_to_champion": false,
+  "durable_resumed_checkpoint": false,
+  "next_gate": "independent completed model-controlled eight-seat game"
+}

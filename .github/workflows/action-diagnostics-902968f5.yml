@@ -1,0 +1,72 @@
+name: Diagnose V5 unmodified PPO actions 902968f5
+
+on:
+  push:
+    branches:
+      - 'agent/s-20261102-902968f5/optimization-001'
+    paths:
+      - 'tavern_ai/action_diagnostics_902968f5.py'
+      - 'tests/test_action_diagnostics_902968f5.py'
+      - '.github/workflows/action-diagnostics-902968f5.yml'
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: action-diagnostics-902968f5
+  cancel-in-progress: false
+
+jobs:
+  action-diagnostic:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install and test public-only behavioral diagnostics
+        run: |
+          python -m pip install -e '.[train,test]'
+          python -m pytest tests/test_action_diagnostics_902968f5.py
+      - name: Bootstrap exact real TavernGym
+        run: bash scripts/bootstrap_engine.sh
+      - name: Recover the actual 1408-step diagnostic checkpoint from own Actions
+        run: |
+          mkdir -p restored
+          gh run download 41427679320 --repo sstxww/reinforcement-learning \
+            --name release-resume-diagnostic-902968f5-41427679320 --dir restored
+          test -f restored/checkpoints/resumed-902968f5/model.zip
+          printf '%s  %s\n' 503c527492d3a43ff2be9996c4865d2af8be55a981a5a0308b4dccb316598e8e restored/checkpoints/resumed-902968f5/model.zip | sha256sum -c -
+      - name: Trace exactly the failed pure-model seed, without fallback or new training
+        run: |
+          python -m tavern_ai.action_diagnostics_902968f5 \
+            --seed 927104 \
+            --model restored/checkpoints/resumed-902968f5/model.zip \
+            --expected-sha 503c527492d3a43ff2be9996c4865d2af8be55a981a5a0308b4dccb316598e8e \
+            --output reports/s-20261102-902968f5/002-public-action-trace.json \
+            --max-actions 1500 --max-actions-per-turn 300
+      - name: Save only honest trace on own branch (never fake completion)
+        if: success()
+        run: |
+          test "$GITHUB_REF_NAME" = "agent/s-20261102-902968f5/optimization-001"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add reports/s-20261102-902968f5/002-public-action-trace.json
+          git diff --cached --quiet && exit 0
+          git commit -m "results(902968f5): capture authentic unmodified model action pathology"
+          git pull --rebase origin "$GITHUB_REF_NAME"
+          git push origin "HEAD:$GITHUB_REF_NAME"
+      - name: Retain trace as backup
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: model-public-trace-902968f5-${{ github.run_id }}
+          path: reports/s-20261102-902968f5/002-public-action-trace.json
+          if-no-files-found: ignore
+          retention-days: 30
