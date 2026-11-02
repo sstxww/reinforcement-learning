@@ -1,0 +1,28 @@
+{
+  "schema": 1,
+  "kind": "real_bounded_optimizer_resume_128_steps",
+  "source_model_id": "v2-learning-41413557445",
+  "source_model_sha256": "73bde2666426cecce39f135980a897bb2cd4a7d70783ba04c9c0d29477a6664a",
+  "source_hash_verified": true,
+  "source_cpu_load_verified": true,
+  "source_legal_inference_verified": true,
+  "old_total_timesteps": 1280,
+  "new_gradient_rollout_timesteps": 128,
+  "new_total_timesteps": 1408,
+  "old_optimizer_step": 80,
+  "new_optimizer_step": 88,
+  "new_model_sha256": "2a2212a9abb400f844bc05c625c41f4f57db7d8227e1f37c44f8a7470b977754",
+  "engine": {
+    "version": "1.1.0",
+    "source_hash": "6d8712c93022ba11",
+    "features": 4017,
+    "cards": 447,
+    "actions": 245,
+    "n_cards": 3984
+  },
+  "training_seed": 86253,
+  "new_model_cpu_load_verified": true,
+  "new_model_unguarded_full_game_verified": false,
+  "competitive_gain_verified": false,
+  "champion_promoted": false
+}
