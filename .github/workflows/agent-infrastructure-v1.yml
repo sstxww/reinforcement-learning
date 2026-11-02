@@ -2,6 +2,13 @@ name: Agent infrastructure - real V1 experiment
 on:
   push:
     branches: ['agent/infrastructure/v1']
+    # Do not rerun the expensive pinned engine/game for documentation and receipt-only commits.
+    paths:
+      - 'scripts/**'
+      - 'tests/**'
+      - 'tavern_ai/contract.py'
+      - 'tavern_ai/validate_receipt.py'
+      - '.github/workflows/agent-infrastructure-v1.yml'
   workflow_dispatch:
 permissions:
   contents: write
