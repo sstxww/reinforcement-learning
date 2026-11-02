@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "task_key": "verify/postmerge-main-head-ci",
+  "session_id": "s-20261103-fea0d63f",
+  "state": "claimed",
+  "role": "worker_no_main_merge",
+  "base_main_sha": "c1b828734527bae6141805581693d890cc3bff94",
+  "branch": "agent/s-20261103-fea0d63f/optimization-001",
+  "owned_files": [
+    "scripts/v7_main_ci_attestation_fea0d63f.py",
+    "tests/test_v7_main_ci_attestation_fea0d63f.py",
+    ".github/workflows/v7-main-ci-probe-fea0d63f.yml",
+    "research/sessions/s-20261103-fea0d63f/",
+    "research/knowledge/proposals/s-20261103-fea0d63f-001.md",
+    "experiments/s-20261103-fea0d63f/"
+  ],
+  "claim_ref": "claims/v7-postmerge-exact-ci-attestation",
+  "start_event": "atomic ref creation succeeded; no merge lease asserted",
+  "action_run": "https://github.com/sstxww/reinforcement-learning/actions/runs/41513152839",
+  "handoff_conditions": "Mark released after evidence PR/handoff; no global merge rights; issue #182 remains"
+}
