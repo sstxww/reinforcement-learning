@@ -18,8 +18,8 @@
 ## Real execution status (to be updated against exact Actions outcome)
 - First live Actions 41449566645 failed a synthetic test fixture, not simulator logic: the Python assignment mutated a list index before locating the old rank. 16/17 tests passed. No full game ran in that failure.
 - Fix commit 6439f190a98706c4247593269a73bfa187f07718 uses precomputed rank index.
-- Second live Actions 41449685070: contract and repository tests passed; engine/full-game stage pending when this report was written.
-- Genuine own complete match receipt: **not yet claimed**.
+- Second live Actions 41449685070 **SUCCESS**: 17 own tests, entire repository tests (234 passed, 1 skipped), fixed TavernGym version/source contract, genuine completed eight-seat baseline game, source-generated receipt artifact 13143807609.
+- Genuine own complete match: experiments/s-20261102-15ac04d0/001-93431.json, copied byte-for-byte in fields from successful Actions runner output. Seed 93431, own seat 0 rank 7, turns 14, decisions 65, placements [7,6,4,5,3,2,1,8], zero combat truncations, no game-turn guard. Rules baseline policy only; NOT PPO competitive evidence. Action source commit 6439f190a98706c4247593269a73bfa187f07718. Artifact https://github.com/sstxww/reinforcement-learning/actions/runs/41449685070/artifacts/13143807609.
 - Own training: **0** PPO steps; no new model/checkpoint or Champion.
 - PR CI and postmerge main CI: **not yet claimed**.
 
