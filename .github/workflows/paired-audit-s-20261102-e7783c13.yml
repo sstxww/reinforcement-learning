@@ -1,0 +1,44 @@
+name: V5 e7783c13 paired evidence and real-match audit
+on:
+  push:
+    branches: ['agent/s-20261102-e7783c13/optimization-001']
+  pull_request:
+    paths:
+      - 'tavern_ai/paired_eval_gate_e7783c13.py'
+      - 'tests/test_paired_eval_gate_e7783c13.py'
+      - '.github/workflows/paired-audit-s-20261102-e7783c13.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: paired-audit-e7783c13-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  validation-and-true-game:
+    if: github.event_name == 'push' || startsWith(github.head_ref, 'agent/s-20261102-e7783c13/') || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 65
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Dependencies
+        run: python -m pip install -e '.[test]'
+      - name: Strict evidence regression tests
+        run: python -m pytest -q tests/test_paired_eval_gate_e7783c13.py
+      - name: Pinned TavernGym
+        run: bash scripts/bootstrap_engine.sh
+      - name: Genuine full 8-seat game (baseline only; no PPO strength claim)
+        run: |
+          python -m tavern_ai.canary --agent-id s-20261102-e7783c13 --seed 977813 --policy baseline --receipt outputs/e7783c13-baseline-977813.json
+          python -m tavern_ai.validate_receipt outputs/e7783c13-baseline-977813.json
+          python -c 'import json; from tavern_ai.receipt_integrity import validate_integrity; validate_integrity(json.load(open("outputs/e7783c13-baseline-977813.json")))'
+      - name: Archive authentic run receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: s-20261102-e7783c13-receipt-${{ github.run_id }}
+          path: outputs/e7783c13-baseline-977813.json
+          if-no-files-found: ignore
+          retention-days: 30

@@ -1,0 +1,16 @@
+# s-20261102-e7783c13 STATUS
+
+- Round: 001
+- Audited main: `db5e23ae8c218808821327d806b05d2604cfadfb`
+- Scope: integration census, paired-evidence read-only gate, synthetic regression tests, dedicated genuine-match workflow.
+- PR remains Draft pending exact-head CI, true own eight-seat receipt and integration review.
+- Latest registered model: 1408-step V5 unpromoted; 3 heldout eighth-place results, no Champion.
+- This session's PPO training: 0 steps.
+- Own genuine completed games: 0 at initial commit. A workflow definition is NOT a result.
+- Next: inspect real Action jobs, archive genuine receipt, complete verification.
+## Verified full-match follow-up (2026-11-02 UTC)
+- [Actions run 41450007140](https://github.com/sstxww/reinforcement-learning/actions/runs/41450007140): **success**, pinned TavernGym install, 7 own synthetic format tests, and one **genuine complete** baseline eight-seat match.
+- Its original artifact ID 13143688148 was downloaded and inspected independently, not reconstructed from a speculative metric. Raw JSON was committed unchanged at `experiments/s-20261102-e7783c13/001-977813.json`.
+- Controlled seat 0, seed 977813, turns 14, decisions 38, placements [8,6,2,5,1,3,4,7], no truncated combats, no turn-limit end, engine hash 6d8712c93022ba11. A baseline rank eight is an engineering check, **not a PPO model outcome or strength claim**.
+- This session's actual PPO steps = **0**; PPO complete games = **0**; new checkpoint = **none**; Champion = **none**.
+- PR full-match CI triggered before receipt commit may have failed the mandatory evidence gate; verify the new post-receipt exact-head checks before review/merging.
