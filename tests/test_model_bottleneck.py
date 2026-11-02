@@ -1,5 +1,9 @@
 """Shape, masking and gradient tests for the isolated card bottleneck."""
-import torch
+import pytest
+# Shared CI installs only the lightweight [test] extra. Full optional-Torch
+# tests run in this session's isolated [train,test] workflow.
+torch = pytest.importorskip("torch", reason="requires optional train extra")
+pytest.importorskip("stable_baselines3", reason="requires optional train extra")
 from gymnasium import spaces
 from tavern_ai.model import TavernExtractor
 

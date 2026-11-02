@@ -22,7 +22,7 @@ concurrency:
 
 jobs:
   run-experiment:
-    if: github.ref == 'refs/heads/agent/s-20261102-cbc3c4927c/optimization-001'
+    if: github.ref == 'refs/heads/agent/s-20261102-cbc3c4927c/optimization-001' && !contains(github.event.head_commit.message, '[skip experiment]')
     runs-on: ubuntu-latest
     timeout-minutes: 65
     env:
