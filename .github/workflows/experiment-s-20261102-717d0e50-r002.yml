@@ -1,0 +1,64 @@
+name: Public-shop Freeze value gate s-20261102-717d0e50 R002
+on:
+  push:
+    branches: ['agent/s-20261102-717d0e50/optimization-002']
+    paths:
+      - '.github/workflows/experiment-s-20261102-717d0e50-r002.yml'
+      - 'tavern_ai/freeze_value_s_717d0e50.py'
+      - 'tests/test_freeze_value_s_717d0e50.py'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: freeze-quality-s-20261102-717d0e50-r002
+  cancel-in-progress: false
+jobs:
+  three-arm-quality-ablation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install unit tests
+        run: python -m pip install -e '.[test]'
+      - name: Run project plus isolated tests
+        run: python -m pytest
+      - name: Install genuine pinned TavernGym
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Play thirty real eight-seat games
+        run: python -m tavern_ai.freeze_value_s_717d0e50
+      - name: Validate every round-two receipt
+        run: |
+          for f in experiments/s-20261102-717d0e50/*.json; do
+            python -m tavern_ai.validate_receipt "$f"
+          done
+      - name: Commit only own genuine round-two receipts
+        if: success()
+        shell: bash
+        run: |
+          test "$GITHUB_REF_NAME" = 'agent/s-20261102-717d0e50/optimization-002'
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add experiments/s-20261102-717d0e50/ research/sessions/s-20261102-717d0e50/metrics-002.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'results(s-20261102-717d0e50): real value-aware freeze data'
+            git pull --rebase origin "$GITHUB_REF_NAME"
+            git push origin "HEAD:$GITHUB_REF_NAME"
+          fi
+      - name: Preserve temporary evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: freeze-quality-s-20261102-717d0e50-${{ github.run_id }}
+          path: |
+            experiments/s-20261102-717d0e50/*.json
+            research/sessions/s-20261102-717d0e50/metrics-002.json
+          if-no-files-found: ignore
+          retention-days: 30
