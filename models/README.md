@@ -1,40 +1,38 @@
-# Release-backed PPO registry (integrator candidate)
+# Canonical Release-backed model registry and strict archive preflight
 
-This registry is intentionally conservative. It indexes two **existing** experimental
-GitHub Releases and their GitHub-API-reported SHA256 digests, without downloading
-or promoting either checkpoint. Their unverified state is **not** a claim the authors
-failed to load or play them: prior PRs report real games and continuation. It means
-this registry's own independent load, resume, and held-out gates have not run.
+The **single source of truth** is the existing **main-integrated** `models/registry.json`,
+which currently lists **four** unpromoted durable experimental model Releases.
+That registry was incorporated into main by another integrator while this session
+was running. This PR **preserves its exact content** and does not fork or replace
+its candidate history.
 
-No Champion is registered. A release listing plus checksum from the Releases API
-proves publication metadata, **not** independent artifact download integrity or
-working PyTorch deserialization. All numerical competitive claims require full
-independent tests on controlled seeds and seats.
+The current `latest` points to 1280-step V2, but `best` and `champion`
+remain null. A training count and Release URL are not evidence of strength.
 
-## Preflight an existing archived model
+## Two separate levels of integrity checking
 
-1. Download model.zip and model.metadata.json from the corresponding immutable Release.
-2. Run:
-   python -m tavern_ai.model_registry --model-id v2-learning-41413557445 --checkpoint /path/model.zip --metadata /path/model.metadata.json
-3. This verifies SHA256, stable engine/observation/action metadata, PPO optimizer
-   member presence, and ZIP CRC without deserializing executable weights.
-4. Only in a trusted pinned TavernGym environment, separately run actual
-   MaskablePPO.load, inference, a bounded continued learn, save/reload, a complete
-   model-controlled eight-seat game, and paired held-out evaluation. Store links
-   and SHA of the new checkpoint in its own immutable Release.
+- Existing `python -m tavern_ai.registry_integrity`: structural invariants,
+  canonical Release identifiers and declared weights hash.
+- New `python -m tavern_ai.model_registry`: validates that same manifest,
+  with **no second index**.
+- Download from the existing actual GitHub Release, then run:
 
-Preflight success must never be described as a verified restore or a Champion
-promotion. These checks do not alter the existing shared training workflow.
+```bash
+python -m tavern_ai.model_registry \
+  --model-id v2-learning-41413557445 \
+  --checkpoint /path/to/model.zip \
+  --metadata /path/to/model.metadata.json
+```
 
-## Known evidence / remaining work
+Preflight verifies the actual checkpoint SHA256 against the existing registry,
+schema 1 or 2 metadata, pinned environment, schema-2 catalog/ruleset/source/patch
+fingerprints, embedded checksum, ZIP CRC, and presence of policy+optimizer entries.
 
-- V1 PR #9: 256 PPO steps; poor full-match placements; author left Draft.
-- V2 PR #15: 1280 cumulative steps; depends on V1 PR #9; candidate ranked
-  8th in four held-out matches; author did not claim improvement.
-- V2 Release sha256: 73bde2666426cecce39f135980a897bb2cd4a7d70783ba04c9c0d29477a6664a
-- Actual hash-verified re-download, optimizer **usability** and independently
-  reproducible 128-step resume are still outstanding for this integration.
+**Do not call preflight alone a successful model restore.** In a trusted pinned
+engine, separately deserialize the model, test legal inference, perform any
+independently justified training continuation (including optimizer state),
+then real complete eight-seat games with held-out seeds. The accompanying V5
+workflow attempts V2 Release download, load/inference and a raw model game,
+and must be judged by its actual GitHub Actions outcome.
 
-A dedicated future integration can connect this safe preflight to the common
-train.yml only after demonstrating compatibility with the already-published V1
-metadata; do not silently reinitialize a model when an integrity check fails.
+No Champion is created. Original models and other sessions' data are not changed.
