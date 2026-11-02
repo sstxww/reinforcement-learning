@@ -1,0 +1,69 @@
+name: "Choice tie-break paired game s-20261102-9c463177"
+on:
+  push:
+    branches:
+      - "agent/s-20261102-9c463177/optimization-001"
+    paths:
+      - ".github/workflows/experiment-s-20261102-9c463177.yml"
+      - "scripts/choice_tiebreak_s-20261102-9c463177.py"
+      - "tests/test_choice_tiebreak_s-20261102-9c463177.py"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: choice-tiebreak-s-20261102-9c463177
+  cancel-in-progress: false
+
+jobs:
+  game-ablation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install unit tests
+        run: |
+          python -m pip install -e '.[test]'
+          python -m pytest
+      - name: Install exact real TavernGym engine
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Execute paired full eight-seat engine games
+        run: |
+          python scripts/choice_tiebreak_s-20261102-9c463177.py --start-seed 39001 --games 4
+          python -m tavern_ai.validate_receipt experiments/s-20261102-9c463177/001-39001.json
+          python -m pytest tests/test_choice_tiebreak_s-20261102-9c463177.py
+      - name: Publish only this session's genuine receipts and metrics
+        if: success()
+        shell: bash
+        run: |
+          test "$GITHUB_REF_NAME" = "agent/s-20261102-9c463177/optimization-001"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add experiments/s-20261102-9c463177/*.json
+          git add research/sessions/s-20261102-9c463177/round-001-metrics.json
+          if git diff --cached --quiet; then
+            echo "No new results to commit"
+          else
+            git commit -m "results(s-20261102-9c463177): archive authentic paired game evidence [skip ci]"
+            git pull --rebase origin "$GITHUB_REF_NAME"
+            git push origin "HEAD:$GITHUB_REF_NAME"
+          fi
+      - name: Preserve receipts even if commit is blocked
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: "choice-tiebreak-s-20261102-9c463177"
+          path: |
+            experiments/s-20261102-9c463177/*.json
+            research/sessions/s-20261102-9c463177/round-001-metrics.json
+          if-no-files-found: ignore
+          retention-days: 30
