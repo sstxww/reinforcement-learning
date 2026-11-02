@@ -1,0 +1,120 @@
+name: Bounded buy-override paired games s-20261102-704cec7b
+on:
+  push:
+    branches:
+      - 'agent/s-20261102-704cec7b/optimization-001'
+    paths:
+      - 'tavern_ai/behavior_probe_704cec7b.py'
+      - 'tests/test_behavior_probe_704cec7b.py'
+      - '.github/workflows/buy-override-s-20261102-704cec7b.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: buy-override-s-20261102-704cec7b
+  cancel-in-progress: false
+
+jobs:
+  paired-engine-test:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 70
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install isolated test environment
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[train,test]'
+      - name: Verify hypothesis-specific regression tests and release index
+        run: |
+          python -m pytest tests/test_behavior_probe_704cec7b.py tests/test_model_registry.py
+          python -m tavern_ai.model_registry
+      - name: Install pinned exact TavernGym
+        run: bash scripts/bootstrap_engine.sh
+      - name: Download immutable V2 model and check integrity
+        run: |
+          mkdir -p checkpoints
+          gh release download v2-learning-41413557445 --repo "$GITHUB_REPOSITORY" \
+            --pattern model.zip --pattern model.metadata.json --dir checkpoints
+          python -m tavern_ai.model_registry \
+            --model-id v2-learning-41413557445 --asset checkpoints/model.zip
+      - name: Paired authentic eight-seat seeded comparison
+        run: |
+          set -euo pipefail
+          for seed in 88301 88302; do
+            python -m tavern_ai.behavior_probe_704cec7b \
+              --model checkpoints/model.zip \
+              --expected-sha256 73bde2666426cecce39f135980a897bb2cd4a7d70783ba04c9c0d29477a6664a \
+              --seed "$seed" --receipt "experiments/s-20261102-704cec7b/003-model-reference-$seed.json"
+            python -m tavern_ai.behavior_probe_704cec7b \
+              --model checkpoints/model.zip \
+              --expected-sha256 73bde2666426cecce39f135980a897bb2cd4a7d70783ba04c9c0d29477a6664a \
+              --seed "$seed" --buy-when-empty-board \
+              --receipt "experiments/s-20261102-704cec7b/003-buy-override-$seed.json"
+            python -m tavern_ai.validate_receipt "experiments/s-20261102-704cec7b/003-model-reference-$seed.json"
+            python -m tavern_ai.validate_receipt "experiments/s-20261102-704cec7b/003-buy-override-$seed.json"
+          done
+      - name: Report behavior differences without promotion
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          seeds = [88301, 88302]
+          d = Path("experiments/s-20261102-704cec7b")
+          rows = []
+          for seed in seeds:
+              ref = json.loads((d / f"003-model-reference-{seed}.json").read_text())
+              new = json.loads((d / f"003-buy-override-{seed}.json").read_text())
+              rows.append({"seed": seed,
+                           "reference_rank": ref["placements"][0], "candidate_rank": new["placements"][0],
+                           "rank_delta_candidate_minus_reference": new["placements"][0] - ref["placements"][0],
+                           "reference_buys": ref["diagnostics"]["selected_buys"],
+                           "candidate_buys": new["diagnostics"]["selected_buys"],
+                           "explicit_buy_overrides": new["diagnostics"]["explicit_buy_overrides"],
+                           "reference_forced_ends": ref["diagnostics"]["guard_forced_end_turns"],
+                           "candidate_forced_ends": new["diagnostics"]["guard_forced_end_turns"]})
+          report = {
+              "schema": 1,
+              "session": "s-20261102-704cec7b",
+              "experiment": "one-factor empty-board legal-buy intervention",
+              "policy_weights": "v2-learning-41413557445",
+              "engine_source_hash": "6d8712c93022ba11",
+              "seeded_pairs": rows,
+              "games_total": 4,
+              "gradient_steps_new": 0,
+              "promotion_eligible": False,
+              "interpretation": "Tiny n=2, descriptive only. Guarded reference and intervened candidate are not raw-model results."
+          }
+          p = Path("reports/s-20261102-704cec7b/003-paired.json")
+          p.parent.mkdir(parents=True, exist_ok=True)
+          p.write_text(json.dumps(report, indent=2)+"\n")
+          print(json.dumps(report))
+          PY
+      - name: Upload complete records (fallback only, not permanent)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bounded-buy-override-s-20261102-704cec7b
+          path: |
+            experiments/s-20261102-704cec7b/003-*.json
+            reports/s-20261102-704cec7b/003-paired.json
+          retention-days: 30
+          if-no-files-found: ignore
+      - name: Commit genuine match data to own research branch only
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add experiments/s-20261102-704cec7b/003-*.json reports/s-20261102-704cec7b/003-paired.json
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "evidence: save four genuine paired buy-override eight-seat games"
+          test "$GITHUB_REF_NAME" = "agent/s-20261102-704cec7b/optimization-001"
+          git pull --rebase origin "$GITHUB_REF_NAME"
+          git push origin HEAD:"$GITHUB_REF_NAME"
