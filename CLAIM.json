@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "task_key": "audit/1536-candidate-censoring",
+  "session_id": "s-20261103-4c5fcc9a",
+  "round": "001",
+  "state": "claimed",
+  "base_main_sha": "c1b828734527bae6141805581693d890cc3bff94",
+  "work_branch": "agent/s-20261103-4c5fcc9a/optimization-001",
+  "owner_files": [
+    "scripts/v7_candidate_censor_audit_4c5fcc9a.py",
+    "tests/test_v7_candidate_censor_audit_4c5fcc9a.py",
+    "research/sessions/s-20261103-4c5fcc9a/"
+  ],
+  "exclusive_main_merge": false,
+  "claims_are_task_only": true,
+  "recovery": "On completion mark this record released; other sessions must inspect work PR and cannot treat this as main merge authority."
+}
