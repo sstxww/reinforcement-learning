@@ -1,0 +1,77 @@
+{
+  "schema": 1,
+  "session_id": "s-20261102-c097d0cc",
+  "round": 1,
+  "timestamp": "2026-11-02T08:29:03.668495+00:00",
+  "seed_start": 31001,
+  "seeds": [
+    31001,
+    31002,
+    31003,
+    31004
+  ],
+  "engine": "TavernGym 1.1.0",
+  "engine_source_hash": "6d8712c93022ba11",
+  "upstream_commit": "fb61201a557ddd36a411cf44aac51ce4d9b606ce",
+  "patch_sha256": "1e48a071cad63c284debbf917cb012595a405a4ef5ab66180eb2918e205aaac0",
+  "contract": {
+    "features": 4017,
+    "cards": 447,
+    "actions": 245
+  },
+  "base_commit": "6ac59235b8238196a0e6462de77b72413c829372",
+  "run_commit": "d856106f338ee14e75c020cde9c7296b50035ae8",
+  "workflow_run": "41413164987",
+  "control": {
+    "n": 4,
+    "ranks": [
+      8,
+      8,
+      8,
+      8
+    ],
+    "mean_rank": 8,
+    "top4_rate": 0.0,
+    "win_rate": 0.0,
+    "decisions": [
+      57,
+      68,
+      36,
+      48
+    ],
+    "truncated_combats": 0,
+    "turn_limit_end_count": 0
+  },
+  "candidate": {
+    "n": 4,
+    "ranks": [
+      8,
+      1,
+      8,
+      8
+    ],
+    "mean_rank": 6.25,
+    "top4_rate": 0.25,
+    "win_rate": 0.25,
+    "decisions": [
+      55,
+      55,
+      34,
+      37
+    ],
+    "truncated_combats": 0,
+    "turn_limit_end_count": 0
+  },
+  "paired_rank_delta_candidate_minus_control": [
+    0,
+    -7,
+    0,
+    0
+  ],
+  "mean_rank_delta": -1.75,
+  "gradient_training_steps": 0,
+  "tuning": "4+ seeded paired full games, position-parameter ablation",
+  "decision_rule": "lower mean rank wins descriptively; no significance claim from small n",
+  "checkpoint": null,
+  "checkpoint_recovery": "None: deterministic hand-position ablation; no learned weights"
+}

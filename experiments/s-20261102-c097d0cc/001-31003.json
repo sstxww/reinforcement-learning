@@ -1,0 +1,29 @@
+{
+  "schema": 1,
+  "timestamp": "2026-11-02T08:29:03.658212+00:00",
+  "environment": "TavernGym",
+  "engine_source_hash": "6d8712c93022ba11",
+  "engine_version": "1.1.0",
+  "agent_id": "s-20261102-c097d0cc",
+  "policy": "rightmost-play-v1",
+  "seed": 31003,
+  "completed": true,
+  "turns": 16,
+  "decisions": 34,
+  "placements": [
+    8,
+    5,
+    2,
+    6,
+    3,
+    4,
+    1,
+    7
+  ],
+  "truncated_combats": 0,
+  "turn_limit_end": false,
+  "git_sha": "d856106f338ee14e75c020cde9c7296b50035ae8",
+  "model_sha256": null,
+  "strategy_version": "rightmost-play-v1",
+  "illegal_actions": 0
+}
