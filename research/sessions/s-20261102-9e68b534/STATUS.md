@@ -11,6 +11,6 @@
 - **Training:** 0 PPO steps; not a learning/weight experiment.
 - **Model:** no model generated; Candidate/Best/Latest N/A; checkpoint N/A.
 - **Experiment evidence commit:** `ab2183ba5ffa912074ac2288db3934c76ecb8751` (self-committed by the isolated successful workflow).
-- **PR:** to be created against `main`, keep draft pending PR CI review.
+- **PR:** https://github.com/sstxww/reinforcement-learning/pull/37 (draft, targets main; latest PR CI is a separate gate).
 - **Failures:** none in this round's GitHub Actions job; a live-running job log fetch returned a transient 404 BlobNotFound before job completion, but final workflow and all steps were successful.
 - **Next:** inspect PR CI on final head and review; if first PR CI passes, do not merge automatically. Future research: 30+ held-out paired games for meaningful candidate-vs-control comparisons.
