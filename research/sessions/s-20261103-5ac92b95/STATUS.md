@@ -1,0 +1,11 @@
+# STATUS — s-20261103-5ac92b95 / V6.1 R001
+- Role: **WORKER**; task key `evaluation/paired-guard-alias-integrity` (path-scoped, **not** an atomic exclusive lease).
+- Base `main`: `3602f64b798bb51dcf69ef5964fe0b4c4cd39495`.
+- Branch: `agent/s-20261103-5ac92b95/optimization-001`.
+- Status: **in progress / DRAFT**, awaiting independently verified authentic complete-game receipt and latest-head CI.
+- Scope: narrow guard/fallback counter aliases in `tavern_ai/paired_receipt_gate_v5.py`; isolated regression test, workflow and own research paths. No main push, shared workflow, registry or model changes.
+- P0: main already merged #116, #117, #125, #138, #140, #152, #154, #157 and #162 at snapshot; #15 is Ready but stacked on Draft #9; do not merge. Concurrent Drafts #161/#164/#165/#167 own other fixes; not copied/merged.
+- Hypothesis: actual telemetry `guard_forced_ends` and canonical evaluator `fallback_actions` can be nonzero while paired gate marks the receipt raw model, risking inflated research claims. Regression must reject assisted raw games.
+- Source model: registry Latest unpromoted V5 1408-step Release, SHA256 `a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632`; Best/Champion null (snapshot only).
+- Own PPO updates: **0**. Own model Release: **none**. Own training and model-game placement: **not claimed**. A real baseline canary is scheduled only by the isolated workflow; count it only after actual run and receipt verification.
+- Next: capture and validate own full eight-seat receipt from the exact workflow run, commit unmodified receipt to our branch, rerun PR CI and publish verified result.
