@@ -57,5 +57,7 @@ jobs:
           git add experiments/s-20261102-1aff5449/001-91991.json
           if ! git diff --cached --quiet; then
             git commit -m "evidence(s-20261102-1aff5449): verified real eight-seat canary seed 91991"
+            git fetch origin "$GITHUB_REF_NAME"
+            git rebase "origin/$GITHUB_REF_NAME"
             git push origin "HEAD:${GITHUB_REF_NAME}"
           fi
