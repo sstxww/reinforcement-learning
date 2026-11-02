@@ -24,7 +24,8 @@
       "pr": 165,
       "sha": "c1b828734527bae6141805581693d890cc3bff94",
       "postmerge_ci": "https://github.com/sstxww/reinforcement-learning/actions/runs/41512315964",
-      "postmerge_ci_conclusion": "unknown_in_progress_at_last_read"
+      "postmerge_ci_conclusion": "success",
+      "postmerge_ci_head_sha": "c1b828734527bae6141805581693d890cc3bff94"
     }
   ],
   "own_pr_merges": 0,
