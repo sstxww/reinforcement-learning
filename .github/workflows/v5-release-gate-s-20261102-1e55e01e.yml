@@ -11,7 +11,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: v5-release-gate-s-20261102-1e55e01e
@@ -47,16 +47,12 @@ jobs:
             --policy baseline --seed 95001 \
             --receipt experiments/s-20261102-1e55e01e/001-95001.json
           python -m tavern_ai.validate_receipt experiments/s-20261102-1e55e01e/001-95001.json
-      - name: Commit only this session's genuine evidence
-        shell: bash
+      - name: Explain permanent receipt provenance
         run: |
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add experiments/s-20261102-1e55e01e/001-95001.json
-          if ! git diff --cached --quiet; then
-            git commit -m 'evidence(v5): complete eight-seat verification game s-20261102-1e55e01e'
-            git push origin HEAD:refs/heads/agent/s-20261102-1e55e01e/optimization-001
-          fi
+          echo 'The completed seed-95001 receipt from workflow run 41450170855'
+          echo 'was downloaded from actual Actions Artifact 13144577744 and'
+          echo 'committed by the integration session as experiments/s-20261102-1e55e01e/001-95001.json.'
+          echo 'Do not push from a stale Actions checkout; preserve new proof in the current run Artifact.'
       - name: Preserve independent game evidence
         if: always()
         uses: actions/upload-artifact@v4
