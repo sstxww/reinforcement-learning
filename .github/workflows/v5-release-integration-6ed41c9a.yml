@@ -46,6 +46,15 @@ jobs:
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add experiments/s-20261102-6ed41c9a/001-94311.json
+          RECEIPT="experiments/s-20261102-6ed41c9a/001-94311.json"
+          TARGET="agent/s-20261102-6ed41c9a/optimization-001"
+          # The source branch may advance while TavernGym compiles. Never force-push.
+          git fetch origin "refs/heads/${TARGET}:refs/remotes/origin/${TARGET}"
+          if git cat-file -e "refs/remotes/origin/${TARGET}:${RECEIPT}" 2>/dev/null; then
+            echo "An immutable real receipt is already recorded in this session; preserving it."
+            exit 0
+          fi
+          git add "$RECEIPT"
           git commit -m "Record s-20261102-6ed41c9a real eight-seat baseline integration receipt"
-          git push origin "HEAD:refs/heads/agent/s-20261102-6ed41c9a/optimization-001"
+          git rebase "refs/remotes/origin/${TARGET}"
+          git push origin "HEAD:refs/heads/${TARGET}"
