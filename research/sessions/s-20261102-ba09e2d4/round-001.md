@@ -8,3 +8,9 @@
 - PR #60 provides reason to test legal BUY opportunities in model-controlled runs, not enough to conclude low learning rate is causal.
 - Follow-up implementation: isolated real-model action-opportunity probe, release hash verification, paired same-seed baseline in a separate finite branch-only workflow. Outcome pending, not represented as verified yet.
 - Full PR #80 stays Draft until independent latest-head PR CI and compatibility review. 
+
+## Real R001 failure-loop correction
+- Job [41427938674](https://github.com/sstxww/reinforcement-learning/actions/runs/41427938674) failed after successful real V2 Release download, before model load, because the initial inspector rejected actual metadata `schema: 2`. It is a schema compatibility error, not proof of checkpoint corruption.
+- Original learning PR #9 source code explicitly writes schema-2 `checkpoint_sha256` and `compatibility`; code has now been adjusted to validate both. Synthetic regression tests cover positive schema 2 and negative wrong hash/compatibility. This is repair attempt 1 of at most 2; awaiting real rerun.
+- Independent PR CI run [41427946441](https://github.com/sstxww/reinforcement-learning/actions/runs/41427946441) succeeded on previous source head. Post-repair latest-head CI must be confirmed separately.
+- Main has now integrated #87 independent registry, so this PR's duplicate registry must be reconciled instead of merging two canonical sources.

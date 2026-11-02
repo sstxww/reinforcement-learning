@@ -6,7 +6,7 @@ import zipfile
 import pytest
 
 from tavern_ai.checkpoint_audit_ba09e2d4 import audit_checkpoint
-from tavern_ai.contract import ACTIONS, CARDS, ENGINE_HASH, FEATURES
+from tavern_ai.contract import ACTIONS, CARDS, ENGINE_HASH, FEATURES, CATALOG_SHA256, RULESET_ID, PATCH_SHA256, UPSTREAM_COMMIT
 
 
 def fixture_files(tmp_path, optimizer=True):
@@ -92,4 +92,53 @@ def test_corrupt_zip_rejected_without_hash_bypass(tmp_path):
     with pytest.raises(ValueError, match="archive"):
         audit_checkpoint(model, meta, changed)
     with pytest.raises(ValueError, match="mismatch"):
+        audit_checkpoint(model, meta, sha)
+
+def schema2_fixture(tmp_path):
+    model, meta, sha = fixture_files(tmp_path)
+    info = json.loads(meta.read_text())
+    info["schema"] = 2
+    info["checkpoint_sha256"] = sha
+    info["compatibility"] = {
+        "engine": info["engine"],
+        "catalog_sha256": CATALOG_SHA256,
+        "ruleset_id": RULESET_ID,
+        "patch_sha256": PATCH_SHA256,
+        "upstream_commit": UPSTREAM_COMMIT,
+    }
+    meta.write_text(json.dumps(info))
+    return model, meta, sha
+
+
+def test_pinned_schema2_release_metadata_contract(tmp_path):
+    model, meta, sha = schema2_fixture(tmp_path)
+    result = audit_checkpoint(model, meta, sha)
+    assert result["metadata_schema"] == 2
+    assert result["torch_load_verified"] is False
+
+
+def test_schema2_metadata_sha_mismatch_rejected(tmp_path):
+    model, meta, sha = schema2_fixture(tmp_path)
+    info = json.loads(meta.read_text())
+    info["checkpoint_sha256"] = "0" * 64
+    meta.write_text(json.dumps(info))
+    with pytest.raises(ValueError, match="metadata SHA256"):
+        audit_checkpoint(model, meta, sha)
+
+
+def test_schema2_compatibility_mismatch_rejected(tmp_path):
+    model, meta, sha = schema2_fixture(tmp_path)
+    info = json.loads(meta.read_text())
+    info["compatibility"]["ruleset_id"] = "changed-rules"
+    meta.write_text(json.dumps(info))
+    with pytest.raises(ValueError, match="compatibility"):
+        audit_checkpoint(model, meta, sha)
+
+
+def test_schema2_missing_compatibility_rejected(tmp_path):
+    model, meta, sha = schema2_fixture(tmp_path)
+    info = json.loads(meta.read_text())
+    info.pop("compatibility")
+    meta.write_text(json.dumps(info))
+    with pytest.raises(ValueError, match="compatibility"):
         audit_checkpoint(model, meta, sha)

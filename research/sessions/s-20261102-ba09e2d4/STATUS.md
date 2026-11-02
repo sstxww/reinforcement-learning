@@ -9,3 +9,8 @@
 - Next independently run candidate: read-only V2 Release hash/load/model-controlled full-game probe and same-seed baseline. Workflow launched by second-round commit, report outcome only after finished. No new PPO training until action pathology is understood.
 - Open Draft PR: #80. Must verify latest-head CI and conflicts before integration.
 - No official scoring Arena access, no upstream or other-session branch writes.
+
+## 2026-11-02 R001 real failure and repair
+- Full model probe [Actions #41427938674](https://github.com/sstxww/reinforcement-learning/actions/runs/41427938674) downloaded the real V2 Release and installed the pinned engine but failed at an overly strict audit schema gate: `Unsupported checkpoint metadata schema`. No model game ran, no candidate conclusion.
+- Root cause confirmed by PR #9's original model trainer: published Release metadata uses schema **2** including `checkpoint_sha256` and detailed `compatibility`. Our first synthetic tests only covered schema 1.
+- Implemented one bounded correction: schema 2 accepted only with matching actual digest, pinned engine, catalog, ruleset, patch and upstream. Added negative regression tests, preserving schema 1 support for existing main model format. New workflow run must be inspected; do not declare success from code alone.

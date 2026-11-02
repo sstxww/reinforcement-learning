@@ -5,6 +5,8 @@ on:
     paths:
       - 'tavern_ai/behavior_probe_ba09e2d4.py'
       - 'tests/test_behavior_probe_ba09e2d4.py'
+      - 'tavern_ai/checkpoint_audit_ba09e2d4.py'
+      - 'tests/test_checkpoint_audit_ba09e2d4.py'
       - '.github/workflows/restore-probe-s-20261102-ba09e2d4.yml'
 permissions:
   contents: write

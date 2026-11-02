@@ -12,7 +12,7 @@ import re
 import zipfile
 from pathlib import Path
 
-from .contract import ACTIONS, CARDS, ENGINE_HASH, FEATURES
+from .contract import ACTIONS, CARDS, ENGINE_HASH, FEATURES, CATALOG_SHA256, RULESET_ID, PATCH_SHA256, UPSTREAM_COMMIT
 
 
 REQUIRED_MEMBERS = {"data", "policy.pth", "policy.optimizer.pth"}
@@ -36,7 +36,7 @@ def audit_checkpoint(checkpoint: Path, metadata: Path, expected_sha256: str) -> 
     if actual != expected_sha256:
         raise ValueError("Checkpoint SHA256 mismatch")
     info = json.loads(metadata.read_text(encoding="utf-8"))
-    if not isinstance(info, dict) or info.get("schema") != 1:
+    if not isinstance(info, dict) or type(info.get("schema")) is not int or info["schema"] not in (1, 2):
         raise ValueError("Unsupported checkpoint metadata schema")
     engine = info.get("engine")
     if not isinstance(engine, dict):
@@ -52,6 +52,20 @@ def audit_checkpoint(checkpoint: Path, metadata: Path, expected_sha256: str) -> 
         raise ValueError("Incompatible engine, observation, card or action contract")
     if type(engine.get("n_cards")) is not int or engine["n_cards"] <= 1:
         raise ValueError("Missing card vocabulary size")
+    if info["schema"] == 2:
+        if info.get("checkpoint_sha256") != actual:
+            raise ValueError("Schema-2 checkpoint metadata SHA256 mismatch")
+        expected_compatibility = {
+            "engine": engine,
+            "catalog_sha256": CATALOG_SHA256,
+            "ruleset_id": RULESET_ID,
+            "patch_sha256": PATCH_SHA256,
+            "upstream_commit": UPSTREAM_COMMIT,
+        }
+        if info.get("compatibility") != expected_compatibility:
+            raise ValueError("Schema-2 pinned engine/catalog/ruleset/patch compatibility mismatch")
+    elif info.get("checkpoint_sha256") and info["checkpoint_sha256"] != actual:
+        raise ValueError("Checkpoint metadata SHA256 mismatch")
     if info.get("algorithm") != "MaskablePPO":
         raise ValueError("Not a MaskablePPO checkpoint")
     if type(info.get("total_timesteps")) is not int or info["total_timesteps"] < 0:
@@ -69,6 +83,7 @@ def audit_checkpoint(checkpoint: Path, metadata: Path, expected_sha256: str) -> 
         raise ValueError("Invalid SB3 checkpoint archive") from exc
     return {
         "schema": 1,
+        "metadata_schema": info["schema"],
         "source": str(checkpoint),
         "sha256": actual,
         "size_bytes": size,
