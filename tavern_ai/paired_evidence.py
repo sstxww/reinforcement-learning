@@ -33,7 +33,7 @@ def _validated(record: dict, label: str) -> tuple[int, int, str]:
     seed, seat = record.get("seed"), record.get("controlled_seat", 0)
     if type(seed) is not int or seed < 0 or type(seat) is not int or not 0 <= seat < 8:
         raise ValueError(f"{label}: invalid seed or controlled seat")
-    if record.get("policy") not in ("baseline", "model", "guarded_model"):
+    if record.get("policy") not in ("baseline", "model", "guarded_model", "model_guarded"):
         raise ValueError(f"{label}: unknown policy")
     for name in _GUARD_KEYS:
         value = record.get(name, 0)
@@ -48,7 +48,8 @@ def _validated(record: dict, label: str) -> tuple[int, int, str]:
         if not isinstance(sha, str) or not _SHA256.fullmatch(sha):
             raise ValueError(f"{label}: model weight SHA256 is missing/invalid")
         variant = record.get("policy_variant")
-        guarded = (record["policy"] == "guarded_model" or
+        guarded = (record["policy"] in ("guarded_model", "model_guarded") or
+                   record.get("guarded") is True or
                    any(record.get(k, 0) > 0 for k in _GUARD_KEYS) or
                    record.get("raw_model_only") is False or
                    (variant is not None and variant not in ("raw_ppo_model", "raw_model", "raw")))
