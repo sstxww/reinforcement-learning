@@ -23,7 +23,7 @@ def good():
     ref = {"object": {"sha": MAIN}}
     ci = {"name": "CI - full-match gate", "event": "pull_request",
           "status": "completed", "conclusion": "success", "head_sha": SHA,
-          "pull_requests": [{"number": 42}], "html_url": "https://example.test/run/10"}
+          "pull_requests": [{"number": 42, "base": {"sha": MAIN}}], "html_url": "https://example.test/run/10"}
     jobs = {"jobs": [{"name": "tests-and-full-match", "conclusion": "success",
                       "steps": [{"name": "Unit tests and PR evidence", "conclusion": "success"},
                                 {"name": "Real full eight-seat simulated match", "conclusion": "success"}]}]}
@@ -63,11 +63,20 @@ def test_fail_closed_mutations(change):
         check(v)
 
 
-def test_synthetic_merge_sha_allowed_only_if_pr_head_is_pinned():
+def test_updated_pr_reference_cannot_retroactively_validate_old_ci():
     v = list(good())
     v[2]["head_sha"] = "c"*40
-    v[2]["pull_requests"] = [{"number": 42, "head": {"sha": SHA}}]
-    assert check(v)["safe_for_serial_review"]
+    v[2]["pull_requests"] = [{"number": 42, "head": {"sha": SHA},
+                               "base": {"sha": MAIN}}]
+    with pytest.raises(gate.GateError):
+        check(v)
+
+
+def test_updated_main_invalidates_previous_ci_base():
+    v = list(good())
+    v[2]["pull_requests"][0]["base"]["sha"] = "c"*40
+    with pytest.raises(gate.GateError):
+        check(v)
 
 
 def test_later_review_supersedes_old_approval():
