@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "model_status": "rejected_behavior_safety_failure",
+  "session_id": "s-20261102-9732a21e",
+  "source_release": "v2-learning-41413557445",
+  "source_weight_sha256": "73bde2666426cecce39f135980a897bb2cd4a7d70783ba04c9c0d29477a6664a",
+  "source_steps": 1280,
+  "candidate_steps": 1408,
+  "additional_requested_steps": 128,
+  "candidate_weight_sha256": "976d9323e79cd00fa1dae73ea31886e4087171078eabdde8eeca06fac7eb0cc6",
+  "candidate_metadata_sha256": "83d4a7d5df6d18b9fcc4816edd14988ab2f4e5768cdd41fa2f670cf2b6df7991",
+  "engine": {
+    "version": "1.1.0",
+    "source_hash": "6d8712c93022ba11",
+    "features": 4017,
+    "cards": 447,
+    "actions": 245,
+    "n_cards": 3984
+  },
+  "source_commit": "325a20815c32e1cfea808e6c53fd6c3f94c705a9",
+  "full_game_seed": 83601,
+  "full_game_placement": 8,
+  "independent_paired_seeds": [
+    83701,
+    83702
+  ],
+  "paired_model_minus_baseline_mean_placement": 0,
+  "candidate_games_completed": 1,
+  "candidate_games_failed": 1,
+  "paired_completed_count": 1,
+  "legal_buy_end_turns": 0,
+  "legal_buy_opportunities": 125,
+  "formal_resume_allowed": false,
+  "model_promotion": false,
+  "evaluations_are_exploratory": true,
+  "checkpoint_persistence": "verified_release_roundtrip"
+}
