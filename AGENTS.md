@@ -1,12 +1,12 @@
 # Agent Operating Rules — AutoTavern-AI V1
 
-Read `docs/PROJECT_BACKGROUND.md` and `prompts/PARALLEL_AGENTS.md` before making changes.
+Read `docs/PROJECT_BACKGROUND.md`, `docs/SESSION_PROTOCOL.md`, and `prompts/INDEPENDENT_SESSION.md` before making changes. `prompts/PARALLEL_AGENTS.md` is the older multi-Agent coordination template; independent ChatGPT sessions must use the new protocol.
 
 1. **ONLY repository:** `sstxww/reinforcement-learning`. It is a separate repository. Do not fork-push,
    modify, open PRs against, or write to `MCG-NJU/AutoTavern` or `rizling.top` source.
-2. **Isolated branches:** each Agent uses `agent/<agent-id>/<task>` and PRs to `main`.
+2. **Isolated branches:** each independent ChatGPT session generates a **globally unique** `agent-id`, uses `agent/<agent-id>/<task>`, and PRs to `main`.
    No Agent directly pushes to `main` or force-pushes another Agent's branch.
-3. **Single owner per module:** claim a non-overlapping file set before changes.
+3. **Single owner per module:** inspect open PRs and choose a non-overlapping file set before changes.
    Shared files (workflows, API contracts, README) require integration-owner review.
 4. **Mandatory battle:** run `python -m tavern_ai.canary --agent-id <agent-id>
    --seed <seed> --policy baseline --receipt experiments/<agent-id>/<experiment>.json`
@@ -28,3 +28,5 @@ Read `docs/PROJECT_BACKGROUND.md` and `prompts/PARALLEL_AGENTS.md` before making
 
 If tools or the simulator are unavailable, do not fabricate a receipt. Explain the
 blocker in the PR and leave it unmerged. Every Agent must actually play its own match.
+11. **Persistent research handoff:** each session must write `research/sessions/<agent-id>/round-<NNN>.md`, `STATUS.md` and a unique `research/knowledge/proposals/<agent-id>-<NNN>.md` in its own branch; curated `research/knowledge/` is integrator-owned.
+12. **Isolated training:** the shared `train.yml` is main-only; do not use it as a private parallel run or overwrite another session's checkpoints/artifacts. Use a distinct finite workflow or isolated executor.

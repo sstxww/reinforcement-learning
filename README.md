@@ -1,6 +1,6 @@
 # AutoTavern-AI V1 · Continuous Training Lab
 
-[中文项目背景](docs/PROJECT_BACKGROUND.md) · [并发 Agent 总控提示词](prompts/PARALLEL_AGENTS.md) · [架构](docs/ARCHITECTURE.md) · [竞技场接入](docs/ARENA.md)
+[中文项目背景](docs/PROJECT_BACKGROUND.md) · [多会话独立调优提示词](prompts/INDEPENDENT_SESSION.md) · [并行隔离协议](docs/SESSION_PROTOCOL.md) · [架构](docs/ARCHITECTURE.md) · [竞技场接入](docs/ARENA.md)
 
 An **independent** AI training/research scaffold built on the open-source [AutoTavern / TavernGym](https://github.com/MCG-NJU/AutoTavern) simulator. The goal is to build a reproducible Battlegrounds agent via a small deterministic baseline, mask-aware PPO, real eight-seat simulated games, incremental checkpoints and multiple coordinated research agents. This is **not** the official pretrained TavernAgent.
 
@@ -17,7 +17,7 @@ An **independent** AI training/research scaffold built on the open-source [AutoT
 
 Go to **Actions** in this repository. `CI · full-match gate` validates a PR and plays one real TavernGym game. `Train · incremental V1` is manually runnable or runs weekly on `main`, downloads the last successful compatible model if available, trains a bounded number of extra PPO steps, evaluates, and uploads `v1-model` as a downloadable Artifact.
 
-**Status:** scaffold only, not yet successfully run in Actions; no training score is claimed. Model Artifacts have **90-day retention**; they are not permanent backups.
+**Status:** initial CI including a complete eight-seat TavernGym game has passed; this is not proof of competitive model performance. Verify current Actions results before making new claims. Model Artifacts have **90-day retention**; they are not permanent backups.
 
 ## Manual Linux / cloud setup
 
