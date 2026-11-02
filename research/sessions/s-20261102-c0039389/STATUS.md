@@ -7,7 +7,7 @@
 - Training steps: 0, checkpoint: null, no Best promotion.
 
 ## Round 002 — real-engine experiment successful, PR pending
-- **Status:** `completed_experiment_pending_pr_ci`.
+- **Status:** `completed_experiment_pending_final_head_ci`, Draft PR #59 created and pending latest-head CI.
 - **Branch:** `agent/s-20261102-c0039389/optimization-002`, forked from our own R001 head `31adcfe4589df5a419b8c8ce052019d63c1dbc90`. Original main anchor `315b068bac5ab6d8403c3c9b18f8c101c0cded5d`. R002 explicitly depends on R001 PR #44 and must not be integrated first.
 - **Run:** https://github.com/sstxww/reinforcement-learning/actions/runs/41418165218 — **SUCCESS**. Run source SHA `7274a19d2af94e1e1db7568f88cc7024d509b5c1`, evidence-committed SHA `e585cb00863740eadd4a3046ef9a704e17c5f491`. Full tests, genuine engine pinned bootstrap, 33 complete real matches, JSON integrity gates, Artifact upload, namespaced evidence commit all succeeded.
 - **Engine:** TavernGym 1.1.0, source hash `6d8712c93022ba11`; observe2 4017/447/245. Original unmodified BaselinePolicy SHA256 `e4722a44660f8a880c9eeb949c80e81ebb652926f43d71acd64f958762bd6bac`.
@@ -17,5 +17,5 @@
 - **Interpretation:** seat-conditional observed performance is unstable across new seeds and may reflect hero allocations, opponents, turn/action order, not a pure causal seat advantage or policy improvement. All arms use exactly the same untouched policy.
 - **Gradient training steps:** `0`; no model checkpoint or Best/Latest promotion. Artifact `13128209144` expires `2026-12-02T09:10:07Z`; compact receipts are already committed.
 - **Faults:** no R002 failures, no repairs needed. No Arena activity.
-- **PR:** create an R002 PR to main as a dependent/stacked research PR, verify final-head `CI - full-match gate`, do not merge without integration review.
+- **PR:** https://github.com/sstxww/reinforcement-learning/pull/59 (Draft to main, stacked dependency on our own PR #44; do not merge ahead of #44). Verify latest-head `CI - full-match gate` after this documentation update, and do not merge without integration review.
 - **Next:** recommend seat × seed stratified evaluation and research hero allocation confounding before promoting new PPO models. Do not extrapolate the first-round n=3 seat advantage.

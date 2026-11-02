@@ -41,3 +41,7 @@ Changing controlled seat also changes assigned heroes, opponents, turn schedule 
 
 ## Next
 If new seeds show substantial seat differences, propose a model assessment gate averaging over multiple controlled seats and independent seeds, separate from trainer changes and Arena play.
+
+## Pull request
+- Dependent Draft PR #59: https://github.com/sstxww/reinforcement-learning/pull/59 , targets main as requested; **must not merge ahead of R001 PR #44**.
+- Initial PR head before this final documentation commit: `93e03eed74e5ecda1a7a5c042c3879aacc87d1a4`; final head CI must be checked and linked by a PR comment after it finishes.
