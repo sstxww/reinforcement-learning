@@ -15,20 +15,15 @@ from pathlib import Path
 import numpy as np
 
 from .contract import ACTIONS, CARDS, FEATURES, verify_engine
-
-FAMILIES = (
-    ("end_turn", 0, 1), ("refresh", 1, 2), ("freeze", 2, 3),
-    ("upgrade", 3, 4), ("hero_power", 4, 6), ("dark_gift", 6, 7),
-    ("cancel", 7, 8), ("buy", 8, 16), ("sell", 16, 23),
-    ("activate", 23, 30), ("choose", 30, 46), ("play", 46, 126),
-    ("magnetize", 126, 196), ("move", 196, 245),
-)
-
+from .mechanics_audit_f3af3b4d import action_family
 
 def family(action: int) -> str:
+    """Use the already engine-verified 245-action taxonomy, not a duplicate."""
     if type(action) is not int or not 0 <= action < ACTIONS:
         raise ValueError("Invalid action ID")
-    return next(name for name, first, last in FAMILIES if first <= action < last)
+    resolved = action_family(action)
+    return "end_turn" if resolved == "end" else resolved
+
 
 
 def summarize_probabilities(probs, mask, action: int) -> dict:
