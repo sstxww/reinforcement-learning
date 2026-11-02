@@ -1,0 +1,47 @@
+{
+  "schema": 1,
+  "kind": "workflow_baseline_game_evidence_audit",
+  "session_id": "s-20261103-f6497e7a",
+  "task_key": "coordination/v7-atomic-task-ref",
+  "status": "complete_source_verified",
+  "source_workflow": "https://github.com/sstxww/reinforcement-learning/actions/runs/41512216069",
+  "source_job_id": 125506656404,
+  "source_artifact_id": 13173254450,
+  "source_commit": "824a47a090fbab1bb3315a62441c3adaaba3a29e",
+  "receipt": "experiments/s-20261103-f6497e7a/001-99841.json",
+  "source_artifact_receipt_sha256": "890a68e77e04e3a1669fccbb4b5e6a404f26345cf0f6267a31beb541bf436b3b",
+  "verified_dimensions": {
+    "engine": "TavernGym 1.1.0",
+    "source_hash": "6d8712c93022ba11",
+    "observe2_features": 4017,
+    "observe2_cards": 447,
+    "legal_actions": 245
+  },
+  "game": {
+    "policy": "baseline",
+    "controlled_seat": 0,
+    "seed": 99841,
+    "completed": true,
+    "placements": [
+      8,
+      7,
+      3,
+      6,
+      4,
+      5,
+      1,
+      2
+    ],
+    "turns": 14,
+    "decisions": 35,
+    "combat_truncations": 0,
+    "turn_limit_end": false
+  },
+  "claim_ref": "refs/heads/claims/v7/eea1bc1baf2d37ef54955cbdffea8ca0",
+  "claim_create_commit": "3ef0dd71ed39d01151f91870c1551b484366dff7",
+  "training_steps_added": 0,
+  "checkpoint_published": false,
+  "model_evaluated": false,
+  "champion_promoted": false,
+  "notes": "The actual GitHub job and original ZIP were inspected; baseline evidence only. No direct main merge authority."
+}
