@@ -1,0 +1,72 @@
+name: V6.1 isolated raw PPO economy s-20261103-9dc0a960
+
+on:
+  push:
+    branches:
+      - agent/s-20261103-9dc0a960/optimization-001
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: v61-raw-economy-9dc0a960-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  bounded-raw-diagnostic:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install test and CPU PPO dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[train,test]'
+      - name: Check own raw-action mask and accounting tests
+        run: python -m pytest -q tests/test_v61_raw_economy_9dc0a960.py
+      - name: Install pinned public TavernGym engine
+        run: bash scripts/bootstrap_engine.sh
+      - name: Real independent eight-seat scripted baseline (not model strength)
+        run: |
+          mkdir -p outputs
+          python -m tavern_ai.canary --agent-id s-20261103-9dc0a960 \
+            --seed 43837 --policy baseline \
+            --receipt outputs/baseline-43837.json
+          python -m tavern_ai.validate_receipt outputs/baseline-43837.json
+      - name: Download and verify published unpromoted 1408-step candidate
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p checkpoints
+          gh release download v5-s-20261102-68099929-1408-41428692617 \
+            --repo "$GITHUB_REPOSITORY" \
+            --pattern 'model.zip' --pattern 'model.metadata.json' \
+            --dir checkpoints
+          printf '%s  %s\n' \
+            'a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632' \
+            'checkpoints/model.zip' | sha256sum -c -
+          test -s checkpoints/model.metadata.json
+          python -m tavern_ai.contract
+      - name: Bounded unassisted deterministic PPO raw-action trace (no guard)
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m tavern_ai.v61_raw_economy_9dc0a960 \
+            --model checkpoints/model.zip --seed 43837 --max-decisions 480 \
+            --out outputs/raw-ppo-43837.json \
+            --receipt outputs/raw-ppo-complete-43837.json
+          python -m tavern_ai.validate_receipt outputs/raw-ppo-complete-43837.json
+      - name: Upload independently measured evidence, including failed traces
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v61-s-20261103-9dc0a960-raw-43837-${{ github.run_id }}
+          path: outputs/*.json
+          if-no-files-found: warn
+          retention-days: 30
