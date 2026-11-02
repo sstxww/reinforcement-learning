@@ -4,9 +4,10 @@ on:
   push:
     branches:
       - agent/s-20261102-14ce98f3/optimization-001
+    # A marker is required for an explicit retrain. Source/document fixes do not
+    # respend the original 512-step budget or overwrite/duplicate run artifacts.
     paths:
-      - tavern_ai/reward_study.py
-      - tests/test_reward_study.py
+      - .github/session-run-request/s-20261102-14ce98f3.txt
 
 permissions:
   contents: write

@@ -37,13 +37,14 @@ class RewardScale(gym.Wrapper):
 
 def train_arm(*, seed: int, steps: int, scale: float, out: Path, metrics: Path) -> dict:
     """Train one independently seeded MaskablePPO model, save a bounded receipt."""
+    # Validate CLI parameters before importing optional training-only dependencies.
+    # Shared PR CI intentionally installs only the [test] extra.
+    if steps < 128 or steps % 128:
+        raise ValueError("steps must be >=128 and divisible by 128")
     from sb3_contrib import MaskablePPO
     from stable_baselines3.common.callbacks import BaseCallback
     from stable_baselines3.common.logger import configure
     from .model import TavernExtractor
-
-    if steps < 128 or steps % 128:
-        raise ValueError("steps must be >=128 and divisible by 128")
     engine = verify_engine()
     env = RewardScale(TavernEnv(seed=seed), scale)
 
