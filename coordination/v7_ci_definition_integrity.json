@@ -1,0 +1,18 @@
+{
+  "schema": 1,
+  "task_key": "integrate/ci-workflow-definition-integrity",
+  "session_id": "s-20261103-223b16589f",
+  "role": "REPAIRER",
+  "state": "held",
+  "base_main_sha": "c1b828734527bae6141805581693d890cc3bff94",
+  "branch": "agent/s-20261103-223b16589f/optimization-001",
+  "scope": [
+    "scripts/v7_ci_definition_guard_223b16589f.py",
+    "tests/test_v7_ci_definition_guard_223b16589f.py",
+    ".github/workflows/v7-ci-definition-223b16589f.yml",
+    "research/sessions/s-20261103-223b16589f",
+    "research/knowledge/proposals/s-20261103-223b16589f-001.md"
+  ],
+  "prohibits_main_merge": true,
+  "notes": "Exclusive task claim ref only. NOT an integrator lease. Runtime has no globally enforced merge mutex. Claim will be marked released/ready on exit."
+}
