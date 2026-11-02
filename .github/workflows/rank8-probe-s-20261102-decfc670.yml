@@ -1,11 +1,7 @@
 name: Rank8 legal-purchase opportunity probe - s-20261102-decfc670
 
 on:
-  push:
-    branches:
-      - 'agent/s-20261102-decfc670/optimization-001'
-    paths:
-      - '.github/workflows/rank8-probe-s-20261102-decfc670.yml'
+  workflow_dispatch:
 
 permissions:
   contents: write
