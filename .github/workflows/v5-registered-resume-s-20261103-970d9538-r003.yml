@@ -1,0 +1,176 @@
+name: V5 R003 genuine registered Release PPO continuation s-20261103-970d9538
+
+on:
+  push:
+    branches:
+      - agent/s-20261103-970d9538/optimization-003
+    paths:
+      - .github/workflows/v5-registered-resume-s-20261103-970d9538-r003.yml
+
+concurrency:
+  group: v5-r003-s-20261103-970d9538
+  cancel-in-progress: false
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    permissions:
+      contents: read
+    env:
+      GH_TOKEN: ${{ github.token }}
+      SOURCE_TAG: v5-s-20261102-68099929-1408-41428692617
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned Python dependencies
+        run: |
+          python -m pip install -e '.[train,test]'
+      - name: Check canonical trainer resume, source and receipt gates
+        run: |
+          python -m pytest -q tests/test_checkpoint_writer.py tests/test_registry_integrity.py tests/test_release_asset_verifier.py
+          python -m tavern_ai.release_asset_verifier
+      - name: Install and verify pinned TavernGym 1.1 engine
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Original unassisted eight-seat baseline match
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p experiments/s-20261103-970d9538
+          python -m tavern_ai.canary --agent-id s-20261103-970d9538 \
+            --policy baseline --seed 97311 \
+            --receipt experiments/s-20261103-970d9538/003-baseline-97311.json
+          python -m tavern_ai.validate_receipt experiments/s-20261103-970d9538/003-baseline-97311.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('experiments/s-20261103-970d9538/003-baseline-97311.json').read_text())
+          assert d['completed'] is True and sorted(d['placements']) == list(range(1,9))
+          print('V5_R003_BASELINE_RECEIPT='+json.dumps(d,sort_keys=True))
+          PY
+      - name: Strict Release restore of canonical unpromoted 1408-step model
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m tavern_ai.release_restore_entry --model-id "$SOURCE_TAG" --out-dir checkpoints
+          printf '%s  %s\n' a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632 checkpoints/model.zip | sha256sum -c -
+      - name: Exactly 128 real optimizer PPO continuation steps, never overwrite parent
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m tavern_ai.train --steps 128 --seed 42 \
+            --resume checkpoints/model.zip --out checkpoints/candidate.zip
+          python - <<'PY'
+          import json, hashlib
+          from pathlib import Path
+          parent=Path('checkpoints/model.zip')
+          output=Path('checkpoints/candidate.zip')
+          meta=json.loads(output.with_suffix('.metadata.json').read_text())
+          sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+          assert meta['total_timesteps'] == 1536,meta
+          assert sha(parent) == 'a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632'
+          assert meta['parent_checkpoint_sha256'] == sha(parent)
+          assert meta['checkpoint_sha256'] == sha(output)
+          assert sha(output) != sha(parent)
+          print('V5_R003_REAL_RESUME='+json.dumps({'source_sha256':sha(parent),'candidate_sha256':sha(output),'training_steps':meta['total_timesteps'],'new_steps':128},sort_keys=True))
+          PY
+      - name: Raw candidate itself plays complete eight-seat match, no guard
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m tavern_ai.canary --agent-id s-20261103-970d9538 \
+            --policy model --model checkpoints/candidate.zip --seed 97312 \
+            --receipt experiments/s-20261103-970d9538/003-model-97312.json
+          python -m tavern_ai.validate_receipt experiments/s-20261103-970d9538/003-model-97312.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('experiments/s-20261103-970d9538/003-model-97312.json').read_text())
+          assert d['completed'] is True and d['policy'] == 'model'
+          assert sorted(d['placements']) == list(range(1,9))
+          assert not d.get('fallback_actions',0) and not d.get('guard_forced_ends',0)
+          print('V5_R003_RAW_MODEL_RECEIPT='+json.dumps(d,sort_keys=True))
+          PY
+      - name: Check resumed candidate CPU inference and archive integrity
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from sb3_contrib import MaskablePPO
+          from tavern_ai.checkpoint_preflight import audit_archive
+          m=MaskablePPO.load('checkpoints/candidate.zip',device='cpu')
+          assert m.num_timesteps == 1536, m.num_timesteps
+          print('V5_R003_CPU_LOAD_OK',m.num_timesteps)
+          PY
+      - name: Preserve genuine run evidence; Artifact not a permanent Release
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v5-r003-s-20261103-970d9538-${{ github.run_id }}
+          path: |
+            experiments/s-20261103-970d9538/*.json
+            checkpoints/candidate.zip
+            checkpoints/candidate.metadata.json
+          if-no-files-found: ignore
+          retention-days: 30
+
+  publish:
+    needs: smoke
+    if: needs.smoke.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    permissions:
+      contents: write
+      actions: read
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download own run's verified smoke checkpoint and receipts
+        uses: actions/download-artifact@v4
+        with:
+          name: v5-r003-s-20261103-970d9538-${{ github.run_id }}
+          path: payload
+      - name: Recheck source lineage, original real game and digest before release
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json,hashlib
+          from pathlib import Path
+          root=Path('payload')
+          model=root/'checkpoints/candidate.zip'
+          meta=json.loads((root/'checkpoints/candidate.metadata.json').read_text())
+          assert meta['total_timesteps'] == 1536
+          assert meta['parent_checkpoint_sha256'] == 'a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632'
+          assert hashlib.sha256(model.read_bytes()).hexdigest() == meta['checkpoint_sha256']
+          for name,policy in [('003-baseline-97311.json','baseline'),('003-model-97312.json','model')]:
+            d=json.loads((root/'experiments/s-20261103-970d9538'/name).read_text())
+            assert d['completed'] is True and d['policy'] == policy
+            assert sorted(d['placements']) == list(range(1,9))
+            assert d['truncated_combats'] == 0 and d['turn_limit_end'] is False
+          PY
+      - name: Publish immutable unpromoted and re-download byte-exact
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="v5-r003-s-20261103-970d9538-${GITHUB_RUN_ID}"
+          mkdir -p release verify
+          cp payload/checkpoints/candidate.zip release/model.zip
+          cp payload/checkpoints/candidate.metadata.json release/model.metadata.json
+          cp payload/experiments/s-20261103-970d9538/003-baseline-97311.json release/baseline.json
+          cp payload/experiments/s-20261103-970d9538/003-model-97312.json release/model-match.json
+          (cd release && sha256sum model.zip model.metadata.json > checksums.sha256)
+          gh release create "$tag" --repo "$GITHUB_REPOSITORY" \
+            --target "$GITHUB_SHA" --prerelease --title "Unpromoted V5 128-step continuity $tag" \
+            --notes "No Champion promotion; source V5 1408-step hash verified. Original raw model complete match seed 97312. One smoke run is not strength proof." \
+            release/model.zip release/model.metadata.json release/baseline.json \
+            release/model-match.json release/checksums.sha256
+          gh release download "$tag" --repo "$GITHUB_REPOSITORY" \
+            --pattern model.zip --pattern model.metadata.json --dir verify
+          cmp release/model.zip verify/model.zip
+          cmp release/model.metadata.json verify/model.metadata.json
+          echo "V5_R003_DURABLE_RELEASE=$tag"
