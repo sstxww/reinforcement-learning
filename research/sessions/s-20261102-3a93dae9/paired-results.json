@@ -1,0 +1,34 @@
+{
+  "session_id": "s-20261102-3a93dae9",
+  "hypothesis": "Use one zero-cost legal hero power per turn before baseline shop actions",
+  "seeds": [
+    18021,
+    18022
+  ],
+  "candidate": {
+    "n": 2,
+    "placements": [
+      8,
+      8
+    ],
+    "mean_placement": 8.0,
+    "top4_rate": 0.0,
+    "first_place_rate": 0.0
+  },
+  "baseline": {
+    "n": 2,
+    "placements": [
+      8,
+      8
+    ],
+    "mean_placement": 8.0,
+    "top4_rate": 0.0,
+    "first_place_rate": 0.0
+  },
+  "hero_power_actions_per_game": [
+    0,
+    0
+  ],
+  "paired_mean_placement_delta": 0.0,
+  "interpretation": "Exploratory sample; no validated strength improvement claimed"
+}
