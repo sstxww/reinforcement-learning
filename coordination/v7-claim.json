@@ -4,9 +4,9 @@
   "session_id": "s-20261103-c5d8b870",
   "round": "001",
   "role": "EVALUATOR",
-  "state": "claimed",
+  "state": "released_handoff_to_open_pr",
   "issued_at": "2026-11-02T19:48:45.135Z",
-  "expires_at": "2026-11-02T20:13:45.135Z",
+  "expires_at": "2026-11-02T20:02:20.688Z",
   "base_main_sha": "c1b828734527bae6141805581693d890cc3bff94",
   "branch": "agent/s-20261103-c5d8b870/optimization-001",
   "scope": [
@@ -17,5 +17,13 @@
     "reports/s-20261103-c5d8b870/"
   ],
   "integration_lock": false,
-  "note": "Atomic task-claim ref only; not a permission to merge main; will release/expire after handoff."
+  "note": "No main merge right. Source evidence retained on own PR. Claim released; new owner must inspect exact latest HEAD CI, global serializer and owner status.",
+  "released_at": "2026-11-02T20:02:20.688Z",
+  "pr": "https://github.com/sstxww/reinforcement-learning/pull/216",
+  "pr_head_sha": "d43e50ae80fb8db7eebe247596368e4abbeb4bbd",
+  "real_run": "https://github.com/sstxww/reinforcement-learning/actions/runs/41513736888",
+  "real_run_status": "completed_success",
+  "latest_head_ci": "https://github.com/sstxww/reinforcement-learning/actions/runs/41515143031",
+  "latest_head_ci_status_at_release": "in_progress",
+  "merged_by_session": false
 }
