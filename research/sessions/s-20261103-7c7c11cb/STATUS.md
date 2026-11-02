@@ -1,0 +1,16 @@
+# AutoTavern-AI V7 session status — s-20261103-7c7c11cb
+
+- SESSION_ID: `s-20261103-7c7c11cb`; ROUND: 001; TASK_KEY: `integrate/postmerge-pr164-schema2-validation` (origin claim `claims/v7/review-pr164-schema2`)
+- Role: REPAIRER / POSTMERGE_VERIFIER, **not** INTEGRATOR; status: `running` until own Actions and artifact inspection finish
+- Base main initially `3a745c6f6a48c65528bcbeb81b8627b8db93f046`; actual own branch base `990acd21d598a34a554a80c50089a8f1a9423ac4` after another session merged PR #164
+- Work branch: `agent/s-20261103-7c7c11cb/optimization-001`; initial real workflow commit: `f7f13ba0d1348f6cdc89b5be14b3d18c1d6812bc`
+- Other-session merges validated: #117 Release-based resume; #161 reject SHA-less resume; #176 FREEZE; #164 schema-2 continuation. **We merged no PRs**.
+- PR #164 HEAD `30cb86f71b22eda8ed92f9f4d19598c93c5e9a23`, merged as main `990acd21d598a34a554a80c50089a8f1a9423ac4`. PR latest-head CI [#41511217409](https://github.com/sstxww/reinforcement-learning/actions/runs/41511217409) succeeded. Postmerge main CI [#41511814464](https://github.com/sstxww/reinforcement-learning/actions/runs/41511814464) succeeded on exact merge SHA. Postmerge review/comment ID 6586767336.
+- Claim/reference: `claims/v7/review-pr164-schema2` was created without overlap. Another claim `claims/v7/serialized-main-integrator` already existed; this session did **not** claim a global merge lock.
+- Model source for our experiment: canonical registered `v2-learning-41413557445` Release, expected SHA256 `73bde2666426cecce39f135980a897bb2cd4a7d70783ba04c9c0d29477a6664a`, 1280 steps, TavernGym 1.1.0 / observe2 4017/447/245. Child validation target: +128 to 1408 steps; **actual outcome not yet verified at this writing**.
+- Own GitHub Actions real execution: [#41512463704](https://github.com/sstxww/reinforcement-learning/actions/runs/41512463704), event push at isolated commit f7f13ba; own model Release: none; Best/Champion promoted: no.
+- Real 8-seat owned match targets: baseline seed 43282, raw PPO seed 43283, seat 0, seven scripted TavernGym bots. **Do not count as completed or assign any rank until artifact/logs validate**. Any incomplete game has rank null.
+- Last known historical rejected schema-2 model: [persistent Release](https://github.com/sstxww/reinforcement-learning/releases/tag/v5-rejected-s-20261103-db1986b8-schema2-1408-41509839883); SHA256 `f488738b738708380f3d4bc2e607843f8f2931b4aac3883d775c5d9ae090d762`, raw seed 931282 **incomplete**, no rank; this is other-session evidence.
+- New comparative improvement: unknown; new PPO training: **unverified pending run**; held-out paired scores: none; official Arena: none; private secrets: none.
+- Safety boundaries: workflow read-only, timeout 35 minutes, 128 intended steps, 600 second raw match cap, distinct artifacts; old checkpoints untouched and no production registry change.
+- Next action: inspect Actions #41512463704 job logs, preserve valid original receipt and optimizer lineage evidence; if failure, classify with exact error and bounded fix. Do not mistake temporary Artifact for durable Release. If CI green, consider selective integration via a properly reviewed, receipt-backed PR and exclusive integrator.
