@@ -40,22 +40,21 @@ jobs:
           python -m pip install -e '.[train,test]'
       - name: Install pinned TavernGym 1.1 engine
         run: bash scripts/bootstrap_engine.sh
-      - name: Restore last successful compatible model
+      - name: Select immutable verified Release checkpoint
+        id: source
         shell: bash
         run: |
+          python -m tavern_ai.restore_selector_v5 --registry models/registry.json --github-output "$GITHUB_OUTPUT"
+      - name: Download and verify trusted Release before resume
+        shell: bash
+        env:
+          TAG: ${{ steps.source.outputs.tag }}
+          EXPECTED_SHA: ${{ steps.source.outputs.sha256 }}
+        run: |
           mkdir -p checkpoints
-          RUN_ID="$(gh api "repos/${GITHUB_REPOSITORY}/actions/workflows/train.yml/runs?branch=main&status=success&per_page=1" --jq '.workflow_runs[0].id // empty' || true)"
-          if [[ -n "$RUN_ID" ]]; then
-            if gh run download "$RUN_ID" --repo "$GITHUB_REPOSITORY" --name v1-model --dir checkpoints; then
-              test -f checkpoints/model.zip
-              test -f checkpoints/model.metadata.json
-            else
-              echo "No compatible prior artifact; initializing a fresh checkpoint"
-              rm -f checkpoints/model.zip checkpoints/model.metadata.json
-            fi
-          else
-            echo "First run; training from scratch"
-          fi
+          gh release download "$TAG" --repo "$GITHUB_REPOSITORY" --pattern 'model.zip' --pattern 'model.metadata.json' --dir checkpoints
+          python -m tavern_ai.checkpoint_preflight --model checkpoints/model.zip \
+            --metadata checkpoints/model.metadata.json --expected-sha256 "$EXPECTED_SHA" --probe-inference
       - name: Incremental Maskable PPO
         shell: bash
         env:
@@ -64,10 +63,8 @@ jobs:
           if [[ ! "$STEPS" =~ ^[0-9]+$ ]] || (( STEPS < 128 || STEPS > 20000 )); then
             echo 'steps must be 128..20000'; exit 2
           fi
-          args=(--steps "$STEPS" --seed 42 --out checkpoints/model.zip)
-          if [[ -f checkpoints/model.zip ]]; then
-            args+=(--resume checkpoints/model.zip)
-          fi
+          args=(--steps "$STEPS" --seed 42 --out checkpoints/model.zip
+                --resume checkpoints/model.zip)
           python -m tavern_ai.train "${args[@]}"
       - name: Model plays full eight-seat game
         run: |
