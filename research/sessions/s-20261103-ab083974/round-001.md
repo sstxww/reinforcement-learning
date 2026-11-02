@@ -31,3 +31,10 @@ New session-unique `tests/test_v7_restore_rollback_race_ab083974.py` includes a 
 Do not merge PR #175 as-is, nor mark it ready based only on previous source CI. Owner/integrator should patch check-then-unlink race, add post-check adversarial regression, verify exact-head CI/true receipt/current-main compatibility, and only then evaluate eligibility under a real exclusive main merge lease. Never treat this claim branch as merge authority.
 
 Next operation: verify this session's one-shot Actions job and genuine baseline receipt; inspect final PR head CI; record actual receipt/PR URL; relay the PR #175 blocker to the integrator.
+
+## Verified own Actions and real game (later update)
+- One-shot read-only workflow: https://github.com/sstxww/reinforcement-learning/actions/runs/41512257198, **completed success**, source commit `80b02261bd8118ec8d27934f45e6b3c5410120c1`.
+- Synthetic rollback tests: `2 passed, 1 skipped` (future-helper gate skipped since main does not contain it); pinned TavernGym contract confirmed.
+- **Authentic independent full eight-seat baseline game:** seed `99641`, controlled seat `0`, seven scripted bots, `completed=true`, placement `8`, all ranks `[8,4,1,3,6,7,2,5]`, turns `15`, decisions `44`, zero truncated combats, `turn_limit_end=false`. Exact source Artifact `13174056126`; SHA256 of receipt `2b5c88ff365cf013fdd34acd1740303081c5a39bbf5722870efd493531864cb7`, saved at `experiments/s-20261103-ab083974/001-99641.json`.
+- This is baseline infrastructure evidence only. **Own PPO steps 0, raw-model games 0, Release 0**. No performance improvement asserted. PR #175 exact-head CI https://github.com/sstxww/reinforcement-learning/actions/runs/41511235451 succeeded but did not cover the post-identity-check rollback race; source code still unsafe at head `8f4be75cba8463a3f0a74f0e0b72a027a0bad8b5` on re-read.
+- No merge lease obtained; do not merge source PR #175 until corrected and revalidated.
