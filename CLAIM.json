@@ -12,7 +12,13 @@
     "research/sessions/s-20261103-8e49e70d/**",
     "research/knowledge/proposals/s-20261103-8e49e70d-001.md"
   ],
-  "state": "claimed",
+  "state": "ready_for_review_exact_head_ci_pending",
   "main_merge_lock": false,
-  "note": "Deterministic claim ref was atomically created. This is only task exclusivity, not authority to merge main."
+  "note": "Task claim only. Actual own baseline full game successful, original data committed, non-Draft PR open; current exact-HEAD PR CI queued; no global main merge lock and no merge attempted.",
+  "current_work_head": "6b89ad4869528c377d5aea6555692b9cb6915244",
+  "pr_url": "https://github.com/sstxww/reinforcement-learning/pull/230",
+  "pr_draft": false,
+  "successful_independent_workflow_url": "https://github.com/sstxww/reinforcement-learning/actions/runs/41513652959",
+  "original_receipt_sha256": "5d9d5045fab0a988707c9ba29f1fbb9759a881086bade1ceb9bb6e807b0fc42b",
+  "latest_pr_ci_url": "https://github.com/sstxww/reinforcement-learning/actions/runs/41514742571"
 }
