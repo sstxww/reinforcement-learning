@@ -1,62 +1,73 @@
-# AutoTavern-AI 独立会话调优提示词
+# AutoTavern-AI V1：独立会话闭环调优指令（每个会话原样复制）
 
-复制本提示词到**每一个**新 ChatGPT 会话即可。每个会话自己负责完整的研发闭环；不要创建子 Agent 或指挥其他会话。
+你是 `sstxww/reinforcement-learning` 仓库的一名**独立研究会话**。用户会同时开启很多 ChatGPT 会话，**不要创建子 Agent、不要指挥其他会话**。你只对自己的独立实验负责。
 
-## 唯一允许写入的项目
+**唯一写入仓库**：https://github.com/sstxww/reinforcement-learning
+**只读 TavernGym**：https://github.com/MCG-NJU/AutoTavern
+**在线竞技场**：https://rizling.top （未经用户额外授权不进入正式计分匹配）
 
-https://github.com/sstxww/reinforcement-learning
+禁止使用用户本地 A11/AgentDock，禁止控制用户本地电脑。使用 GitHub 连接和真正可用的隔离云端/Actions 执行；不得伪造运行结果或称在聊天结束后自己还会继续工作。
 
-只读依赖：https://github.com/MCG-NJU/AutoTavern
-论文：https://huggingface.co/papers/2610.33845
-竞技场（未授权不得正式参赛）：https://rizling.top
+## 0. 先读项目真实状态（不要直接训练）
 
-## 你的身份与界限
+阅读 `AGENTS.md`、`docs/PROJECT_BACKGROUND.md`、`docs/SESSION_PROTOCOL.md`、**`docs/CLOSED_LOOP.md`**、`research/knowledge/README.md`、最新 PR、GitHub Actions 运行及失败日志。查出已知问题、训练版本、正在占用的文件、可用 checkpoint 和失败经验。**所有决定必须以最新 Commit 和真实日志为准，不能沿用过时的“已通过”口头结论。**
 
-你是**一个独立的调优研究会话**，不是总协调员。其他 ChatGPT 会话会同时执行同一份提示词；你无权控制它们、替它们写总结或合并它们的代码。
+## 1. 自己领取唯一身份与独立分支
 
-禁止使用本地 A11/AgentDock、控制用户电脑、向上游写入、参加未授权的计分竞技、伪造训练/评测/对局结果。允许使用实际可用的 GitHub 连接、隔离云端执行及 GitHub Actions。若没有运行能力，说明阻塞，不得把 CI 的另一场对局谎称为你自己的对局。
+创建未使用过的 `SESSION_ID=s-YYYYMMDD-<8位随机十六进制>`，检查 GitHub 分支/记录防止冲突；从 main 确定的 SHA 新建 `agent/<SESSION_ID>/optimization-001`。先检查开放 PR；选择一个有价值且不会抢改其他会话文件的优化假设。
 
-先读 `AGENTS.md`、`docs/PROJECT_BACKGROUND.md`、`docs/SESSION_PROTOCOL.md`、`research/knowledge/README.md` 以及自己职责涉及的代码与最近 PR。
+自己的实验只写自己的分支、自己的 `research/sessions/<SESSION_ID>/`、`experiments/<SESSION_ID>/` 和 `research/knowledge/proposals/<SESSION_ID>-NNN.md`。不直接写 main，不覆盖其他 Agent，不强推，不使用共享 `train.yml` 的 main-only 工作流进行私有并行训练。
 
-## 你的第一项任务：领取不冲突的身份与研究范围
+## 2. 实际优化 — 必须进入闭环
 
-1. 生成唯一 `SESSION_ID=s-YYYYMMDD-<8位随机十六进制>`，查看远端分支及 `research/sessions/` 防止重名；如冲突立即重取。
-2. 选择单一明确的优化假设：购买/升级策略、PPO 表示、训练稳定性、奖励、评测或工程效率之一。检查**开放 PR** 和其他会话日志，遇到相同文件/方向就主动避开。
-3. 读取 `main` 的 HEAD SHA，创建 `agent/<SESSION_ID>/optimization-001`，**所有提交仅进入自己的分支**。禁止直接修改 main、其他分支、其他会话的实验文件、公共模型 checkpoint 和公共 Actions 并发组。
+严格执行：
 
-## 必须真实完成的本轮工作
+```text
+读最新验证经验 → 明确单个可检验假设
+→ 记录基线 → 最小代码修改 → 单测
+→ 有界真实训练/调优 → 候选模型亲自完成完整八人 TavernGym 对局
+→ 固定独立种子评测旧/新策略 → 保存模型与证据 → 提交 PR
+→ 读取最新经验 → 下一轮
+```
 
-- 在隔离环境运行真实 TavernGym，明确核对 patched v1.1.0 observe2 兼容条件、卡表及动作掩码。
-- 在自己的范围内修改代码，先记录 baseline，再用有界资源预算训练或调优。
-- **至少亲自完整打完 1 局八人 TavernGym 模拟对局**，直到 `Game.is_over()` 为真；自己控制第 0 席，余下 7 席为规则机器人；留下真实名次、seed、决策次数和对局收据。
-- 运行相关单元测试，对有提升主张的改动使用固定的独立随机种子对比（均名、第一/前四率和样本数）；单局结果只说明通路可用，不能证明提升。
-- 云端训练必须独立隔离。现有 `.github/workflows/train.yml` 限制 main 且共享全局并发组，**禁止拿它当多会话的私有训练作业**。确有需要时，在自己分支创建唯一命名、push 触发的有限训练工作流；不能覆盖其他会话的产物。永久保留关键模型需要单独可验证的持久存储，不能依赖会过期的 Artifact。
+每个会话至少亲自完成一局 `Game.is_over()==True` 的 TavernGym 八人对局，第 0 席为自己的候选策略/模型，其他 7 席可以是上游机器人；保存真实种子、动作数、名次、完整收据、GitHub run URL。不能用 CI 的另一场对局冒充自己的，也不能用基线救援对局冒充 PPO 模型的胜率。所有实际训练步数、指标、置信度与样本量必须准确。
 
-## 把经验保存在 GitHub，而不是聊天里
+## 3. 出问题，自己查根因、修复后继续；禁止一错就停
 
-每完成一轮，在自己的分支新增或更新以下文件：
+每个失败必须：
 
-- `research/sessions/<SESSION_ID>/round-001.md`：写明假设、完整操作过程、基础版本 SHA、代码改动、训练和对局真实证据、前后评测、成功与失败经验、问题、下一轮计划。
-- `research/sessions/<SESSION_ID>/STATUS.md`：最新状态、当前分支与 PR、最佳已验证指标、模型/检查点保存位置、如何继续。
-- `experiments/<SESSION_ID>/001-<seed>.json`：由真实 canary 程序生成的完整八人对局收据，不得手写假数据。
-- `research/knowledge/proposals/<SESSION_ID>-001.md`：可供其他会话学习的精简结论，注明实验来源、适用版本、局数、不确定性和建议验证方案。
+1. 读失败的 Actions **job logs**、出错步骤及当前源代码；按可复现的 `failure_signature` 定位问题。
+2. 判断是代码错误、测试假设、模型无进展、数据/版本错配、CPU 预算、网络暂态、GitHub 权限/审批，还是训练质量本身不达标。
+3. 在**自己的分支**做一个最小可解释的修复，增加回归测试；重新执行失败步骤及完整对局门槛。
+4. 一次失败最多进行**2 轮有实质改动的修复重试**；同样的报错不能原封不动反复重跑。若仍失败，隔离该候选，保留诊断记录，换新假设或回到已验证的基线继续**其他可执行实验**。
+5. 如果是缺少 GitHub 权限/审批（例如 Release 403、`action_required`），不要用改 Python 代码掩盖，不能擅自获取密钥或更改仓库设置。记录阻塞与替代方案；需要人为授权的步骤明确报告。
 
-先把这些文件和代码**提交到自己的分支**，建立 PR 指向 main，等待 CI 验证。不能自行合并或修改共享 `research/knowledge/README.md`；由用户/集成会话统一审查合并，避免互相覆盖。
+**已经看到的真实问题**：有 PPO 模型在完整比赛里触发 `Full-game safety limit exceeded`；有 GitHub Release 上传 `HTTP 403`；有站位策略预期动作 55、实际 61 的单测失败；还有大量重复/取消的 Actions 运行。应检查这些问题是否已被其他分支修复，避免重复造轮子。每轮要提出并验证自己的解决方式，而不是机械复读这些故障。
 
-## 下一轮必须利用已有经验
+禁止无界循环、无界重试、无限运行 Actions；限制训练预算、并发和产物保留。只要当前环境、资源和授权允许，就从一个已验证的基线继续下一轮调优，不因单个失败让整条研究线停摆。
 
-开始 `round-002` 前，读取：
-1. main 上 `research/knowledge/` 中已验证的结论；
-2. 自己 `research/sessions/<SESSION_ID>/STATUS.md` 与最新日志；
-3. 其他已合并会话的报告和相关 PR；
-4. 未合并 PR 中可借鉴的实验（标记为“未经验证的线索”）。
+## 4. 训练结果、故障和经验永久可追溯
 
-据此提出**与上一轮不同、可以检验**的新假设，说明借鉴的 GitHub 文档路径/PR，再重复：修改 → 训练 → 完整对局 → 独立评测 → 保存经验 → PR。
+每轮必须提交这些属于自己的文件：
 
-如果本轮结果失败，也要保留简洁的失败结论和复现方式。清理缓存、临时 rollout、大量无用日志，**不要删除唯一有效 checkpoint**，不要把大体积权重提交进 Git 历史。没有持久存储则如实标明。
+- `research/sessions/<SESSION_ID>/round-<NNN>.md` — 改动、训练、对局、对比、成功失败经验和下一轮计划。
+- `research/sessions/<SESSION_ID>/STATUS.md` — 当前进度、已验证结果、PR、可恢复 checkpoint、待修故障。
+- `research/sessions/<SESSION_ID>/failures/<NNN>-<slug>.md` — 每个重要故障的日志 URL、根因、修复、复测结果。
+- `research/knowledge/proposals/<SESSION_ID>-<NNN>.md` — 供其他会话学习的精简经验，明确证据和适用环境。
+- `experiments/<SESSION_ID>/...json` — 真实完整对局收据（只有实际完成才能生成）。
 
-## 执行标准
+提交代码和数据到自己的 Git 分支，创建 PR。不要把临时缓存、无用 rollout、大量日志和权重写进 Git 历史。模型需隔离、留哈希和存储位置；Actions Artifacts 会过期，只能算临时存储。存储不可持久时写明真实局限，不能假称断点续训永久可靠。
 
-在当前会话立刻通过 GitHub 工具展开实际工作，不要只提出方案。可独立执行的步骤直接执行；不要创建子 Agent、不要招募其他会话，不要等它们结束。若遭遇权限限制，交付已完成的提交、真实运行结果和具体阻塞，不得虚报。
+## 5. 避免相互干扰，持续吸收经验
 
-最后报告 Session ID、独立分支、真实完整比赛收据、训练步数、评测指标、经验文档、PR/CI 链接、下一轮研究假设。**此会话只代表自己完成的工作。**
+开始新一轮前读 main 上已合并的 `research/knowledge/` 与最新 `research/sessions/`，还要读自己的历史和其他 PR 的未验证发现。根据**新证据**选择下一轮假设，不要重复失败方案。
+
+任何改动先独立测试，再通过 PR 让集成者合并；你不能擅自合并其他会话，不能取消其他会话 Actions。
+
+## 6. 立即执行，别只回复计划
+
+现在连接 GitHub，确认最新状态、领取独立身份、选择假设、执行调优/训练与真实比赛。遇到可修复问题自己查日志、修复、回归测试并继续，不要每次都问用户怎么修。
+
+如果当前会话已达到执行时间/预算或需要授权：先把**真实**代码、实验记录、失败原因、恢复命令和下一轮假设提交到自己的分支和 PR，再报告准确阻塞。禁止空喊“持续训练中”。
+
+完成时给出 Session ID、分支、Commit/PR、真实 Actions 运行链接、完整比赛证据、训练步数、比较指标、故障修复记录、模型存储状态与下一轮计划。

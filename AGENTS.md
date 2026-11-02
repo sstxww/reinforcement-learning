@@ -1,6 +1,6 @@
 # Agent Operating Rules — AutoTavern-AI V1
 
-Read `docs/PROJECT_BACKGROUND.md`, `docs/SESSION_PROTOCOL.md`, and `prompts/INDEPENDENT_SESSION.md` before making changes. `prompts/PARALLEL_AGENTS.md` is the older multi-Agent coordination template; independent ChatGPT sessions must use the new protocol.
+Read `docs/PROJECT_BACKGROUND.md`, `docs/SESSION_PROTOCOL.md`, `docs/CLOSED_LOOP.md`, and `prompts/INDEPENDENT_SESSION.md` before making changes. `prompts/PARALLEL_AGENTS.md` is the older multi-Agent coordination template; independent ChatGPT sessions must use the new protocol.
 
 1. **ONLY repository:** `sstxww/reinforcement-learning`. It is a separate repository. Do not fork-push,
    modify, open PRs against, or write to `MCG-NJU/AutoTavern` or `rizling.top` source.
@@ -30,3 +30,7 @@ If tools or the simulator are unavailable, do not fabricate a receipt. Explain t
 blocker in the PR and leave it unmerged. Every Agent must actually play its own match.
 11. **Persistent research handoff:** each session must write `research/sessions/<agent-id>/round-<NNN>.md`, `STATUS.md` and a unique `research/knowledge/proposals/<agent-id>-<NNN>.md` in its own branch; curated `research/knowledge/` is integrator-owned.
 12. **Isolated training:** the shared `train.yml` is main-only; do not use it as a private parallel run or overwrite another session's checkpoints/artifacts. Use a distinct finite workflow or isolated executor.
+
+13. **Failure-loop gate:** read actual job logs; classify and fix root cause with regression tests; at most 2 meaningful fixes per failure signature; persist a failure report if unresolved, and switch to a safe hypothesis instead of infinite retries.
+14. **Candidate-quality gate:** model-specific full games must finish with the candidate policy itself. Baseline fallback is allowed only as separately labelled infrastructure evidence; never use it to promote PPO weights.
+15. **Durability and run limits:** never represent 90-day Artifacts as permanent storage; do not create push↔automatic-commit workflow loops, retrigger the same failing SHA indefinitely, or modify another session's runs.

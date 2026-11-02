@@ -1,6 +1,6 @@
 # AutoTavern-AI V1 · Continuous Training Lab
 
-[中文项目背景](docs/PROJECT_BACKGROUND.md) · [多会话独立调优提示词](prompts/INDEPENDENT_SESSION.md) · [并行隔离协议](docs/SESSION_PROTOCOL.md) · [架构](docs/ARCHITECTURE.md) · [竞技场接入](docs/ARENA.md)
+[中文项目背景](docs/PROJECT_BACKGROUND.md) · [多会话闭环调优提示词](prompts/INDEPENDENT_SESSION.md) · [故障自修复闭环](docs/CLOSED_LOOP.md) · [并行隔离协议](docs/SESSION_PROTOCOL.md) · [架构](docs/ARCHITECTURE.md) · [竞技场接入](docs/ARENA.md)
 
 An **independent** AI training/research scaffold built on the open-source [AutoTavern / TavernGym](https://github.com/MCG-NJU/AutoTavern) simulator. The goal is to build a reproducible Battlegrounds agent via a small deterministic baseline, mask-aware PPO, real eight-seat simulated games, incremental checkpoints and multiple coordinated research agents. This is **not** the official pretrained TavernAgent.
 
