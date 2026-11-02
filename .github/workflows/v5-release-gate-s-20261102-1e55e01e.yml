@@ -1,0 +1,68 @@
+name: V5 independent Release-gate proof s-20261102-1e55e01e
+
+on:
+  push:
+    branches:
+      - 'agent/s-20261102-1e55e01e/optimization-001'
+    paths:
+      - '.github/workflows/v5-release-gate-s-20261102-1e55e01e.yml'
+      - 'scripts/v5_train_release_source_1e55e01e.py'
+      - 'tests/test_v5_train_release_source_1e55e01e.py'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: v5-release-gate-s-20261102-1e55e01e
+  cancel-in-progress: false
+
+jobs:
+  source-gate-and-real-match:
+    runs-on: ubuntu-latest
+    timeout-minutes: 65
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Test canonical Release source selection and integrity
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[test]'
+          python -m pytest -q tests/test_v5_train_release_source_1e55e01e.py
+          python scripts/v5_train_release_source_1e55e01e.py \
+            | tee /tmp/release-source-selection.json
+      - name: Install pinned TavernGym engine
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Play independent complete eight-seat TavernGym match
+        run: |
+          mkdir -p experiments/s-20261102-1e55e01e
+          python -m tavern_ai.canary \
+            --agent-id s-20261102-1e55e01e \
+            --policy baseline --seed 95001 \
+            --receipt experiments/s-20261102-1e55e01e/001-95001.json
+          python -m tavern_ai.validate_receipt experiments/s-20261102-1e55e01e/001-95001.json
+      - name: Commit only this session's genuine evidence
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add experiments/s-20261102-1e55e01e/001-95001.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'evidence(v5): complete eight-seat verification game s-20261102-1e55e01e'
+            git push origin HEAD:refs/heads/agent/s-20261102-1e55e01e/optimization-001
+          fi
+      - name: Preserve independent game evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v5-release-gate-s-20261102-1e55e01e
+          path: |
+            experiments/s-20261102-1e55e01e/*.json
+          if-no-files-found: ignore
+          retention-days: 30
