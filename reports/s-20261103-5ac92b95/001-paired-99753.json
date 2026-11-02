@@ -1,0 +1,31 @@
+{
+  "schema": 1,
+  "source": "paired full eight-seat TavernGym receipts",
+  "seed_seat_pairs": [
+    {
+      "seed": 99753,
+      "seat": 0
+    }
+  ],
+  "games_per_arm": 1,
+  "candidate_placements": [
+    8
+  ],
+  "baseline_placements": [
+    7
+  ],
+  "candidate_mean_placement": 8.0,
+  "baseline_mean_placement": 7.0,
+  "candidate_top4_rate": 0.0,
+  "candidate_first_place_rate": 0.0,
+  "paired_differences_candidate_minus_baseline": [
+    1
+  ],
+  "paired_mean_placement_delta": 1.0,
+  "paired_bootstrap_95pct_interval": null,
+  "guarded_candidate_games": 0,
+  "pure_model_candidate_games": 1,
+  "model_promotion_authorized": false,
+  "evidence_status": "insufficient_evidence",
+  "limitations": "No training/heldout seed overlap test; bootstrap measures paired seed variation only, not causality. Guarded games never prove raw policy strength."
+}
