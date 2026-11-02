@@ -231,6 +231,17 @@
     "Current release is an experimental candidate, not a validated Best.",
     "A published model can remain weak. This 1408-step model remains Challenger only: no promotion until independent paired evidence demonstrates strength."
   ],
+  "champion": null,
+  "registry_provenance": {
+    "source": "Original registry from existing main and audited PR #8; V5 1408-step release overlaid after real validated resume",
+    "snapshot_date": "2026-11-02",
+    "release_assets_seen_in_github_api": true,
+    "release_asset_bytes_verified_in_this_session": true,
+    "latest_release_resume_tested": true,
+    "notes": "Source PR reports verified V1-to-384-step continuation, but latest 1280-step Release has not passed independent download+resume. No model promotion is implied.",
+    "latest_v5_release_download_tested": true,
+    "validation_run": "https://github.com/sstxww/reinforcement-learning/actions/runs/41428692617"
+  },
   "source_integration": {
     "source_pr": 8,
     "source_head": "97f11dc827bf",

@@ -1,0 +1,96 @@
+{
+  "schema": 1,
+  "source": "Public GitHub Releases asset API digest field (2026-11-02); expected digests, NOT downloaded-byte verification",
+  "assets": [
+    {
+      "id": "v2-learning-41413557445",
+      "weights": {
+        "url": "https://github.com/sstxww/reinforcement-learning/releases/download/v2-learning-41413557445/model.zip",
+        "sha256": "73bde2666426cecce39f135980a897bb2cd4a7d70783ba04c9c0d29477a6664a"
+      },
+      "metadata": {
+        "url": "https://github.com/sstxww/reinforcement-learning/releases/download/v2-learning-41413557445/model.metadata.json",
+        "sha256": "6f0b433191a8242dcedc627f6be49d1551a82788ce7bfd8e60416ede8146acc0"
+      },
+      "weights_bytes_verified": false,
+      "metadata_bytes_verified": false,
+      "model_load_verified": false,
+      "optimizer_resume_verified": false
+    },
+    {
+      "id": "v1-learning-resume-41413508653",
+      "weights": {
+        "url": "https://github.com/sstxww/reinforcement-learning/releases/download/v1-learning-resume-41413508653/model.zip",
+        "sha256": "79f90ee56e1bf49eac86e39cb76e0df70e2316a5baf5067515bced15649829e7"
+      },
+      "metadata": {
+        "url": "https://github.com/sstxww/reinforcement-learning/releases/download/v1-learning-resume-41413508653/model.metadata.json",
+        "sha256": "5562c29610044263ed8b632c84fc939d6e68bad11616911344e86f450692c010"
+      },
+      "weights_bytes_verified": false,
+      "metadata_bytes_verified": false,
+      "model_load_verified": false,
+      "optimizer_resume_verified": false
+    },
+    {
+      "id": "v1-learning-bfa971c690dd",
+      "weights": {
+        "url": "https://github.com/sstxww/reinforcement-learning/releases/download/v1-learning-bfa971c690dd/model.zip",
+        "sha256": "165785f4a1572a7f30855fc1043024046ff68c826ef1030aaaf746487c2d2dd7"
+      },
+      "metadata": {
+        "url": "https://github.com/sstxww/reinforcement-learning/releases/download/v1-learning-bfa971c690dd/model.metadata.json",
+        "sha256": "542ffae4356893e52044499c92bd668769b1827ed1faeea1bed3c87136d17ad8"
+      },
+      "weights_bytes_verified": false,
+      "metadata_bytes_verified": false,
+      "model_load_verified": false,
+      "optimizer_resume_verified": false
+    },
+    {
+      "id": "v1-learning-9eada5801f99",
+      "weights": {
+        "url": "https://github.com/sstxww/reinforcement-learning/releases/download/v1-learning-9eada5801f99/model.zip",
+        "sha256": "dc5195658995358e70c0d565a979b9cf05ccc5e47ae7adaa0a2f078f01cad917"
+      },
+      "metadata": {
+        "url": "https://github.com/sstxww/reinforcement-learning/releases/download/v1-learning-9eada5801f99/model.metadata.json",
+        "sha256": "74a6b25af97087a003d74a3b8e274ac9dbf95bf91fa409eb0fea1a5cc05e5ac6"
+      },
+      "weights_bytes_verified": false,
+      "metadata_bytes_verified": false,
+      "model_load_verified": false,
+      "optimizer_resume_verified": false
+    },
+    {
+      "id": "v1-learning-41414737020",
+      "weights": {
+        "url": "https://github.com/sstxww/reinforcement-learning/releases/download/v1-learning-41414737020/model.zip",
+        "sha256": "e26c583a5ea2858dbbe420c6ec075e8cede6e9f0d883a40cd0c45e4f48d009ed"
+      },
+      "metadata": {
+        "url": "https://github.com/sstxww/reinforcement-learning/releases/download/v1-learning-41414737020/model.metadata.json",
+        "sha256": "45df2ea3657015c715c1db794081208bf4fe6bba886013fdbcf9a0141ead3ed1"
+      },
+      "weights_bytes_verified": false,
+      "metadata_bytes_verified": false,
+      "model_load_verified": false,
+      "optimizer_resume_verified": false
+    },
+    {
+      "id": "v1-learning-165a76a18afb",
+      "weights": {
+        "url": "https://github.com/sstxww/reinforcement-learning/releases/download/v1-learning-165a76a18afb/model.zip",
+        "sha256": "5e6ea8dcce8d0a66b524692a3d90a8553a0f4115494212cc70e9257e617d1683"
+      },
+      "metadata": {
+        "url": "https://github.com/sstxww/reinforcement-learning/releases/download/v1-learning-165a76a18afb/model.metadata.json",
+        "sha256": "086e5303989a6ed3e65729803af664168f865403584124c6a4918e54f2118937"
+      },
+      "weights_bytes_verified": false,
+      "metadata_bytes_verified": false,
+      "model_load_verified": false,
+      "optimizer_resume_verified": false
+    }
+  ]
+}

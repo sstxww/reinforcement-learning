@@ -1,0 +1,17 @@
+{
+  "champion_promoted": false,
+  "full_game_completed_by_this_check": false,
+  "model_id": "v2-learning-41413557445",
+  "optimizer_archive_entry_present": true,
+  "optimizer_restored": false,
+  "policy_archive_entry_present": true,
+  "ppo_steps_executed": 0,
+  "registry_metadata_steps_consistent": true,
+  "sha256_verified": "73bde2666426cecce39f135980a897bb2cd4a7d70783ba04c9c0d29477a6664a",
+  "torch_model_loaded": false,
+  "zip_crc_verified": true,
+  "source_workflow": "https://github.com/sstxww/reinforcement-learning/actions/runs/41428615729",
+  "source_job_id": 125221250388,
+  "source_commit": "028a2b9830844b1f805536ad459e7f8ac2c74e56",
+  "model_controller_game_performed": false
+}

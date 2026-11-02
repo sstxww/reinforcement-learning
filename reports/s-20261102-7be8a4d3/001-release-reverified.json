@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "run_id": 41428181901,
+  "source_release": "v2-learning-41413557445",
+  "source_steps": 1280,
+  "resumed_steps": 1408,
+  "actual_added_steps": 128,
+  "release_tag": "v5-recovery-s-20261102-7be8a4d3-41428181901",
+  "model_asset": "model.zip",
+  "metadata_asset": "model.metadata.json",
+  "model_sha256": "250be6159508fdd1ef91abb6c7277efe32fa49c726ea347923f18f6a4765e0f0",
+  "hash_verified_after_independent_redownload": true,
+  "model_retrain_verified_in_run": true,
+  "promotion": "NOT ELIGIBLE",
+  "heldout_strength_verified": false,
+  "note": "Original release publish succeeded but CLI #label did not rename assets; this separate run repairs and re-verifies canonical filenames."
+}

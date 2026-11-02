@@ -1,0 +1,92 @@
+{
+  "schema": 1,
+  "session_id": "s-20261102-42875425",
+  "engine_version": "1.1.0",
+  "engine_source_hash": "6d8712c93022ba11",
+  "upstream_commit": "fb61201a557ddd36a411cf44aac51ce4d9b606ce",
+  "patch_sha256": "1e48a071cad63c284debbf917cb012595a405a4ef5ab66180eb2918e205aaac0",
+  "input": {
+    "features": 4017,
+    "cards": 447,
+    "action_mask": 245
+  },
+  "method": "Twin Game.from_json states; modify one existing minion's attack/health using real engine debug; no rollouts or RNG inspection",
+  "cases": [
+    {
+      "seed": 83011,
+      "zone": "hand",
+      "mutated_seat": 1,
+      "observer_seat": 0,
+      "expected_invariant": true,
+      "features_equal": true,
+      "cards_equal": true,
+      "legal_mask_equal": true,
+      "passed": true,
+      "baseline_input_sha256": "cef1a8087b02b84e91c57f7b19a84955686483bebd845095cccacfdbee0e77b1"
+    },
+    {
+      "seed": 83011,
+      "zone": "board",
+      "mutated_seat": 1,
+      "observer_seat": 0,
+      "expected_invariant": true,
+      "features_equal": true,
+      "cards_equal": true,
+      "legal_mask_equal": true,
+      "passed": true,
+      "baseline_input_sha256": "cef1a8087b02b84e91c57f7b19a84955686483bebd845095cccacfdbee0e77b1"
+    },
+    {
+      "seed": 83011,
+      "zone": "hand",
+      "mutated_seat": 0,
+      "observer_seat": 0,
+      "expected_invariant": false,
+      "features_equal": false,
+      "cards_equal": true,
+      "legal_mask_equal": true,
+      "passed": true,
+      "baseline_input_sha256": "4b3e5b8d196e0328f8516ea568cd439833b9c19032d48aad437abf8ce8b1e816"
+    },
+    {
+      "seed": 83012,
+      "zone": "hand",
+      "mutated_seat": 1,
+      "observer_seat": 0,
+      "expected_invariant": true,
+      "features_equal": true,
+      "cards_equal": true,
+      "legal_mask_equal": true,
+      "passed": true,
+      "baseline_input_sha256": "3826e7591fff29d7602436fb1e2e97888bdb32ecf7be53f686e0df97585d2d48"
+    },
+    {
+      "seed": 83012,
+      "zone": "board",
+      "mutated_seat": 1,
+      "observer_seat": 0,
+      "expected_invariant": true,
+      "features_equal": true,
+      "cards_equal": true,
+      "legal_mask_equal": true,
+      "passed": true,
+      "baseline_input_sha256": "3826e7591fff29d7602436fb1e2e97888bdb32ecf7be53f686e0df97585d2d48"
+    },
+    {
+      "seed": 83012,
+      "zone": "hand",
+      "mutated_seat": 0,
+      "observer_seat": 0,
+      "expected_invariant": false,
+      "features_equal": false,
+      "cards_equal": true,
+      "legal_mask_equal": true,
+      "passed": true,
+      "baseline_input_sha256": "5724fcacdb4c8a98c702f2c047d76472134627f73928d90005f17808c1a6de35"
+    }
+  ],
+  "passed": true,
+  "interpretation": "Only same-state hidden-stat noninterference, not complete proof against all information leaks or strategy quality.",
+  "model_training_steps": 0,
+  "ppo_training_steps": 0
+}

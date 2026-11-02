@@ -1,0 +1,75 @@
+name: V5 released-PPO opportunity probe s-20261102-94a71ba0
+
+on:
+  push:
+    branches:
+      - agent/s-20261102-94a71ba0/optimization-001
+    paths:
+      - tavern_ai/v5_opportunity_94a71ba0.py
+      - tests/test_v5_opportunity_94a71ba0.py
+      - .github/workflows/v5-opportunity-94a71ba0.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: v5-opportunity-94a71ba0
+  cancel-in-progress: false
+
+jobs:
+  game-and-diagnostics:
+    if: github.repository == 'sstxww/reinforcement-learning' && github.ref == 'refs/heads/agent/s-20261102-94a71ba0/optimization-001'
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install model/test dependencies
+        run: |
+          python -m pip install -e '.[train,test]'
+          python -m pytest -q
+      - name: Verify pinned TavernGym
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Fetch durable V2 candidate and verify release weight SHA256
+        run: |
+          mkdir -p checkpoints
+          gh release download v2-learning-41413557445 --repo "$GITHUB_REPOSITORY" -p model.zip -p model.metadata.json --dir checkpoints --clobber
+          echo "73bde2666426cecce39f135980a897bb2cd4a7d70783ba04c9c0d29477a6664a  checkpoints/model.zip" | sha256sum --check
+      - name: Real model-controlled eight-seat game with explicit fallback accounting
+        run: |
+          python -m tavern_ai.v5_opportunity_94a71ba0 --seed 83501 --policy model --model checkpoints/model.zip --expected-sha256 73bde2666426cecce39f135980a897bb2cd4a7d70783ba04c9c0d29477a6664a --guard-cap 80 --receipt experiments/s-20261102-94a71ba0/001-83501-model.json --report reports/s-20261102-94a71ba0/001-v2-opportunities.json
+      - name: Independent same-seed real baseline game
+        run: |
+          python -m tavern_ai.v5_opportunity_94a71ba0 --seed 83501 --policy baseline --receipt experiments/s-20261102-94a71ba0/001-83501-baseline.json --report reports/s-20261102-94a71ba0/001-baseline-opportunities.json
+          python -m tavern_ai.validate_receipt experiments/s-20261102-94a71ba0/001-83501-model.json
+          python -m tavern_ai.validate_receipt experiments/s-20261102-94a71ba0/001-83501-baseline.json
+      - name: Persist ONLY real generated metrics and receipts on own branch
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add experiments/s-20261102-94a71ba0 reports/s-20261102-94a71ba0
+          if ! git diff --cached --quiet; then
+            git commit -m "evidence(v5): preserve actual release-model and baseline opportunity traces [skip ci]"
+            git pull --rebase origin "$GITHUB_REF_NAME"
+            git push origin HEAD:"$GITHUB_REF_NAME"
+          fi
+      - name: Temporary independent evidence backup
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v5-opportunity-94a71ba0
+          path: |
+            experiments/s-20261102-94a71ba0/*.json
+            reports/s-20261102-94a71ba0/*.json
+          if-no-files-found: ignore
+          retention-days: 30
