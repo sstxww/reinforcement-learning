@@ -1,0 +1,56 @@
+name: V7 raw V5-1408 paired game s-20261103-4799a663
+on:
+  push:
+    branches:
+      - agent/s-20261103-4799a663/optimization-001
+    paths:
+      - '.github/workflows/v7-raw-pair-s-20261103-4799a663.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: v7-raw-pair-s-20261103-4799a663
+  cancel-in-progress: false
+
+jobs:
+  model-baseline-pair:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install CPU MaskablePPO and test dependencies
+        run: |
+          python -m pip install -e '.[train,test]'
+      - name: Check integrity attribution regressions
+        run: |
+          python -m pytest tests/test_v7_raw_pair_s_20261103_4799a663.py
+      - name: Install official pinned TavernGym and verify native layout
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Restore registered immutable Release to read-only experimental source
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python -m tavern_ai.release_restore_entry --model-id latest --out-dir checkpoints
+          sha256sum checkpoints/model.zip checkpoints/model.metadata.json
+      - name: Actual same-seed raw PPO and seven-bot baseline complete-game attempt
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/v7_raw_pair_s_20261103_4799a663.py \
+            --seed 99687 --agent-id s-20261103-4799a663 \
+            --model checkpoints/model.zip --out-dir outputs
+      - name: Preserve original game receipts OR explicit incomplete failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v7-raw-pair-s-20261103-4799a663-${{ github.run_id }}
+          path: outputs/*.json
+          if-no-files-found: ignore
+          retention-days: 30
