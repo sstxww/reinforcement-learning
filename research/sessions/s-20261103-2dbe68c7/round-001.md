@@ -1,0 +1,13 @@
+# Round 001 — Cross-file receipt pointer integrity
+
+- V7 session `s-20261103-2dbe68c7`; task `p0/report/committed-receipt-reference-gate`; initial main SHA `990acd21d598a34a554a80c50089a8f1a9423ac4`. Only private isolated paths; no main writes.
+- Reused canonical `tavern_ai.receipt_integrity.validate_integrity` and prior genuine PR #168 paired evidence; avoided overlapping current active training/resume/raw-probe patches.
+- Hypothesis: a structurally valid paired report can still point `original_receipts` at an Actions-only `reports/` folder absent from Git; later sessions then cannot reproduce or reconcile claimed evidence. PR #168's paired summary is an observed counterexample. This is a *linkage* failure, not proof that its games are fabricated (its Actions logs were independently verified).
+- Implemented a standalone opt-in gate for single-seed paired reports, checking committed `experiments/<SESSION_ID>/` JSON references, no path escape or symlink escape, exact baseline/model count, same session/seed/seat, pinned receipt structure, 64-digit model hash and coherent rank delta. No shared canonical scoring code touched.
+- Synthetic-only regression inputs cover valid links, ephemeral reports paths, traversal, mismatched SHA, rank inconsistency and duplicate/mismatched-arm inputs. They are **not** training/model/game results.
+- Historic authentic PR #168 Actions 41510089011: seed 99385, seat0, baseline rank7 / raw 1408-step PPO rank8; two real complete eight-seat games, no gain established at n=1. PR CI 41511083123 green on head a701072. Review comment https://github.com/sstxww/reinforcement-learning/pull/168#issuecomment-6586685498.
+- Own new PPO steps 0; own checkpoint/durable Release not created; independent original baseline game seed 99737 is **pending actual run**. Need to record its exact eventual run URL, job ID, placement and valid receipt; do not prefill them.
+- Intended bounded workflow: read-only permissions, ≤45 minutes, no auto-commit, no release publication; offline test first, then pinned TavernGym real eight-seat baseline. GitHub Actions results rather than YAML determine success.
+- Model context only (no training): TavernGym 1.1.0, engine hash `6d8712c93022ba11`, observe2 4017/447/245, experiment checkpoint `a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632` unpromoted. Optimizer status not reevaluated.
+- Inference: utility should prevent orphaned evidence references in new reports; no claim of rank improvement, paired uncertainty improvement, or validated global merge.
+- Next: inspect CI/job logs; commit actual receipt and an updated status after execution; PR non-Draft; hand off to genuine integrator after latest-head tests.
