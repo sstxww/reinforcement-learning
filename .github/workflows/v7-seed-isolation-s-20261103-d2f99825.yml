@@ -44,7 +44,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: v7-seed-s-20261103-d2f99825-\${{ github.run_id }}
+          name: v7-seed-s-20261103-d2f99825-r001
           path: outputs/
           if-no-files-found: ignore
           retention-days: 30
