@@ -1,0 +1,31 @@
+{
+  "schema": 1,
+  "timestamp": "2026-11-02T08:37:55.114049+00:00",
+  "environment": "TavernGym",
+  "engine_source_hash": "6d8712c93022ba11",
+  "engine_version": "1.1.0",
+  "agent_id": "s-20261102-14ce98f3",
+  "policy": "model_guarded",
+  "policy_version": "reward-study-v1-end-turn-cap",
+  "max_actions_per_turn": 18,
+  "guarded_ends": 0,
+  "illegal_actions": 0,
+  "seed": 26012,
+  "completed": true,
+  "turns": 14,
+  "decisions": 27,
+  "placements": [
+    8,
+    5,
+    6,
+    2,
+    1,
+    4,
+    7,
+    3
+  ],
+  "truncated_combats": 0,
+  "turn_limit_end": false,
+  "git_sha": "4bd49b30b0889027c907d5c89b93dce492125f82",
+  "model_sha256": "6b086172e7d08a7d19fa64ab67034193e6f340c4c64078eff3f941c1e369679d"
+}

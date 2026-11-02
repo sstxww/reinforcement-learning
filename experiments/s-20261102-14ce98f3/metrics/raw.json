@@ -1,0 +1,28 @@
+{
+  "schema": 1,
+  "session_id": "s-20261102-14ce98f3",
+  "variant": "raw",
+  "reward_scale": 1.0,
+  "seed": 74231,
+  "requested_timesteps": 256,
+  "actual_timesteps": 256,
+  "engine": {
+    "version": "1.1.0",
+    "source_hash": "6d8712c93022ba11",
+    "features": 4017,
+    "cards": 447,
+    "actions": 245,
+    "n_cards": 3984
+  },
+  "training_algorithm": "MaskablePPO",
+  "model_sha256": "6b086172e7d08a7d19fa64ab67034193e6f340c4c64078eff3f941c1e369679d",
+  "model_artifact_path": "checkpoints/s-20261102-14ce98f3/raw.zip",
+  "commit": "c6f075f5befb56f3424088ac8b2bc689362436fb",
+  "observed_rewards": 256,
+  "mean_training_reward": -0.00390625,
+  "std_training_reward": 0.06237781024480981,
+  "train_value_loss": 0.5108554218895733,
+  "train_approx_kl": 0.0031453119590878487,
+  "train_explained_variance": -2.4957480430603027,
+  "log_records": 2
+}
