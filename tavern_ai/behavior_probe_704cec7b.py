@@ -50,6 +50,7 @@ def summarize(events: list[dict]) -> dict:
     had_buy_in_turn = set()
     selected_buys = 0
     forced_end = 0
+    buy_overrides = 0
     observed_unchanged = 0
     repeats = 0
     last_by_turn: dict[int, int] = {}
@@ -68,6 +69,8 @@ def summarize(events: list[dict]) -> dict:
             selected_buys += 1
         if row["forced_end"]:
             forced_end += 1
+        if row.get("buy_override"):
+            buy_overrides += 1
         if row.get("public_observation_unchanged") is True:
             observed_unchanged += 1
         if last_by_turn.get(turn) == action:
@@ -91,6 +94,7 @@ def summarize(events: list[dict]) -> dict:
         "end_turn_while_buy_legal": end_with_legal_buy,
         "turns_ended_with_buy_legal": len(ended_turn_with_buy),
         "guard_forced_end_turns": forced_end,
+        "explicit_buy_overrides": buy_overrides,
         "same_action_adjacent_within_turn": repeats,
         "observable_unchanged_post_actions": observed_unchanged,
         "per_turn": per_turn,
@@ -99,7 +103,18 @@ def summarize(events: list[dict]) -> dict:
     }
 
 
-def run(seed: int, model_path: Path, expected_sha256: str) -> dict:
+def first_legal_buy_if_empty_board(proposed: int, mask: np.ndarray, board_size: float, enabled: bool) -> int:
+    """Only one-factor constrained purchase when the public board is empty.
+
+    This is an explicit strategy intervention, not an assertion that the raw
+    PPO policy learned to purchase. It uses own public board size + legal mask.
+    """
+    if enabled and proposed in (1, 2) and board_size == 0 and bool(mask[8:16].any()):
+        return int(np.flatnonzero(mask[8:16])[0]) + 8
+    return proposed
+
+
+def run(seed: int, model_path: Path, expected_sha256: str, *, buy_when_empty_board: bool = False) -> dict:
     import taverngym
     from sb3_contrib import MaskablePPO
 
@@ -137,6 +152,7 @@ def run(seed: int, model_path: Path, expected_sha256: str) -> dict:
                 raise ValueError("Public observation / mask mismatch")
             before = hashlib.sha256(features.tobytes() + cards.tobytes() + mask.tobytes()).hexdigest()
             forced = used >= TURN_BUDGET
+            proposed_action = None
             if forced:
                 if not mask[0]:
                     raise RuntimeError("No legal end turn at budget")
@@ -144,11 +160,15 @@ def run(seed: int, model_path: Path, expected_sha256: str) -> dict:
             else:
                 proposal, _ = model.predict({"features": features, "cards": cards},
                                             action_masks=mask, deterministic=True)
-                action = int(np.asarray(proposal).item())
+                proposed_action = int(np.asarray(proposal).item())
+                action = first_legal_buy_if_empty_board(proposed_action, mask, float(features[33]),
+                                                       buy_when_empty_board)
             if action < 0 or action >= ACTIONS or not mask[action]:
                 raise RuntimeError("Model/guard produced illegal action")
             event = {
                 "turn": turn, "action": action,
+                "model_proposed_action": proposed_action,
+                "buy_override": bool(proposed_action is not None and proposed_action != action),
                 "forced_end": forced,
                 "buy_legal": bool(mask[8:16].any()),
                 "board_size_observed": float(features[33]),
@@ -174,7 +194,7 @@ def run(seed: int, model_path: Path, expected_sha256: str) -> dict:
         "engine_version": engine["version"],
         "engine_source_hash": engine["source_hash"],
         "agent_id": "s-20261102-704cec7b",
-        "policy": "guarded_model_diagnostic_not_raw",
+        "policy": "guarded_model_buy_when_empty" if buy_when_empty_board else "guarded_model_diagnostic_not_raw",
         "seed": seed, "completed": True,
         "turns": int(game.turn),
         "decisions": len(events),
@@ -186,6 +206,7 @@ def run(seed: int, model_path: Path, expected_sha256: str) -> dict:
         "diagnostics": summarize(events),
         "all_action_events": events,
         "promotion_eligible": False,
+        "buy_when_empty_board": buy_when_empty_board,
     }
     validate(result)
     if sorted(result["placements"]) != list(range(1, 9)):
@@ -198,9 +219,11 @@ def main() -> None:
     p.add_argument("--model", required=True, type=Path)
     p.add_argument("--expected-sha256", required=True)
     p.add_argument("--seed", required=True, type=int)
+    p.add_argument("--buy-when-empty-board", action="store_true")
     p.add_argument("--receipt", required=True, type=Path)
     args = p.parse_args()
-    result = run(args.seed, args.model, args.expected_sha256)
+    result = run(args.seed, args.model, args.expected_sha256,
+                 buy_when_empty_board=args.buy_when_empty_board)
     args.receipt.parent.mkdir(parents=True, exist_ok=True)
     args.receipt.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n",
                             encoding="utf-8")
