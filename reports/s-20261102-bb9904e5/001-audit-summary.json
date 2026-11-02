@@ -1,0 +1,44 @@
+{
+  "schema": 1,
+  "session_id": "s-20261102-bb9904e5",
+  "audit_workflow_run": "https://github.com/sstxww/reinforcement-learning/actions/runs/41428217708",
+  "audit_run_id": 41428217708,
+  "audit_run_head_sha": "7c434f22cc5479eb757964dafb83fe8ade95d195",
+  "main_sha_at_scan_start": "31dc7c82ad2fcba461706b4f324d743b5c1c2b9e",
+  "main_sha_at_scan_end": "c85d566cccccf5e2ef7de09b6cc95e1aa506da9c",
+  "main_stable_during_scan": false,
+  "open_pr_count": 76,
+  "scanned_pr_count": 76,
+  "preliminary_category_counts": {
+    "B_fix_or_verify_before_merge": 53,
+    "D_negative_or_no_gain": 23
+  },
+  "category_caveat": "Draft/CI/stacked classification is a preliminary triage only; no PR is automatically merge approved.",
+  "live_full_inventory_artifact": "https://github.com/sstxww/reinforcement-learning/actions/runs/41428217708/artifacts/13133311312",
+  "full_inventory_artifact_retention_days": 30,
+  "canary": {
+    "policy": "baseline",
+    "seed": 92031,
+    "agent_id": "s-20261102-bb9904e5",
+    "receipt": "experiments/s-20261102-bb9904e5/001-92031.json",
+    "completed": true,
+    "turns": 14,
+    "decisions": 56,
+    "seat0_rank": 7,
+    "placements": [
+      7,
+      5,
+      4,
+      6,
+      3,
+      2,
+      1,
+      8
+    ],
+    "truncated_combats": 0,
+    "turn_limit_end": false
+  },
+  "model_training_steps": 0,
+  "model_matches": 0,
+  "champion_promotion": false
+}
