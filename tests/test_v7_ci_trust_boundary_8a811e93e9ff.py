@@ -24,6 +24,8 @@ def test_benign_isolated_change_passes():
 
 @pytest.mark.parametrize("path", [
     ".github/workflows/ci.yml",
+    ".github/workflows/v7-serialized-integrator.yml",
+    "scripts/v7_serial_integrator.py",
     "tavern_ai/canary.py",
     "tavern_ai/validate_receipt.py",
     "tavern_ai/receipt_integrity.py",
@@ -58,6 +60,7 @@ def test_cannot_rename_over_trusted_workflow():
     ([], 1),
     ([file("x.py")], 2),
     ([file("x.py")], 0),
+    ([file("x.py"), file("x.py")], 2),
     ([file("x.py")], 3001),
     ([file("../tavern_ai/canary.py")], 1),
     ([file("scripts\\check_pr_evidence.py")], 1),
