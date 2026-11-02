@@ -8,7 +8,7 @@
 | Work branch | `agent/s-20261103-469d13fa/optimization-001` |
 | Atomic task claim | `claims/integrate-pr174` created successfully; owner record commit `dfa4024ce065ff353e600f7546327680a5879594` |
 | Shared main merge lock | **Not held**; coordination ref's released lease reports concurrent merge despite prior lease |
-| Target PR | https://github.com/sstxww/reinforcement-learning/pull/174 |
+| Target PR under review | https://github.com/sstxww/reinforcement-learning/pull/174 |
 | Expected PR head | `874bbba4377c229c2218b565779dd4dc7d3b0104` |
 | PR state | Ready/non-Draft; `mergeable_state=clean`, old base SHA `70c411b6`; re-validate immediately before merge |
 | Exact PR-head CI | https://github.com/sstxww/reinforcement-learning/actions/runs/41511087345 — SUCCESS, all checked job steps |
@@ -36,3 +36,8 @@ This status is an auditable handoff, not proof of additional training, model str
 - Authentic TavernGym 1.1.0 / source `6d8712c93022ba11`, seed **99517**, controlled seat 0 **rank 8**, placements **[8,2,6,7,1,5,3,4]**, 17 turns, 54 decisions; completed=true; 0 truncated combats; no turn-limit end.
 - Explicitly baseline only. No model-controlled game, no new PPO steps, no training Release, no rank improvement or Champion. Original one-shot workflow was retired after success at commit `e2d43b5ec79e27e64dfe7558c2010c5ac966439b` to avoid future push loops.
 - This confirms infrastructure execution, not learned policy quality. PR #174's own distinct baseline seed 99431 rank 8 remains independently attributable to its author; do not conflate the two receipts.
+
+## Submitted own integration evidence PR
+
+- Independent non-Draft [PR #210](https://github.com/sstxww/reinforcement-learning/pull/210) opened from `agent/s-20261103-469d13fa/optimization-001` into `main` with unique session-scoped original receipt, source hashes, claim status, concrete review and future merge-gate handoff. Original PR creation head `d3a2c0c90eae6e3b31162df2ee950a67febc4758` (this status update will advance it).
+- PR #210 is an **evidence PR**, not the original audited #174 and not permission to merge either PR without exclusive main integration lane. Await **final** exact HEAD CI before any readiness claim; no main merge performed.
