@@ -1,0 +1,149 @@
+name: Verify candidate Release download and actual PPO resume
+
+on:
+  push:
+    branches: ['agent/learning/v1']
+    paths: ['.github/workflows/verify-release-resume.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: v1-release-resume-check-learning
+  cancel-in-progress: false
+
+jobs:
+  verified-resume:
+    if: github.repository == 'sstxww/reinforcement-learning' && github.ref == 'refs/heads/agent/learning/v1'
+    runs-on: ubuntu-latest
+    timeout-minutes: 80
+    env:
+      GH_TOKEN: ${{ github.token }}
+      SOURCE_TAG: v1-learning-9eada5801f99
+      SOURCE_SHA256: dc5195658995358e70c0d565a979b9cf05ccc5e47ae7adaa0a2f078f01cad917
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies and run unit tests
+        run: |
+          python -m pip install -e '.[train,test]'
+          python -m pytest
+      - name: Install real pinned TavernGym and verify observation contract
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Download actual persisted Release and check checksum
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p checkpoints/source
+          gh release download "$SOURCE_TAG" --repo "$GITHUB_REPOSITORY" \
+            --pattern model.zip --pattern model.metadata.json --dir checkpoints/source
+          printf '%s  %s\n' "$SOURCE_SHA256" checkpoints/source/model.zip | sha256sum --check -
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          m=json.loads(Path('checkpoints/source/model.metadata.json').read_text())
+          assert m['checkpoint_sha256']=='dc5195658995358e70c0d565a979b9cf05ccc5e47ae7adaa0a2f078f01cad917'
+          assert m['total_timesteps']==256 and m['engine']['version']=='1.1.0'
+          assert m['compatibility']['engine']==m['engine']
+          print('Confirmed authentic 256-step source checkpoint from release')
+          PY
+      - name: Load model and continue real MaskablePPO training for 128 steps
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m tavern_ai.train --steps 128 --seed 42 \
+            --resume checkpoints/source/model.zip --out checkpoints/next/model.zip
+          python - <<'PY'
+          import json, hashlib
+          from pathlib import Path
+          before=json.loads(Path('checkpoints/source/model.metadata.json').read_text())
+          after=json.loads(Path('checkpoints/next/model.metadata.json').read_text())
+          checkpoint=Path('checkpoints/next/model.zip')
+          assert after['compatibility']==before['compatibility']
+          assert after['total_timesteps']==384
+          assert after['increment_timesteps']==128
+          assert hashlib.sha256(checkpoint.read_bytes()).hexdigest()==after['checkpoint_sha256']
+          print('Resumed checkpoint verified: 256 -> 384 real PPO steps')
+          PY
+      - name: Complete genuine model-controlled eight-seat TavernGym game
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p experiments/learning reports/learning
+          python -m tavern_ai.canary --agent-id learning --policy model \
+            --model checkpoints/next/model.zip --seed 23001 \
+            --receipt "experiments/learning/release-resume-${GITHUB_RUN_ID}.json"
+          python -m tavern_ai.validate_receipt "experiments/learning/release-resume-${GITHUB_RUN_ID}.json"
+          python -m tavern_ai.evaluate --model checkpoints/next/model.zip \
+            --games 3 --start-seed 26500 \
+            --out "reports/learning/release-resume-heldout-${GITHUB_RUN_ID}.json"
+      - name: Save reproducible validation summary to repository branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          n=os.environ['GITHUB_RUN_ID']
+          meta=json.loads(Path('checkpoints/next/model.metadata.json').read_text())
+          match=json.loads(Path(f'experiments/learning/release-resume-{n}.json').read_text())
+          evaluation=json.loads(Path(f'reports/learning/release-resume-heldout-{n}.json').read_text())
+          assert match['completed'] and match['model_sha256']==meta['checkpoint_sha256']
+          report={'schema':1,'source_release':'v1-learning-9eada5801f99',
+            'source_model_sha256':os.environ['SOURCE_SHA256'],'source_steps':256,
+            'source_release_download_verified':True,
+            'resumed_steps':meta['total_timesteps'],'increment_steps':meta['increment_timesteps'],
+            'resumed_model_sha256':meta['checkpoint_sha256'],
+            'model_full_game_completed':match['completed'],
+            'model_match_seed':match['seed'],'model_placement':match['placements'][0],
+            'model_decisions':match['decisions'],'evaluation':evaluation,
+            'model_role':'candidate_unpromoted',
+            'claim':'Release download, real PPO resume, and model full-match checked; no model strength claim'}
+          Path(f'reports/learning/release-resume-{n}.json').write_text(json.dumps(report,indent=2)+'\n')
+          print(json.dumps(report))
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add experiments/learning/release-resume-*.json reports/learning/release-resume-*.json
+          git commit -m "evidence(learning): verify persistent Release and real PPO resume"
+          git pull --rebase origin "$GITHUB_REF_NAME"
+          git push origin "HEAD:$GITHUB_REF_NAME"
+      - name: Publish unpromoted resumable 384-step candidate and verify its assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="v1-learning-resume-${GITHUB_RUN_ID}"
+          gh release create "$tag" \
+            checkpoints/next/model.zip checkpoints/next/model.metadata.json \
+            "experiments/learning/release-resume-${GITHUB_RUN_ID}.json" \
+            "reports/learning/release-resume-${GITHUB_RUN_ID}.json" \
+            "reports/learning/release-resume-heldout-${GITHUB_RUN_ID}.json" \
+            --repo "$GITHUB_REPOSITORY" --target "$(git rev-parse HEAD)" \
+            --prerelease --title "AutoTavern V1 verified-resume candidate $tag" \
+            --notes "From v1-learning-9eada5801f99; real 256 to 384-step PPO resume with genuine full game. Candidate only, NOT Best."
+          mkdir -p checkpoints/verify-published
+          gh release download "$tag" --repo "$GITHUB_REPOSITORY" \
+            --pattern model.zip --pattern model.metadata.json --dir checkpoints/verify-published
+          cmp checkpoints/next/model.zip checkpoints/verify-published/model.zip
+          cmp checkpoints/next/model.metadata.json checkpoints/verify-published/model.metadata.json
+          echo "Verified published candidate release: $tag"
+      - name: Preserve audit copy of model and JSON evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-resume-check-${{ github.run_id }}
+          path: |
+            checkpoints/next/model.zip
+            checkpoints/next/model.metadata.json
+            experiments/learning/release-resume-*.json
+            reports/learning/release-resume-*.json
+          if-no-files-found: ignore
+          retention-days: 30
