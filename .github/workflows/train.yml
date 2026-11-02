@@ -11,6 +11,16 @@ on:
         description: 'Held-out full games: 1 to 10'
         required: true
         default: '3'
+      source_release:
+        description: 'Optional explicit Release tag from verified models/release_asset_digests.json'
+        required: false
+        type: string
+        default: ''
+      allow_fresh_start:
+        description: 'Explicitly allow random initialization ONLY when no prior checkpoint exists'
+        required: false
+        type: boolean
+        default: false
   schedule:
     - cron: '13 4 * * 1'
 
@@ -40,22 +50,37 @@ jobs:
           python -m pip install -e '.[train,test]'
       - name: Install pinned TavernGym 1.1 engine
         run: bash scripts/bootstrap_engine.sh
-      - name: Restore last successful compatible model
+      - name: Verify an explicit Release or fail-closed prior Artifact
         shell: bash
+        env:
+          RESUME_RELEASE: ${{ github.event.inputs.source_release || '' }}
+          ALLOW_FRESH_START: ${{ github.event.inputs.allow_fresh_start || 'false' }}
         run: |
+          set -euo pipefail
           mkdir -p checkpoints
-          RUN_ID="$(gh api "repos/${GITHUB_REPOSITORY}/actions/workflows/train.yml/runs?branch=main&status=success&per_page=1" --jq '.workflow_runs[0].id // empty' || true)"
-          if [[ -n "$RUN_ID" ]]; then
-            if gh run download "$RUN_ID" --repo "$GITHUB_REPOSITORY" --name v1-model --dir checkpoints; then
-              test -f checkpoints/model.zip
-              test -f checkpoints/model.metadata.json
-            else
-              echo "No compatible prior artifact; initializing a fresh checkpoint"
-              rm -f checkpoints/model.zip checkpoints/model.metadata.json
-            fi
+          if [[ -n "$RESUME_RELEASE" ]]; then
+            echo "Explicit Release recovery requested: $RESUME_RELEASE"
+            gh release download "$RESUME_RELEASE" --repo "$GITHUB_REPOSITORY" \
+              --pattern 'model.zip' --pattern 'model.metadata.json' --dir checkpoints
+            python -m tavern_ai.release_asset_verifier \
+              --model-id "$RESUME_RELEASE" --weights checkpoints/model.zip \
+              --metadata checkpoints/model.metadata.json --check-load
           else
-            echo "First run; training from scratch"
+            RUN_ID="$(gh api "repos/${GITHUB_REPOSITORY}/actions/workflows/train.yml/runs?branch=main&status=success&per_page=1" --jq '.workflow_runs[0].id // empty')"
+            if [[ -n "$RUN_ID" ]]; then
+              echo "Recovering prior main training Artifact from run $RUN_ID"
+              gh run download "$RUN_ID" --repo "$GITHUB_REPOSITORY" \
+                --name v1-model --dir checkpoints || {
+                  echo 'ERROR: previous Artifact unavailable; refusing silent random restart.' >&2
+                  echo 'Choose a verified source_release manually, or opt into fresh_start explicitly after clearing the source.' >&2
+                  exit 2
+                }
+            fi
           fi
+          gate_args=(--checkpoint checkpoints/model.zip --metadata checkpoints/model.metadata.json)
+          if [[ "$ALLOW_FRESH_START" == "true" ]]; then gate_args+=(--allow-fresh-start); fi
+          python -m tavern_ai.continuation_gate "${gate_args[@]}"
+          echo 'Model archive gate passed; optimizer continuation still requires real training.'
       - name: Incremental Maskable PPO
         shell: bash
         env:

@@ -1,0 +1,150 @@
+name: V5 isolated 128-step Release resume s-20261102-2b9660fa
+
+on:
+  push:
+    branches:
+      - agent/s-20261102-2b9660fa/optimization-001
+    paths:
+      - .github/workflows/v5-release-resume-s-20261102-2b9660fa.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-resume-s-20261102-2b9660fa
+  cancel-in-progress: false
+
+jobs:
+  real-release-resume:
+    runs-on: ubuntu-latest
+    timeout-minutes: 100
+    env:
+      GH_TOKEN: ${{ github.token }}
+      SOURCE_TAG: v2-learning-41413557445
+      SOURCE_SHA256: 73bde2666426cecce39f135980a897bb2cd4a7d70783ba04c9c0d29477a6664a
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install isolated training dependencies and pinned TavernGym
+        run: |
+          python -m pip install -e '.[train,test]'
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Download BOTH genuine Release assets and validate before loading
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p checkpoints/source checkpoints/next reports/s-20261102-2b9660fa
+          gh release download "$SOURCE_TAG" --repo "$GITHUB_REPOSITORY" --pattern model.zip --dir checkpoints/source
+          gh release download "$SOURCE_TAG" --repo "$GITHUB_REPOSITORY" --pattern model.metadata.json --dir checkpoints/source
+          python -m tavern_ai.release_asset_verifier --model-id "$SOURCE_TAG" \
+            --weights checkpoints/source/model.zip \
+            --metadata checkpoints/source/model.metadata.json --check-load
+          python -m tavern_ai.continuation_gate \
+            --checkpoint checkpoints/source/model.zip \
+            --metadata checkpoints/source/model.metadata.json \
+            --expected-sha256 "$SOURCE_SHA256"
+      - name: Real, finite 128-step optimizer continuation
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m tavern_ai.train --steps 128 --seed 85622 \
+            --resume checkpoints/source/model.zip --out checkpoints/next/model.zip
+          python -m tavern_ai.continuation_gate \
+            --checkpoint checkpoints/next/model.zip \
+            --metadata checkpoints/next/model.metadata.json
+          python - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          before=json.loads(Path('checkpoints/source/model.metadata.json').read_text())
+          after=json.loads(Path('checkpoints/next/model.metadata.json').read_text())
+          source_sha=hashlib.sha256(Path('checkpoints/source/model.zip').read_bytes()).hexdigest()
+          new_sha=hashlib.sha256(Path('checkpoints/next/model.zip').read_bytes()).hexdigest()
+          if source_sha!=os.environ['SOURCE_SHA256']:
+              raise SystemExit('Source SHA mismatch after download')
+          if int(before['total_timesteps'])!=1280 or int(after['total_timesteps'])!=1408:
+              raise SystemExit('Did not really continue the model by 128 steps')
+          if new_sha==source_sha or after.get('checkpoint_sha256')!=new_sha:
+              raise SystemExit('Saved continuation weights or metadata digest invalid')
+          if after.get('parent_checkpoint_sha256')!=source_sha:
+              raise SystemExit('Lost checkpoint provenance during continuation')
+          report={'schema':1,'session_id':'s-20261102-2b9660fa','source_release':os.environ['SOURCE_TAG'],
+                  'source_checkpoint_sha256':source_sha,'source_steps':1280,
+                  'new_steps':128,'total_steps':1408,'new_checkpoint_sha256':new_sha,
+                  'model_full_game_verified':False,'champion_promoted':False,
+                  'game_status':'pending','durable_release_status':'pending_complete_game'}
+          Path('reports/s-20261102-2b9660fa/002-resume.json').write_text(json.dumps(report,indent=2)+'\n')
+          print(json.dumps(report))
+          PY
+      - name: New weights themselves play a complete eight-seat TavernGym match
+        shell: bash
+        run: |
+          set -euo pipefail
+          timeout 1200 python -m tavern_ai.canary \
+            --agent-id s-20261102-2b9660fa --policy model \
+            --model checkpoints/next/model.zip --seed 85623 \
+            --receipt experiments/s-20261102-2b9660fa/002-85623-model.json
+          python -m tavern_ai.validate_receipt experiments/s-20261102-2b9660fa/002-85623-model.json
+      - name: Publish unique UNPROMOTED research Release only after authentic model match
+        shell: bash
+        run: |
+          set -euo pipefail
+          TAG="v5-smoke-s-20261102-2b9660fa-${GITHUB_RUN_ID}"
+          mkdir -p checkpoints/publish
+          cp checkpoints/next/model.zip checkpoints/publish/model.zip
+          cp checkpoints/next/model.metadata.json checkpoints/publish/model.metadata.json
+          gh release create "$TAG" \
+            checkpoints/publish/model.zip \
+            checkpoints/publish/model.metadata.json \
+            experiments/s-20261102-2b9660fa/002-85623-model.json \
+            --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --prerelease \
+            --title "UNPROMOTED 128-step continuation s-20261102-2b9660fa" \
+            --notes "Only an engineering resume smoke; source V2 1280 steps, +128 real PPO steps. Completed real model-only eight-seat game. Not a Champion or validated strength gain."
+          mkdir -p checkpoints/rechecked
+          gh release download "$TAG" --repo "$GITHUB_REPOSITORY" --pattern model.zip --dir checkpoints/rechecked
+          gh release download "$TAG" --repo "$GITHUB_REPOSITORY" --pattern model.metadata.json --dir checkpoints/rechecked
+          cmp checkpoints/next/model.zip checkpoints/rechecked/model.zip
+          cmp checkpoints/next/model.metadata.json checkpoints/rechecked/model.metadata.json
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          p=Path('reports/s-20261102-2b9660fa/002-resume.json')
+          r=json.loads(p.read_text())
+          receipt=json.loads(Path('experiments/s-20261102-2b9660fa/002-85623-model.json').read_text())
+          assert receipt['completed'] is True and receipt['policy']=='model'
+          r['model_full_game_verified']=True
+          r['game_status']='complete'
+          r['game_seed']=receipt['seed']
+          r['game_place']=receipt['placements'][0]
+          r['game_decisions']=receipt['decisions']
+          r['durable_release_status']='published_and_byte_rechecked_unpromoted'
+          r['release_tag']='v5-smoke-s-20261102-2b9660fa-'+os.environ['GITHUB_RUN_ID']
+          p.write_text(json.dumps(r,indent=2)+'\n')
+          PY
+      - name: Commit authentic own evidence only (not binary weights)
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add reports/s-20261102-2b9660fa/002-resume.json experiments/s-20261102-2b9660fa/002-85623-model.json
+          git diff --cached --quiet && exit 0
+          git commit -m 'evidence: verified V2 Release PPO continuation and genuine model match s-20261102-2b9660fa'
+          git pull --rebase origin "$GITHUB_REF_NAME"
+          git push origin "HEAD:refs/heads/$GITHUB_REF_NAME"
+      - name: Preserve bounded diagnostic only, including failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v5-resume-s-20261102-2b9660fa-${{ github.run_id }}
+          path: |
+            checkpoints/next/model.zip
+            checkpoints/next/model.metadata.json
+            reports/s-20261102-2b9660fa/002-resume.json
+            experiments/s-20261102-2b9660fa/002-85623-model.json
+          if-no-files-found: ignore
+          retention-days: 30

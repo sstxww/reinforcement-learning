@@ -1,0 +1,65 @@
+name: V5 continuation gate validation s-20261102-2b9660fa
+
+on:
+  push:
+    branches:
+      - agent/s-20261102-2b9660fa/optimization-001
+    paths:
+      - .github/workflows/v5-continuation-s-20261102-2b9660fa.yml
+      - tavern_ai/continuation_gate.py
+      - tavern_ai/train.py
+      - tests/test_continuation_gate_2b9660fa.py
+      - .github/workflows/train.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: continuation-s-20261102-2b9660fa
+  cancel-in-progress: false
+
+jobs:
+  regression-and-authentic-canary:
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install exact project test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[test]'
+      - name: Fail-closed continuation regression tests
+        run: python -m pytest -q tests/test_continuation_gate_2b9660fa.py
+      - name: Install pinned real TavernGym
+        run: bash scripts/bootstrap_engine.sh
+      - name: Confirm engine contract
+        run: python -m tavern_ai.contract
+      - name: Play an independent genuine eight-seat baseline game
+        run: |
+          python -m tavern_ai.canary --agent-id s-20261102-2b9660fa \
+            --policy baseline --seed 85621 \
+            --receipt experiments/s-20261102-2b9660fa/001-85621.json
+          python -m tavern_ai.validate_receipt experiments/s-20261102-2b9660fa/001-85621.json
+      - name: Commit own genuine match receipt only
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add experiments/s-20261102-2b9660fa/001-85621.json
+          git diff --cached --quiet && exit 0
+          git commit -m 'evidence: authentic eight-seat TavernGym run for s-20261102-2b9660fa'
+          git push origin 'HEAD:refs/heads/agent/s-20261102-2b9660fa/optimization-001'
+      - name: Preserve run evidence even on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v5-continuation-s-20261102-2b9660fa-${{ github.run_id }}
+          path: experiments/s-20261102-2b9660fa/*.json
+          if-no-files-found: ignore
+          retention-days: 30
