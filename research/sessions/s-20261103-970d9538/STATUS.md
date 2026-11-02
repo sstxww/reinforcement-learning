@@ -6,3 +6,5 @@
 - Dedicated Actions full-game/128-step continuation: **pending**.
 - Verified own R002 PPO steps: **0 yet**. Original completed games: **0 yet**. New saved model: **none yet**. Champion: **none**.
 - Known unresolved central train.yml fail-open Artifact fallback; no blind large-scale PPO, no Arena ranked games, no direct main push.
+
+- **Superseded / DO NOT MERGE**: concurrent merged PR #125 on main introduced staged digest-bound checkpoint writes and internal-step checks, superseding our extraction of #124. Concurrent PR #117 then replaced fail-open Artifact continuation with explicit registered Release input, manual-only gate and unpromoted durable output. No R002 workflow launched, no own R002 PPO steps, games or model. Prefer real smoke against new main rather than merging stale trainer.
