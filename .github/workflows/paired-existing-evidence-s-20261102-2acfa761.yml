@@ -1,0 +1,55 @@
+name: V5 archived paired model evidence s-20261102-2acfa761
+
+on:
+  push:
+    branches:
+      - agent/s-20261102-2acfa761/optimization-001
+    paths:
+      - .github/workflows/paired-existing-evidence-s-20261102-2acfa761.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: v5-archive-evidence-s-20261102-2acfa761
+  cancel-in-progress: false
+
+jobs:
+  archived-pair-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install basic Python test dependencies
+        run: python -m pip install -e '.[test]'
+      - name: Pure regression verification
+        run: python -m pytest tests/test_paired_evidence_v5_s-20261102-2acfa761.py
+      - name: Analyze authentic already archived 1408-step model vs baseline matches
+        run: |
+          python -m tavern_ai.paired_evidence_v5 \
+            --baseline-glob 'experiments/s-20261102-68099929/002-baseline-*.json' \
+            --candidate-glob 'experiments/s-20261102-68099929/002-model-*.json' \
+            --out reports/s-20261102-2acfa761/001-actual-1408step-paired.json
+          python -m json.tool reports/s-20261102-2acfa761/001-actual-1408step-paired.json > /dev/null
+      - name: Archive only derived genuine evidence to isolated branch
+        run: |
+          test "$GITHUB_REF_NAME" = "agent/s-20261102-2acfa761/optimization-001"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add reports/s-20261102-2acfa761/001-actual-1408step-paired.json
+          if ! git diff --cached --quiet; then
+            git commit -m "docs(v5): derive honest paired rank evidence from archived real games"
+            git push origin HEAD:refs/heads/agent/s-20261102-2acfa761/optimization-001
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: actual-paired-1408-s-20261102-2acfa761
+          path: reports/s-20261102-2acfa761/001-actual-1408step-paired.json
+          if-no-files-found: ignore
+          retention-days: 30
