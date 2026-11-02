@@ -5,7 +5,7 @@
 - Parent main commit at session start: `6ac59235b8238196a0e6462de77b72413c829372`
 - Experiment code SHA: `332fe14c252d97fc3f7fa75a2e8ffaa0c666a9da`
 - Evidence commit: `a3ae791deb3b815e4f37eb9cf9f72d498c1d1e2a`
-- PR: pending creation against `main` (will be added after PR creation)
+- PR: https://github.com/sstxww/reinforcement-learning/pull/20 (draft, integration review required)
 - Status: **completed exploratory round, no proven strength gain**
 - Successful GitHub run: https://github.com/sstxww/reinforcement-learning/actions/runs/41413940695
 - First failed run: https://github.com/sstxww/reinforcement-learning/actions/runs/41413283468 (raw model exceeded game loop cap)
