@@ -190,7 +190,8 @@ def execute(out:Path,seed_train=56100,seed_eval=56103):
             "paired_mean_rank_delta_student_minus_teacher":delta,
             "claim":"pilot only; guarded BC is not pure model; n=2 cannot prove improvement",
             "checkpoint_durable":False,"checkpoint_storage":"Actions artifact with expiration"}
-    (out/"summary.json").write_text(json.dumps(report,indent=2))
+    (out/"reports").mkdir(exist_ok=True)
+    (out/"reports"/"summary.json").write_text(json.dumps(report,indent=2))
     print(json.dumps(report,ensure_ascii=False))
     return report
 

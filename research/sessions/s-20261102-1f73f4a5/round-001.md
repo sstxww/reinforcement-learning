@@ -29,7 +29,7 @@ Each receipt was produced only after `Game.is_over()` and validated. Trainer add
 | 56103 | student_bc_guarded | 8 | 214 | 2 | 0 |
 | 56104 | student_bc_guarded | 8 | 154 | 1 | 0 |
 
-Receipts: `experiments/s-20261102-1f73f4a5/teacher-56103.json`, `teacher-56104.json`, `student-guarded-56103.json`, `student-guarded-56104.json`; training summary `summary.json`.
+Receipts: `experiments/s-20261102-1f73f4a5/teacher-56103.json`, `teacher-56104.json`, `student-guarded-56103.json`, `student-guarded-56104.json`; training summary `reports/summary.json`.
 Student guarded mean rank 8.0 vs teacher 7.0; paired delta +1.0 **worse** (lower rank number better). Student 368 vs teacher 88 actions on these matched seeds, although legal. This suggests incomplete action-progress competence, not competitive strength.
 Guard intervention count = 3; this is BC+guard, **not raw unassisted BC**. N=2 gives no reliable significance assessment or MMR mapping.
 
@@ -39,3 +39,7 @@ Initial PR CI https://github.com/sstxww/reinforcement-learning/actions/runs/4142
 ## Decision and integration
 **REJECT promotion of this candidate as a stronger model.** Its raw, no-guard completion has not been tested; independent guarded games show worse rank and elevated non-progress decisions. Keep PR DRAFT as experimental mechanism/data plumbing for integrator review; no merge as a performance improvement.
 Recommended follow-up: collect a stronger, high-coverage teacher (many distinct economy/turn/synergy states) and train with explicit progress/phase diagnostics; then evaluate pure model vs guarded model separately on many seat-rotated heldout seeds. Do not repeat this tiny 113-sample configuration as proof of learning.
+
+## CI corrective change
+- Initial post-evidence CI https://github.com/sstxww/reinforcement-learning/actions/runs/41420778736: 21 unit tests passed, then `validate_receipt` failed on the non-game `experiments/s-20261102-1f73f4a5/summary.json` caught by `check_pr_evidence.py` glob. Fixed by relocating metrics into `experiments/s-20261102-1f73f4a5/reports/summary.json` and staging only real game receipts at the experiment root. Do not weaken common validator.
+- Dedicated bounded workflow reruns once after this source/workflow fix; final results and CI require fresh verification.
