@@ -1,0 +1,58 @@
+name: Real V2 schema2 checkpoint compatibility s-20261102-75cf9e03
+on:
+  push:
+    branches:
+      - agent/s-20261102-75cf9e03/optimization-001
+    paths:
+      - .github/workflows/verify-v2-schema2-s-20261102-75cf9e03.yml
+permissions:
+  contents: read
+jobs:
+  verify-authentic-source-release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      GH_TOKEN: ${{ github.token }}
+      EXPECTED_SHA: 73bde2666426cecce39f135980a897bb2cd4a7d70783ba04c9c0d29477a6664a
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install lightweight checkpoint verification dependencies
+        run: |
+          set -euo pipefail
+          python -m pip install -e '.[test]'
+          python -m pytest -q tests/test_checkpoint_preflight.py
+      - name: Download actual published V2 model and schema-2 metadata
+        run: |
+          set -euo pipefail
+          mkdir -p checkpoints/v2 reports/s-20261102-75cf9e03
+          gh release download v2-learning-41413557445 --repo "$GITHUB_REPOSITORY" --pattern model.zip --dir checkpoints/v2
+          gh release download v2-learning-41413557445 --repo "$GITHUB_REPOSITORY" --pattern model.metadata.json --dir checkpoints/v2
+          echo "$EXPECTED_SHA  checkpoints/v2/model.zip" | sha256sum -c -
+      - name: Fail-closed real schema2 engine/catalog/patch/optimizer CRC validation
+        run: |
+          set -euo pipefail
+          python -m tavern_ai.checkpoint_preflight \
+            --model checkpoints/v2/model.zip \
+            --metadata checkpoints/v2/model.metadata.json \
+            --expected-sha256 "$EXPECTED_SHA" | tee reports/s-20261102-75cf9e03/005-real-v2-schema2.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('reports/s-20261102-75cf9e03/005-real-v2-schema2.json').read_text())
+          assert r['checkpoint_metadata_schema']==2, r
+          assert r['archive_integrity']=='passed'
+          assert r['champion_eligible'] is False
+          assert r['sha256']=='73bde2666426cecce39f135980a897bb2cd4a7d70783ba04c9c0d29477a6664a'
+          print('ACTUAL V2 RELEASE schema-2 verified; no model game or training here')
+          PY
+      - name: Save transparent check proof
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: real-v2-schema2-s-20261102-75cf9e03-${{ github.run_id }}
+          path: reports/s-20261102-75cf9e03/005-real-v2-schema2.json
+          if-no-files-found: ignore
+          retention-days: 30
