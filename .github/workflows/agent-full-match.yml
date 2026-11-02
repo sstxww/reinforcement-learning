@@ -1,0 +1,77 @@
+name: Agent full-match evidence
+
+on:
+  push:
+    branches:
+      - agent/strategy/v1
+      - agent/learning/v1
+      - agent/evaluation/v1
+      - agent/infrastructure/v1
+    paths-ignore:
+      - 'experiments/**'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: agent-match-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  complete-eight-seat-game:
+    if: github.repository == 'sstxww/reinforcement-learning'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install project and test
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[test]'
+          python -m pytest
+      - name: Install and verify the real TavernGym engine
+        run: bash scripts/bootstrap_engine.sh
+      - name: Play one genuine eight-player match
+        shell: bash
+        run: |
+          set -euo pipefail
+          case "${GITHUB_REF_NAME}" in
+            agent/strategy/v1) AGENT=strategy; SEED=11001 ;;
+            agent/learning/v1) AGENT=learning; SEED=12001 ;;
+            agent/evaluation/v1) AGENT=evaluation; SEED=13001 ;;
+            agent/infrastructure/v1) AGENT=infrastructure; SEED=14001 ;;
+            *) echo 'Unsupported branch'; exit 2 ;;
+          esac
+          RECEIPT="experiments/${AGENT}/seed-${SEED}-${GITHUB_SHA:0:12}.json"
+          if [[ -e "$RECEIPT" ]]; then
+            echo "Receipt already exists: $RECEIPT"
+            exit 3
+          fi
+          python -m tavern_ai.canary --agent-id "$AGENT" --seed "$SEED" \
+            --policy baseline --receipt "$RECEIPT"
+          python -m tavern_ai.validate_receipt "$RECEIPT"
+          echo "RECEIPT=$RECEIPT" >> "$GITHUB_ENV"
+      - name: Commit the true receipt to the same agent branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- "$RECEIPT"
+          git commit -m "test: record genuine eight-seat ${GITHUB_REF_NAME} match"
+          git pull --rebase origin "$GITHUB_REF_NAME"
+          git push origin "HEAD:$GITHUB_REF_NAME"
+      - name: Upload audit copy (not the permanent record)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: agent-match-${{ github.run_id }}
+          path: experiments/*/seed-*.json
+          if-no-files-found: ignore
+          retention-days: 14
