@@ -16,7 +16,8 @@ from tavern_ai.contract import ACTIONS, CARDS, FEATURES, PATCH_SHA256, UPSTREAM_
 from tavern_ai.validate_receipt import validate
 
 SESSION_ID = "s-20261102-3a93dae9"
-SEEDS = (18101, 18102, 18103, 18104, 18105, 18106)
+SEEDS = (18201, 18202, 18203, 18204, 18205, 18206)
+POLICY_NAME = "affordable_hero_power_gold_reserve_v2"
 
 
 class AffordableHeroPowerPolicy:
@@ -113,7 +114,7 @@ def run_candidate(seed: int, agent_id: str = SESSION_ID) -> dict:
         "upstream_commit": UPSTREAM_COMMIT,
         "observe2_patch_sha256": PATCH_SHA256,
         "agent_id": agent_id,
-        "policy": "free_hero_power_once_per_turn",
+        "policy": POLICY_NAME,
         "seed": seed,
         "completed": True,
         "turns": int(game.turn),
@@ -171,7 +172,7 @@ def run_paired(seeds: tuple[int, ...] = SEEDS, out_root: Path | None = None) -> 
         ),
         "interpretation": "Active intervention only if hero_power_actions > 0; small sample never proves improvement",
     }
-    report = Path("research") / "sessions" / SESSION_ID / "paired-affordable-results.json"
+    report = Path("research") / "sessions" / SESSION_ID / "paired-confirmatory-results.json"
     report.parent.mkdir(parents=True, exist_ok=True)
     report.write_text(json.dumps(result, indent=2), encoding="utf-8")
     return result
