@@ -1,0 +1,23 @@
+# Session s-20261102-9c463177 — Status
+
+- State: **successful bounded real-engine ablation; not proven competitively stronger**. Evidence committed; pending independent PR CI/integration.
+- Branch: agent/s-20261102-9c463177/optimization-001
+- Base main: 315b068bac5ab6d8403c3c9b18f8c101c0cded5d
+- Tested source commit: 9c6e97b9717fd3113a158444c56ae27d780d3d74
+- Successful experiment: https://github.com/sstxww/reinforcement-learning/actions/runs/41415579630
+- Engine: pinned TavernGym 1.1.0, hash 6d8712c93022ba11, 4017+447 input / 245 masked actions.
+- Round: research/sessions/s-20261102-9c463177/round-001.md
+- Change: session-only rightmost mandatory choice policy, its tests and bounded workflow. Shared baseline unchanged.
+- Own authentic complete eight-seat candidate receipt: experiments/s-20261102-9c463177/001-39001.json; seed 39001, rank 8, 38 decisions, no truncation/turn-limit.
+- Additional games: 4 baseline + 4 candidate on seeds 39001–39004; 8 full-game receipts in experiments/s-20261102-9c463177/.
+- Candidate ranks [8,7,6,5], mean 6.50, top-four 0%, wins 0%; baseline [5,8,7,7], mean 6.75, top-four 0%, wins 0%.
+- Nontrivial intervention: 21 changed mandatory decisions. Only four seeds; **no statistically verified improvement**.
+- Actual training steps: **0**, deliberately pure policy experiment, not PPO.
+- Model Best/Candidate/Latest: no model trained or promoted; checkpoint hash/recovery not applicable.
+- Source SHA256 694993624ff33bd9564463e9c08a673bf080d819cfbbda461ebbe786d5f202bd.
+- Metrics: research/sessions/s-20261102-9c463177/round-001-metrics.json.
+- Persistence: JSON receipts committed in Git; temporary 30-day Actions Artifact is not permanent model storage.
+- Failure status: no session-owned errors; another session's upgrade tests failed and were not modified here.
+- Knowledge proposal: research/knowledge/proposals/s-20261102-9c463177-001.md.
+- PR: https://github.com/sstxww/reinforcement-learning/pull/34 (draft; independent PR-head CI queued, integration pending).
+- Next: probe semantic choice utility; use >=30 independently seeded paired matches before claims of playing-strength gain.
