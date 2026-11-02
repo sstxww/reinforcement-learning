@@ -5,7 +5,7 @@
 - **Base main SHA:** `6ac59235b8238196a0e6462de77b72413c829372`
 - **Authoring commits:** `3bda97fd6e0606a5ca8c80a5cdbcc42ea37528c3`, `245bfb3a808715c91d62f4f986aa8b1d5175a538`, `727e53f3a005ba9262e6e221e794bc52dc88d96a`
 - **Evidence-producing commit:** `28e83970bdcdc76b2b37b17bbe1ea5deea3515f1`
-- **PR:** To be linked when opened; see branch's PR against main.
+- **PR:** https://github.com/sstxww/reinforcement-learning/pull/24 (draft).
 - **Date:** 2026-11-02
 
 ## Hypothesis, prior work and isolation

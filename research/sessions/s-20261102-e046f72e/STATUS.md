@@ -3,7 +3,7 @@
 - **Branch:** `agent/s-20261102-e046f72e/optimization-001`
 - **Base:** `6ac59235b8238196a0e6462de77b72413c829372`
 - **Current evidence commit:** `28e83970bdcdc76b2b37b17bbe1ea5deea3515f1`
-- **PR:** To be added after creation; base branch `main`.
+- **PR:** https://github.com/sstxww/reinforcement-learning/pull/24 (draft; base `main`).
 - **Main research area:** compact neural architecture / masked action stability.
 - **Runs:** 41413064111 (failed candidate game), 41413715344
   (failed CLI), **41414170876 (successful)**.
