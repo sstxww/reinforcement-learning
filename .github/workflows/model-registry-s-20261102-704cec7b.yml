@@ -1,0 +1,92 @@
+name: Registry and release resume probe s-20261102-704cec7b
+
+on:
+  push:
+    branches:
+      - 'agent/s-20261102-704cec7b/optimization-001'
+    paths:
+      - 'models/registry.json'
+      - 'tavern_ai/model_registry.py'
+      - 'tests/test_model_registry.py'
+      - '.github/workflows/model-registry-s-20261102-704cec7b.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: model-registry-s-20261102-704cec7b
+  cancel-in-progress: false
+
+jobs:
+  verify-and-resume:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 70
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[train,test]'
+      - name: Unit tests and registry schema
+        run: |
+          python -m pytest tests/test_model_registry.py
+          python -m tavern_ai.model_registry --registry models/registry.json
+      - name: Bootstrap pinned TavernGym
+        run: bash scripts/bootstrap_engine.sh
+      - name: Independent real complete eight-seat baseline game
+        run: |
+          python -m tavern_ai.canary \
+            --agent-id s-20261102-704cec7b --seed 88101 \
+            --policy baseline \
+            --receipt experiments/s-20261102-704cec7b/001-88101.json
+          python -m tavern_ai.validate_receipt experiments/s-20261102-704cec7b/001-88101.json
+      - name: Commit only authentic branch-owned match receipt
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add experiments/s-20261102-704cec7b/
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "evidence: archive actual eight-seat model-registry canary"
+          test "$GITHUB_REF_NAME" = "agent/s-20261102-704cec7b/optimization-001"
+          git pull --rebase origin "$GITHUB_REF_NAME"
+          git push origin HEAD:"$GITHUB_REF_NAME"
+      - name: Independently download existing V2 Release
+        run: |
+          mkdir -p checkpoints
+          gh release download v2-learning-41413557445 \
+            --repo "$GITHUB_REPOSITORY" \
+            --pattern model.zip --pattern model.metadata.json \
+            --dir checkpoints
+          python -m tavern_ai.model_registry \
+            --model-id v2-learning-41413557445 --asset checkpoints/model.zip
+      - name: Check actual model load and cumulative PPO steps
+        run: |
+          python - <<'PY'
+          from sb3_contrib import MaskablePPO
+          model = MaskablePPO.load('checkpoints/model.zip', device='cpu')
+          assert model.num_timesteps == 1280, model.num_timesteps
+          print({'model_load': 'passed', 'steps': model.num_timesteps})
+          PY
+      - name: Bounded 128-step genuine resume smoke (no promotion)
+        run: |
+          python -m tavern_ai.train --steps 128 --seed 42 \
+            --resume checkpoints/model.zip --out checkpoints/probe.zip
+          test -s checkpoints/probe.zip
+      - name: Save diagnostics without committing model weights
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: model-registry-probe-s-20261102-704cec7b
+          path: |
+            experiments/s-20261102-704cec7b/*.json
+            checkpoints/probe.metadata.json
+          if-no-files-found: ignore
+          retention-days: 30
