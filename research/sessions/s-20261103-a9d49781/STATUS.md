@@ -22,3 +22,11 @@
 - OTHER sessions merged #125 (SHA-bound staged checkpoint writing) and #117 (manual-only main train.yml using canonical registered durable Release; explicit fail-closed restore; raw model canary, paired eval and unpromoted Release publication after gates). These supersede the original main silent Artifact reset risk documented above. Do not merge older conflicting shared-train variants over #117.
 - Posted actionable blocking review on #149: https://github.com/sstxww/reinforcement-learning/pull/149#issuecomment-6586153916
 - Independent model **optimizer continuation from newly restored published 1408-step Release** and subsequent save/re-download is not claimed in this session. Do not start unsupported bulk PPO.
+
+## R002 — bounded canonical checkpoint continuation validation (P1)
+- Started from **merged main #162**, SHA `3602f64b798bb51dcf69ef5964fe0b4c4cd39495`; branch `agent/s-20261103-a9d49781/optimization-002`.
+- Hypothesis: integrated #117 fail-closed registered Release restore plus #125 staged SHA-bound save really can recover the **same** 1408-step V5 optimizer, continue **exactly 128** steps, and retain a new immutable unpromoted candidate after independent real eight-seat model game and paired baseline evaluation.
+- Distinct old Release `v5-s-20261102-68099929-1408-41428692617`, SHA256 `a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632`; source weight not overwritten, no shared `train.yml` dispatch, no official Arena.
+- Planned independent run seed 99367 for PPO learning, unassisted model full-game seed 99368, paired candidate/baseline evaluation seed 99369; aim 1408 → 1536 steps. The actual result must be read from own Actions and model hashes, not assumed.
+- Separate publishing job owns short-lived write access and only uploads a unique **unpromoted** Release if training + model-only game + evaluation all complete; no Best/Champion promotion.
+- At creation: **pending**, 0 new PPO steps and 0 new weights claimed for R002. Stop and record failure rather than silently reset or invent a match.
