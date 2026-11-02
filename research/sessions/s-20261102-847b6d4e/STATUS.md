@@ -1,0 +1,11 @@
+# s-20261102-847b6d4e status — P0/P1 integration prepared; own eight-seat smoke passed
+
+- Session: `s-20261102-847b6d4e`; owned branch `agent/s-20261102-847b6d4e/optimization-001`; original main base `1afd8297e3c661bee3117ac5301b1ca08d64869b`.
+- Integration proposal: [PR #116](https://github.com/sstxww/reinforcement-learning/pull/116) (draft until latest-head full CI). Existing Release SHA256 verification now composes existing strict optimizer ZIP/CRC/schema-2 preflight. No policy/model/Champion/registry updates.
+- Independent branch [Actions #41449947363](https://github.com/sstxww/reinforcement-learning/actions/runs/41449947363) **SUCCESS**: scoped integration regression tests, pinned TavernGym 1.1.0 installation, actual eight-seat baseline canary seed 84761, validated real receipt committed to branch SHA `ce0c28224a3c77a57ecddadd2b734ae8b9140960`.
+- Own authentic receipt: `experiments/s-20261102-847b6d4e/001-84761.json`, `completed=true`, 16 turns, 42 decisions, controlled seat 0 **rank 8**, valid placements `[8,5,7,1,3,6,2,4]`, 0 combat truncations, no turn-limit end. This is **baseline infrastructure proof**, NOT new PPO model performance.
+- Initial [PR CI #41449992791](https://github.com/sstxww/reinforcement-learning/actions/runs/41449992791) failed only for **missing independent receipt at its older head** (pytest 238 passed, 1 skipped). Receipt exists now. Bot receipt commit triggered [PR CI #41450295784](https://github.com/sstxww/reinforcement-learning/actions/runs/41450295784) as `action_required` without jobs; this is a GitHub approval/trigger condition, NOT a passing or failed unit test.
+- Latest-head CI validation still required; do not mark merged. Postmerge main CI required if integrator later merges.
+- Rank-8 observational synthesis saved to `reports/s-20261102-847b6d4e/001-rank8-evidence.md`; source data from other agents' real reports, not own new model evaluation.
+- Source weights created: 0; PPO updates: 0; model-only full games by this session: 0; Champion: none. No official Arena.
+- Next priority: unblock latest-head PR CI, recheck main/overlap and integration ownership. Only after durable resume validation and root-cause-specific behavior improvement consider bounded PPO. No unchecked bulk training.

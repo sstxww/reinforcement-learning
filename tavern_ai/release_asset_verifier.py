@@ -14,6 +14,7 @@ from pathlib import Path
 
 from .contract import ACTIONS, CARDS, ENGINE_HASH, FEATURES
 from .registry_integrity import validate_registry as validate_canonical
+from .checkpoint_preflight import audit_archive
 
 RELEASE_PREFIX = "https://github.com/sstxww/reinforcement-learning/releases/download/"
 HEX = re.compile(r"^[a-f0-9]{64}$")
@@ -88,8 +89,15 @@ def verify_local(index: dict, canonical: dict, model_id: str, weights: Path,
     candidate = next((m for m in canonical["candidates"] if m["id"] == model_id), None)
     if candidate and doc.get("total_timesteps") != candidate["training_steps"]:
         raise ValueError("Model training step counter mismatch")
+    # Compose the already-integrated strict PPO ZIP/optimizer/compatibility gate.
+    # Two matching Release digests alone are insufficient: a corrupt archive,
+    # missing optimizer or mismatched schema-2 vocabulary must not pass.
+    preflight = audit_archive(weights, metadata, record["weights"]["sha256"])
     result = {"release_id": model_id, "weight_bytes_sha256_verified": True,
               "metadata_bytes_sha256_verified": True, "engine_metadata_verified": True,
+              "archive_integrity_verified": preflight["archive_integrity"] == "passed",
+              "optimizer_state_present": True,
+              "checkpoint_metadata_schema": preflight["checkpoint_metadata_schema"],
               "sb3_load_checked": False, "optimizer_resume_checked": False,
               "complete_game_checked": False}
     if check_load:

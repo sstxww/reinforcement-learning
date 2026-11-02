@@ -3,6 +3,7 @@ from pathlib import Path
 import copy
 import hashlib
 import json
+import zipfile
 
 import pytest
 from tavern_ai.release_asset_verifier import validate_asset_index, verify_local
@@ -17,11 +18,15 @@ def canonical():
 def fixture(tmp_path):
     model_id = "v2-learning-41413557445"
     weights = tmp_path/"model.zip"
-    weights.write_bytes(b"synthetic CHECKSUM TEST ONLY")
+    # Synthetic structurally valid archive, never a real PPO checkpoint.
+    with zipfile.ZipFile(weights, "w") as zf:
+        for filename in ("data", "policy.pth", "policy.optimizer.pth"):
+            zf.writestr(filename, b"synthetic-test-only")
     meta = tmp_path/"model.metadata.json"
-    meta.write_text(json.dumps({"total_timesteps":1280,"engine":{
+    meta.write_text(json.dumps({"schema": 1, "algorithm": "MaskablePPO",
+        "total_timesteps":1280,"engine":{
         "version":"1.1.0","source_hash":ENGINE_HASH,"features":FEATURES,
-        "cards":CARDS,"actions":ACTIONS}}))
+        "cards":CARDS,"actions":ACTIONS, "n_cards":4096}}))
     index = real_index()
     asset = next(a for a in index["assets"] if a["id"]==model_id)
     asset["weights"]["sha256"] = hashlib.sha256(weights.read_bytes()).hexdigest()
@@ -43,6 +48,8 @@ def test_local_good_hashes_no_fake_resume(tmp_path):
     index, canon, ident, w, m = fixture(tmp_path)
     report = verify_local(index, canon, ident, w, m)
     assert report["weight_bytes_sha256_verified"]
+    assert report["archive_integrity_verified"]
+    assert report["optimizer_state_present"]
     assert not report["optimizer_resume_checked"]
     assert not report["complete_game_checked"]
 
@@ -79,3 +86,40 @@ def test_mutations_rejected(mutation,expected):
         next(a for a in index["assets"] if a["id"]=="v2-learning-41413557445")["optimizer_resume_verified"]=True
     with pytest.raises(ValueError,match=expected):
         validate_asset_index(index,canon)
+
+def _retarget_synthetic_weights(index, canonical_registry, model_id, weights):
+    """Keep both trusted digests internally consistent for negative ZIP tests."""
+    digest = hashlib.sha256(weights.read_bytes()).hexdigest()
+    next(a for a in index["assets"] if a["id"] == model_id)["weights"]["sha256"] = digest
+    next(c for c in canonical_registry["candidates"] if c["id"] == model_id)["checkpoint_sha256"] = digest
+    if canonical_registry["latest"]["id"] == model_id:
+        canonical_registry["latest"]["checkpoint_sha256"] = digest
+
+
+def test_matching_digests_do_not_accept_nonzip(tmp_path):
+    index, canon, ident, weights, metadata = fixture(tmp_path)
+    weights.write_bytes(b"not-a-zip-even-with-two-matching-sha256-digests")
+    _retarget_synthetic_weights(index, canon, ident, weights)
+    with pytest.raises(ValueError, match="ZIP"):
+        verify_local(index, canon, ident, weights, metadata)
+
+
+def test_matching_digests_do_not_accept_missing_optimizer(tmp_path):
+    index, canon, ident, weights, metadata = fixture(tmp_path)
+    with zipfile.ZipFile(weights, "w") as zf:
+        zf.writestr("data", b"synthetic")
+        zf.writestr("policy.pth", b"synthetic")
+    _retarget_synthetic_weights(index, canon, ident, weights)
+    with pytest.raises(ValueError, match="optimizer"):
+        verify_local(index, canon, ident, weights, metadata)
+
+
+def test_matching_digests_do_not_accept_bad_schema(tmp_path):
+    index, canon, ident, weights, metadata = fixture(tmp_path)
+    doc = json.loads(metadata.read_text())
+    doc["schema"] = 999
+    metadata.write_text(json.dumps(doc), encoding="utf-8")
+    asset = next(a for a in index["assets"] if a["id"] == ident)
+    asset["metadata"]["sha256"] = hashlib.sha256(metadata.read_bytes()).hexdigest()
+    with pytest.raises(ValueError, match="schema"):
+        verify_local(index, canon, ident, weights, metadata)
