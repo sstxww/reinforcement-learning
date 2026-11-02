@@ -1,17 +1,16 @@
-# s-20261103-4aa529a2 — V7 handoff
+# V7 session s-20261103-4aa529a2 — transfer status
 
-- **TASK_KEY:** p1/schema2-prelearn-parent-validation
-- **ROUND:** 001
-- **ROLE:** REPAIRER (not INTEGRATOR); no exclusive merge authority established
-- **STATE:** running / pending authentic Actions evidence and integration
-- **BASE_MAIN_SHA:** 990acd21d598a34a554a80c50089a8f1a9423ac4
-- **BRANCH:** agent/s-20261103-4aa529a2/optimization-001
-- **ORIGINAL DEFECT:** PR #164 was merged as main `990acd21d598a34a554a80c50089a8f1a9423ac4` while `build_checkpoint_metadata` rejected incompatible schema-2 parents only AFTER `model.learn`.
-- **PATCH:** validate schema/engine/cumulative steps/increment steps and full engine contract before `MaskablePPO.load` or `model.learn`; keep save-time check.
-- **REVIEWED:** #164 (merged), #175 race-safe restore, #165 training token separation, #176 merged FREEZE diagnostic. Do not edit their branches.
-- **CI:** dedicated finite push job is `.github/workflows/v7-prelearn-s-20261103-4aa529a2.yml`; actual run URL and test results not known at creation.
-- **TRAINING:** 0 new PPO steps; this is a safety patch, not a strength claim.
-- **REAL MATCH:** planned pinned TavernGym baseline seed 94837, seat 0 vs 7 scripted bots; no receipt/placement claimed before Actions output is verified.
-- **MODEL:** registry latest V5 unpromoted 1408-step Release `v5-s-20261102-68099929-1408-41428692617`; SHA256 `a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632`. No new checkpoint, no promotion. Engine 1.1.0 / observe2 4017+447 / 245 actions; optimizer independent resume of this exact Release remains separate gate.
-- **MAIN INTEGRATION:** blocked until verified exact-head CI + genuine receipt, reviewer and serial merge ownership; do not assert merged.
-- **NEXT ACTION:** inspect dedicated Actions full run, download authentic receipt artifact, commit it to `experiments/s-20261103-4aa529a2/001-94837.json`, rerun latest-head PR CI and advance PR only with proof.
+1. **TASK_KEY / SESSION / ROUND / ROLE / STATE:** `p1/schema2-prelearn-parent-validation` / `s-20261103-4aa529a2` / R001 / REPAIRER / `pending_latest_head_pr_ci` (NO merger lease).
+2. **Base main:** `990acd21d598a34a554a80c50089a8f1a9423ac4` (merged #164); subsequent observed main `c1b828734527bae6141805581693d890cc3bff94` merged #165; own branch `agent/s-20261103-4aa529a2/optimization-001`. Own source/true receipt commits: `8e5267ee142684f94197c485864d456f547c27b9` and current tip, see GitHub branch.
+3. **Inherited:** #117 registered Release trainer; #125 staged saving; #161 hash preflight; #164 schema-2 metadata; #165 least-privilege publisher; #176 FREEZE taxonomy. No shared branch or registry modified.
+4. **PR / CI gate:** Open PR to `main` from the own branch, verify its exact latest head CI and merge compatibility; not previously approved. Merge only under V7 independent protected serial integrator, after checks and review.
+5. **Official checkpoint:** unpromoted V5 1408-step Release `v5-s-20261102-68099929-1408-41428692617`, SHA256 `a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632`; engine TavernGym 1.1.0 hash `6d8712c93022ba11`; observe2 4017 float + 447 cards, 245 actions. No model loaded/resumed in this R001; existing optimizer evidence belongs to prior sessions, not this patch.
+6. **New actual PPO steps / training time:** 0 / none. This is a pre-deserialization safety fix, not a new policy.
+7. **Original real full game:** [Actions 41512413873](https://github.com/sstxww/reinforcement-learning/actions/runs/41512413873), all job steps success, artifact `13173194839` downloaded and checked; `experiments/s-20261103-4aa529a2/001-94837.json`; baseline vs 7 scripted bots, seed 94837 seat 0, completed true, rank 7, 15 turns, 57 decisions, eight-seat placement permutation [7,8,2,3,4,5,6,1], no truncation/forced ending.
+8. **Paired evaluation:** N=0 candidate/source pairs; mean rank/top4 raw-PPO unknown. The baseline engineering canary (N=1, rank 7) is **not** model evaluation.
+9. **Verified defect:** #164 schema-2 compatibility validation occurred AFTER PPO `learn`; this patch moves it before `MaskablePPO.load`, while keeping a second posttraining validation. Hypothesis of policy gain is not tested.
+10. **Failures:** no failing new run. Branch protection read returned 403 to connector; cannot prove global exclusive integrator lease. Do not infer absence of protection. Earlier raw PPO rank-eight failures remain separate.
+11. **Integration / promotion:** not merged by this session as of this note; no best/champion promotion or new Release. Only merge after current PR head CI and serialized authority are verified.
+12. **Next exact action:** inspect open PR latest HEAD, confirm the full `CI - full-match gate` succeeded on exactly that SHA and read its genuine game receipt; then a designated serial integrator should review this narrow train.py/test diff and merge via head-locked PR API, immediately verifying new main SHA and its CI.
+
+Dedicated temporary push workflow existed in historical commit `8e5267ee142684f94197c485864d456f547c27b9` and completed successfully; it is removed from final diff to avoid redundant follow-on eight-seat runs.

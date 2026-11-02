@@ -32,6 +32,8 @@ def validate_resume_parent(parent: dict, engine: dict) -> None:
     if type(steps) is not int or steps < 1:
         raise ValueError("Invalid parent cumulative training steps")
     schema = parent.get("schema")
+    if type(schema) is not int:
+        raise ValueError("Parent checkpoint schema must be an integer")
     if schema == 1:
         return
     if schema != 2:

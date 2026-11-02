@@ -35,6 +35,8 @@ def test_valid_schema1_and_schema2_parent_are_accepted():
 
 @pytest.mark.parametrize("change", [
     {"schema": 3},
+    {"schema": True},
+    {"schema": 2.0},
     {"compatibility": {**COMPAT, "catalog_sha256": "tampered"}},
     {"compatibility": None},
     {"increment_timesteps": 0},
