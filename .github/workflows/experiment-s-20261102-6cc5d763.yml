@@ -1,0 +1,71 @@
+name: "Refresh ablation s-20261102-6cc5d763"
+on:
+  push:
+    branches:
+      - "agent/s-20261102-6cc5d763/optimization-001"
+    paths:
+      - ".github/workflows/experiment-s-20261102-6cc5d763.yml"
+      - "tavern_ai/refresh_ablation.py"
+      - "tests/test_refresh_ablation.py"
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: "refresh-ablation-s-20261102-6cc5d763"
+  cancel-in-progress: false
+
+jobs:
+  bounded-real-taverngym-experiment:
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install Python test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[test]'
+          python -m pytest
+      - name: Install the pinned unmodified upstream engine plus verified observe2 patch
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Execute one original candidate game and three held-out matched pairs
+        run: |
+          python -m tavern_ai.refresh_ablation --seed 36501 --start-seed 36502 --games 3
+          python -m tavern_ai.validate_receipt experiments/s-20261102-6cc5d763/001-36501.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=json.loads(Path("reports/s-20261102-6cc5d763/comparison.json").read_text())
+          assert p["candidate"]["games"] == p["baseline"]["games"] == 3
+          assert p["ppo_training_steps"] == 0
+          print("VERIFIED_MATCHES", 1 + p["baseline"]["games"] + p["candidate"]["games"])
+          PY
+      - name: Commit only this session's genuine game evidence
+        if: success()
+        shell: bash
+        run: |
+          test "$GITHUB_REF_NAME" = "agent/s-20261102-6cc5d763/optimization-001"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "experiments/s-20261102-6cc5d763" "reports/s-20261102-6cc5d763"
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "results(s-20261102-6cc5d763): save real full-match receipts and paired metrics"
+          git pull --rebase origin "$GITHUB_REF_NAME"
+          git push origin "HEAD:$GITHUB_REF_NAME"
+      - name: Preserve experiment evidence as a bounded artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: "refresh-s-20261102-6cc5d763-${{ github.run_id }}"
+          path: |
+            experiments/s-20261102-6cc5d763/*.json
+            reports/s-20261102-6cc5d763/*.json
+          if-no-files-found: ignore
+          retention-days: 30
