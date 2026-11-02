@@ -16,3 +16,9 @@
 
 ## Follow-up gate
 Review Actions run result; if any model run exceeds safety bounds, save failure without placement. Compare only same-seed completed games. Preserve work as Draft if no own receipt; no direct main or other-agent edits; any strategic improvement requires real paired replication before training expansion.
+
+## R001 authentic match result and independently restored evidence
+- GitHub Actions `41510235754` **success**, original Artifact `13171803636` downloaded. SHA-pinned Release file passed `sha256sum --check`. Pinned TavernGym 1.1.0 / observe2 4017,447,245 / source `6d8712c93022ba11`.
+- Same seed 99407, same controlled seat 0 and seven scripted opponents: baseline complete [8,2,1,7,4,5,3,6], 36 decisions, 15 turns; *unguarded raw* 1408-step PPO complete [8,7,1,6,2,4,3,5], 125 decisions, 15 turns. Neither improves own placement. Model 1 BUY / 49 mask-legal exposures over 7 turns, 43 REFRESH, 70 FREEZE ID2, 1 PLAY; zero guard intervention. Raw mask exposure count is correlated and does not establish optimal purchases or unique fault.
+- Original baseline/raw JSON SHA256 `2a293501926790dd1d23564262cd3906a92b338783707eac7b4f0428d4883626`/`ecf009256faea66c24c0678fed5fa25e0544a59a8ec074647ed51ccf6454937c`. The repository JSON copies are reformatted semantic equivalents; original bytes remain in the temporary Artifact. Raw public trace covers first 32 decisions, **not** all 125. Training delta 0, no model promotion.
+- Early PR CI [41510317526](https://github.com/sstxww/reinforcement-learning/actions/runs/41510317526) passed all Python unit tests (337 passed, 1 skipped) then failed due to missing receipt before the Actions experiment completed. Actual receipt is now included on new head, pending fresh CI. #161 merged by another session; main latest observed `70c411b...`.

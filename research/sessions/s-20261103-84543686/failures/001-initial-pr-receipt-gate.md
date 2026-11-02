@@ -1,0 +1,7 @@
+# R001 first PR CI dependency — repaired by original real game evidence
+
+- Initial branch PR CI [41510317526](https://github.com/sstxww/reinforcement-learning/actions/runs/41510317526) at `33b6d8a3`: **337 tests passed, 1 skipped**; failed exclusively at `scripts/check_pr_evidence.py` with `Missing independent agent game receipt`. Engine/full-match were skipped; not evidence of failed game code.
+- Root cause: PR created before own read-only Actions run had finished. No fabricated receipt was checked in.
+- Actual fix: verified own Actions [41510235754](https://github.com/sstxww/reinforcement-learning/actions/runs/41510235754) **success**; downloaded original Artifact [13171803636](https://github.com/sstxww/reinforcement-learning/actions/runs/41510235754/artifacts/13171803636), inspected both JSON files and engine/model SHA, committed complete semantic receipt copies to own `experiments/s-20261103-84543686/` without altering game values.
+- Original artifact SHA256 `fa64abe37ce275847199792c22e79fdcfc32fd77392ccea4f30a32296427ba94`, original baseline JSON SHA256 `2a293501926790dd1d23564262cd3906a92b338783707eac7b4f0428d4883626`, raw JSON SHA256 `ecf009256faea66c24c0678fed5fa25e0544a59a8ec074647ed51ccf6454937c`. JSON was reformatted for Git; these digests describe *original artifact bytes*, not Git-formatting bytes.
+- Await fresh PR CI on this evidence commit; do not call it successful until actual completion.

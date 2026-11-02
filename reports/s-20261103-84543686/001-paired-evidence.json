@@ -1,0 +1,63 @@
+{
+  "schema": 1,
+  "kind": "real_completed_pair_with_original_artifact",
+  "session_id": "s-20261103-84543686",
+  "seed": 99407,
+  "seat": 0,
+  "game_engine": "TavernGym 1.1.0",
+  "engine_source_hash": "6d8712c93022ba11",
+  "runner_commit": "33b6d8a3a117f81c8baaf8434c742f1f7e5c8f1b",
+  "run_url": "https://github.com/sstxww/reinforcement-learning/actions/runs/41510235754",
+  "artifact_url": "https://github.com/sstxww/reinforcement-learning/actions/runs/41510235754/artifacts/13171803636",
+  "artifact_archive_sha256": "fa64abe37ce275847199792c22e79fdcfc32fd77392ccea4f30a32296427ba94",
+  "original_baseline_json_sha256": "2a293501926790dd1d23564262cd3906a92b338783707eac7b4f0428d4883626",
+  "original_raw_json_sha256": "ecf009256faea66c24c0678fed5fa25e0544a59a8ec074647ed51ccf6454937c",
+  "git_receipts": "JSON semantic copies of original Artifact; formatted serialization changes file hash without changing recorded fields",
+  "completed_games": 2,
+  "baseline": {
+    "policy": "baseline",
+    "completed": true,
+    "placements": [
+      8,
+      2,
+      1,
+      7,
+      4,
+      5,
+      3,
+      6
+    ],
+    "seat0_rank": 8,
+    "decisions": 36,
+    "turns": 15
+  },
+  "model": {
+    "policy": "raw_unassisted_PPO",
+    "completed": true,
+    "placements": [
+      8,
+      7,
+      1,
+      6,
+      2,
+      4,
+      3,
+      5
+    ],
+    "seat0_rank": 8,
+    "decisions": 125,
+    "turns": 15,
+    "model_sha256": "a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632",
+    "opportunities": 49,
+    "distinct_buy_turns": 7,
+    "chosen_buy": 1,
+    "rate": 0.02040816326530612,
+    "reroll": 43,
+    "freeze_id2": 70,
+    "forced_end_turns": 0
+  },
+  "added_training_steps": 0,
+  "new_model_published": false,
+  "champion_promoted": false,
+  "conclusion": "Both controlled-seat games completed and finished eighth. Raw model chose BUY only once in 49 masked-legal decision exposures. This is correlated descriptive exposure evidence, not 49 IID trials, not a unique causal diagnosis and not a strength gain."
+}

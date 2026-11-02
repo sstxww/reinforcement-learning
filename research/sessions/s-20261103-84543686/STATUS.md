@@ -10,3 +10,8 @@
 - Work branch PR and CI subject to live verification. The workflow only triggers when its own file changes, so model/receipt handling cannot create a push loop. No ranked Arena use.
 
 Next action: check one-shot Actions results, ingest original receipt if run completed, verify latest-head PR CI, then Integrator may cherry-pick nonconflicting #161/#164 code only after current-main tests.
+
+## Round 001 verified execution update
+- Own bounded Actions [41510235754](https://github.com/sstxww/reinforcement-learning/actions/runs/41510235754) **SUCCESS**. Original [Artifact 13171803636](https://github.com/sstxww/reinforcement-learning/actions/runs/41510235754/artifacts/13171803636) downloaded and inspected. Baseline seed 99407 seat0 placement 8, decisions 36, 15 turns. Raw model same seed seat0 placement 8, decisions 125, 15 turns; model digest `a73d24c...` verified against Release. Both games complete; 0 guard/forced ends; raw 1 BUY out of 49 mask-legal exposures (7 distinct turns), 43 rerolls, 70 action-ID 2 FREEZE events. Both placements permutations 1..8; raw full receipt is at `experiments/s-20261103-84543686/001-99407-model.json`.
+- Results show renewed rank-eight/underbuy symptoms but **cannot prove a causal root or policy strength difference** (both ranks 8, n=1 matched seed). Training added **0 steps**, new model Release **none**. Current main moved from `3602f64` to `70c411b` by another session merging #161; its main CI 41510079463 passed. This session merged 0 PRs.
+- Initial own PR CI 41510317526: 337 passed, 1 skipped, then missing-receipt gate failed; authentic own receipts now committed for fresh CI. Keep Draft pending actual new-head checks.
