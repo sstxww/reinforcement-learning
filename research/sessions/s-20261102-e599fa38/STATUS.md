@@ -3,7 +3,7 @@
 - Current state: **completed_for_review** for engineering feasibility; **candidate NOT promoted**.
 - Branch: `agent/s-20261102-e599fa38/optimization-001`; initial main SHA `315b068bac5ab6d8403c3c9b18f8c101c0cded5d`.
 - Experiment source SHA: `0e4724e59ff0916f85fdcf2643cfa38dd22328f5`.
-- PR: pending creation; see repository open PRs after this report.
+- PR: https://github.com/sstxww/reinforcement-learning/pull/31 (Draft; independent CI verification pending).
 - Workflow succeeded: https://github.com/sstxww/reinforcement-learning/actions/runs/41415158420; **25 tests passed**, **128 PPO steps**.
 - Own model-controlled guarded games: seed 31071 and 31072 both complete, rank 8/8.
 - Comparison: baseline 8/6 on same seeds; n=2, no demonstrated improvement.

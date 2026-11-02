@@ -6,7 +6,7 @@
 - Branch: `agent/s-20261102-e599fa38/optimization-001`
 - Workflow: https://github.com/sstxww/reinforcement-learning/actions/runs/41415158420 (**success**)
 - Artifact: https://github.com/sstxww/reinforcement-learning/actions/runs/41415158420/artifacts/13128035277 (expires **2026-12-02 08:47 UTC**, not permanent)
-- Integration: PR pending; never automatically merge this candidate.
+- Integration: https://github.com/sstxww/reinforcement-learning/pull/31 (Draft; check latest head CI); never automatically merge this candidate.
 
 ## Prior evidence and selected hypothesis
 
