@@ -51,7 +51,7 @@ class BoardSwapPolicy:
         if not eligible:
             return default
         weakest=min(eligible,key=lambda i:(strength(f,BOARD+i*MINION),i))
-        if strength(f,HAND+9)<strength(f,BOARD+weakest*MINION)+self.margin:
+        if strength(f,HAND+9)<=strength(f,BOARD+weakest*MINION)+self.margin:
             return default
         self.swaps_this_turn+=1
         self.swaps+=1
@@ -59,14 +59,16 @@ class BoardSwapPolicy:
 
 def check_public_layout(f,game):
     """Oracle check only: game objects never enter policy.act."""
-    own=game.players[0]
-    if round(float(f[32])*7)!=len(own.board):
+    # The Python PyGame does not expose Rust game.players. Its documented
+    # view(0)["me"] is the own-player UI view. Opponents are never inspected.
+    own=json.loads(game.view(0))["me"]
+    if round(float(f[32])*7)!=len(own["board"]):
         raise AssertionError("board count observation mismatch")
-    if round(float(f[33])*10)!=len(own.hand):
+    if round(float(f[33])*10)!=len(own["hand"]):
         raise AssertionError("hand count observation mismatch")
-    for i,m in enumerate(own.board):
+    for i,m in enumerate(own["board"]):
         off=BOARD+i*MINION
-        if abs(float(f[off+1])*10-m.atk)>.06 or abs(float(f[off+2])*10-m.hp)>.06:
+        if abs(float(f[off+1])*10-m["atk"])>.06 or abs(float(f[off+2])*10-m["hp"])>.06:
             raise AssertionError("public minion stats observation mismatch")
 
 def play_real(seed,margin):

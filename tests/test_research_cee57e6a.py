@@ -27,6 +27,12 @@ def test_do_not_sell_golden_or_equal_hand():
     assert p.act(scene(golden=True),{"turn":8,"actions_used":7})==8
     assert p.act(scene(hand_attack=1.,hand_health=1.),{"turn":9,"actions_used":7})==8
 
+def test_even_strong_hand_never_sells_golden_slot():
+    p=BoardSwapPolicy(4)
+    chosen=p.act(scene(golden=True,hand_attack=30.,hand_health=30.),
+                 {"turn":8,"actions_used":7})
+    assert 16<=chosen<=22 and chosen!=20
+
 def test_original_plays_upgrades_and_one_swap_cap():
     p=BoardSwapPolicy(4)
     x=scene()
