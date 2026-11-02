@@ -1,0 +1,68 @@
+name: Isolated uncertainty audit s-20261102-9e68b534
+on:
+  push:
+    branches: ['agent/s-20261102-9e68b534/optimization-001']
+    paths:
+      - '.github/workflows/experiment-s-20261102-9e68b534.yml'
+      - 'tavern_ai/session_9e68b534_stats.py'
+      - 'tests/test_session_9e68b534_stats.py'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: isolated-uncertainty-s-20261102-9e68b534-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  full-game-baseline-uncertainty:
+    if: github.ref == 'refs/heads/agent/s-20261102-9e68b534/optimization-001'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[test]'
+      - name: Session statistics regression tests
+        run: python -m pytest -q tests/test_session_9e68b534_stats.py
+      - name: Install pinned real TavernGym engine
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Play four genuine complete eight-seat baseline games
+        run: |
+          python -m tavern_ai.session_9e68b534_stats \
+            --agent-id s-20261102-9e68b534 --seed-start 392500 --games 4 \
+            --receipt-dir experiments/s-20261102-9e68b534 \
+            --metrics research/sessions/s-20261102-9e68b534/round-001-metrics.json
+          for seed in 392500 392501 392502 392503; do
+            python -m tavern_ai.validate_receipt experiments/s-20261102-9e68b534/001-${seed}.json
+          done
+      - name: Commit only genuine receipts and metrics to this session branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "${GITHUB_REF_NAME}" = 'agent/s-20261102-9e68b534/optimization-001'
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add experiments/s-20261102-9e68b534/ research/sessions/s-20261102-9e68b534/round-001-metrics.json
+          git diff --cached --quiet && exit 0
+          git commit -m 'results(s-20261102-9e68b534): persist four actual TavernGym match receipts and uncertainty metrics'
+          git pull --rebase origin "${GITHUB_REF_NAME}"
+          git push origin "HEAD:refs/heads/${GITHUB_REF_NAME}"
+      - name: Preserve independent experiment evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: uncertainty-s-20261102-9e68b534-${{ github.run_id }}
+          path: |
+            experiments/s-20261102-9e68b534/*.json
+            research/sessions/s-20261102-9e68b534/round-001-metrics.json
+          if-no-files-found: ignore
+          retention-days: 30
