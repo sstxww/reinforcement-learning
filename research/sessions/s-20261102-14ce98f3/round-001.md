@@ -1,15 +1,22 @@
-# Round 001 — isolated reward-scale experiment
+# Round 001 — reward magnitude sensitivity, with real training and failure recovery
 
 - Session: `s-20261102-14ce98f3`
 - Branch: `agent/s-20261102-14ce98f3/optimization-001`
-- Immutable base main: `6ac59235b8238196a0e6462de77b72413c829372`
-- Research focus: reward scale and MaskablePPO critic optimization, **not** a claim of competitive improvement.
-- Hypothesis: scaling TavernGym rewards by 0.25 reduces critic value loss after 256 PPO steps compared with scale 1.0 under identical seed 74231. Any gameplay strength change remains unproven without more games.
-- Existing knowledge reviewed: main README, AGENTS.md, docs/PROJECT_BACKGROUND.md, docs/SESSION_PROTOCOL.md, research/knowledge/README.md; main research/sessions/ had only .gitkeep. Open PRs #6 strategy, #7 evaluation, #8 infrastructure, #9 learning are unmerged. This experiment adds only new dedicated files to avoid their module edits.
-- Engine: TavernGym 1.1.0, upstream `fb61201a557ddd36a411cf44aac51ce4d9b606ce`, patch SHA256 `1e48a071cad63c284debbf917cb012595a405a4ef5ab66180eb2918e205aaac0`, source hash `6d8712c93022ba11`, observe2 4017 float + 447 card + 245 legal-masked actions.
-- Implementation: `tavern_ai/reward_study.py`, `tests/test_reward_study.py`, isolated cloud workflow `.github/workflows/reward-s-20261102-14ce98f3.yml`; no shared train.yml edits.
-- Training planned: 256 PPO steps per arm, MaskablePPO with n_steps=128, 4 epochs, batch=64, learning_rate=3e-4, seed=74231, CPU. Total 512 attempted steps. Max 85 min per workflow.
-- Full matches planned: baseline seed 26011, trained scaled and control models paired on seed 26012. Bot opponents from true patched TavernGym. All receipts must be from Game.is_over and pass validate_receipt.
-- Actual training, CI, receipts, statistics and recovery: **PENDING remote execution**, never inferred from the workflow definition.
-- Checkpoints: artifact `reward-models-s-20261102-14ce98f3`, 30-day expiry; NOT permanent until verified. Metadata includes SHA256 in metrics JSON after actual training.
-- Comparison caveat: a single paired seed is not statistical proof of placement advantage. Next: add independent seeds, confirm receipt integrity and compare value-loss distributions across several training seeds.
+- Base main SHA: `6ac59235b8238196a0e6462de77b72413c829372`.
+- Scope: reward magnitude / isolated PPO train, no edits to concurrent PR #6–#9's production modules.
+- Sources reviewed: main README, AGENTS.md, docs/PROJECT_BACKGROUND.md, docs/SESSION_PROTOCOL.md, research/knowledge/README.md; empty main research/sessions at start; open PRs #6 strategy #7 evaluation #8 infrastructure #9 PPO, none assumed merged.
+- Hypothesis: 0.25 reward scale reduces PPO critic value loss after 256 training timesteps relative to 1.0. This hypothesis was **not supported** by the first observed update data.
+- Implementation: `tavern_ai/reward_study.py` and `tests/test_reward_study.py`; isolated cloud workflow `.github/workflows/reward-s-20261102-14ce98f3.yml`; supplemental guarded evaluation in `tavern_ai/reward_eval.py`.
+- Game engine: TavernGym 1.1.0; upstream `fb61201a557ddd36a411cf44aac51ce4d9b606ce`; patch SHA256 `1e48a071cad63c284debbf917cb012595a405a4ef5ab66180eb2918e205aaac0`; source hash `6d8712c93022ba11`; observe2 float 4017, card 447, legal mask 245, n_cards 3984.
+- Proven run: [GitHub Actions #41413148710](https://github.com/sstxww/reinforcement-learning/actions/runs/41413148710) (overall failure on uncapped model match; tests, engine validation, baseline match, two PPO trainings, receipt/model artifact upload succeeded).
+- Config: MaskablePPO CPU, training seed 74231 shared across paired arms (distinct from other sessions), n_steps 128, batch size 64, 4 epochs, gamma .99, gae .95, learning rate 3e-4, ent_coef .01; 256 actual steps each, **512 actual steps total**; workflow timeout 85 min.
+- Real **completed** eight-seat baseline match: `experiments/s-20261102-14ce98f3/001-26011.json`, seed 26011, seat 0 placement 8, turns 14, decisions 39, placements `[8,6,4,2,5,7,1,3]`, engine protection truncations 0, turn_limit_end false. This is our own full-match run; not the PR CI match.
+- PPO metrics (real): raw reward mean -0.00390625, std 0.0623778102; scaled mean -0.0009765625, std 0.0155944526. Both last logged value_loss `0.5108554218895733`, approx_kl `0.0031453119590878487`, explained_variance `-2.4957480430603027`. Despite 4x reward scale, no measured critic-loss reduction. Short horizons/sparse terminal rewards can explain unchanged logged losses; not yet confirmed by additional seeds.
+- Real failure: uncapped 0.25-trained model on seed 26012 did **not** finish; `tavern_ai.canary` raised `RuntimeError: Full-game safety limit exceeded` (30,000 loop bound). No model-match receipt was written. Original raw-model test was skipped. Never treat those attempts as completed full games.
+- Recovery hypothesis: bound optional per-turn model actions to 18, choose legal end-turn (action 0) when possible, log overrides. This **changes** the evaluated policy to `model_guarded`; any guarded result must not be reported as the raw model's quality. Recovery job reads exact artifact by run ID and verifies both SHA256 before pairing matches on seed 26012.
+- Models from run #41413148710: `checkpoints/s-20261102-14ce98f3/raw.zip` SHA256 `6b086172e7d08a7d19fa64ab67034193e6f340c4c64078eff3f941c1e369679d`; `scaled.zip` SHA256 `95224bd6c3c4e406255d30718a702f1d1be95fb0e8e7c90974d82ef42c19ec0e`. Artifact ID `13127120696`, name `reward-models-s-20261102-14ce98f3`, expires 2026-12-02; **not permanent storage**. Recovery: download from the Actions run, verify hashes, use reward_eval with --max-actions-per-turn 18.
+- Source/results commits: `c6f075f5befb56f3424088ac8b2bc689362436fb` (initial); `2ee2edd3854cd9375404734f2db6f09687cf41ed` (bot-generated real receipt/metrics). Subsequent recovery commits and PR to be recorded in STATUS.
+- Statistical claim: none; one completed baseline game, and only one guarded paired seed planned. Need >=20 independent paired seeds for placement inference.
+- Reusable failure: a legal-mask-only PPO model can repeat legal non-progress actions indefinitely; impose explicit decision budgets and report intervention count, separately from pure model evaluation. Keep full-game safety hard-stop.
+- Cleanup: no temporary logs/checkpoint binaries committed to Git; small experiment JSON and matching models in expiring artifact only.
+- Next: inspect recovery run receipts, collect override rate and ranks, run further independent model seeds, investigate time-aware anti-loop penalties or more PPO timesteps.

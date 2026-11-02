@@ -1,0 +1,73 @@
+name: Session s-20261102-14ce98f3 - bounded recovery evaluation
+
+on:
+  push:
+    branches:
+      - agent/s-20261102-14ce98f3/optimization-001
+    paths:
+      - .github/workflows/reward-recovery-s-20261102-14ce98f3.yml
+      - tavern_ai/reward_eval.py
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: guarded-eval-s-20261102-14ce98f3
+  cancel-in-progress: false
+
+jobs:
+  guarded-matches:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: python -m pip install -e '.[train,test]'
+      - name: Unit tests
+        run: python -m pytest
+      - name: Install genuine pinned simulator
+        run: bash scripts/bootstrap_engine.sh
+      - name: Recover the models from the actual training run
+        uses: actions/download-artifact@v4
+        with:
+          name: reward-models-s-20261102-14ce98f3
+          run-id: 41413148710
+          github-token: ${{ github.token }}
+          path: .
+      - name: Verify model bytes against original training SHA256
+        run: |
+          echo '6b086172e7d08a7d19fa64ab67034193e6f340c4c64078eff3f941c1e369679d  checkpoints/s-20261102-14ce98f3/raw.zip' | sha256sum -c -
+          echo '95224bd6c3c4e406255d30718a702f1d1be95fb0e8e7c90974d82ef42c19ec0e  checkpoints/s-20261102-14ce98f3/scaled.zip' | sha256sum -c -
+      - name: Complete real eight-seat guarded scaled-model game
+        run: |
+          python -m tavern_ai.reward_eval --agent-id s-20261102-14ce98f3 --seed 26012 --max-actions-per-turn 18 --model checkpoints/s-20261102-14ce98f3/scaled.zip --receipt experiments/s-20261102-14ce98f3/002-26012.json
+          python -m tavern_ai.validate_receipt experiments/s-20261102-14ce98f3/002-26012.json
+      - name: Complete real eight-seat guarded raw-model game
+        run: |
+          python -m tavern_ai.reward_eval --agent-id s-20261102-14ce98f3 --seed 26012 --max-actions-per-turn 18 --model checkpoints/s-20261102-14ce98f3/raw.zip --receipt experiments/s-20261102-14ce98f3/003-26012.json
+          python -m tavern_ai.validate_receipt experiments/s-20261102-14ce98f3/003-26012.json
+      - name: Commit only actual receipts to own branch
+        if: always()
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add experiments/s-20261102-14ce98f3
+          if ! git diff --cached --quiet; then
+            git commit -m "experiment(s-20261102-14ce98f3): genuine guarded eight-seat game receipts"
+            git push origin HEAD:refs/heads/agent/s-20261102-14ce98f3/optimization-001
+          fi
+      - name: Retain evaluation receipts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: guarded-evaluation-s-20261102-14ce98f3
+          path: experiments/s-20261102-14ce98f3/*.json
+          if-no-files-found: ignore
+          retention-days: 30

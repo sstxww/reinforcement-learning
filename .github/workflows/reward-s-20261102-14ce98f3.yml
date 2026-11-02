@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - agent/s-20261102-14ce98f3/optimization-001
+    paths:
+      - tavern_ai/reward_study.py
+      - tests/test_reward_study.py
 
 permissions:
   contents: write
