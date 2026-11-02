@@ -5,6 +5,10 @@ on:
       - agent/s-20261102-75cf9e03/optimization-001
     paths:
       - .github/workflows/diagnose-rejected-s-20261102-75cf9e03.yml
+      - tavern_ai/checkpoint_preflight.py
+      - tavern_ai/action_opportunity_probe_75cf9e03.py
+      - tests/test_checkpoint_preflight.py
+      - tests/test_action_opportunity_probe_75cf9e03.py
 permissions:
   contents: write
   actions: read
