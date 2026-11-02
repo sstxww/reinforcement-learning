@@ -1,0 +1,65 @@
+name: Purchase-slot ablation s-20261102-1d9e7456
+
+on:
+  push:
+    branches:
+      - agent/s-20261102-1d9e7456/optimization-001
+    paths:
+      - .github/workflows/experiment-s-20261102-1d9e7456.yml
+      - research/sessions/s-20261102-1d9e7456/run_purchase_ablation.py
+      - tests/test_purchase_ablation_s_20261102_1d9e7456.py
+
+permissions:
+  contents: write
+
+concurrency:
+  group: purchase-ablation-s-20261102-1d9e7456
+  cancel-in-progress: false
+
+jobs:
+  finite-real-taverngym-ablation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 85
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install bounded dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[test]'
+      - name: Unit tests
+        run: python -m pytest tests/test_purchase_ablation_s_20261102_1d9e7456.py tests/test_baseline.py
+      - name: Install pinned real TavernGym and verify contract
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Calibrate and play real eight-seat games
+        run: |
+          python research/sessions/s-20261102-1d9e7456/run_purchase_ablation.py
+          python -m tavern_ai.validate_receipt experiments/s-20261102-1d9e7456/001-38200.json
+      - name: Upload isolated evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: purchase-s-20261102-1d9e7456
+          path: |
+            experiments/s-20261102-1d9e7456/*.json
+            research/sessions/s-20261102-1d9e7456/*.json
+          retention-days: 90
+          if-no-files-found: ignore
+      - name: Commit real receipt to OWN branch only
+        run: |
+          test "$GITHUB_REF_NAME" = "agent/s-20261102-1d9e7456/optimization-001"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add experiments/s-20261102-1d9e7456/001-38200.json
+          git add research/sessions/s-20261102-1d9e7456/metrics.json
+          git add research/sessions/s-20261102-1d9e7456/selected-policy.json
+          if ! git diff --cached --quiet; then
+            git commit -m "experiment: save verified real slot-ablation receipts"
+            git push origin "HEAD:refs/heads/$GITHUB_REF_NAME"
+          fi
