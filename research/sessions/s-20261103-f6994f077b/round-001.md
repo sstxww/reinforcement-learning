@@ -40,3 +40,14 @@ The added test file provides negative mutation and positive backward-compatibili
 ## Exact next operation
 
 Read GitHub Actions run 41512909874 jobs/logs. If it completes, extract the exact `AUTHENTIC_SEAT3_RECEIPT`, validate its SHA/seed/seat/model-policy/placements from original output, commit it under `experiments/s-20261103-f6994f077b/`, and update this status with immutable run URLs. If a genuine game fails, commit a failure note rather than a fabricated completed JSON. Create a reviewable PR and check all latest-head CI before any exclusive integrator merge. 
+
+## Post-run verification — authoritative final round evidence
+
+The preceding sections are a timestamped initial snapshot. The run subsequently **completed SUCCESS**; the original execution is [Actions #41512909874](https://github.com/sstxww/reinforcement-learning/actions/runs/41512909874), job `125509004790`. Synthetic integrity and seat-rotation regression steps passed; the pinned engine contract and genuine complete seat-3 baseline match passed independently.
+
+- Real match: seed **99841**, controlled seat **3**, **original baseline** versus seven scripted TavernGym bots, **16 turns**, **40 seat-3 policy decisions**. Completed `Game.is_over()=true`, rank at seat 3 **8**; all placements `[5,7,6,8,1,2,4,3]`, `truncated_combats=0`, `turn_limit_end=false`. This is n=1 baseline CI evidence, *not* PPO strength.
+- Original [Artifact #13174805676](https://github.com/sstxww/reinforcement-learning/actions/runs/41512909874/artifacts/13174805676) ZIP SHA256 `cf7371e06e90cce04d7f3d41107e18c804a54fab8195b1e71ceb2101440f35b0`, original 784-byte JSON entry SHA256 `bbde08a26895b54f4d6f7e396b29fd14ca7b4e04b67fe52690771af2f386aca1`.
+- Authenticated source JSON was committed unmodified under [experiments/s-20261103-f6994f077b/001-99841-seat3-baseline.json](https://github.com/sstxww/reinforcement-learning/blob/agent/s-20261103-f6994f077b/optimization-001/experiments/s-20261103-f6994f077b/001-99841-seat3-baseline.json), commit [0a16860](https://github.com/sstxww/reinforcement-learning/commit/0a16860e9d5d1f88ffd638197abb31120e15a4c7). The original job log includes the exact receipt JSON after the new strict validator checked it. This is genuine fixed-engine match evidence; no regenerated/hypothetical data.
+- PPO additional training steps **0**; new weight release/optimizer save **0**; raw model / assisted model games **0**. No independent candidate-vs-baseline comparison, hence no model promotion. Rank-eight model pathology remains open to separate P2 workers.
+
+**Next required acceptance:** open non-Draft PR to main, check latest exact-head PR CI and conflicts, and hand over to an independently exclusive INTEGRATOR. GitHub read of branch-protection policy returned 403, so this Worker may not merge main on presumed privileges.
