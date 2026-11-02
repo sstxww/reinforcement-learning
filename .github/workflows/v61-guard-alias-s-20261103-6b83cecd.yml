@@ -1,0 +1,50 @@
+name: V6.1 guarded-receipt alias evidence s-20261103-6b83cecd
+
+on:
+  push:
+    branches:
+      - agent/s-20261103-6b83cecd/optimization-001
+    paths:
+      - tavern_ai/paired_receipt_gate_v5.py
+      - tests/test_v61_guard_alias_s_20261103_6b83cecd.py
+      - .github/workflows/v61-guard-alias-s-20261103-6b83cecd.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: v61-guard-alias-6b83cecd
+  cancel-in-progress: false
+
+jobs:
+  evidence:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Focused canonical gate regression (synthetic only)
+        run: |
+          python -m pip install -e '.[test]'
+          python -m pytest -q tests/test_v61_guard_alias_s_20261103_6b83cecd.py tests/test_paired_receipt_gate_v5_15ac04d0.py
+      - name: Install pinned TavernGym
+        run: bash scripts/bootstrap_engine.sh
+      - name: Verify real engine contract
+        run: python -m tavern_ai.contract
+      - name: Own complete eight-seat baseline smoke (not PPO proof)
+        run: |
+          python -m tavern_ai.canary --agent-id s-20261103-6b83cecd \
+            --seed 99631 --policy baseline \
+            --receipt outputs/001-99631.json
+          python -m tavern_ai.validate_receipt outputs/001-99631.json
+          cat outputs/001-99631.json
+      - name: Preserve original real game receipt (30-day cache only)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v61-guard-alias-6b83cecd-${{ github.run_id }}
+          path: outputs/001-99631.json
+          if-no-files-found: ignore
+          retention-days: 30
