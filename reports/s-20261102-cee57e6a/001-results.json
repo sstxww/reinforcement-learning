@@ -1,0 +1,174 @@
+{
+  "schema": 1,
+  "session_id": "s-20261102-cee57e6a",
+  "hypothesis": "Observed full-board replacement improves weak baseline",
+  "method": "Real-game bounded hyperparameter search, no gradients",
+  "actual_ppo_steps": 0,
+  "actual_training_games": 8,
+  "train_seeds": [
+    73011,
+    73012
+  ],
+  "heldout_seeds": [
+    73031,
+    73032,
+    73033
+  ],
+  "mandatory_seed": 73029,
+  "grid": [
+    4.0,
+    8.0,
+    12.0
+  ],
+  "selected_margin": 12.0,
+  "engine": {
+    "version": "1.1.0",
+    "source_hash": "6d8712c93022ba11",
+    "features": 4017,
+    "cards": 447,
+    "actions": 245,
+    "n_cards": 3984
+  },
+  "source_sha256": "58e1b1efaf73508743e41371982780ebf7269dd57e37d71dea40e42bbc26751c",
+  "training_baseline": {
+    "games": 2,
+    "placements": [
+      8,
+      8
+    ],
+    "seeds": [
+      73011,
+      73012
+    ],
+    "mean_placement": 8,
+    "top4_rate": 0.0,
+    "first_place_rate": 0.0,
+    "swaps": 0,
+    "decisions": 83
+  },
+  "training_candidates": {
+    "4": {
+      "games": 2,
+      "placements": [
+        8,
+        8
+      ],
+      "seeds": [
+        73011,
+        73012
+      ],
+      "mean_placement": 8,
+      "top4_rate": 0.0,
+      "first_place_rate": 0.0,
+      "swaps": 3,
+      "decisions": 94
+    },
+    "8": {
+      "games": 2,
+      "placements": [
+        8,
+        8
+      ],
+      "seeds": [
+        73011,
+        73012
+      ],
+      "mean_placement": 8,
+      "top4_rate": 0.0,
+      "first_place_rate": 0.0,
+      "swaps": 0,
+      "decisions": 83
+    },
+    "12": {
+      "games": 2,
+      "placements": [
+        8,
+        8
+      ],
+      "seeds": [
+        73011,
+        73012
+      ],
+      "mean_placement": 8,
+      "top4_rate": 0.0,
+      "first_place_rate": 0.0,
+      "swaps": 0,
+      "decisions": 83
+    }
+  },
+  "mandatory": {
+    "schema": 1,
+    "timestamp": "2026-11-02T09:46:54.499425+00:00",
+    "environment": "TavernGym",
+    "engine_source_hash": "6d8712c93022ba11",
+    "engine_version": "1.1.0",
+    "agent_id": "s-20261102-cee57e6a",
+    "policy": "public-board-swap",
+    "seed": 73029,
+    "completed": true,
+    "turns": 15,
+    "decisions": 38,
+    "placements": [
+      8,
+      3,
+      6,
+      7,
+      2,
+      4,
+      1,
+      5
+    ],
+    "truncated_combats": 0,
+    "turn_limit_end": false,
+    "margin": 12.0,
+    "swaps": 0,
+    "safety_forced_end_turns": 0,
+    "model_sha256": null,
+    "source_sha256": "58e1b1efaf73508743e41371982780ebf7269dd57e37d71dea40e42bbc26751c"
+  },
+  "heldout_baseline": {
+    "games": 3,
+    "placements": [
+      7,
+      8,
+      8
+    ],
+    "seeds": [
+      73031,
+      73032,
+      73033
+    ],
+    "mean_placement": 7.666666666666667,
+    "top4_rate": 0.0,
+    "first_place_rate": 0.0,
+    "swaps": 0,
+    "decisions": 156
+  },
+  "heldout_candidate": {
+    "games": 3,
+    "placements": [
+      7,
+      8,
+      8
+    ],
+    "seeds": [
+      73031,
+      73032,
+      73033
+    ],
+    "mean_placement": 7.666666666666667,
+    "top4_rate": 0.0,
+    "first_place_rate": 0.0,
+    "swaps": 0,
+    "decisions": 156
+  },
+  "paired_candidate_minus_baseline": [
+    0,
+    0,
+    0
+  ],
+  "paired_mean_delta": 0,
+  "total_complete_game_receipts": 15,
+  "promotion": "RETEST, not enough evidence even if candidate improves",
+  "checkpoint": "No neural network; source code plus selected margin reproduces policy"
+}
