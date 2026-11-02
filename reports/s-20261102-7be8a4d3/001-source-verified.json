@@ -1,0 +1,12 @@
+{
+  "registry_valid": true,
+  "latest_candidate": "v2-learning-41413557445",
+  "candidate": "v2-learning-41413557445",
+  "model_sha256": "73bde2666426cecce39f135980a897bb2cd4a7d70783ba04c9c0d29477a6664a",
+  "verified_steps": 1280,
+  "engine_version": "1.1.0",
+  "source_hash": "6d8712c93022ba11",
+  "byte_integrity_verified": true,
+  "model_loading_verified": false,
+  "resume_training_verified": false
+}
