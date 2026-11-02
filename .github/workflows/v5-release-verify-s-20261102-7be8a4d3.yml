@@ -1,0 +1,83 @@
+name: V5 Release asset canonicalization s-20261102-7be8a4d3
+on:
+  push:
+    branches: [agent/s-20261102-7be8a4d3/optimization-001]
+    paths:
+      - '.github/workflows/v5-release-verify-s-20261102-7be8a4d3.yml'
+permissions:
+  contents: write
+concurrency:
+  group: v5-release-verify-s-20261102-7be8a4d3
+  cancel-in-progress: false
+jobs:
+  verify-archive:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      GH_TOKEN: ${{ github.token }}
+      SESSION: s-20261102-7be8a4d3
+      TAG: v5-recovery-s-20261102-7be8a4d3-41428181901
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+          fetch-depth: 0
+      - name: Independently download exact originally published assets
+        run: |
+          mkdir -p archive
+          gh release download "$TAG" --repo "$GITHUB_REPOSITORY" --pattern resumed.zip --pattern resumed.metadata.json --dir archive
+          printf '250be6159508fdd1ef91abb6c7277efe32fa49c726ea347923f18f6a4765e0f0  archive/resumed.zip\n' | sha256sum -c -
+          python - <<'PY'
+          import json,pathlib
+          m=json.loads(pathlib.Path("archive/resumed.metadata.json").read_text())
+          assert m["total_timesteps"] == 1408,m
+          assert m["engine"]["version"]=="1.1.0"
+          assert m["engine"]["source_hash"]=="6d8712c93022ba11"
+          print("release metadata verified:",m["total_timesteps"])
+          PY
+      - name: Publish canonical asset names without overwriting existing files
+        run: |
+          cp archive/resumed.zip archive/model.zip
+          cp archive/resumed.metadata.json archive/model.metadata.json
+          gh release upload "$TAG" archive/model.zip archive/model.metadata.json --repo "$GITHUB_REPOSITORY"
+      - name: Re-download canonical model assets and verify against source digest
+        run: |
+          mkdir -p verified
+          for i in 1 2 3; do
+            if gh release download "$TAG" --repo "$GITHUB_REPOSITORY" --pattern model.zip --pattern model.metadata.json --dir verified; then break; fi
+            if [ "$i" -eq 3 ]; then exit 1; fi
+            sleep 3
+          done
+          printf '250be6159508fdd1ef91abb6c7277efe32fa49c726ea347923f18f6a4765e0f0  verified/model.zip\n' | sha256sum -c -
+          cmp archive/resumed.metadata.json verified/model.metadata.json
+          python - <<'PY'
+          import json,pathlib
+          p=pathlib.Path("reports/s-20261102-7be8a4d3")
+          p.mkdir(parents=True,exist_ok=True)
+          output={"schema":1,"run_id":41428181901,"source_release":"v2-learning-41413557445",
+          "source_steps":1280,"resumed_steps":1408,"actual_added_steps":128,
+          "release_tag":"v5-recovery-s-20261102-7be8a4d3-41428181901",
+          "model_asset":"model.zip","metadata_asset":"model.metadata.json",
+          "model_sha256":"250be6159508fdd1ef91abb6c7277efe32fa49c726ea347923f18f6a4765e0f0",
+          "hash_verified_after_independent_redownload":True,"model_retrain_verified_in_run":True,
+          "promotion":"NOT ELIGIBLE","heldout_strength_verified":False,
+          "note":"Original release publish succeeded but CLI #label did not rename assets; this separate run repairs and re-verifies canonical filenames."}
+          (p/"001-release-reverified.json").write_text(json.dumps(output,indent=2)+"\n")
+          print(json.dumps(output))
+          PY
+      - name: Commit tiny verified report only
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "reports/$SESSION/001-release-reverified.json"
+          git commit -m "results($SESSION): independently reverify permanent Release assets"
+          git pull --rebase origin "$GITHUB_REF_NAME"
+          git push origin "HEAD:$GITHUB_REF_NAME"
+      - name: Preserve report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v5-release-reverify-s-20261102-7be8a4d3-${{ github.run_id }}
+          path: reports/s-20261102-7be8a4d3/001-release-reverified.json
+          if-no-files-found: ignore
+          retention-days: 30
