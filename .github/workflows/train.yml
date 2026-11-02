@@ -104,6 +104,12 @@ jobs:
           receipt=json.loads(Path("publish/trained-canary.json").read_text())
           evaluation=json.loads(Path("publish/evaluation.json").read_text())
           digest=lambda path: hashlib.sha256(Path(path).read_bytes()).hexdigest()
+          registry=json.loads(Path("models/registry.json").read_text())
+          requested=os.environ["SOURCE_MODEL_ID"]
+          source_id=registry["latest"]["id"] if requested=="latest" else requested
+          matches=[row for row in registry["candidates"] if row["id"]==source_id]
+          if len(matches)!=1 or digest("checkpoints/model.zip")!=matches[0]["checkpoint_sha256"]:
+              raise ValueError("Source checkpoint is not the registered immutable Release")
           if candidate.get("engine")!=source.get("engine") or candidate.get("total_timesteps",0)<=source.get("total_timesteps",0):
               raise ValueError("PPO continuation did not preserve engine and increase steps")
           if receipt.get("policy")!="model" or receipt.get("model_sha256")!=digest("publish/model.zip") or receipt.get("completed") is not True:
@@ -114,7 +120,7 @@ jobs:
               raise ValueError("Candidate evaluation is not raw-model evidence")
           if evaluation["candidate"]["games"]<1 or evaluation["baseline"]["games"]!=evaluation["candidate"]["games"]:
               raise ValueError("Paired baseline receipts missing")
-          lineage={"schema":1,"source_model_id":os.environ["SOURCE_MODEL_ID"],
+          lineage={"schema":1,"source_model_id":source_id,
                    "parent_sha256":digest("checkpoints/model.zip"),
                    "candidate_sha256":digest("publish/model.zip"),
                    "parent_steps":source["total_timesteps"],"candidate_steps":candidate["total_timesteps"],
