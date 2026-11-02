@@ -1,0 +1,62 @@
+{
+  "candidates": [
+    {
+      "in_legacy_inventory": true,
+      "metadata_digest_indexed": true,
+      "metadata_download_verified_claim": false,
+      "model_id": "v1-learning-9eada5801f99",
+      "published_release_cpu_load_claim": false,
+      "published_release_optimizer_resume_claim": false,
+      "weights_download_verified_claim": false
+    },
+    {
+      "in_legacy_inventory": true,
+      "metadata_digest_indexed": true,
+      "metadata_download_verified_claim": false,
+      "model_id": "v1-learning-165a76a18afb",
+      "published_release_cpu_load_claim": false,
+      "published_release_optimizer_resume_claim": false,
+      "weights_download_verified_claim": false
+    },
+    {
+      "in_legacy_inventory": true,
+      "metadata_digest_indexed": true,
+      "metadata_download_verified_claim": false,
+      "model_id": "v2-learning-41413557445",
+      "published_release_cpu_load_claim": false,
+      "published_release_optimizer_resume_claim": false,
+      "weights_download_verified_claim": false
+    },
+    {
+      "in_legacy_inventory": true,
+      "metadata_digest_indexed": true,
+      "metadata_download_verified_claim": false,
+      "model_id": "v1-learning-resume-41413508653",
+      "published_release_cpu_load_claim": false,
+      "published_release_optimizer_resume_claim": false,
+      "weights_download_verified_claim": false
+    },
+    {
+      "in_legacy_inventory": false,
+      "metadata_digest_indexed": true,
+      "metadata_download_verified_claim": true,
+      "model_id": "v5-s-20261102-68099929-1408-41428692617",
+      "published_release_cpu_load_claim": false,
+      "published_release_optimizer_resume_claim": false,
+      "weights_download_verified_claim": true
+    }
+  ],
+  "canonical_candidate_count": 5,
+  "digest_record_count": 7,
+  "latest_experimental_unpromoted": "v5-s-20261102-68099929-1408-41428692617",
+  "latest_is_champion": false,
+  "latest_manifest_resume_gate": false,
+  "legacy_inventory_count": 6,
+  "legacy_missing_latest": true,
+  "schema": 1,
+  "unindexed_extra_release_ids": [
+    "v1-learning-41414737020",
+    "v1-learning-bfa971c690dd"
+  ],
+  "warning": "Metadata-only consistency audit. A true gate would still need independent download, SHA256, deserialization, optimizer continuation, and model-only full-game tests. Do not train/promote on this output alone."
+}
