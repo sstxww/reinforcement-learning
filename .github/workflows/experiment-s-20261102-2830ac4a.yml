@@ -1,4 +1,4 @@
-name: "Hold-sell ablation s-20261102-2830ac4a"
+name: "Magnetize-priority ablation s-20261102-2830ac4a"
 
 on:
   push:
@@ -39,6 +39,7 @@ jobs:
         run: |
           bash scripts/bootstrap_engine.sh
           python -m tavern_ai.contract
+          python -c "import taverngym; assert 'sell' in str(taverngym.action_name(16)).lower(); assert 'magnetize' in str(taverngym.action_name(126)).lower()"
       - name: Run own candidate match and three seed-paired controls
         run: |
           python -m tavern_ai.hold_sell_experiment \
@@ -56,7 +57,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: hold-sell-s-20261102-2830ac4a-${{ github.run_id }}
+          name: magnetize-s-20261102-2830ac4a-${{ github.run_id }}
           path: |
             experiments/s-20261102-2830ac4a/*.json
             reports/s-20261102-2830ac4a/*.json

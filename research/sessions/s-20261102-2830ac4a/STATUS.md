@@ -1,17 +1,14 @@
 # Session s-20261102-2830ac4a — STATUS
 
-- **Round:** 001 — completed real-game experiment; negative/inconclusive rank result, awaiting PR CI gate/integrator review.
-- **Branch:** `agent/s-20261102-2830ac4a/optimization-001`; base main `315b068bac5ab6d8403c3c9b18f8c101c0cded5d`.
-- **Research focus:** opt-in no-auto-sell baseline strategy, leaves original baseline and model untouched.
-- **Actual execution:** https://github.com/sstxww/reinforcement-learning/actions/runs/41415008425 (success), code SHA `f6cd60f951be78c67e30c6a717e5d600b05d49d8`.
-- **Engine:** pinned TavernGym 1.1.0; source hash `6d8712c93022ba11`; `observe2` 4017/447/245; real eight-seat game.
-- **Tests:** unit/regression tests passed; contracts and all seven receipts validated in Actions.
-- **Training:** 0 PPO timesteps (pure rule policy), no model checkpoint, no restored optimizer, no Best model.
-- **Required personal full-game evidence:** `experiments/s-20261102-2830ac4a/001-34200.json`; seed 34200, rank 8, 44 decisions, placements [8,5,7,1,3,6,4,2], 15 turns, complete, no guard or invalid actions.
-- **Held-out evaluation:** candidate 3 games placements [7,8,8], mean 7.6667, first 0%, top-four 0%; same-seed unchanged baseline exactly [7,8,8], mean 7.6667, first 0%, top-four 0%. Difference 0.00, inconclusive.
-- **Summary:** `reports/s-20261102-2830ac4a/hold-sell-paired.json`; seven genuine completed match receipts retained in session directory.
-- **Candidate policy SHA256:** `0fbedc281a33e4ff5f7c52ddb22e2290db7193c055b1a85f1cccb72c260c481f`.
-- **Artifact:** `hold-sell-s-20261102-2830ac4a-41415008425`, artifact ID `13127795190`, expires 2026-12-02 08:44:36 UTC. Git-tracked JSON receipts and code survive artifact expiry, but no weights exist.
-- **Failures:** none in own workflow. Another PR's `sb3_contrib` missing-module CI issue is outside this branch and not modified.
-- **Next hypothesis:** measure observed action divergence and legal sell availability before spending additional optimization budget; unchanged placements alone do not show strategy exposure.
-- **PR:** to be created for main, draft until own latest-head CI passes.
+- **State:** original real-game execution succeeded; critical action-encoding interpretation error discovered; corrected magnetize-avoidance variant undergoing independent rerun and latest-head PR CI.
+- **Branch:** `agent/s-20261102-2830ac4a/optimization-001`, base main `315b068bac5ab6d8403c3c9b18f8c101c0cded5d`.
+- **PR:** https://github.com/sstxww/reinforcement-learning/pull/28 (draft).
+- **Original run:** https://github.com/sstxww/reinforcement-learning/actions/runs/41415008425; seven fully completed TavernGym 1.1.0 games; baseline and candidate ranks [7,8,8] vs [7,8,8], with no verified improvement. Candidate own seed 34200 rank 8, 44 decisions, all eight ranks [8,5,7,1,3,6,4,2].
+- **Core correction:** actions 16–22 are **Sell**, 126–195 are **Magnetize** (upstream actions.rs @ fb61201). Old run labeled 'hold_sell' is genuine but did not test selling; must not be cited as sell-policy evidence.
+- **Repair:** legacy path `tavern_ai/hold_sell_experiment.py` now houses `AvoidMagnetizePolicy`, reports optional magnetize exposure and shadow baseline disagreements; engine-action-name regression added to branch-scoped Actions. Re-execution evidence pending.
+- **Environment:** TavernGym 1.1.0, source hash `6d8712c93022ba11`, 4017/447/245 observe2; source SHA and source-policy hash recorded in receipts.
+- **Training:** 0 MaskablePPO steps; deterministic rules only. Model checkpoint absent/not applicable; no candidate promoted to Best.
+- **Original JSON receipts:** `experiments/s-20261102-2830ac4a/*.json` with original policy label; corrected run will update receipts under own path, with previous Git revisions preserved.
+- **Original evidence artifact:** ID `13127795190`, 30-day retention until 2026-12-02 08:44:36 UTC. This is not model durability.
+- **Failure report:** `research/sessions/s-20261102-2830ac4a/failures/001-action-encoding.md`.
+- **Next step:** read new workflow logs + real action exposure counts; update report and knowledge proposal; check PR #28 final-head CI. If no exposure, do not assert candidate/baseline functional equivalence on all game states.

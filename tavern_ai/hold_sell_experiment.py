@@ -1,6 +1,9 @@
-"""Session-local ablation: do not automatically sell board minions.
+"""Session-local ablation: bypass optional magnetize actions to prioritize buys.
 
-This module deliberately leaves the shared baseline, canary and trainer unchanged.
+Historically this file was named hold_sell from a mistaken action-space reading.
+The fixed upstream maps sell to 16..22 and magnetize to 126..195.
+The module preserves the legacy filename for auditable history.
+The shared baseline, canary and trainer are unchanged.
 All matches run on the pinned real TavernGym engine.
 """
 from __future__ import annotations
@@ -20,16 +23,18 @@ from .canary import run as run_baseline
 from .contract import ACTIONS, CARDS, FEATURES, verify_engine
 from .validate_receipt import validate
 
-POLICY_NAME = "hold_sell_v1"
+POLICY_NAME = "avoid_magnetize_v1"
+SELL_ACTIONS = range(16, 23)
+MAGNETIZE_ACTIONS = range(126, 196)
 DEFAULT_SEED = 34200
 PAIR_SEEDS = (34201, 34202, 34203)
 
 
-class HoldSellPolicy:
-    """Play hand, level on baseline schedule, buy, then end; never auto-sell.
+class AvoidMagnetizePolicy:
+    """Play hand, level on baseline schedule, buy, then end; avoid magnetize.
 
     Deliberately preserve the original baseline's discover priority and tier
-    schedule. Change only the unconditional sell-before-buy behavior.
+    schedule. Change optional magnetize-before-buy behavior only.
     """
 
     def act(self, observation: dict, context: dict | None = None) -> int:
@@ -57,7 +62,7 @@ class HoldSellPolicy:
         buy = first(8, 16)
         if buy is not None:
             return buy
-        # Prefer stopping to selling units just because sell is legal.
+        # Prefer ending the turn to optional magnetization after buy/level.
         if mask[0]:
             return 0
         return int(np.flatnonzero(mask)[0])
@@ -70,11 +75,15 @@ def run_candidate(seed: int, agent_id: str) -> dict:
         raise ValueError("Invalid agent ID")
     engine = verify_engine()
     game = taverngym.Game(seed=seed)
-    policy = HoldSellPolicy()
+    policy = AvoidMagnetizePolicy()
     decisions = 0
     turn_actions = 0
     last_turn = -1
     illegal_actions = 0
+    shadow_baseline = BaselinePolicy()
+    shadow_disagreements = 0
+    legal_magnetize_observations = 0
+    skipped_baseline_magnetizations = 0
 
     for _ in range(30000):
         if game.is_over():
@@ -100,6 +109,15 @@ def run_candidate(seed: int, agent_id: str) -> dict:
                 {"features": features, "cards": cards, "action_mask": mask},
                 {"turn": turn, "actions_used": turn_actions},
             )
+            shadow = shadow_baseline.act(
+                {"action_mask": mask}, {"turn": turn, "actions_used": turn_actions}
+            )
+            if shadow != action:
+                shadow_disagreements += 1
+                if shadow in MAGNETIZE_ACTIONS:
+                    skipped_baseline_magnetizations += 1
+            if mask[126:196].any():
+                legal_magnetize_observations += 1
             if not mask[action]:
                 illegal_actions += 1
                 raise ValueError(f"Illegal hold-sell action: {action}")
@@ -126,6 +144,9 @@ def run_candidate(seed: int, agent_id: str) -> dict:
         "truncated_combats": int(game.truncated_combats),
         "turn_limit_end": bool(game.turn_limit_end),
         "illegal_actions": illegal_actions,
+        "shadow_baseline_disagreements": shadow_disagreements,
+        "legal_magnetize_observations": legal_magnetize_observations,
+        "skipped_baseline_magnetizations": skipped_baseline_magnetizations,
         "git_sha": os.getenv("GITHUB_SHA", ""),
         "policy_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
         "model_sha256": None,
@@ -178,20 +199,29 @@ def main() -> None:
     base_summary = summarize(control)
     candidate_summary = summarize(candidate)
     report = {
-        "experiment": "hold_sell_v1_paired",
-        "hypothesis": "Skipping optional auto-sells might improve rank against seven official bots",
+        "experiment": "avoid_magnetize_v1_paired",
+        "hypothesis": "Skipping optional magnetize-before-buy decisions might improve rank",
         "environment": verify_engine(),
         "policy_sha256": own["policy_sha256"],
         "base_git_sha": os.getenv("GITHUB_SHA", ""),
         "training_timesteps": 0,
+        "action_contract": {"sell_indices": [16, 22], "magnetize_indices": [126, 195]},
         "own_full_game": {
             "seed": args.seed,
             "completed": own["completed"],
             "rank": own["placements"][0],
             "decisions": own["decisions"],
+            "shadow_baseline_disagreements": own["shadow_baseline_disagreements"],
+            "skipped_baseline_magnetizations": own["skipped_baseline_magnetizations"],
         },
         "control": base_summary,
         "candidate": candidate_summary,
+        "candidate_action_audit": [
+            {"seed": r["seed"], "shadow_baseline_disagreements": r["shadow_baseline_disagreements"],
+             "legal_magnetize_observations": r["legal_magnetize_observations"],
+             "skipped_baseline_magnetizations": r["skipped_baseline_magnetizations"]}
+            for r in candidate
+        ],
         "paired_rank_deltas_candidate_minus_control": [
             new["placements"][0] - old["placements"][0]
             for old, new in zip(control, candidate)

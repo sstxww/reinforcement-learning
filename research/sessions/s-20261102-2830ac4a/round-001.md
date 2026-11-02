@@ -46,3 +46,10 @@ The exact result must be read from the real workflow and committed receipts. Unt
 - Failed run repairs: none required in this round. Existing other-PR CI fault `ModuleNotFoundError: sb3_contrib` is not this session's failure and was not changed.
 - No transient files were committed. Source, independent tests, workflow, JSON receipts, summary and docs are retained.
 - Suggested next round: instrument `baseline_action != candidate_action` and count legal optional sell opportunities, then evaluate only nonzero-exposure seeds and check for leakage/selection bias.
+
+## Critical action-space correction — 2026-11-02
+**The original sell hypothesis was invalid.** The actual pinned upstream `crates/taverngym/src/actions.rs` maps actions 16–22 to `Sell`, and 126–195 to `Magnetize`. The initial candidate never changed selling priority: it skipped optional magnetization, while preserving baseline purchase/turn priorities. The name `hold_sell_experiment.py` is historical and retained to make the original error traceable.
+
+Source: https://github.com/MCG-NJU/AutoTavern/blob/fb61201a557ddd36a411cf44aac51ce4d9b606ce/crates/taverngym/src/actions.rs
+
+Original run 41415008425 still proves 7 real complete games, but **does not test whether selling less improves placement**. Its descriptive equality of [7,8,8] vs [7,8,8] should be understood only as a misnamed magnetize-avoidance pilot. The corrected version adds action-level shadow disagreement and legal magnetization exposure counts, plus checks the engine's action names. Corrected run and updated policy hash must replace the old hypothesis as the authoritative finding; never combine versions as independent evidence.
