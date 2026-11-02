@@ -1,0 +1,106 @@
+name: V5 s-20261102-880b8a71 - verify Release, bounded PPO resume and games
+on:
+  push:
+    branches:
+      - agent/s-20261102-880b8a71/optimization-001
+    paths:
+      - 'scripts/verify_release_resume_v5_880b8a71.py'
+      - 'tests/test_release_resume_v5_880b8a71.py'
+      - '.github/workflows/experiment-s-20261102-880b8a71.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+  actions: read
+concurrency:
+  group: v5-release-resume-s-20261102-880b8a71
+  cancel-in-progress: false
+jobs:
+  verify-and-resume:
+    if: github.repository == 'sstxww/reinforcement-learning' && github.ref == 'refs/heads/agent/s-20261102-880b8a71/optimization-001'
+    runs-on: ubuntu-latest
+    timeout-minutes: 100
+    env:
+      GH_TOKEN: ${{ github.token }}
+      SOURCE_TAG: v2-learning-41413557445
+      SOURCE_SHA: 73bde2666426cecce39f135980a897bb2cd4a7d70783ba04c9c0d29477a6664a
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run all Python tests
+        run: |
+          python -m pip install -e '.[train,test]'
+          python -m pytest
+      - name: Verify TavernGym pinned engine, public observation contract
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Download immutable experimental Release and fail closed on SHA
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p checkpoints/source checkpoints/next reports/s-20261102-880b8a71 experiments/s-20261102-880b8a71
+          gh release download "$SOURCE_TAG" --repo "$GITHUB_REPOSITORY" --pattern model.zip --pattern model.metadata.json --dir checkpoints/source
+          printf '%s  %s\n' "$SOURCE_SHA" checkpoints/source/model.zip | sha256sum --check -
+          python scripts/verify_release_resume_v5_880b8a71.py preflight --source-model checkpoints/source/model.zip --source-metadata checkpoints/source/model.metadata.json
+      - name: Continue 128 genuine PPO steps without overwriting source
+        run: |
+          python -m tavern_ai.train --steps 128 --seed 42 --resume checkpoints/source/model.zip --out checkpoints/next/model.zip
+          python scripts/verify_release_resume_v5_880b8a71.py postflight --source-model checkpoints/source/model.zip --source-metadata checkpoints/source/model.metadata.json --resumed-model checkpoints/next/model.zip --resumed-metadata checkpoints/next/model.metadata.json --report reports/s-20261102-880b8a71/resume-attestation.json
+      - name: Candidate itself completes real eight-seat game
+        run: |
+          python -m tavern_ai.canary --agent-id s-20261102-880b8a71 --policy model --model checkpoints/next/model.zip --seed 23051 --receipt experiments/s-20261102-880b8a71/001-23051.json
+          python -m tavern_ai.validate_receipt experiments/s-20261102-880b8a71/001-23051.json
+      - name: Paired held-out candidate and rule baseline games
+        run: |
+          python -m tavern_ai.evaluate --model checkpoints/next/model.zip --compare-baseline --games 3 --start-seed 27100 --out reports/s-20261102-880b8a71/paired-evaluation.json
+      - name: Confirm model receipt corresponds to the resumed weights
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          m=json.loads(Path('checkpoints/next/model.metadata.json').read_text())
+          r=json.loads(Path('experiments/s-20261102-880b8a71/001-23051.json').read_text())
+          assert r['policy']=='model' and r['completed'] and r['agent_id']=='s-20261102-880b8a71'
+          assert r['model_sha256']==m['checkpoint_sha256']
+          assert sorted(r['placements'])==list(range(1,9)) and not r['truncated_combats'] and not r['turn_limit_end']
+          assert m['total_timesteps']==1408 and m['role']=='challenger_unpromoted'
+          PY
+      - name: Persist genuine own-session evidence on its isolated branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = 'agent/s-20261102-880b8a71/optimization-001'
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add experiments/s-20261102-880b8a71/001-23051.json reports/s-20261102-880b8a71/*.json
+          git diff --cached --quiet && exit 0
+          git commit -m 'evidence(v5): verified Release continuation and authentic paired games'
+          git pull --rebase origin "$GITHUB_REF_NAME"
+          git push origin "HEAD:$GITHUB_REF_NAME"
+      - name: Publish ONLY unpromoted Release and independently re-download
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="v5-resume-s-20261102-880b8a71-${GITHUB_RUN_ID}"
+          gh release create "$tag" checkpoints/next/model.zip checkpoints/next/model.metadata.json reports/s-20261102-880b8a71/resume-attestation.json reports/s-20261102-880b8a71/paired-evaluation.json experiments/s-20261102-880b8a71/001-23051.json --repo "$GITHUB_REPOSITORY" --target "$(git rev-parse HEAD)" --prerelease --title "Unpromoted V5 1408-step resumed candidate $tag" --notes 'Verified source v2-learning-41413557445. Candidate only, not Champion; all rank claims require independent paired evidence.'
+          mkdir -p checkpoints/published
+          gh release download "$tag" --repo "$GITHUB_REPOSITORY" --pattern model.zip --pattern model.metadata.json --dir checkpoints/published
+          cmp checkpoints/next/model.zip checkpoints/published/model.zip
+          cmp checkpoints/next/model.metadata.json checkpoints/published/model.metadata.json
+      - name: Retain model and failure diagnostics even if later gate fails
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v5-resume-evidence-${{ github.run_id }}
+          path: |
+            checkpoints/next/model.zip
+            checkpoints/next/model.metadata.json
+            reports/s-20261102-880b8a71/*.json
+            experiments/s-20261102-880b8a71/*.json
+          if-no-files-found: ignore
+          retention-days: 30
