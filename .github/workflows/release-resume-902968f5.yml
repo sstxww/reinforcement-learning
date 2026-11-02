@@ -1,0 +1,87 @@
+name: Verify V5 Release lineage 902968f5
+
+on:
+  push:
+    branches:
+      - 'agent/s-20261102-902968f5/optimization-001'
+    paths:
+      - 'tavern_ai/release_integrity.py'
+      - 'tests/test_release_integrity_902968f5.py'
+      - '.github/workflows/release-resume-902968f5.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-resume-902968f5
+  cancel-in-progress: false
+
+jobs:
+  verify-release-and-resume:
+    runs-on: ubuntu-latest
+    timeout-minutes: 80
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Test fail-closed checkpoint preflight
+        run: |
+          python -m pip install -e '.[train,test]'
+          python -m pytest tests/test_release_integrity_902968f5.py
+      - name: Build exact pinned TavernGym
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Fetch durable unpromoted Release assets
+        run: |
+          mkdir -p checkpoints/source
+          gh release download v2-learning-41413557445 --repo sstxww/reinforcement-learning --dir checkpoints/source --pattern model.zip --pattern model.metadata.json
+      - name: Real baseline canary for this session
+        run: |
+          mkdir -p experiments/s-20261102-902968f5
+          python -m tavern_ai.canary --agent-id s-20261102-902968f5 --seed 927103 --policy baseline --receipt experiments/s-20261102-902968f5/001-baseline-927103.json
+          python -m tavern_ai.validate_receipt experiments/s-20261102-902968f5/001-baseline-927103.json
+      - name: Verify weight and metadata hashes; load, infer, resume 128 PPO steps
+        run: |
+          python -m tavern_ai.release_integrity \
+            --model checkpoints/source/model.zip \
+            --metadata checkpoints/source/model.metadata.json \
+            --expected-model-sha 73bde2666426cecce39f135980a897bb2cd4a7d70783ba04c9c0d29477a6664a \
+            --expected-metadata-sha 6f0b433191a8242dcedc627f6be49d1551a82788ce7bfd8e60416ede8146acc0 \
+            --output checkpoints/resumed-902968f5/model.zip \
+            --report reports/s-20261102-902968f5/001-resume-audit.json \
+            --steps 128 --seed 927102
+      - name: Genuine full eight-seat game with resumed candidate (not promotion)
+        run: |
+          python -m tavern_ai.canary --agent-id s-20261102-902968f5 --seed 927104 --policy model --model checkpoints/resumed-902968f5/model.zip --receipt experiments/s-20261102-902968f5/001-resumed-model-927104.json
+          python -m tavern_ai.validate_receipt experiments/s-20261102-902968f5/001-resumed-model-927104.json
+      - name: Preserve authentic evidence only on this session branch
+        if: always()
+        shell: bash
+        run: |
+          test "$GITHUB_REF_NAME" = "agent/s-20261102-902968f5/optimization-001" || exit 0
+          mkdir -p reports/s-20261102-902968f5 experiments/s-20261102-902968f5
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A -- reports/s-20261102-902968f5 experiments/s-20261102-902968f5
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "results(902968f5): preserve genuine bounded checkpoint and match evidence"
+          git pull --rebase origin "$GITHUB_REF_NAME"
+          git push origin "HEAD:$GITHUB_REF_NAME"
+      - name: Upload diagnostic outputs, never claim durable model promotion
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-resume-diagnostic-902968f5-${{ github.run_id }}
+          path: |
+            checkpoints/resumed-902968f5/model.zip
+            checkpoints/resumed-902968f5/model.metadata.json
+            reports/s-20261102-902968f5/*.json
+            experiments/s-20261102-902968f5/*.json
+          if-no-files-found: ignore
+          retention-days: 30

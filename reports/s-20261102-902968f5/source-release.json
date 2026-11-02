@@ -1,0 +1,28 @@
+{
+  "schema": 1,
+  "kind": "unpromoted_source_release",
+  "id": "v2-learning-41413557445",
+  "release_tag": "v2-learning-41413557445",
+  "release_url": "https://github.com/sstxww/reinforcement-learning/releases/tag/v2-learning-41413557445",
+  "repository": "sstxww/reinforcement-learning",
+  "model_asset": {
+    "name": "model.zip",
+    "bytes": 17525115,
+    "github_reported_sha256": "73bde2666426cecce39f135980a897bb2cd4a7d70783ba04c9c0d29477a6664a"
+  },
+  "metadata_asset": {
+    "name": "model.metadata.json",
+    "github_reported_sha256": "6f0b433191a8242dcedc627f6be49d1551a82788ce7bfd8e60416ede8146acc0"
+  },
+  "source_commit": "e37bd7e3a4bf95576ca1b27867df05af86ddab71",
+  "expected_prior_ppo_steps": 1280,
+  "reported_heldout_ranks": [
+    8,
+    8,
+    8,
+    8
+  ],
+  "promoted_to_champion": false,
+  "independent_resume_audit_status": "pending",
+  "notice": "Release API digests verified from metadata only; independent full-byte audit and 128-step optimizer resume pending Actions execution"
+}
