@@ -1,0 +1,72 @@
+name: V5 paired receipt evidence gate s-20261102-f17ed915
+
+on:
+  push:
+    branches:
+      - 'agent/s-20261102-f17ed915/optimization-001'
+    paths:
+      - 'scripts/paired_receipt_audit_f17ed915.py'
+      - 'tests/test_paired_receipt_audit_f17ed915.py'
+      - '.github/workflows/paired-receipts-f17ed915.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: v5-paired-receipts-f17ed915
+  cancel-in-progress: false
+
+jobs:
+  paired-audit-and-authentic-eight-seat-canary:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install offline tests
+        run: python -m pip install -e '.[test]'
+      - name: Validate strict paired evidence gate
+        run: python -m pytest -q tests/test_paired_receipt_audit_f17ed915.py
+      - name: Replay three genuine existing model-baseline seed pairs
+        run: |
+          python scripts/paired_receipt_audit_f17ed915.py \
+            --baseline experiments/s-20261102-68099929/002-baseline-99125.json experiments/s-20261102-68099929/002-baseline-99126.json experiments/s-20261102-68099929/002-baseline-99127.json \
+            --candidate experiments/s-20261102-68099929/002-model-99125.json experiments/s-20261102-68099929/002-model-99126.json experiments/s-20261102-68099929/002-model-99127.json \
+            --out reports/s-20261102-f17ed915/001-paired-custody.json
+      - name: Bootstrap authentic pinned TavernGym
+        run: bash scripts/bootstrap_engine.sh
+      - name: Play one new real eight-seat baseline game, require completion
+        run: |
+          python -m tavern_ai.canary --agent-id s-20261102-f17ed915 --policy baseline --seed 96831 \
+            --receipt experiments/s-20261102-f17ed915/001-96831.json
+          python -m tavern_ai.validate_receipt experiments/s-20261102-f17ed915/001-96831.json
+          echo BEGIN_ACTUAL_OWN_GAME_RECEIPT
+          cat experiments/s-20261102-f17ed915/001-96831.json
+          echo END_ACTUAL_OWN_GAME_RECEIPT
+      - name: Persist ONLY own true receipts and paired report on isolated branch
+        if: success()
+        shell: bash
+        run: |
+          test "$GITHUB_REF_NAME" = 'agent/s-20261102-f17ed915/optimization-001'
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- reports/s-20261102-f17ed915/001-paired-custody.json \
+            experiments/s-20261102-f17ed915/001-96831.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'evidence(s-20261102-f17ed915): authentic game and strict paired custody report'
+            git push origin "HEAD:$GITHUB_REF_NAME"
+          fi
+      - name: Preserve bounded diagnostic artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: paired-receipts-s-20261102-f17ed915
+          path: |
+            reports/s-20261102-f17ed915/001-paired-custody.json
+            experiments/s-20261102-f17ed915/001-96831.json
+          if-no-files-found: warn
+          retention-days: 30
