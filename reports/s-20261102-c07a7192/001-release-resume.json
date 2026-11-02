@@ -1,0 +1,38 @@
+{
+  "schema": 1,
+  "session_id": "s-20261102-c07a7192",
+  "source_workflow_run": "https://github.com/sstxww/reinforcement-learning/actions/runs/41450150026",
+  "source_workflow_head": "2f83885866139d297f4b8ff36489f563d061c894",
+  "source_run_status": "success",
+  "registered_parent_release": "v5-s-20261102-68099929-1408-41428692617",
+  "parent_model_sha256": "a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632",
+  "original_cumulative_steps": 1408,
+  "actual_new_ppo_steps": 128,
+  "actual_resumed_cumulative_steps": 1536,
+  "resumed_checkpoint_sha256": "c1851820a7cbd353b8d8c91b4a446c512c4f6ba3f7048259da3f61ad932be0d1",
+  "resumed_checkpoint_storage": "GitHub Actions diagnostic artifact; 30-day retention, NOT permanent",
+  "archive_integrity_verified": true,
+  "cpu_inference_checked": true,
+  "model_controlled_full_game": {
+    "seed": 76013,
+    "seat": 0,
+    "completed": true,
+    "placement": 8,
+    "turns": 16,
+    "decisions": 122,
+    "truncated_combats": 0,
+    "turn_limit_end": false
+  },
+  "baseline_full_game": {
+    "seed": 76012,
+    "seat": 0,
+    "completed": true,
+    "placement": 8,
+    "turns": 15,
+    "decisions": 30
+  },
+  "paired_heldout_performance_verified": false,
+  "champion_promoted": false,
+  "official_arena_played": false,
+  "note": "True 128 extra PPO steps and a strict full model game completed rank eighth. This establishes engineering recovery/continuation only, not improved competitive model."
+}

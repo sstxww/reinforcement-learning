@@ -1,0 +1,87 @@
+name: V5 Release fail-closed restore and real game s-20261102-c07a7192
+
+on:
+  push:
+    branches: ['agent/s-20261102-c07a7192/optimization-001']
+    paths:
+      - 'tavern_ai/release_restore.py'
+      - 'tests/test_release_restore_c07a7192.py'
+      - '.github/workflows/restore-smoke-s-20261102-c07a7192.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: restore-smoke-s-20261102-c07a7192
+  cancel-in-progress: false
+
+jobs:
+  release-restore-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      GH_TOKEN: ${{ github.token }}
+      AGENT_ID: s-20261102-c07a7192
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install test and bounded training dependencies
+        run: python -m pip install -e '.[test,train]'
+      - name: Offline fail-closed Release restore regressions
+        run: python -m pytest -q tests/test_release_restore_c07a7192.py
+      - name: Bootstrap pinned real TavernGym
+        run: bash scripts/bootstrap_engine.sh
+      - name: Independent genuine eight-seat baseline game
+        run: |
+          mkdir -p "experiments/${AGENT_ID}"
+          python -m tavern_ai.canary --agent-id "$AGENT_ID" --policy baseline \
+            --seed 76012 --receipt "experiments/${AGENT_ID}/001-76012.json"
+          python -m tavern_ai.validate_receipt "experiments/${AGENT_ID}/001-76012.json"
+      - name: Save own completed game evidence only on own branch
+        run: |
+          test "$GITHUB_REF_NAME" = 'agent/s-20261102-c07a7192/optimization-001'
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "experiments/${AGENT_ID}/001-76012.json"
+          git diff --cached --quiet || git commit -m "evidence(${AGENT_ID}): genuine eight-seat baseline game"
+          git pull --rebase origin "$GITHUB_REF_NAME"
+          git push origin "HEAD:$GITHUB_REF_NAME"
+      - name: Download immutable latest Release and require SHA/ZIP/CPU inference
+        run: |
+          python -m tavern_ai.release_restore --output-dir checkpoints --probe-inference \
+            | tee "experiments/${AGENT_ID}/release-restore.json"
+      - name: Actual bounded 128-step PPO optimizer continuation
+        run: |
+          python -m tavern_ai.train --steps 128 --seed 76012 \
+            --resume checkpoints/model.zip --out checkpoints/resumed.zip \
+            | tee "experiments/${AGENT_ID}/ppo-log.txt"
+          python - <<'PY'
+          import json
+          old=json.load(open('checkpoints/model.metadata.json'))['total_timesteps']
+          new=json.load(open('checkpoints/resumed.metadata.json'))['total_timesteps']
+          assert new >= old + 128, (old,new)
+          print('Actual PPO cumulative step increase',old,new)
+          PY
+      - name: Strict model-controlled real eight-seat game
+        run: |
+          python -m tavern_ai.canary --agent-id "$AGENT_ID" --policy model \
+            --model checkpoints/resumed.zip --seed 76013 \
+            --receipt "experiments/${AGENT_ID}/002-76013-model.json"
+          python -m tavern_ai.validate_receipt "experiments/${AGENT_ID}/002-76013-model.json"
+      - name: Retain limited diagnostics, including failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: restore-smoke-s-20261102-c07a7192-${{ github.run_id }}
+          path: |
+            experiments/s-20261102-c07a7192/*
+            checkpoints/restore-attestation.json
+            checkpoints/resumed.zip
+            checkpoints/resumed.metadata.json
+          if-no-files-found: ignore
+          retention-days: 30
