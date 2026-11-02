@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "main_sha": "c1b828734527bae6141805581693d890cc3bff94",
+  "workflow_run_id": 41512315964,
+  "workflow_url": "https://github.com/sstxww/reinforcement-learning/actions/runs/41512315964",
+  "required_job": "tests-and-full-match",
+  "required_steps": [
+    "Unit tests and PR evidence",
+    "Install pinned engine and verified patch",
+    "Confirm engine layout",
+    "Real full eight-seat simulated match",
+    "Preserve CI evidence"
+  ],
+  "receipt_artifact_name": "ci-full-match-41512315964",
+  "decision": "blocked",
+  "blockers": [
+    "main run is not completed SUCCESS"
+  ],
+  "proof_scope": "CI infrastructure + completed baseline canary step; not model performance",
+  "integration_lock_verified": false,
+  "model_improvement_verified": false
+}
