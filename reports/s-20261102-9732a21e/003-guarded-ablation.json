@@ -1,0 +1,230 @@
+{
+  "schema": 1,
+  "session_id": "s-20261102-9732a21e",
+  "study": "HYBRID_RULE_OVERRIDE_ABLATION",
+  "training_steps": 0,
+  "source_unpromoted_release": "v5-resume-smoke-s-20261102-9732a21e-r001",
+  "source_model_sha256": "976d9323e79cd00fa1dae73ea31886e4087171078eabdde8eeca06fac7eb0cc6",
+  "model_is_champion": false,
+  "seeds": [
+    83701,
+    83702,
+    83801,
+    83802
+  ],
+  "results": [
+    {
+      "seed": 83701,
+      "policy_variant": "guarded_model",
+      "completed": true,
+      "failure": null,
+      "decisions": 274,
+      "turns_reached": 16,
+      "model_sha256": "976d9323e79cd00fa1dae73ea31886e4087171078eabdde8eeca06fac7eb0cc6",
+      "legal_buy_opportunities": 48,
+      "buy_actions": 12,
+      "rule_overrides": {
+        "buy_priority": 12,
+        "turn_budget": 7
+      },
+      "action_categories": {
+        "other": 13,
+        "buy": 12,
+        "play": 123,
+        "end_turn": 8,
+        "cancel": 118
+      },
+      "hybrid_policy": true,
+      "model_training_steps_this_study": 0,
+      "rank": 7
+    },
+    {
+      "seed": 83701,
+      "policy_variant": "baseline",
+      "completed": true,
+      "failure": null,
+      "decisions": 38,
+      "turns_reached": 15,
+      "model_sha256": null,
+      "legal_buy_opportunities": 20,
+      "buy_actions": 13,
+      "rule_overrides": {},
+      "action_categories": {
+        "other": 8,
+        "buy": 13,
+        "play": 9,
+        "end_turn": 8
+      },
+      "hybrid_policy": false,
+      "model_training_steps_this_study": 0,
+      "rank": 8
+    },
+    {
+      "seed": 83702,
+      "policy_variant": "guarded_model",
+      "completed": true,
+      "failure": null,
+      "decisions": 253,
+      "turns_reached": 15,
+      "model_sha256": "976d9323e79cd00fa1dae73ea31886e4087171078eabdde8eeca06fac7eb0cc6",
+      "legal_buy_opportunities": 70,
+      "buy_actions": 14,
+      "rule_overrides": {
+        "buy_priority": 14,
+        "turn_budget": 6
+      },
+      "action_categories": {
+        "other": 30,
+        "buy": 14,
+        "play": 104,
+        "end_turn": 8,
+        "cancel": 97
+      },
+      "hybrid_policy": true,
+      "model_training_steps_this_study": 0,
+      "rank": 8
+    },
+    {
+      "seed": 83702,
+      "policy_variant": "baseline",
+      "completed": true,
+      "failure": null,
+      "decisions": 32,
+      "turns_reached": 14,
+      "model_sha256": null,
+      "legal_buy_opportunities": 19,
+      "buy_actions": 10,
+      "rule_overrides": {},
+      "action_categories": {
+        "other": 5,
+        "buy": 10,
+        "play": 10,
+        "end_turn": 7
+      },
+      "hybrid_policy": false,
+      "model_training_steps_this_study": 0,
+      "rank": 8
+    },
+    {
+      "seed": 83801,
+      "policy_variant": "guarded_model",
+      "completed": true,
+      "failure": null,
+      "decisions": 255,
+      "turns_reached": 16,
+      "model_sha256": "976d9323e79cd00fa1dae73ea31886e4087171078eabdde8eeca06fac7eb0cc6",
+      "legal_buy_opportunities": 75,
+      "buy_actions": 14,
+      "rule_overrides": {
+        "buy_priority": 14,
+        "turn_budget": 7
+      },
+      "action_categories": {
+        "other": 45,
+        "buy": 14,
+        "play": 101,
+        "cancel": 88,
+        "end_turn": 7
+      },
+      "hybrid_policy": true,
+      "model_training_steps_this_study": 0,
+      "rank": 8
+    },
+    {
+      "seed": 83801,
+      "policy_variant": "baseline",
+      "completed": true,
+      "failure": null,
+      "decisions": 61,
+      "turns_reached": 20,
+      "model_sha256": null,
+      "legal_buy_opportunities": 31,
+      "buy_actions": 22,
+      "rule_overrides": {},
+      "action_categories": {
+        "other": 14,
+        "buy": 22,
+        "play": 15,
+        "end_turn": 10
+      },
+      "hybrid_policy": false,
+      "model_training_steps_this_study": 0,
+      "rank": 6
+    },
+    {
+      "seed": 83802,
+      "policy_variant": "guarded_model",
+      "completed": true,
+      "failure": null,
+      "decisions": 259,
+      "turns_reached": 14,
+      "model_sha256": "976d9323e79cd00fa1dae73ea31886e4087171078eabdde8eeca06fac7eb0cc6",
+      "legal_buy_opportunities": 9,
+      "buy_actions": 9,
+      "rule_overrides": {
+        "buy_priority": 9,
+        "turn_budget": 7
+      },
+      "action_categories": {
+        "other": 2,
+        "buy": 9,
+        "play": 121,
+        "cancel": 120,
+        "end_turn": 7
+      },
+      "hybrid_policy": true,
+      "model_training_steps_this_study": 0,
+      "rank": 8
+    },
+    {
+      "seed": 83802,
+      "policy_variant": "baseline",
+      "completed": true,
+      "failure": null,
+      "decisions": 39,
+      "turns_reached": 17,
+      "model_sha256": null,
+      "legal_buy_opportunities": 19,
+      "buy_actions": 13,
+      "rule_overrides": {},
+      "action_categories": {
+        "other": 7,
+        "buy": 13,
+        "play": 11,
+        "end_turn": 8
+      },
+      "hybrid_policy": false,
+      "model_training_steps_this_study": 0,
+      "rank": 8
+    }
+  ],
+  "paired_completed_count": 4,
+  "pairs": [
+    {
+      "seed": 83701,
+      "hybrid_rank": 7,
+      "baseline_rank": 8,
+      "delta": -1
+    },
+    {
+      "seed": 83702,
+      "hybrid_rank": 8,
+      "baseline_rank": 8,
+      "delta": 0
+    },
+    {
+      "seed": 83801,
+      "hybrid_rank": 8,
+      "baseline_rank": 6,
+      "delta": 2
+    },
+    {
+      "seed": 83802,
+      "hybrid_rank": 8,
+      "baseline_rank": 8,
+      "delta": 0
+    }
+  ],
+  "mean_paired_rank_delta_if_comparable": 0.25,
+  "interpretation": "Proof of policy-behavior effect only; rule-overridden hybrid is NOT pure PPO; n=4 exploratory."
+}

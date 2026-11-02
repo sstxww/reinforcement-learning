@@ -1,0 +1,1294 @@
+{
+  "schema": 1,
+  "session_id": "s-20261102-9732a21e",
+  "source_run": 41427627265,
+  "experiment": "pure_model_public_buy_opportunity_and_loop_diagnostic",
+  "model_sha256": "976d9323e79cd00fa1dae73ea31886e4087171078eabdde8eeca06fac7eb0cc6",
+  "heldout_seeds": [
+    83701,
+    83702
+  ],
+  "candidate_games_completed": 1,
+  "candidate_games_failed": 1,
+  "paired_completed_count": 1,
+  "paired_results": [
+    {
+      "seed": 83702,
+      "candidate_rank": 8,
+      "baseline_rank": 8,
+      "delta": 0
+    }
+  ],
+  "paired_mean_delta": 0,
+  "entries": [
+    {
+      "seed": 83701,
+      "policy": "model",
+      "source": "real_pinned_taverngym_game",
+      "model_sha256": "976d9323e79cd00fa1dae73ea31886e4087171078eabdde8eeca06fac7eb0cc6",
+      "completed": false,
+      "failure": "full_game_safety_limit_exceeded",
+      "turns_reached": 6,
+      "decisions": 30000,
+      "trace": {
+        "chosen_action_families": {
+          "cancel": 14955,
+          "choose": 3,
+          "end_turn": 5,
+          "freeze": 50,
+          "play": 14955,
+          "refresh": 32
+        },
+        "legal_action_family_decisions": {
+          "buy": 86,
+          "cancel": 14955,
+          "choose": 14958,
+          "dark_gift": 72,
+          "end_turn": 15042,
+          "freeze": 15037,
+          "play": 14962,
+          "refresh": 87,
+          "upgrade": 14978
+        },
+        "legal_buy_decisions": 86,
+        "legal_buy_end_turns": 0,
+        "legal_buy_nonbuy_choices": 86,
+        "gold_positive_legal_buy_ends": 0,
+        "end_turn_gold_mean": 0.0,
+        "same_public_observation_transitions": 0,
+        "max_same_public_observation_streak": 1,
+        "max_same_action_streak": 10,
+        "turn_action_families": {
+          "0": {
+            "choose": 1
+          },
+          "1": {
+            "refresh": 3,
+            "freeze": 10,
+            "end_turn": 1
+          },
+          "2": {
+            "refresh": 4,
+            "freeze": 10,
+            "end_turn": 1
+          },
+          "3": {
+            "refresh": 5,
+            "freeze": 10,
+            "end_turn": 1
+          },
+          "4": {
+            "refresh": 6,
+            "freeze": 10,
+            "end_turn": 1
+          },
+          "5": {
+            "refresh": 7,
+            "freeze": 10,
+            "end_turn": 1
+          },
+          "6": {
+            "choose": 2,
+            "play": 14955,
+            "cancel": 14955,
+            "refresh": 7
+          }
+        },
+        "first_actions": [
+          {
+            "turn": 0,
+            "action": 31,
+            "family": "choose",
+            "buy_legal": false,
+            "gold": 0.0
+          },
+          {
+            "turn": 1,
+            "action": 1,
+            "family": "refresh",
+            "buy_legal": true,
+            "gold": 0.30000001192092896
+          },
+          {
+            "turn": 1,
+            "action": 1,
+            "family": "refresh",
+            "buy_legal": true,
+            "gold": 0.20000000298023224
+          },
+          {
+            "turn": 1,
+            "action": 1,
+            "family": "refresh",
+            "buy_legal": true,
+            "gold": 0.10000000149011612
+          },
+          {
+            "turn": 1,
+            "action": 2,
+            "family": "freeze",
+            "buy_legal": false,
+            "gold": 0.0
+          },
+          {
+            "turn": 1,
+            "action": 2,
+            "family": "freeze",
+            "buy_legal": false,
+            "gold": 0.0
+          },
+          {
+            "turn": 1,
+            "action": 2,
+            "family": "freeze",
+            "buy_legal": false,
+            "gold": 0.0
+          },
+          {
+            "turn": 1,
+            "action": 2,
+            "family": "freeze",
+            "buy_legal": false,
+            "gold": 0.0
+          },
+          {
+            "turn": 1,
+            "action": 2,
+            "family": "freeze",
+            "buy_legal": false,
+            "gold": 0.0
+          },
+          {
+            "turn": 1,
+            "action": 2,
+            "family": "freeze",
+            "buy_legal": false,
+            "gold": 0.0
+          },
+          {
+            "turn": 1,
+            "action": 2,
+            "family": "freeze",
+            "buy_legal": false,
+            "gold": 0.0
+          },
+          {
+            "turn": 1,
+            "action": 2,
+            "family": "freeze",
+            "buy_legal": false,
+            "gold": 0.0
+          },
+          {
+            "turn": 1,
+            "action": 2,
+            "family": "freeze",
+            "buy_legal": false,
+            "gold": 0.0
+          },
+          {
+            "turn": 1,
+            "action": 2,
+            "family": "freeze",
+            "buy_legal": false,
+            "gold": 0.0
+          },
+          {
+            "turn": 1,
+            "action": 0,
+            "family": "end_turn",
+            "buy_legal": false,
+            "gold": 0.0
+          },
+          {
+            "turn": 2,
+            "action": 1,
+            "family": "refresh",
+            "buy_legal": true,
+            "gold": 0.4000000059604645
+          },
+          {
+            "turn": 2,
+            "action": 1,
+            "family": "refresh",
+            "buy_legal": true,
+            "gold": 0.30000001192092896
+          },
+          {
+            "turn": 2,
+            "action": 1,
+            "family": "refresh",
+            "buy_legal": true,
+            "gold": 0.20000000298023224
+          },
+          {
+            "turn": 2,
+            "action": 1,
+            "family": "refresh",
+            "buy_legal": true,
+            "gold": 0.10000000149011612
+          },
+          {
+            "turn": 2,
+            "action": 2,
+            "family": "freeze",
+            "buy_legal": false,
+            "gold": 0.0
+          },
+          {
+            "turn": 2,
+            "action": 2,
+            "family": "freeze",
+            "buy_legal": false,
+            "gold": 0.0
+          },
+          {
+            "turn": 2,
+            "action": 2,
+            "family": "freeze",
+            "buy_legal": false,
+            "gold": 0.0
+          },
+          {
+            "turn": 2,
+            "action": 2,
+            "family": "freeze",
+            "buy_legal": false,
+            "gold": 0.0
+          },
+          {
+            "turn": 2,
+            "action": 2,
+            "family": "freeze",
+            "buy_legal": false,
+            "gold": 0.0
+          },
+          {
+            "turn": 2,
+            "action": 2,
+            "family": "freeze",
+            "buy_legal": false,
+            "gold": 0.0
+          },
+          {
+            "turn": 2,
+            "action": 2,
+            "family": "freeze",
+            "buy_legal": false,
+            "gold": 0.0
+          },
+          {
+            "turn": 2,
+            "action": 2,
+            "family": "freeze",
+            "buy_legal": false,
+            "gold": 0.0
+          },
+          {
+            "turn": 2,
+            "action": 2,
+            "family": "freeze",
+            "buy_legal": false,
+            "gold": 0.0
+          },
+          {
+            "turn": 2,
+            "action": 2,
+            "family": "freeze",
+            "buy_legal": false,
+            "gold": 0.0
+          },
+          {
+            "turn": 2,
+            "action": 0,
+            "family": "end_turn",
+            "buy_legal": false,
+            "gold": 0.0
+          },
+          {
+            "turn": 3,
+            "action": 1,
+            "family": "refresh",
+            "buy_legal": true,
+            "gold": 0.5
+          },
+          {
+            "turn": 3,
+            "action": 1,
+            "family": "refresh",
+            "buy_legal": true,
+            "gold": 0.4000000059604645
+          }
+        ]
+      },
+      "engine": {
+        "version": "1.1.0",
+        "source_hash": "6d8712c93022ba11",
+        "features": 4017,
+        "cards": 447,
+        "actions": 245,
+        "n_cards": 3984
+      },
+      "no_fallback": true
+    },
+    {
+      "seed": 83701,
+      "policy": "baseline",
+      "source": "real_pinned_taverngym_game",
+      "model_sha256": null,
+      "completed": true,
+      "failure": null,
+      "turns_reached": 15,
+      "decisions": 38,
+      "trace": {
+        "chosen_action_families": {
+          "buy": 13,
+          "choose": 5,
+          "end_turn": 8,
+          "play": 9,
+          "upgrade": 3
+        },
+        "legal_action_family_decisions": {
+          "activate": 17,
+          "buy": 20,
+          "cancel": 1,
+          "choose": 5,
+          "dark_gift": 15,
+          "end_turn": 33,
+          "freeze": 33,
+          "hero_power": 33,
+          "move": 26,
+          "play": 9,
+          "refresh": 23,
+          "sell": 31,
+          "upgrade": 8
+        },
+        "legal_buy_decisions": 20,
+        "legal_buy_end_turns": 0,
+        "legal_buy_nonbuy_choices": 7,
+        "gold_positive_legal_buy_ends": 0,
+        "end_turn_gold_mean": 0.02500000037252903,
+        "same_public_observation_transitions": 0,
+        "max_same_public_observation_streak": 1,
+        "max_same_action_streak": 3,
+        "turn_action_families": {
+          "0": {
+            "choose": 1
+          },
+          "1": {
+            "buy": 1,
+            "play": 1,
+            "end_turn": 1
+          },
+          "2": {
+            "upgrade": 1,
+            "end_turn": 1
+          },
+          "3": {
+            "buy": 2,
+            "play": 2,
+            "choose": 1,
+            "end_turn": 1
+          },
+          "4": {
+            "play": 3,
+            "buy": 2,
+            "end_turn": 1
+          },
+          "5": {
+            "upgrade": 1,
+            "buy": 1,
+            "play": 1,
+            "end_turn": 1
+          },
+          "6": {
+            "choose": 3,
+            "play": 2,
+            "buy": 3,
+            "end_turn": 1
+          },
+          "7": {
+            "upgrade": 1,
+            "buy": 1,
+            "end_turn": 1
+          },
+          "8": {
+            "buy": 3,
+            "end_turn": 1
+          }
+        },
+        "first_actions": [
+          {
+            "turn": 0,
+            "action": 30,
+            "family": "choose",
+            "buy_legal": false,
+            "gold": 0.0
+          },
+          {
+            "turn": 1,
+            "action": 8,
+            "family": "buy",
+            "buy_legal": true,
+            "gold": 0.30000001192092896
+          },
+          {
+            "turn": 1,
+            "action": 46,
+            "family": "play",
+            "buy_legal": false,
+            "gold": 0.0
+          },
+          {
+            "turn": 1,
+            "action": 0,
+            "family": "end_turn",
+            "buy_legal": false,
+            "gold": 0.0
+          },
+          {
+            "turn": 2,
+            "action": 3,
+            "family": "upgrade",
+            "buy_legal": true,
+            "gold": 0.4000000059604645
+          },
+          {
+            "turn": 2,
+            "action": 0,
+            "family": "end_turn",
+            "buy_legal": false,
+            "gold": 0.0
+          },
+          {
+            "turn": 3,
+            "action": 8,
+            "family": "buy",
+            "buy_legal": true,
+            "gold": 0.5
+          },
+          {
+            "turn": 3,
+            "action": 46,
+            "family": "play",
+            "buy_legal": true,
+            "gold": 0.20000000298023224
+          },
+          {
+            "turn": 3,
+            "action": 11,
+            "family": "buy",
+            "buy_legal": true,
+            "gold": 0.20000000298023224
+          },
+          {
+            "turn": 3,
+            "action": 46,
+            "family": "play",
+            "buy_legal": false,
+            "gold": 0.0
+          },
+          {
+            "turn": 3,
+            "action": 30,
+            "family": "choose",
+            "buy_legal": false,
+            "gold": 0.0
+          },
+          {
+            "turn": 3,
+            "action": 0,
+            "family": "end_turn",
+            "buy_legal": false,
+            "gold": 0.0
+          },
+          {
+            "turn": 4,
+            "action": 46,
+            "family": "play",
+            "buy_legal": true,
+            "gold": 0.6000000238418579
+          },
+          {
+            "turn": 4,
+            "action": 8,
+            "family": "buy",
+            "buy_legal": true,
+            "gold": 0.6000000238418579
+          },
+          {
+            "turn": 4,
+            "action": 46,
+            "family": "play",
+            "buy_legal": true,
+            "gold": 0.30000001192092896
+          },
+          {
+            "turn": 4,
+            "action": 8,
+            "family": "buy",
+            "buy_legal": true,
+            "gold": 0.30000001192092896
+          },
+          {
+            "turn": 4,
+            "action": 46,
+            "family": "play",
+            "buy_legal": false,
+            "gold": 0.0
+          },
+          {
+            "turn": 4,
+            "action": 0,
+            "family": "end_turn",
+            "buy_legal": false,
+            "gold": 0.0
+          },
+          {
+            "turn": 5,
+            "action": 3,
+            "family": "upgrade",
+            "buy_legal": true,
+            "gold": 0.699999988079071
+          },
+          {
+            "turn": 5,
+            "action": 8,
+            "family": "buy",
+            "buy_legal": true,
+            "gold": 0.30000001192092896
+          },
+          {
+            "turn": 5,
+            "action": 46,
+            "family": "play",
+            "buy_legal": false,
+            "gold": 0.0
+          },
+          {
+            "turn": 5,
+            "action": 0,
+            "family": "end_turn",
+            "buy_legal": false,
+            "gold": 0.0
+          },
+          {
+            "turn": 6,
+            "action": 30,
+            "family": "choose",
+            "buy_legal": false,
+            "gold": 0.800000011920929
+          },
+          {
+            "turn": 6,
+            "action": 30,
+            "family": "choose",
+            "buy_legal": false,
+            "gold": 0.800000011920929
+          },
+          {
+            "turn": 6,
+            "action": 46,
+            "family": "play",
+            "buy_legal": true,
+            "gold": 0.800000011920929
+          },
+          {
+            "turn": 6,
+            "action": 8,
+            "family": "buy",
+            "buy_legal": true,
+            "gold": 0.800000011920929
+          },
+          {
+            "turn": 6,
+            "action": 8,
+            "family": "buy",
+            "buy_legal": true,
+            "gold": 0.5
+          },
+          {
+            "turn": 6,
+            "action": 10,
+            "family": "buy",
+            "buy_legal": true,
+            "gold": 0.20000000298023224
+          },
+          {
+            "turn": 6,
+            "action": 62,
+            "family": "play",
+            "buy_legal": false,
+            "gold": 0.10000000149011612
+          },
+          {
+            "turn": 6,
+            "action": 30,
+            "family": "choose",
+            "buy_legal": false,
+            "gold": 0.10000000149011612
+          },
+          {
+            "turn": 6,
+            "action": 0,
+            "family": "end_turn",
+            "buy_legal": false,
+            "gold": 0.10000000149011612
+          },
+          {
+            "turn": 7,
+            "action": 3,
+            "family": "upgrade",
+            "buy_legal": true,
+            "gold": 0.8999999761581421
+          }
+        ]
+      },
+      "engine": {
+        "version": "1.1.0",
+        "source_hash": "6d8712c93022ba11",
+        "features": 4017,
+        "cards": 447,
+        "actions": 245,
+        "n_cards": 3984
+      },
+      "no_fallback": false,
+      "rank": 8
+    },
+    {
+      "seed": 83702,
+      "policy": "model",
+      "source": "real_pinned_taverngym_game",
+      "model_sha256": "976d9323e79cd00fa1dae73ea31886e4087171078eabdde8eeca06fac7eb0cc6",
+      "completed": true,
+      "failure": null,
+      "turns_reached": 14,
+      "decisions": 122,
+      "trace": {
+        "chosen_action_families": {
+          "choose": 2,
+          "end_turn": 7,
+          "freeze": 70,
+          "refresh": 42,
+          "upgrade": 1
+        },
+        "legal_action_family_decisions": {
+          "buy": 39,
+          "choose": 2,
+          "dark_gift": 25,
+          "end_turn": 120,
+          "freeze": 113,
+          "hero_power": 106,
+          "refresh": 42,
+          "upgrade": 29
+        },
+        "legal_buy_decisions": 39,
+        "legal_buy_end_turns": 0,
+        "legal_buy_nonbuy_choices": 39,
+        "gold_positive_legal_buy_ends": 0,
+        "end_turn_gold_mean": 0.0,
+        "same_public_observation_transitions": 0,
+        "max_same_public_observation_streak": 1,
+        "max_same_action_streak": 10,
+        "turn_action_families": {
+          "0": {
+            "choose": 1
+          },
+          "1": {
+            "refresh": 3,
+            "freeze": 10,
+            "end_turn": 1
+          },
+          "2": {
+            "refresh": 4,
+            "freeze": 10,
+            "end_turn": 1
+          },
+          "3": {
+            "refresh": 5,
+            "freeze": 10,
+            "end_turn": 1
+          },
+          "4": {
+            "refresh": 6,
+            "freeze": 10,
+            "end_turn": 1
+          },
+          "5": {
+            "refresh": 7,
+            "freeze": 10,
+            "end_turn": 1
+          },
+          "6": {
+            "choose": 1,
+            "refresh": 8,
+            "upgrade": 1,
+            "freeze": 10,
+            "end_turn": 1
+          },
+          "7": {
+            "refresh": 9,
+            "freeze": 10,
+            "end_turn": 1
+          }
+        },
+        "first_actions": [
+          {
+            "turn": 0,
+            "action": 30,
+            "family": "choose",
+            "buy_legal": false,
+            "gold": 0.0
+          },
+          {
+            "turn": 1,
+            "action": 1,
+            "family": "refresh",
+            "buy_legal": true,
+            "gold": 0.30000001192092896
+          },
+          {
+            "turn": 1,
+            "action": 1,
+            "family": "refresh",
+            "buy_legal": false,
+            "gold": 0.20000000298023224
+          },
+          {
+            "turn": 1,
+            "action": 1,
+            "family": "refresh",
+            "buy_legal": true,
+            "gold": 0.10000000149011612
+          },
+          {
+            "turn": 1,
+            "action": 2,
+            "family": "freeze",
+            "buy_legal": false,
+            "gold": 0.0
+          },
+          {
+            "turn": 1,
+            "action": 2,
+            "family": "freeze",
+            "buy_legal": false,
+            "gold": 0.0
+          },
+          {
+            "turn": 1,
+            "action": 2,
+            "family": "freeze",
+            "buy_legal": false,
+            "gold": 0.0
+          },
+          {
+            "turn": 1,
+            "action": 2,
+            "family": "freeze",
+            "buy_legal": false,
+            "gold": 0.0
+          },
+          {
+            "turn": 1,
+            "action": 2,
+            "family": "freeze",
+            "buy_legal": false,
+            "gold": 0.0
+          },
+          {
+            "turn": 1,
+            "action": 2,
+            "family": "freeze",
+            "buy_legal": false,
+            "gold": 0.0
+          },
+          {
+            "turn": 1,
+            "action": 2,
+            "family": "freeze",
+            "buy_legal": false,
+            "gold": 0.0
+          },
+          {
+            "turn": 1,
+            "action": 2,
+            "family": "freeze",
+            "buy_legal": false,
+            "gold": 0.0
+          },
+          {
+            "turn": 1,
+            "action": 2,
+            "family": "freeze",
+            "buy_legal": false,
+            "gold": 0.0
+          },
+          {
+            "turn": 1,
+            "action": 2,
+            "family": "freeze",
+            "buy_legal": false,
+            "gold": 0.0
+          },
+          {
+            "turn": 1,
+            "action": 0,
+            "family": "end_turn",
+            "buy_legal": false,
+            "gold": 0.0
+          },
+          {
+            "turn": 2,
+            "action": 1,
+            "family": "refresh",
+            "buy_legal": true,
+            "gold": 0.4000000059604645
+          },
+          {
+            "turn": 2,
+            "action": 1,
+            "family": "refresh",
+            "buy_legal": true,
+            "gold": 0.30000001192092896
+          },
+          {
+            "turn": 2,
+            "action": 1,
+            "family": "refresh",
+            "buy_legal": true,
+            "gold": 0.20000000298023224
+          },
+          {
+            "turn": 2,
+            "action": 1,
+            "family": "refresh",
+            "buy_legal": true,
+            "gold": 0.10000000149011612
+          },
+          {
+            "turn": 2,
+            "action": 2,
+            "family": "freeze",
+            "buy_legal": false,
+            "gold": 0.0
+          },
+          {
+            "turn": 2,
+            "action": 2,
+            "family": "freeze",
+            "buy_legal": false,
+            "gold": 0.0
+          },
+          {
+            "turn": 2,
+            "action": 2,
+            "family": "freeze",
+            "buy_legal": false,
+            "gold": 0.0
+          },
+          {
+            "turn": 2,
+            "action": 2,
+            "family": "freeze",
+            "buy_legal": false,
+            "gold": 0.0
+          },
+          {
+            "turn": 2,
+            "action": 2,
+            "family": "freeze",
+            "buy_legal": false,
+            "gold": 0.0
+          },
+          {
+            "turn": 2,
+            "action": 2,
+            "family": "freeze",
+            "buy_legal": false,
+            "gold": 0.0
+          },
+          {
+            "turn": 2,
+            "action": 2,
+            "family": "freeze",
+            "buy_legal": false,
+            "gold": 0.0
+          },
+          {
+            "turn": 2,
+            "action": 2,
+            "family": "freeze",
+            "buy_legal": false,
+            "gold": 0.0
+          },
+          {
+            "turn": 2,
+            "action": 2,
+            "family": "freeze",
+            "buy_legal": false,
+            "gold": 0.0
+          },
+          {
+            "turn": 2,
+            "action": 2,
+            "family": "freeze",
+            "buy_legal": false,
+            "gold": 0.0
+          },
+          {
+            "turn": 2,
+            "action": 0,
+            "family": "end_turn",
+            "buy_legal": false,
+            "gold": 0.0
+          },
+          {
+            "turn": 3,
+            "action": 1,
+            "family": "refresh",
+            "buy_legal": true,
+            "gold": 0.5
+          },
+          {
+            "turn": 3,
+            "action": 1,
+            "family": "refresh",
+            "buy_legal": true,
+            "gold": 0.4000000059604645
+          }
+        ]
+      },
+      "engine": {
+        "version": "1.1.0",
+        "source_hash": "6d8712c93022ba11",
+        "features": 4017,
+        "cards": 447,
+        "actions": 245,
+        "n_cards": 3984
+      },
+      "no_fallback": true,
+      "rank": 8
+    },
+    {
+      "seed": 83702,
+      "policy": "baseline",
+      "source": "real_pinned_taverngym_game",
+      "model_sha256": null,
+      "completed": true,
+      "failure": null,
+      "turns_reached": 14,
+      "decisions": 32,
+      "trace": {
+        "chosen_action_families": {
+          "buy": 10,
+          "choose": 2,
+          "end_turn": 7,
+          "play": 10,
+          "upgrade": 3
+        },
+        "legal_action_family_decisions": {
+          "buy": 19,
+          "choose": 2,
+          "dark_gift": 15,
+          "end_turn": 30,
+          "freeze": 30,
+          "hero_power": 27,
+          "move": 23,
+          "play": 10,
+          "refresh": 27,
+          "sell": 28,
+          "upgrade": 6
+        },
+        "legal_buy_decisions": 19,
+        "legal_buy_end_turns": 0,
+        "legal_buy_nonbuy_choices": 9,
+        "gold_positive_legal_buy_ends": 0,
+        "end_turn_gold_mean": 0.014285714498588018,
+        "same_public_observation_transitions": 0,
+        "max_same_public_observation_streak": 1,
+        "max_same_action_streak": 2,
+        "turn_action_families": {
+          "0": {
+            "choose": 1
+          },
+          "1": {
+            "buy": 1,
+            "play": 1,
+            "end_turn": 1
+          },
+          "2": {
+            "upgrade": 1,
+            "end_turn": 1
+          },
+          "3": {
+            "buy": 2,
+            "play": 2,
+            "end_turn": 1
+          },
+          "4": {
+            "buy": 2,
+            "play": 2,
+            "end_turn": 1
+          },
+          "5": {
+            "upgrade": 1,
+            "buy": 1,
+            "play": 1,
+            "end_turn": 1
+          },
+          "6": {
+            "choose": 1,
+            "play": 4,
+            "buy": 3,
+            "end_turn": 1
+          },
+          "7": {
+            "upgrade": 1,
+            "buy": 1,
+            "end_turn": 1
+          }
+        },
+        "first_actions": [
+          {
+            "turn": 0,
+            "action": 30,
+            "family": "choose",
+            "buy_legal": false,
+            "gold": 0.0
+          },
+          {
+            "turn": 1,
+            "action": 8,
+            "family": "buy",
+            "buy_legal": true,
+            "gold": 0.30000001192092896
+          },
+          {
+            "turn": 1,
+            "action": 46,
+            "family": "play",
+            "buy_legal": false,
+            "gold": 0.0
+          },
+          {
+            "turn": 1,
+            "action": 0,
+            "family": "end_turn",
+            "buy_legal": false,
+            "gold": 0.0
+          },
+          {
+            "turn": 2,
+            "action": 3,
+            "family": "upgrade",
+            "buy_legal": true,
+            "gold": 0.4000000059604645
+          },
+          {
+            "turn": 2,
+            "action": 0,
+            "family": "end_turn",
+            "buy_legal": false,
+            "gold": 0.0
+          },
+          {
+            "turn": 3,
+            "action": 8,
+            "family": "buy",
+            "buy_legal": true,
+            "gold": 0.5
+          },
+          {
+            "turn": 3,
+            "action": 46,
+            "family": "play",
+            "buy_legal": true,
+            "gold": 0.20000000298023224
+          },
+          {
+            "turn": 3,
+            "action": 11,
+            "family": "buy",
+            "buy_legal": true,
+            "gold": 0.20000000298023224
+          },
+          {
+            "turn": 3,
+            "action": 46,
+            "family": "play",
+            "buy_legal": false,
+            "gold": 0.10000000149011612
+          },
+          {
+            "turn": 3,
+            "action": 0,
+            "family": "end_turn",
+            "buy_legal": false,
+            "gold": 0.10000000149011612
+          },
+          {
+            "turn": 4,
+            "action": 8,
+            "family": "buy",
+            "buy_legal": true,
+            "gold": 0.6000000238418579
+          },
+          {
+            "turn": 4,
+            "action": 46,
+            "family": "play",
+            "buy_legal": true,
+            "gold": 0.30000001192092896
+          },
+          {
+            "turn": 4,
+            "action": 8,
+            "family": "buy",
+            "buy_legal": true,
+            "gold": 0.30000001192092896
+          },
+          {
+            "turn": 4,
+            "action": 46,
+            "family": "play",
+            "buy_legal": false,
+            "gold": 0.0
+          },
+          {
+            "turn": 4,
+            "action": 0,
+            "family": "end_turn",
+            "buy_legal": false,
+            "gold": 0.0
+          },
+          {
+            "turn": 5,
+            "action": 3,
+            "family": "upgrade",
+            "buy_legal": true,
+            "gold": 0.699999988079071
+          },
+          {
+            "turn": 5,
+            "action": 8,
+            "family": "buy",
+            "buy_legal": true,
+            "gold": 0.30000001192092896
+          },
+          {
+            "turn": 5,
+            "action": 46,
+            "family": "play",
+            "buy_legal": false,
+            "gold": 0.0
+          },
+          {
+            "turn": 5,
+            "action": 0,
+            "family": "end_turn",
+            "buy_legal": false,
+            "gold": 0.0
+          },
+          {
+            "turn": 6,
+            "action": 30,
+            "family": "choose",
+            "buy_legal": false,
+            "gold": 0.800000011920929
+          },
+          {
+            "turn": 6,
+            "action": 46,
+            "family": "play",
+            "buy_legal": true,
+            "gold": 0.5
+          },
+          {
+            "turn": 6,
+            "action": 46,
+            "family": "play",
+            "buy_legal": true,
+            "gold": 0.699999988079071
+          },
+          {
+            "turn": 6,
+            "action": 8,
+            "family": "buy",
+            "buy_legal": true,
+            "gold": 0.8999999761581421
+          },
+          {
+            "turn": 6,
+            "action": 46,
+            "family": "play",
+            "buy_legal": true,
+            "gold": 0.6000000238418579
+          },
+          {
+            "turn": 6,
+            "action": 8,
+            "family": "buy",
+            "buy_legal": true,
+            "gold": 0.6000000238418579
+          },
+          {
+            "turn": 6,
+            "action": 46,
+            "family": "play",
+            "buy_legal": true,
+            "gold": 0.30000001192092896
+          },
+          {
+            "turn": 6,
+            "action": 8,
+            "family": "buy",
+            "buy_legal": true,
+            "gold": 0.30000001192092896
+          },
+          {
+            "turn": 6,
+            "action": 0,
+            "family": "end_turn",
+            "buy_legal": false,
+            "gold": 0.0
+          },
+          {
+            "turn": 7,
+            "action": 3,
+            "family": "upgrade",
+            "buy_legal": true,
+            "gold": 0.8999999761581421
+          },
+          {
+            "turn": 7,
+            "action": 8,
+            "family": "buy",
+            "buy_legal": true,
+            "gold": 0.30000001192092896
+          },
+          {
+            "turn": 7,
+            "action": 0,
+            "family": "end_turn",
+            "buy_legal": false,
+            "gold": 0.0
+          }
+        ]
+      },
+      "engine": {
+        "version": "1.1.0",
+        "source_hash": "6d8712c93022ba11",
+        "features": 4017,
+        "cards": 447,
+        "actions": 245,
+        "n_cards": 3984
+      },
+      "no_fallback": false,
+      "rank": 8
+    }
+  ],
+  "failure_is_not_rank": true,
+  "model_promotion": false,
+  "interpretation": "Exploratory diagnostic; no fallback; incomplete games have no rank."
+}

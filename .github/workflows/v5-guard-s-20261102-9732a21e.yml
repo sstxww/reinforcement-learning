@@ -1,0 +1,81 @@
+name: V5 buy-before-idle bounded ablation s-20261102-9732a21e
+on:
+  push:
+    branches:
+      - 'agent/s-20261102-9732a21e/optimization-001'
+    paths:
+      - '.github/workflows/v5-guard-s-20261102-9732a21e.yml'
+permissions:
+  contents: write
+concurrency:
+  group: v5-guard-s-20261102-9732a21e-r003
+  cancel-in-progress: false
+jobs:
+  rules-hybrid-pilot:
+    if: github.repository == 'sstxww/reinforcement-learning'
+    runs-on: ubuntu-latest
+    timeout-minutes: 80
+    env:
+      GH_TOKEN: ${{ github.token }}
+      SESSION_ID: s-20261102-9732a21e
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Unit and contract tests
+        run: |
+          python -m pip install -e '.[train,test]'
+          python -m pytest -q
+      - name: Install pinned real engine
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Restore exactly rejected/unpromoted candidate
+        run: |
+          mkdir -p checkpoints
+          gh release download v5-resume-smoke-s-20261102-9732a21e-r001 --repo "$GITHUB_REPOSITORY" --pattern candidate.zip --dir checkpoints
+          echo '976d9323e79cd00fa1dae73ea31886e4087171078eabdde8eeca06fac7eb0cc6  checkpoints/candidate.zip' | sha256sum -c -
+      - name: Real eight-seat hybrid rule-override ablation, four fixed seeds
+        run: |
+          python -m tavern_ai.v5_guarded_9732a21e \
+            --model checkpoints/candidate.zip \
+            --report "reports/$SESSION_ID/003-guarded-ablation.json" \
+            --receipt-dir "reports/$SESSION_ID/guarded-receipts"
+          test -s "reports/$SESSION_ID/003-guarded-ablation.json"
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          r=json.loads(Path(f"reports/{os.environ['SESSION_ID']}/003-guarded-ablation.json").read_text())
+          assert r["source_model_sha256"]=="976d9323e79cd00fa1dae73ea31886e4087171078eabdde8eeca06fac7eb0cc6"
+          assert r["training_steps"]==0
+          assert len(r["results"])==8
+          assert r["model_is_champion"] is False
+          print("real-game-completed",sum(x["completed"] for x in r["results"]))
+          print("paired-valid",r["paired_completed_count"])
+          print("no strength inference from a small n=4 sample")
+          PY
+          for p in reports/$SESSION_ID/guarded-receipts/*.json; do
+            [ -f "$p" ] || continue
+            python -m tavern_ai.validate_receipt "$p"
+          done
+      - name: Commit only own compact genuine receipts and real analysis
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "reports/$SESSION_ID/003-guarded-ablation.json" "reports/$SESSION_ID/guarded-receipts/"
+          git diff --cached --quiet && exit 0
+          git commit -m "evidence($SESSION_ID): true eight-seat legal-buy guard pilot, no Champion claim"
+          git pull --rebase origin "$GITHUB_REF_NAME"
+          git push origin "HEAD:$GITHUB_REF_NAME"
+      - name: Diagnostic files, short-lived
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v5-guard-s-20261102-9732a21e-${{ github.run_id }}
+          path: reports/s-20261102-9732a21e
+          if-no-files-found: ignore
+          retention-days: 30
