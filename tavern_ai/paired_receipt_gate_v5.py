@@ -28,10 +28,14 @@ def _guard_count(row: dict) -> int:
         raise ValueError("Malformed action counts")
     fields = (
         row.get("guard_forced_end", 0),
+        row.get("guard_forced_ends", 0),
         row.get("forced_end_count", 0),
         row.get("fallback_count", 0),
+        row.get("fallback_actions", 0),
         row.get("safety_fallback_count", 0),
         counts.get("guard_forced_end", 0),
+        counts.get("guard_forced_ends", 0),
+        counts.get("fallback_actions", 0),
     )
     if any(type(v) is not int or v < 0 for v in fields):
         raise ValueError("Invalid guard/fallback counter")
