@@ -52,10 +52,27 @@ def read_registry(path: Path) -> dict:
     for key in ("champion", "challenger", "latest"):
         if roles.get(key) is not None and roles[key] not in ids:
             raise ValueError(f"Role {key} references an unknown model")
+    for group in ("population", "rejected"):
+        members = roles.get(group, [])
+        if not isinstance(members, list) or any(
+            not isinstance(member, str) or member not in ids for member in members
+        ) or len(set(members)) != len(members):
+            raise ValueError(f"Invalid {group} model references")
     if roles.get("champion") is not None:
         selected = next(e for e in entries if e["id"] == roles["champion"])
         if selected["review_status"] != "verified":
             raise ValueError("Unverified checkpoint cannot be Champion")
+        required_evidence = (
+            "durable_download_verified",
+            "hash_verified",
+            "load_verified",
+            "resume_verified",
+            "complete_match_verified",
+            "competitive_gain_verified",
+        )
+        missing = [name for name in required_evidence if selected.get(name) is not True]
+        if missing:
+            raise ValueError("Champion requires positive independent evidence: " + ", ".join(missing))
     return obj
 
 

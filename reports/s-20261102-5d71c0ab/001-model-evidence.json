@@ -1,0 +1,96 @@
+{
+  "schema": 1,
+  "session_id": "s-20261102-5d71c0ab",
+  "round": 1,
+  "kind": "engine_and_model_behavior_diagnostic",
+  "source_run": "https://github.com/sstxww/reinforcement-learning/actions/runs/41449729015",
+  "artifact_url": "https://github.com/sstxww/reinforcement-learning/actions/runs/41449729015/artifacts/13143652738",
+  "artifact_sha256": "441a0309b91398b986a9431340423e5a681f623792d9a401be9c727d69e4c52c",
+  "source_commit": "ee561f9531cb9bb61832b770847eadfc48ab1ab7",
+  "engine": {
+    "version": "1.1.0",
+    "source_hash": "6d8712c93022ba11",
+    "features": 4017,
+    "cards": 447,
+    "actions": 245
+  },
+  "registry_gate_tests": "passed",
+  "full_baseline_session_match": {
+    "seed": 884631,
+    "completed": true,
+    "rank": 8,
+    "decisions": 37,
+    "receipt": "experiments/s-20261102-5d71c0ab/001-884631.json"
+  },
+  "source_release": "v5-s-20261102-68099929-1408-41428692617",
+  "model_sha256": "a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632",
+  "historical_total_steps": 1408,
+  "steps_trained_this_session": 0,
+  "release_checkpoint_preflight": {
+    "downloaded": true,
+    "sha256_match": true,
+    "optimizer_zip_entry_present": true,
+    "model_cpu_load": "passed",
+    "inference": "passed_one_action",
+    "new_optimizer_resume": "not_tested",
+    "full_model_game_by_preflight": "not_tested",
+    "champion_eligible": false
+  },
+  "paired_true_full_games": {
+    "seeds": [
+      884632,
+      884633
+    ],
+    "model_raw_unassisted": {
+      "ranks": [
+        8,
+        8
+      ],
+      "decisions": [
+        122,
+        127
+      ],
+      "legal_buy_exposures": [
+        42,
+        40
+      ],
+      "buys": [
+        0,
+        0
+      ],
+      "forced_end_turns": 0,
+      "raw_action_1": [
+        42,
+        43
+      ],
+      "raw_action_2": [
+        70,
+        70
+      ],
+      "first_place_rate": 0,
+      "top4_rate": 0
+    },
+    "baseline": {
+      "ranks": [
+        6,
+        7
+      ],
+      "decisions": [
+        50,
+        45
+      ],
+      "legal_buy_exposures": [
+        27,
+        22
+      ],
+      "buys": [
+        17,
+        16
+      ],
+      "top4_rate": 0
+    },
+    "candidate_minus_baseline_mean_rank": 1.5
+  },
+  "outcome": "Repeated no-buy behavior despite 82 mask-legal BUY decision exposures in two new real games; causal action semantics and interventions not established; no promotion or training expansion",
+  "caveat": "Two seed pairs are exploratory; exposures correlated, no causal interpretation, independent optimizer resume not performed. Artifact is retained 30 days; compact report is permanent."
+}
