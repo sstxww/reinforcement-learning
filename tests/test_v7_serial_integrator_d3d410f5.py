@@ -1,7 +1,7 @@
 """Negative and positive tests: no live GitHub merge side effects."""
 import pytest
 from scripts.v7_serial_integrator import (
-    GateError, check_pr, check_reviews, check_run, check_jobs, sha
+    GateError, check_pr, check_reviews, check_run, check_jobs, check_sensitive_paths, sha
 )
 
 HEAD = "a" * 40
@@ -75,3 +75,13 @@ def test_reject_invalid_sha():
     for value in ("short", "../" + HEAD, HEAD.upper(), ""):
         with pytest.raises(GateError):
             sha(value)
+
+def test_pr_cannot_redefine_evidence_workflow_or_gate():
+    check_sensitive_paths([{"filename": "tavern_ai/model.py"}])
+    for critical in (".github/workflows/ci.yml", "scripts/check_pr_evidence.py",
+                     "tavern_ai/receipt_integrity.py",
+                     ".github/workflows/v7-serialized-integrator.yml"):
+        with pytest.raises(GateError):
+            check_sensitive_paths([{"filename": critical}])
+    with pytest.raises(GateError):
+        check_sensitive_paths([{"filename": f"file-{i}"} for i in range(100)])

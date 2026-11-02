@@ -16,8 +16,26 @@ STEPS = ("Unit tests and PR evidence", "Install pinned engine and verified patch
          "Confirm engine layout", "Real full eight-seat simulated match",
          "Preserve CI evidence")
 
+PROTECTED_EVIDENCE = frozenset({
+    ".github/workflows/ci.yml",
+    ".github/workflows/v7-serialized-integrator.yml",
+    "scripts/check_pr_evidence.py",
+    "scripts/v7_serial_integrator.py",
+    "tavern_ai/receipt_integrity.py",
+    "tavern_ai/validate_receipt.py",
+})
+
 class GateError(RuntimeError):
     pass
+
+def check_sensitive_paths(files):
+    """Do not trust a PR's self-modified CI or integration checks."""
+    if len(files) >= 100:
+        raise GateError("Changed-file list might be truncated")
+    touched = {f.get("filename") for f in files}
+    blocked = sorted(PROTECTED_EVIDENCE.intersection(touched))
+    if blocked:
+        raise GateError("PR changes its evidence/integration gate; requires separate review: " + ", ".join(blocked))
 
 def sha(value):
     if not re.fullmatch(r"[0-9a-f]{40}", value):
@@ -113,6 +131,7 @@ def main():
         raise GateError("Main moved before integration")
     pr = api.call("/pulls/" + str(a.pr))
     check_pr(pr, api.repo, a.pr, head, base)
+    check_sensitive_paths(api.call("/pulls/" + str(a.pr) + "/files?per_page=100"))
     reviews = api.call("/pulls/" + str(a.pr) + "/reviews?per_page=100")
     if len(reviews) >= 100:
         raise GateError("Paginated review evidence is incomplete")
