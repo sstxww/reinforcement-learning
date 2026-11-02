@@ -1,0 +1,87 @@
+name: V7 receipt source ancestry audit - s-20261103-2a7f188b
+
+on:
+  push:
+    branches:
+      - agent/s-20261103-2a7f188b/optimization-001
+    paths:
+      - .github/workflows/v7-receipt-ancestry-2a7f188b.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: v7-receipt-ancestry-s-20261103-2a7f188b
+  cancel-in-progress: false
+
+jobs:
+  read-only-evidence:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      GH_TOKEN: ${{ github.token }}
+      SOURCE_RELEASE: v5-s-20261102-68099929-1408-41428692617
+      SOURCE_SHA256: a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Test source-commit and negative evidence regressions
+        run: |
+          python -m pip install -e '.[train,test]'
+          python -m pytest -q tests/test_v7_receipt_ancestry_2a7f188b.py
+      - name: Install pinned real TavernGym
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Independently play one complete baseline eight-seat game
+        run: |
+          mkdir -p outputs
+          python -m tavern_ai.canary --agent-id s-20261103-2a7f188b --seed 99647 --policy baseline --receipt outputs/001-99647-baseline.json
+          python -m tavern_ai.validate_receipt outputs/001-99647-baseline.json
+          python scripts/v7_receipt_ancestry_2a7f188b.py --receipt outputs/001-99647-baseline.json --head "$GITHUB_SHA" --repo .
+          cat outputs/001-99647-baseline.json
+      - name: Validate current unpromoted source Release identity
+        run: |
+          mkdir -p checkpoint
+          gh release download "$SOURCE_RELEASE" --repo "$GITHUB_REPOSITORY" --pattern model.zip --pattern model.metadata.json --dir checkpoint
+          echo "$SOURCE_SHA256  checkpoint/model.zip" | sha256sum --check
+          python -m tavern_ai.checkpoint_preflight --help
+      - name: Raw 1408-step PPO same-seed eight-seat diagnostic (may fail)
+        id: raw_game
+        continue-on-error: true
+        timeout-minutes: 12
+        run: |
+          timeout 600s python -m tavern_ai.canary --agent-id s-20261103-2a7f188b --seed 99647 --policy model --model checkpoint/model.zip --receipt outputs/002-99647-model.json
+          python -m tavern_ai.validate_receipt outputs/002-99647-model.json
+          python scripts/v7_receipt_ancestry_2a7f188b.py --receipt outputs/002-99647-model.json --head "$GITHUB_SHA" --repo .
+          cat outputs/002-99647-model.json
+      - name: Preserve explicit bounded raw-game outcome
+        if: always()
+        shell: bash
+        env:
+          RAW_GAME_OUTCOME: ${{ steps.raw_game.outcome }}
+        run: |
+          mkdir -p outputs
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          out={"kind":"raw_game_status_not_a_match_receipt",
+               "raw_game_outcome":os.environ.get("RAW_GAME_OUTCOME","unknown"),
+               "raw_receipt_exists":Path("outputs/002-99647-model.json").exists(),
+               "training_new_steps":0,
+               "strength_gain_claimed":False}
+          Path("outputs/raw-game-status.json").write_text(json.dumps(out,indent=2))
+          print(json.dumps(out))
+          PY
+      - name: Preserve original evidence (temporary, not a Release)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v7-ancestry-s-20261103-2a7f188b-${{ github.run_id }}
+          path: outputs/*.json
+          if-no-files-found: warn
+          retention-days: 14
