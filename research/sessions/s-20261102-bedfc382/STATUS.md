@@ -1,20 +1,16 @@
-# s-20261102-bedfc382 — STATUS (after verified round 001)
+# s-20261102-bedfc382 — STATUS after two verified rounds
 
-- **Base main SHA:** `6ac59235b8238196a0e6462de77b72413c829372`.
-- **Own branch:** `agent/s-20261102-bedfc382/optimization-001`; commits `4e3a015962d5f143e49cbd01fd5061b0665c8c75` (implementation), `0a3671649cfae87f898adf9155aee86efd259d1d` (safe game driver), `a0ae01cfda12d3a148bcda0368abb153f42b7412` (genuine receipts).
-- **PR:** https://github.com/sstxww/reinforcement-learning/pull/12 (draft; CI + integrator review required).
-- **Actual training:** 512 environment steps (256 control + 256 shaped), 2 terminal rollout episodes per arm.
-- **Independent complete games:** 6 (three paired held-out seeds 31011–31013 per arm); all finished; 0 illegal model actions, 0 simulator truncations, 0 turn limit terminations.
-- **Our shaped placements:** [8,8,8]; mean 8.00, top4 0%, win 0%; control also [8,8,8]. **No measured increase** under this small budget; no statistically supported conclusion about training at scale.
-- **Receipts:** `experiments/s-20261102-bedfc382/001-31011.json`, `001-31012.json`, `001-31013.json`, generated from real Game.is_over() matches by workflow #41413908927.
-- **Evidence and exact config:** `research/sessions/s-20261102-bedfc382/metrics-001.json`. Seed 22042, gamma=.99, n_steps=128, train steps 256/arm, alpha control 0/shaped .5. Engine 1.1.0 hash 6d8712c93022ba11, observe2 4017/447, action 245.
-- **Training run:** https://github.com/sstxww/reinforcement-learning/actions/runs/41413908927 — success, evidence commit `a0ae01cfda12d3a148bcda0368abb153f42b7412`.
-- **Failed first run:** #41413209781; untrained PPO model stalled with original canary 30,000-cycle guard. Fixed via equal 48-actions-per-turn cap for both arms, logged in round-001.
-- **Checkpoints:** `outputs/reward/control.zip` SHA256 `c6d2656fd988188f24d69a8bd521dcaeaa1634dadc99671531b63d7273a7236b` and `shaped.zip` SHA256 `2d3d29a47063cb5aad029c0282c90e775a639634f904f19f183e6a415fc40352`.
-- **Restore location:** expiring session Artifact at https://github.com/sstxww/reinforcement-learning/actions/runs/41413908927/artifacts/13125934555 (30 days, expires 2026-12-02 UTC). Download and SHA256-verify before use. Not a durable model registry; expired weights are not recoverable from Git.
-- **Best result:** no top-four result in 3 own held-out games; score 8.00; insufficient to claim strength.
-- **Next:** confirm PR CI; test longer, compute action-type proportions, bootstrap uncertainty on 20+ held-out seeds. Do not change other open Agent PR files or push main.
-
-## Round 002 started
-- Isolated new runner: `.github/workflows/experiment-s-20261102-bedfc382-r002.yml` on own branch; actual measurements and receipt pending at creation.
-- New planned training: 4096 per arm, 20 held-out paired seeds 32001–32020; artifacts and receipts under `r002` / `002-` prefixes, preserving round 001.
+- **Repository/base:** `sstxww/reinforcement-learning`, original main `6ac59235b8238196a0e6462de77b72413c829372`; latest main checked before R002 `315b068bac5ab6d8403c3c9b18f8c101c0cded5d`.
+- **Isolated branch:** `agent/s-20261102-bedfc382/optimization-001`. No direct main commits, no other branch/PR edits and no force pushes.
+- **PR:** https://github.com/sstxww/reinforcement-learning/pull/12 (draft for integrator review; **negative experimental result**, not recommended as production performance upgrade).
+- **Successful training:** R001 256+256=512, R002 4096+4096=8192, total **8704 confirmed PPO environment steps**. Initial failed run #41413209781 additionally trained 512 steps but its game stalled; not included in successful budget.
+- **Complete individual session games:** R001 3 treatment + 3 controls, R002 20 treatment + 20 controls, **46 completed original TavernGym eight-player games**, 23 personal shaped-policy JSON receipts. Generic PR CI games are not counted.
+- **Results:** R001 control [8,8,8] and shaped [8,8,8]; R002 each arm all 20 seeds rank 8. R002 mean placement both 8.0, top4 both 0/20, wins 0/20. **No verified strength improvement**; no Arena result claimed.
+- **Safety:** R002 0 illegal model actions, 0 combat truncations, 0 turn-limit endings. Shared 48-actions-per-turn deterministic fallback used 75 control / 82 treatment times. All R002 real games ended with `Game.is_over()=True`.
+- **Engine:** TavernGym 1.1.0, source hash 6d8712c93022ba11, observe2 4017 float features + 447 card indices + 245 masked discrete actions; upstream commit fb61201a557ddd36a411cf44aac51ce4d9b606ce; observe2 patch SHA256 1e48a071cad63c284debbf917cb012595a405a4ef5ab66180eb2918e205aaac0.
+- **Runs:** R001 success https://github.com/sstxww/reinforcement-learning/actions/runs/41413908927 ; R002 success https://github.com/sstxww/reinforcement-learning/actions/runs/41414889163 . R001 final CI succeeded https://github.com/sstxww/reinforcement-learning/actions/runs/41414594656; R002 final PR CI must be checked on its final head.
+- **Raw evidence:** `research/sessions/s-20261102-bedfc382/metrics-001.json` and `metrics-002.json`, `experiments/s-20261102-bedfc382/001-31011.json` through `001-31013.json`, `002-32001.json` through `002-32020.json`.
+- **R001 checkpoints:** expiring Artifact https://github.com/sstxww/reinforcement-learning/actions/runs/41413908927/artifacts/13125934555 ; control SHA256 c6d2656fd988188f24d69a8bd521dcaeaa1634dadc99671531b63d7273a7236b; shaped SHA256 2d3d29a47063cb5aad029c0282c90e775a639634f904f19f183e6a415fc40352.
+- **R002 checkpoints:** expiring Artifact https://github.com/sstxww/reinforcement-learning/actions/runs/41414889163/artifacts/13127920334 ; control SHA256 0ff0e414122e7278eec7e788c6df1ace5216bd113a584b57913b32e9307107d8; shaped SHA256 f65f492607d29c6f62f7a8034f49b614e75da54231306224b2910c1a0e31a609. Both artifact sets expire **2026-12-02 UTC** (30-day retention). Download and match SHA256 to restore/check authenticity. Model weights are not permanently archived; no Git weight copies.
+- **Research:** `research/sessions/s-20261102-bedfc382/round-001.md`, `round-002.md`, `research/knowledge/proposals/s-20261102-bedfc382-001.md`, `s-20261102-bedfc382-002.md`. Integrator owns curated knowledge files.
+- **Next:** inspect final PR CI; investigate deterministic action distributions and terminal reward sparsity before more expensive PPO scaling. Keep failed approaches recorded; do not merge negative-strength code as proven improvement.
