@@ -1,0 +1,19 @@
+{
+  "session": "s-20261102-decfc670",
+  "kind": "guarded real eight-seat model-action diagnostic",
+  "model_sha256": "73bde2666426cecce39f135980a897bb2cd4a7d70783ba04c9c0d29477a6664a",
+  "seeds": [
+    86251,
+    86252
+  ],
+  "game_count": 2,
+  "placements": [
+    8,
+    8
+  ],
+  "total_buys": 0,
+  "total_legal_buy_opportunity_decisions": 77,
+  "total_model_ends_with_legal_buy": 0,
+  "total_guard_forced_ends": 2,
+  "caution": "Guard-assisted play is not unguarded model strength. Legal mask does not alone establish economic optimality."
+}

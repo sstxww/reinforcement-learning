@@ -1,0 +1,92 @@
+{
+  "schema": 1,
+  "timestamp": "2026-11-02T10:24:20.172290+00:00",
+  "environment": "TavernGym",
+  "engine_version": "1.1.0",
+  "engine_source_hash": "6d8712c93022ba11",
+  "agent_id": "s-20261102-decfc670",
+  "policy": "guarded_model_diagnostic",
+  "seed": 86252,
+  "completed": true,
+  "turns": 15,
+  "decisions": 164,
+  "placements": [
+    8,
+    5,
+    6,
+    2,
+    3,
+    4,
+    7,
+    1
+  ],
+  "truncated_combats": 0,
+  "turn_limit_end": false,
+  "git_sha": "5ccc5aad445ba567ad9d38b2c809389573d9b482",
+  "model_sha256": "73bde2666426cecce39f135980a897bb2cd4a7d70783ba04c9c0d29477a6664a",
+  "guard_forced_end_turns": 2,
+  "model_chosen_end_turns": 5,
+  "legal_buy_opportunity_decisions": 38,
+  "legal_buy_opportunity_turns": 7,
+  "model_ends_with_legal_buy": 0,
+  "actual_buys": 0,
+  "repeated_identical_state_and_action": 0,
+  "action_categories": {
+    "other": 151,
+    "end_turn": 7,
+    "play": 4,
+    "upgrade": 1,
+    "sell": 1
+  },
+  "per_turn": {
+    "0": {
+      "model_ends": 0,
+      "legal_buy_decisions": 0,
+      "buys": 0,
+      "forced": 0
+    },
+    "1": {
+      "model_ends": 1,
+      "legal_buy_decisions": 3,
+      "buys": 0,
+      "forced": 0
+    },
+    "2": {
+      "model_ends": 1,
+      "legal_buy_decisions": 3,
+      "buys": 0,
+      "forced": 0
+    },
+    "3": {
+      "model_ends": 1,
+      "legal_buy_decisions": 6,
+      "buys": 0,
+      "forced": 0
+    },
+    "4": {
+      "model_ends": 1,
+      "legal_buy_decisions": 4,
+      "buys": 0,
+      "forced": 0
+    },
+    "5": {
+      "model_ends": 1,
+      "legal_buy_decisions": 7,
+      "buys": 0,
+      "forced": 0
+    },
+    "6": {
+      "model_ends": 0,
+      "legal_buy_decisions": 8,
+      "buys": 0,
+      "forced": 1
+    },
+    "7": {
+      "model_ends": 0,
+      "legal_buy_decisions": 7,
+      "buys": 0,
+      "forced": 1
+    }
+  },
+  "method": "guarded observation-only masked diagnostic; not pure model performance"
+}
