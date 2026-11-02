@@ -1,6 +1,6 @@
 import numpy as np
 
-from tavern_ai.behavior_probe_704cec7b import action_category, summarize, first_legal_buy_if_empty_board
+from tavern_ai.behavior_probe_704cec7b import action_category, summarize, first_legal_buy_if_empty_board, safe_budget_action
 
 
 def test_action_bands_and_end_turn():
@@ -64,3 +64,26 @@ def test_summary_does_not_count_forced_end_as_learned_purchase():
     assert stats["explicit_buy_overrides"] == 1
     assert stats["model_actions"] == 1
     assert stats["guard_forced_end_turns"] == 1
+
+
+def test_guard_never_invents_illegal_end_turn():
+    mask = np.zeros(245, dtype=bool)
+    mask[33] = True
+    mask[46] = True
+    assert safe_budget_action(mask, 40) == 33
+    mask[33] = False
+    assert safe_budget_action(mask, 40) == 46
+    mask[0] = True
+    assert safe_budget_action(mask, 40) == 0
+
+
+def test_guard_hard_limit_and_empty_mask_fail_closed():
+    import pytest
+    mask = np.zeros(245, dtype=bool)
+    with pytest.raises(RuntimeError, match="No legal"):
+        safe_budget_action(mask, 40)
+    mask[0] = True
+    with pytest.raises(RuntimeError, match="Hard"):
+        safe_budget_action(mask, 120)
+    with pytest.raises(ValueError, match="before"):
+        safe_budget_action(mask, 39)
