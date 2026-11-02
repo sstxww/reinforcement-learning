@@ -1,0 +1,52 @@
+name: V7 session 2dbe68c7 - real eight-seat report-link canary
+
+on:
+  push:
+    branches:
+      - agent/s-20261103-2dbe68c7/optimization-001
+    paths:
+      - .github/workflows/v7-report-links-2dbe68c7.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: v7-report-links-s-20261103-2dbe68c7
+  cancel-in-progress: false
+
+jobs:
+  genuine-baseline-and-regressions:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install offline test requirements
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[test]'
+      - name: Synthetic-only report linkage regression suite
+        run: |
+          python -m pytest -q tests/test_report_link_gate_s_20261103_2dbe68c7.py
+          python -m tavern_ai.report_link_gate_v7 --help
+      - name: Install pinned TavernGym source and patch
+        run: bash scripts/bootstrap_engine.sh
+      - name: Confirm pinned observe2 contract
+        run: python -m tavern_ai.contract
+      - name: Own genuine full eight-seat baseline (not a PPO strength claim)
+        run: |
+          python -m tavern_ai.canary \
+            --agent-id s-20261103-2dbe68c7 --seed 99737 \
+            --policy baseline --receipt outputs/001-99737-baseline.json
+          python -m tavern_ai.validate_receipt outputs/001-99737-baseline.json
+          cat outputs/001-99737-baseline.json
+      - name: Preserve genuine receipts, 30-day temporary only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v7-report-links-2dbe68c7-${{ github.run_id }}
+          path: outputs/*.json
+          if-no-files-found: ignore
+          retention-days: 30
