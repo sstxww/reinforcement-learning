@@ -1,1 +1,0 @@
-Single bounded R002 proof: real pinned-engine baseline seed 98632, registered Release 128 PPO continuation smoke, raw model game 98633, paired tests, 90-day emergency candidate archive. Never claim model promotion.
