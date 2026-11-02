@@ -1,0 +1,84 @@
+name: Parallel TavernGym evaluation s-20261102-8cfa0c44
+on:
+  push:
+    branches:
+      - 'agent/s-20261102-8cfa0c44/optimization-001'
+    paths:
+      - 'tavern_ai/parallel_eval.py'
+      - 'tests/test_parallel_eval.py'
+      - '.github/workflows/experiment-s-20261102-8cfa0c44.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: parallel-evaluation-s-20261102-8cfa0c44
+  cancel-in-progress: false
+
+jobs:
+  paired-real-engine:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout own experiment branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install unit dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[test]'
+      - name: Unit and replay regression tests
+        run: |
+          python -m pytest tests/test_parallel_eval.py tests/test_evaluation_v1.py tests/test_receipt.py
+      - name: Install exact upstream TavernGym with verified observe2 patch
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Execute thirteen genuine eight-seat games
+        run: |
+          python -m tavern_ai.parallel_eval \
+            --agent-id s-20261102-8cfa0c44 \
+            --receipt-seed 28700 --start-seed 28701 \
+            --games 6 --workers 2 \
+            --receipt-dir experiments/s-20261102-8cfa0c44 \
+            --report reports/s-20261102-8cfa0c44/throughput-001.json
+          python -m tavern_ai.validate_receipt \
+            experiments/s-20261102-8cfa0c44/001-28700.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('reports/s-20261102-8cfa0c44/throughput-001.json')
+          record=json.loads(p.read_text())
+          assert record['all_replays_identical']
+          assert record['serial']['summary']['games'] == 6
+          assert record['process']['summary']['games'] == 6
+          assert record['engine']['source_hash'] == '6d8712c93022ba11'
+          print('13 completed games, 6 reproducible seed pairs')
+          PY
+      - name: Commit genuine evidence to this branch only
+        shell: bash
+        run: |
+          test "$GITHUB_REF_NAME" = 'agent/s-20261102-8cfa0c44/optimization-001'
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add experiments/s-20261102-8cfa0c44 reports/s-20261102-8cfa0c44
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'results(s-20261102-8cfa0c44): real seed-paired engine receipts [skip ci]'
+          git pull --rebase origin "$GITHUB_REF_NAME"
+          git push origin HEAD:"$GITHUB_REF_NAME"
+      - name: Preserve per-session evidence temporarily
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: throughput-s-20261102-8cfa0c44
+          path: |
+            experiments/s-20261102-8cfa0c44/*.json
+            reports/s-20261102-8cfa0c44/*.json
+          if-no-files-found: ignore
+          retention-days: 30
