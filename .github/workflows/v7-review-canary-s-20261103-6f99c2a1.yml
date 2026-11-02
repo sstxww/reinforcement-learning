@@ -1,0 +1,49 @@
+name: V7 independent P0 review genuine eight-seat canary s-20261103-6f99c2a1
+
+on:
+  push:
+    branches:
+      - 'agent/s-20261103-6f99c2a1/optimization-001'
+    paths:
+      - '.github/workflows/v7-review-canary-s-20261103-6f99c2a1.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: v7-review-canary-s-20261103-6f99c2a1
+  cancel-in-progress: false
+
+jobs:
+  scoped-review-regression-and-real-game:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install existing tests
+        run: python -m pip install -e '.[test]'
+      - name: Existing guard provenance regressions on canonical main
+        run: python -m pytest -q tests/test_paired_receipt_gate_v5_15ac04d0.py
+      - name: Install pinned engine and verify interface
+        run: |
+          bash scripts/bootstrap_engine.sh
+          python -m tavern_ai.contract
+      - name: Original complete eight-seat baseline match (not PPO performance)
+        run: |
+          mkdir -p outputs
+          timeout 600 python -m tavern_ai.canary \
+            --agent-id s-20261103-6f99c2a1 --seed 99847 --policy baseline \
+            --receipt outputs/001-99847-baseline.json
+          python -m tavern_ai.validate_receipt outputs/001-99847-baseline.json
+          cat outputs/001-99847-baseline.json
+      - name: Archive original run receipt temporarily
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v7-canary-s-20261103-6f99c2a1-${{ github.run_id }}
+          path: outputs/001-99847-baseline.json
+          if-no-files-found: ignore
+          retention-days: 14
