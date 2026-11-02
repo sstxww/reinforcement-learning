@@ -1,0 +1,137 @@
+name: V7 rejected raw PPO checkpoint durable custody s-20261103-7c7c11cb
+on:
+  push:
+    branches:
+      - agent/s-20261103-7c7c11cb/optimization-001
+    paths:
+      - .github/workflows/v7-rejected-custody-s-20261103-7c7c11cb.yml
+permissions:
+  actions: read
+  contents: write
+concurrency:
+  group: v7-s-20261103-7c7c11cb-r001-rejected-release-custody
+  cancel-in-progress: false
+jobs:
+  publish-rejected:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      GH_TOKEN: ${{ github.token }}
+      TAG: v7-rejected-s-20261103-7c7c11cb-1408-1d2d8aa4
+      SOURCE_RUN: "41512463704"
+      ARTIFACT_NAME: v7-s-20261103-7c7c11cb-r001-41512463704
+      EXPECTED_SHA: 1d2d8aa4dc5210ecead7f75a6d0ca41c6fcbab34461618a05481079dc30100ac
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download real model and receipts from immutable source run
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p source publish verified
+          gh run download "$SOURCE_RUN" --repo "$GITHUB_REPOSITORY" \
+            --name "$ARTIFACT_NAME" --dir source
+          test -s source/checkpoints/child.zip
+          test -s source/checkpoints/child.metadata.json
+          test -s source/outputs/001-baseline-43282.json
+          test -s source/outputs/001-raw-model-43283.json
+          cp source/checkpoints/child.zip publish/model.zip
+          cp source/checkpoints/child.metadata.json publish/model.metadata.json
+          cp source/outputs/001-baseline-43282.json publish/baseline-43282.json
+          cp source/outputs/001-raw-model-43283.json publish/raw-model-43283.json
+          cp source/outputs/raw-model-status.json publish/raw-model-status.json
+          cp source/outputs/optimizer-resume-verified.json publish/optimizer-resume-verified.json
+          cp source/outputs/restore.json publish/release-restore.json
+          sha256sum publish/model.zip publish/model.metadata.json > publish/checksums.sha256
+      - name: Strict original identity, schema2, ZIP optimizer and real-game gate
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import hashlib,json,os,zipfile
+          from pathlib import Path
+          root=Path('publish')
+          digest=hashlib.sha256((root/'model.zip').read_bytes()).hexdigest()
+          assert digest == os.environ['EXPECTED_SHA']
+          meta=json.loads((root/'model.metadata.json').read_text())
+          resume=json.loads((root/'optimizer-resume-verified.json').read_text())
+          restore=json.loads((root/'release-restore.json').read_text())
+          baseline=json.loads((root/'baseline-43282.json').read_text())
+          raw=json.loads((root/'raw-model-43283.json').read_text())
+          status=json.loads((root/'raw-model-status.json').read_text())
+          assert meta['schema']==2 and meta['algorithm']=='MaskablePPO'
+          assert meta['checkpoint_sha256']==digest
+          assert meta['total_timesteps']==1408 and meta['increment_timesteps']==128
+          assert meta['parent_checkpoint_sha256']=='73bde2666426cecce39f135980a897bb2cd4a7d70783ba04c9c0d29477a6664a'
+          assert resume['source_steps']==1280 and resume['child_steps']==1408 and resume['added_steps']==128
+          assert resume['model_sha256']==digest and resume['optimizer_archive_preflight'] is True
+          assert restore['weights_and_metadata_hash_verified'] is True and restore['cpu_load_verified'] is True
+          with zipfile.ZipFile(root/'model.zip') as z:
+              assert {'data','policy.pth','policy.optimizer.pth'} <= set(z.namelist())
+              assert z.testzip() is None
+          for receipt, policy, seed in [(baseline,'baseline',43282),(raw,'model',43283)]:
+              assert receipt['environment']=='TavernGym' and receipt['engine_version']=='1.1.0'
+              assert receipt['engine_source_hash']=='6d8712c93022ba11'
+              assert receipt['agent_id']=='s-20261103-7c7c11cb' and receipt['git_sha']=='f7f13ba0d1348f6cdc89b5be14b3d18c1d6812bc'
+              assert receipt['policy']==policy and receipt['seed']==seed
+              assert receipt['completed'] is True and sorted(receipt['placements'])==list(range(1,9))
+              assert receipt['truncated_combats']==0 and receipt['turn_limit_end'] is False
+          assert raw['model_sha256']==digest and raw['placements'][0]==8
+          assert baseline['model_sha256'] is None and baseline['placements'][0]==8
+          assert status['exit_code']==0 and status['completed_receipt_exists'] is True
+          payload={'model_class':'rejected_diagnostic','promoted':False,'no_claim_of_improvement':True,
+                   'source_release':'v2-learning-41413557445','source_sha256':meta['parent_checkpoint_sha256'],
+                   'source_steps':1280,'additional_steps':128,'child_steps':1408,
+                   'model_sha256':digest,'model_metadata_sha256':hashlib.sha256((root/'model.metadata.json').read_bytes()).hexdigest(),
+                   'train_run':'https://github.com/sstxww/reinforcement-learning/actions/runs/41512463704',
+                   'train_commit':'f7f13ba0d1348f6cdc89b5be14b3d18c1d6812bc',
+                   'engine_version':'1.1.0','engine_source_hash':'6d8712c93022ba11',
+                   'observe2':{'features':4017,'cards':447,'actions':245},
+                   'real_raw_game':{'seed':43283,'seat':0,'completed':True,'rank':8,'decisions':raw['decisions']},
+                   'real_baseline_game':{'seed':43282,'seat':0,'completed':True,'rank':8,'decisions':baseline['decisions']},
+                   'paired_comparison':False,'best_promoted':False,'champion_promoted':False}
+          (root/'provenance.json').write_text(json.dumps(payload,indent=2,ensure_ascii=False)+'\n')
+          print(json.dumps(payload))
+          PY
+      - name: Create new immutable rejected prerelease without overwrites
+        shell: bash
+        run: |
+          set -euo pipefail
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "Refusing to overwrite existing Release $TAG"
+            exit 5
+          fi
+          cat > publish/RELEASE_NOTES.md <<'EOF'
+          V7 postmerge schema-2 real optimizer continuation: source registered V2 1280 steps +128 actual MaskablePPO steps =1408.
+          Candidate is REJECTED diagnostic. Raw unassisted model finished seed 43283 in eighth place (19 turns, 122 decisions); baseline is a different seed 43282 and cannot establish paired gain.
+          ZIP weights/optimizer and metadata verified by source GitHub Actions run 41512463704; trainer commit f7f13ba0d1348f6cdc89b5be14b3d18c1d6812bc.
+          No Best/Champion/Latest promotion, no ranked TavernArena game, no evidence of competitive improvement.
+          EOF
+          gh release create "$TAG" --repo "$GITHUB_REPOSITORY" \
+            --target f7f13ba0d1348f6cdc89b5be14b3d18c1d6812bc \
+            --prerelease --title "REJECTED V7 postmerge schema2 1408-step diagnostic s-20261103-7c7c11cb" \
+            --notes-file publish/RELEASE_NOTES.md \
+            publish/model.zip publish/model.metadata.json publish/checksums.sha256 \
+            publish/baseline-43282.json publish/raw-model-43283.json \
+            publish/raw-model-status.json publish/optimizer-resume-verified.json \
+            publish/release-restore.json publish/provenance.json
+      - name: Redownload immutable Release and verify exact published weights
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh release download "$TAG" --repo "$GITHUB_REPOSITORY" \
+            --pattern 'model.zip' --pattern 'model.metadata.json' \
+            --pattern 'provenance.json' --dir verified
+          cmp publish/model.zip verified/model.zip
+          cmp publish/model.metadata.json verified/model.metadata.json
+          cmp publish/provenance.json verified/provenance.json
+          echo "Rejected model stored durably and redownloaded byte-identically"
+      - name: Diagnostic retention if publication cannot complete
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v7-s-20261103-7c7c11cb-r001-release-audit-${{ github.run_id }}
+          path: |
+            publish/checksums.sha256
+            publish/provenance.json
+          retention-days: 30
+          if-no-files-found: ignore
