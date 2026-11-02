@@ -1,0 +1,37 @@
+{
+  "actual_added_steps": 128,
+  "champion_eligible": false,
+  "engine": "TavernGym 1.1.0",
+  "engine_source_hash": "6d8712c93022ba11",
+  "games_per_arm": 2,
+  "limits": "Small matched seed sample, fixed seat 0, seven scripted opponents, no statistically supported skill gain; incomplete model games are excluded and separately diagnosed.",
+  "model_promotion_authorized": false,
+  "model_sha256": "d6771d4439d1deb64231edd4caaf9ebbc8cd2f8db667c94b19a8c144b968b096",
+  "model_vs_baseline_same_seed_pairs": [
+    {
+      "baseline_placement": 2,
+      "model_placement": 8,
+      "rank_delta_model_minus_baseline": 6,
+      "raw_model_only": true,
+      "seat": 0,
+      "seed": 97832
+    },
+    {
+      "baseline_placement": 6,
+      "model_placement": 8,
+      "rank_delta_model_minus_baseline": 2,
+      "raw_model_only": true,
+      "seat": 0,
+      "seed": 97833
+    }
+  ],
+  "paired_mean_rank_delta": 4,
+  "parent_sha256": "a73d24c68d238396136c9857ec4f341f39afc6562139ce9b693d282019db2632",
+  "registered_as_latest": false,
+  "schema": 1,
+  "session_id": "s-20261103-581c69c0",
+  "source_steps": 1408,
+  "source_training_run": "https://github.com/sstxww/reinforcement-learning/actions/runs/41512678144",
+  "storage_status": "pending_rejected_release_publication",
+  "trained_steps": 1536
+}
