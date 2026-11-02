@@ -1,0 +1,82 @@
+name: V5 candidate archive smoke s-20261103-bf44b161 R002
+
+on:
+  push:
+    branches:
+      - agent/s-20261103-bf44b161/optimization-002
+    paths:
+      - research/sessions/s-20261103-bf44b161/run-trigger-002.txt
+
+permissions:
+  contents: write
+
+concurrency:
+  group: v5-custody-s-20261103-bf44b161-002
+  cancel-in-progress: false
+
+jobs:
+  provenance-and-custody:
+    runs-on: ubuntu-latest
+    timeout-minutes: 105
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: New custody tests and full repository regressions
+        run: |
+          python -m pip install -e '.[train,test]'
+          python -m pytest tests/test_train_custody_fallback_bf44b161.py
+          python -m pytest
+      - name: Pinned TavernGym bootstrap
+        run: bash scripts/bootstrap_engine.sh
+      - name: Own genuine eight-seat baseline game
+        run: |
+          python -m tavern_ai.canary --agent-id s-20261103-bf44b161 --seed 98632 --policy baseline --receipt experiments/s-20261103-bf44b161/002-98632-baseline.json
+          python -m tavern_ai.validate_receipt experiments/s-20261103-bf44b161/002-98632-baseline.json
+      - name: Commit independent complete baseline receipt to own branch
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add experiments/s-20261103-bf44b161/002-98632-baseline.json
+          git diff --cached --quiet && { echo 'No independent receipt'; exit 2; }
+          git commit -m 'test(v5): genuine eight-seat rank receipt for s-20261103-bf44b161 R002'
+          git push origin HEAD:refs/heads/agent/s-20261103-bf44b161/optimization-002
+      - name: Restore registered durable Release and perform 128 genuine PPO steps
+        run: |
+          set -euo pipefail
+          python -m tavern_ai.release_restore_entry --model-id latest --out-dir checkpoints
+          python -m tavern_ai.train --steps 128 --seed 78632 --resume checkpoints/model.zip --out checkpoints/candidate.zip
+          test -s checkpoints/candidate.zip
+          test -s checkpoints/candidate.metadata.json
+          sha256sum checkpoints/candidate.zip checkpoints/candidate.metadata.json > checkpoints/candidate.sha256
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          prev=json.loads(Path('checkpoints/model.metadata.json').read_text())
+          after=json.loads(Path('checkpoints/candidate.metadata.json').read_text())
+          assert after['total_timesteps'] > prev['total_timesteps'], (prev,after)
+          assert after['parent_checkpoint_sha256'] == prev['checkpoint_sha256']
+          print(json.dumps({'source_steps':prev['total_timesteps'],'new_steps':after['total_timesteps'],'parent_sha256':after['parent_checkpoint_sha256'],'candidate_sha256':after['checkpoint_sha256']}))
+          PY
+      - name: Genuine unguarded model-controlled eight-seat game
+        run: |
+          python -m tavern_ai.canary --agent-id s-20261103-bf44b161 --seed 98633 --policy model --model checkpoints/candidate.zip --receipt experiments/s-20261103-bf44b161/002-98633-raw-model.json
+          python -m tavern_ai.validate_receipt experiments/s-20261103-bf44b161/002-98633-raw-model.json
+      - name: Independent raw model vs scripted baseline probe
+        run: |
+          python -m tavern_ai.evaluate --model checkpoints/candidate.zip --games 2 --start-seed 98634 --compare-baseline --out experiments/s-20261103-bf44b161/002-paired.json
+      - name: Archive even on model game or Release publishing failure (temporary, not Champion)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v5-s-20261103-bf44b161-r002-unpromoted-${{ github.run_id }}
+          path: |
+            checkpoints/candidate.zip
+            checkpoints/candidate.metadata.json
+            checkpoints/candidate.sha256
+            experiments/s-20261103-bf44b161/*.json
+          if-no-files-found: ignore
+          retention-days: 90
