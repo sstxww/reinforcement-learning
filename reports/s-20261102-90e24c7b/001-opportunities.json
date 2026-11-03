@@ -1,0 +1,70 @@
+{
+  "baseline": {
+    "buy_legal_decisions": 73,
+    "buy_legal_turns": 26,
+    "buy_per_legal_decision": 0.5616438356164384,
+    "decisions": 147,
+    "ends_while_buy_legal": 0,
+    "first_rate": 0.0,
+    "games": 3,
+    "guard_forced_ends": 0,
+    "mean_rank": 7.333333333333333,
+    "ranks": [
+      6,
+      8,
+      8
+    ],
+    "selected_buy_actions": 41,
+    "top4_rate": 0.0
+  },
+  "champion_promoted": false,
+  "engine": {
+    "actions": 245,
+    "cards": 447,
+    "features": 4017,
+    "n_cards": 3984,
+    "source_hash": "6d8712c93022ba11",
+    "version": "1.1.0"
+  },
+  "evaluation_type": "three independent heldout seed-paired real games",
+  "limitations": [
+    "Offline own-view diagnostics; no hidden state enters the policy.",
+    "Guard-triggered model outcomes must be reported separately from raw policy.",
+    "Repeated legal-buy decisions are not independent buying opportunities.",
+    "Three seeds are a diagnostic pilot, NOT evidence of model superiority."
+  ],
+  "model_guarded": {
+    "buy_legal_decisions": 521,
+    "buy_legal_turns": 22,
+    "buy_per_legal_decision": 0.0,
+    "decisions": 1087,
+    "ends_while_buy_legal": 12,
+    "first_rate": 0.0,
+    "games": 3,
+    "guard_forced_ends": 12,
+    "mean_rank": 8,
+    "ranks": [
+      8,
+      8,
+      8
+    ],
+    "selected_buy_actions": 0,
+    "top4_rate": 0.0
+  },
+  "model_sha256": "73bde2666426cecce39f135980a897bb2cd4a7d70783ba04c9c0d29477a6664a",
+  "new_training_steps": 0,
+  "paired_delta_rank_model_minus_baseline": [
+    2,
+    0,
+    0
+  ],
+  "release": "v2-learning-41413557445",
+  "schema": 1,
+  "seeds": [
+    89101,
+    89102,
+    89103
+  ],
+  "session_id": "s-20261102-90e24c7b",
+  "source_training_steps": 1280
+}

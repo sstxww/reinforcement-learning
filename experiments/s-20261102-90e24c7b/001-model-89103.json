@@ -1,0 +1,189 @@
+{
+  "action_family_counts": {
+    "cancel": 74,
+    "choose": 5,
+    "dark_gift": 3,
+    "end": 7,
+    "freeze": 50,
+    "play": 77,
+    "refresh": 21,
+    "sell": 2
+  },
+  "agent_id": "s-20261102-90e24c7b",
+  "buy_actions": 0,
+  "completed": true,
+  "decisions": 239,
+  "end_with_buy_available": 2,
+  "engine_source_hash": "6d8712c93022ba11",
+  "engine_version": "1.1.0",
+  "environment": "TavernGym",
+  "git_sha": "6d38ca15b7e6e920060b4e22c54d7db8ed847f1b",
+  "guard_forced_ends": 2,
+  "legal_buy_decisions": 101,
+  "legal_buy_turn_count": 7,
+  "legal_family_decisions": {
+    "activate": 2,
+    "buy": 101,
+    "cancel": 74,
+    "choose": 79,
+    "dark_gift": 7,
+    "end": 160,
+    "freeze": 151,
+    "hero_power": 96,
+    "play": 79,
+    "refresh": 103,
+    "sell": 104,
+    "upgrade": 93
+  },
+  "model_controlled_with_legal_end_guard": true,
+  "model_sha256": "73bde2666426cecce39f135980a897bb2cd4a7d70783ba04c9c0d29477a6664a",
+  "model_tag": "v2-learning-41413557445",
+  "note": "Opportunity counts are per decision, NOT independent purchase opportunities. Own-view fields never enter policy.",
+  "per_turn_own_view": {
+    "0": {
+      "buy_actions": 0,
+      "decisions": 1,
+      "end_with_buy_legal": 0,
+      "first_own_view": {
+        "board_size": 0,
+        "gold": 0,
+        "hand_size": 0,
+        "tier": 1
+      },
+      "guard_forced_ends": 0,
+      "legal_buy_decisions": 0
+    },
+    "1": {
+      "board_before_end": 0,
+      "buy_actions": 0,
+      "decisions": 14,
+      "end_with_buy_legal": 0,
+      "first_own_view": {
+        "board_size": 0,
+        "gold": 3,
+        "hand_size": 0,
+        "tier": 1
+      },
+      "gold_before_end": 0,
+      "guard_forced_ends": 0,
+      "legal_buy_decisions": 2
+    },
+    "2": {
+      "board_before_end": 0,
+      "buy_actions": 0,
+      "decisions": 15,
+      "end_with_buy_legal": 0,
+      "first_own_view": {
+        "board_size": 0,
+        "gold": 4,
+        "hand_size": 0,
+        "tier": 1
+      },
+      "gold_before_end": 0,
+      "guard_forced_ends": 0,
+      "legal_buy_decisions": 4
+    },
+    "3": {
+      "board_before_end": 0,
+      "buy_actions": 0,
+      "decisions": 16,
+      "end_with_buy_legal": 0,
+      "first_own_view": {
+        "board_size": 0,
+        "gold": 5,
+        "hand_size": 0,
+        "tier": 1
+      },
+      "gold_before_end": 0,
+      "guard_forced_ends": 0,
+      "legal_buy_decisions": 5
+    },
+    "4": {
+      "board_before_end": 0,
+      "buy_actions": 0,
+      "decisions": 19,
+      "end_with_buy_legal": 0,
+      "first_own_view": {
+        "board_size": 0,
+        "gold": 6,
+        "hand_size": 0,
+        "tier": 1
+      },
+      "gold_before_end": 0,
+      "guard_forced_ends": 0,
+      "legal_buy_decisions": 5
+    },
+    "5": {
+      "board_before_end": 0,
+      "buy_actions": 0,
+      "decisions": 20,
+      "end_with_buy_legal": 0,
+      "first_own_view": {
+        "board_size": 0,
+        "gold": 7,
+        "hand_size": 0,
+        "tier": 1
+      },
+      "gold_before_end": 0,
+      "guard_forced_ends": 0,
+      "legal_buy_decisions": 7
+    },
+    "6": {
+      "board_before_end": 1,
+      "buy_actions": 0,
+      "decisions": 77,
+      "end_with_buy_legal": 1,
+      "first_own_view": {
+        "board_size": 0,
+        "gold": 8,
+        "hand_size": 0,
+        "tier": 1
+      },
+      "gold_before_end": 3,
+      "guard_forced_ends": 1,
+      "legal_buy_decisions": 39
+    },
+    "7": {
+      "board_before_end": 1,
+      "buy_actions": 0,
+      "decisions": 77,
+      "end_with_buy_legal": 1,
+      "first_own_view": {
+        "board_size": 1,
+        "gold": 9,
+        "hand_size": 3,
+        "tier": 1
+      },
+      "gold_before_end": 9,
+      "guard_forced_ends": 1,
+      "legal_buy_decisions": 39
+    }
+  },
+  "placements": [
+    8,
+    1,
+    2,
+    3,
+    6,
+    4,
+    5,
+    7
+  ],
+  "policy": "model",
+  "schema": 1,
+  "seed": 89103,
+  "selected_with_family_legal": {
+    "cancel": 74,
+    "choose": 5,
+    "dark_gift": 3,
+    "end": 7,
+    "freeze": 50,
+    "play": 77,
+    "refresh": 21,
+    "sell": 2
+  },
+  "timestamp": "2026-11-02T10:37:48.619936+00:00",
+  "truncated_combats": 0,
+  "turn_limit_end": false,
+  "turns": 15
+}
