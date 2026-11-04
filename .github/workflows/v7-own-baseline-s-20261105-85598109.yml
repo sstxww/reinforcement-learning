@@ -1,0 +1,76 @@
+name: V7 isolated genuine baseline - s-20261105-85598109
+on:
+  push:
+    branches:
+      - 'agent/s-20261105-85598109/optimization-001'
+    paths-ignore:
+      - 'experiments/s-20261105-85598109/**'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: v7-s-20261105-85598109-own-baseline
+  cancel-in-progress: false
+
+jobs:
+  own-eight-seat-baseline:
+    if: "!contains(github.event.head_commit.message, '[skip ci]')"
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install tests and validate latest main-inherited code
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install -e '.[test]'
+          python -m pytest -q
+      - name: Install pinned and hash-verified genuine TavernGym
+        run: bash scripts/bootstrap_engine.sh
+      - name: Generate and validate one own authentic complete eight-seat game
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p experiments/s-20261105-85598109
+          python -m tavern_ai.canary --agent-id 's-20261105-85598109' \
+            --seed 117459 --policy baseline \
+            --receipt experiments/s-20261105-85598109/001-117459-baseline.json
+          python -m tavern_ai.validate_receipt experiments/s-20261105-85598109/001-117459-baseline.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p = Path('experiments/s-20261105-85598109/001-117459-baseline.json')
+          r = json.loads(p.read_text())
+          assert r['completed'] is True and r.get('turn_limit_end') is False
+          assert r['truncated_combats'] == 0
+          assert sorted(r['placements']) == list(range(1, 9))
+          assert r['policy'] == 'baseline'
+          assert r['seed'] == 117459
+          print('GENUINE_OWN_BASELINE_SEAT0_RANK:', r['placements'][0])
+          PY
+      - name: Commit original verified game receipt to own isolated branch only
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF" = 'refs/heads/agent/s-20261105-85598109/optimization-001'
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- experiments/s-20261105-85598109/001-117459-baseline.json
+          git diff --cached --quiet && { echo "expected newly generated receipt missing"; exit 1; }
+          git commit -m 'evidence(s-20261105-85598109): commit real eight-seat baseline seed117459 [skip ci]'
+          git push origin "HEAD:agent/s-20261105-85598109/optimization-001"
+      - name: Preserve original receipt as secondary expiring evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: s-20261105-85598109-genuine-baseline-${{ github.run_id }}
+          path: experiments/s-20261105-85598109/001-117459-baseline.json
+          if-no-files-found: ignore
+          retention-days: 30
