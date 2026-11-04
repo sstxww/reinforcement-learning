@@ -1,0 +1,15 @@
+{
+  "session_id": "s-20261105-c4df3b5a51",
+  "task_key": "train/strict-discrete-action-boundary",
+  "role": "REPAIRER",
+  "state": "held",
+  "base_main_sha": "c1b828734527bae6141805581693d890cc3bff94",
+  "owner_branch": "agent/s-20261105-c4df3b5a51/optimization-001",
+  "scope": [
+    "tavern_ai/env.py",
+    "tavern_ai/action_identity.py",
+    "tests/test_action_identity_s_20261105_c4df3b5a51.py"
+  ],
+  "issued_at": "2026-11-04T19:08:00Z",
+  "lease_policy": "task-specific ownership; not a main merge lease; release or handoff explicitly at round end"
+}
