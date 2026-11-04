@@ -2,7 +2,7 @@
   "session_id": "s-20261105-c4df3b5a51",
   "task_key": "train/strict-discrete-action-boundary",
   "role": "REPAIRER",
-  "state": "held",
+  "state": "released_handoff",
   "base_main_sha": "c1b828734527bae6141805581693d890cc3bff94",
   "owner_branch": "agent/s-20261105-c4df3b5a51/optimization-001",
   "scope": [
@@ -11,5 +11,13 @@
     "tests/test_action_identity_s_20261105_c4df3b5a51.py"
   ],
   "issued_at": "2026-11-04T19:08:00Z",
-  "lease_policy": "task-specific ownership; not a main merge lease; release or handoff explicitly at round end"
+  "lease_policy": "task-specific ownership; not a main merge lease; release or handoff explicitly at round end",
+  "handoff_pr": "https://github.com/sstxww/reinforcement-learning/pull/235",
+  "pr_head_sha": "61b2a3455c8bbc615f8675c85d28ab6f3e229e14",
+  "pr_ci_run": "https://github.com/sstxww/reinforcement-learning/actions/runs/41895349917",
+  "pr_ci_status": "completed_success",
+  "original_game_run": "https://github.com/sstxww/reinforcement-learning/actions/runs/41894584883",
+  "task_result": "strict action identity fixed; tests, PR-head CI and authentic baseline evidence verified",
+  "release_reason": "Work packaged in non-Draft PR #235; no active claim holder; available to an actual exclusive integrator",
+  "merge_authority": "not_acquired; Issue #182 proves CAS ref is cooperative only"
 }
