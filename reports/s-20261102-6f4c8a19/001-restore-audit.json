@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "checked_at": "2026-11-02T10:34:56.019957+00:00",
+  "model_id": "ppo-v2-1280-41413557445",
+  "role": "challenger",
+  "sha256": "73bde2666426cecce39f135980a897bb2cd4a7d70783ba04c9c0d29477a6664a",
+  "release_tag": "v2-learning-41413557445",
+  "source_commit": "ad1bf93498ab5a310e0f4557dde1df7a97bf85fb",
+  "total_timesteps": 1280,
+  "engine": {
+    "version": "1.1.0",
+    "source_hash": "6d8712c93022ba11",
+    "features": 4017,
+    "cards": 447,
+    "actions": 245,
+    "n_cards": 3984
+  },
+  "metadata_schema": 2,
+  "v2_compatibility_verified": true,
+  "optimizer_state": "loaded_nonempty",
+  "status": "load_and_optimizer_verified",
+  "eligible_for_champion": false,
+  "notes": "Recovery verification does not establish match strength or safe model promotion."
+}
