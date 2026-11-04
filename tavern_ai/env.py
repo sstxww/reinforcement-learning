@@ -4,6 +4,7 @@ import gymnasium as gym
 import numpy as np
 from gymnasium import spaces
 from .contract import FEATURES,CARDS,ACTIONS,verify_engine
+from .action_identity import require_discrete_action
 
 class TavernEnv(gym.Env):
     metadata={"render_modes":[]}
@@ -40,7 +41,7 @@ class TavernEnv(gym.Env):
         obs,info=self.game.reset(seed=int(seed))
         return self._map(obs),info
     def step(self,action):
-        action=int(action)
+        action=require_discrete_action(action)
         if action<0 or action>=ACTIONS or not self._mask[action]:
             raise ValueError(f"Illegal action: {action}")
         obs,reward,terminated,truncated,info=self.game.step(action)
