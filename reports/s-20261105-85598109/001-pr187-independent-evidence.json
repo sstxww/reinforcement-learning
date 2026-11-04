@@ -1,0 +1,95 @@
+{
+  "schema": 1,
+  "session_id": "s-20261105-85598109",
+  "round": 1,
+  "task_key": "review/pr187-evidence",
+  "review_id": 5774195418,
+  "pr": 187,
+  "pr_head": "cb7249e47399f90a55fca5038ce4de4302490ba0",
+  "main_sha": "c1b828734527bae6141805581693d890cc3bff94",
+  "ci": {
+    "run_id": 41515486403,
+    "status": "completed",
+    "conclusion": "success",
+    "test_count_passed": 395,
+    "test_count_skipped": 1,
+    "policy": "baseline",
+    "seed": 1001,
+    "seat0_rank": 7,
+    "completed": true
+  },
+  "source_training": {
+    "run_id": 41512678144,
+    "parent_steps": 1408,
+    "added_steps": 128,
+    "child_steps": 1536,
+    "owner": "original PR #187, NOT reviewing session"
+  },
+  "paired": {
+    "run_id": 41513659254,
+    "seeds": [
+      97832,
+      97833
+    ],
+    "seat": 0,
+    "model_ranks": [
+      8,
+      8
+    ],
+    "baseline_ranks": [
+      2,
+      6
+    ],
+    "n": 2,
+    "policy": "raw_model",
+    "improvement_verified": false
+  },
+  "child_model": {
+    "release_tag": "v7-rejected-s-20261103-581c69c0-r001-d6771d4439d1",
+    "sha256": "d6771d4439d1deb64231edd4caaf9ebbc8cd2f8db667c94b19a8c144b968b096",
+    "durable": true,
+    "role": "rejected_unpromoted"
+  },
+  "own_training_steps": 0,
+  "own_model_match": null,
+  "merge_performed": false,
+  "merge_blocker": "main unprotected, no rulesets, no globally exclusive merge entry, Issue #182 CAS-bypass",
+  "own_game": {
+    "run_id": 41894485131,
+    "job_id": 126800246252,
+    "head_sha": "7afc459d76d04ee1f25d28158bc1f7ed2f7caf74",
+    "status": "completed",
+    "conclusion": "success",
+    "engine": "TavernGym 1.1.0",
+    "engine_source_hash": "6d8712c93022ba11",
+    "policy": "baseline",
+    "seed": 117459,
+    "agent_id": "s-20261105-85598109",
+    "seat": 0,
+    "placement": 7,
+    "placements": [
+      7,
+      1,
+      5,
+      6,
+      3,
+      2,
+      8,
+      4
+    ],
+    "turns": 18,
+    "decisions": 47,
+    "completed": true,
+    "truncated_combats": 0,
+    "turn_limit_end": false,
+    "receipt_path": "experiments/s-20261105-85598109/001-117459-baseline.json",
+    "receipt_git_blob": "8132962ed26afcba90a3847063da810a79ff72c6",
+    "artifact_id": 13353459949,
+    "artifact_expires_at": "2026-12-04T19:13:22Z"
+  },
+  "followup_review": {
+    "comment_id": 6639679985,
+    "issue": "schema=true accepted as 1 in PR187; #196/#202 type-check schema, avoid duplicate trainer merges",
+    "fix_verified": false
+  }
+}
