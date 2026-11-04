@@ -53,5 +53,43 @@
   "own_training_steps": 0,
   "own_model_match": null,
   "merge_performed": false,
-  "merge_blocker": "main unprotected, no rulesets, no globally exclusive merge entry, Issue #182 CAS-bypass"
+  "merge_blocker": "main unprotected, no rulesets, no globally exclusive merge entry, Issue #182 CAS-bypass",
+  "own_game": {
+    "run_id": 41894485131,
+    "job_id": 126800246252,
+    "head_sha": "7afc459d76d04ee1f25d28158bc1f7ed2f7caf74",
+    "status": "completed",
+    "conclusion": "success",
+    "engine": "TavernGym 1.1.0",
+    "engine_source_hash": "6d8712c93022ba11",
+    "policy": "baseline",
+    "seed": 117459,
+    "agent_id": "s-20261105-85598109",
+    "seat": 0,
+    "placement": 7,
+    "placements": [
+      7,
+      1,
+      5,
+      6,
+      3,
+      2,
+      8,
+      4
+    ],
+    "turns": 18,
+    "decisions": 47,
+    "completed": true,
+    "truncated_combats": 0,
+    "turn_limit_end": false,
+    "receipt_path": "experiments/s-20261105-85598109/001-117459-baseline.json",
+    "receipt_git_blob": "8132962ed26afcba90a3847063da810a79ff72c6",
+    "artifact_id": 13353459949,
+    "artifact_expires_at": "2026-12-04T19:13:22Z"
+  },
+  "followup_review": {
+    "comment_id": 6639679985,
+    "issue": "schema=true accepted as 1 in PR187; #196/#202 type-check schema, avoid duplicate trainer merges",
+    "fix_verified": false
+  }
 }
