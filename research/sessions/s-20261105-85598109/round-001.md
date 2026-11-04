@@ -16,3 +16,9 @@ One-shot bounded baseline Actions on own isolated branch; own PPO steps 0, own m
 
 ## Success/failure distinction and next action
 Review completed and recorded on live PR; no main merge, no new training, no own completed match at the initial snapshot. First handoff action: verify own real game output and exact finalized HEAD Actions; then pass #187 to a single demonstrably exclusive integrator.
+
+## Final authenticated own run (not inherited from #187)
+Actions #41894485131: completed SUCCESS, job #126800246252; original one-shot workflow head 7afc459d76d04ee1f25d28158bc1f7ed2f7caf74. Genuine pinned TavernGym 1.1.0 eight-seat baseline seed 117459, agent s-20261105-85598109, completed true, 18 turns, 47 decisions, placements [7,1,5,6,3,2,8,4], controlled rank 7, no truncation, no turn-limit ending. Original JSON in experiments/s-20261105-85598109/001-117459-baseline.json, blob 8132962ed26afcba90a3847063da810a79ff72c6. Immutable run artifact #13353459949, expiring 2026-12-04. Own PPO training 0; no new checkpoint, optimizer, Release or model rank; one-shot workflow removed from final PR diff after successful run.
+
+## Distinct code review finding after comparing overlapping PRs
+[#187 comment](https://github.com/sstxww/reinforcement-learning/pull/187#issuecomment-6639679985): `schema=True` reaches `parent.get("schema") == 1` in #187's shared metadata helper and is accepted as schema 1; wrong-type signed metadata can bypass schema-2 provenance validation. #196/#202 guard with `type(schema) is int`; #196 also checks `increment_timesteps` bounds. Integrate one reviewed fix with regression, not all three overlapping trainers. This finding comes from exact source comparison, not a claimed local test result.
